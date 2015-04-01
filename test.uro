@@ -1,0 +1,7 @@
+data Nat where
+  Zero():Nat
+  Succ(Nat):Nat
+
+function add(Nat,Nat):Nat where
+  add(Zero(),n) = n
+  add(Succ(n),m) = Succ(add(n,m))

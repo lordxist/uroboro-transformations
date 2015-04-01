@@ -1,0 +1,18 @@
+name:                uroboro-transformations
+version:             0.0
+-- license:
+-- license-file:
+-- description:      
+author:              Julian Jabs
+build-type:          Simple
+cabal-version:       >=1.10
+
+library
+  exposed-modules:   PrettyPrint
+  build-depends:     base >= 4.7 && < 4.8, uroboro
+  default-language:  Haskell2010
+
+executable uroboro-transformations
+  main-is:           Main.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro
+  default-language:  Haskell2010
