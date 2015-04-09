@@ -1,0 +1,31 @@
+-- meta-interpreter
+-- for the pure untyped lambda calculus
+
+data Nat where
+  zero() : Nat
+  succ(Nat) : Nat
+
+data Exp where
+  app(Exp, Exp) : Exp
+  fun(Exp) : Exp
+  var(Nat) : Exp
+
+codata Val where
+  Val.apply(Val) : Val
+
+codata Env where
+  Env.lookup(Nat) : Val
+
+function nil() : Env where
+
+function cons(Val, Env) : Env where
+  cons(val, env).lookup(zero()) = val
+  cons(val, env).lookup(succ(nat)) = env.lookup(nat)
+
+function eval(Exp, Env) : Val where
+  eval(app(exp1, exp2), env) = eval(exp1, env).apply(eval(exp2, env))
+  eval(fun(exp), env).apply(val) = eval(exp, cons(val, env))
+  eval(var(nat), env) = env.lookup(nat)
+
+function interpret(Exp) : Val where
+  interpret(exp) = eval(exp, nil())
