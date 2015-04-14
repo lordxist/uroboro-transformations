@@ -13,7 +13,7 @@ import UroboroTransformations
 -- For this to work, uroboro.cabal needs to be edited to expose Uroboro.PrettyPrint
 main :: IO ()
 main = do
-    let path = "eval1.uro"
+    let path = "failure.uro"
     input <- readFile path
     putStrLn $ "Defunctionalizing " ++ path ++ " ..."
     let ptsOrError = parseFile path input

@@ -76,7 +76,11 @@ Note: More detailed notes are available in a separate file.
 
 \item $\langle arg^*, prg \rangle^{gensym}$ simply maps $arg^*$ uniquely to a fresh (in $prg$) identifier.
 
-\item Implemented in \texttt{UroboroTransformations.defunc}.
+\item $\langle p \rangle^{name\_pattern}$ gives a pattern a unique name, unique modulo the variable names.
+
+\item $\langle p \rangle^{vars}$ gives all variables appearing in the pattern (from left to right) as a list.
+
+\item Implemented in \texttt{UroboroTransformations.defunc}. TODO: Reflect the changes in $extract\_des$.
 \end{itemize}
 
 Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle prg \rangle^{extract\_des} \rangle^{d'}$
@@ -84,14 +88,17 @@ Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle prg \rangle
 Extract destructor calls from mixed function defs into helper functions:
 \begin{alignat*}{3}
 \langle prg \rangle^{extract\_des} & = ~&&\{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n):\sigma \textrm{\textbf{ where }} \\
-& && && \{ fun(p_1(x_{1,1}, ..., x_{1,k_1}), ..., p_n(x_{n,1}, ..., x_{n,k_n})) = \\
-& && &&\quad \langle fun, `` \textrm{extract} ", prg \rangle^{gensym}(x_{1,1}, ..., x_{n,k_n}) \\
-& && && | ~ `` fun(p_1(...), ..., p_n(...)).des(p'_1, ..., p'_k) = t " \in eqns \} \\
-& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \textrm{ with mixed } eqns \} \\
-&\cup && \{ && \textrm{\textbf{function }} \langle fun, `` \textrm{extract} ", prg \rangle^{gensym} (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && \{ \langle fun, `` \textrm{extract} ", prg \rangle^{gensym}(x_{1,1}, ..., x_{n,k_n}).des(p'_1, ..., p'_k) = t \\
-& && && | ~ `` fun(p_1(x_{1,1},...,x_{1,k_1}), ..., p_n(x_{n,1}, ..., x_{n,k_n})).des(p'_1, ..., p'_k) = t " \in eqns \} \\
-& && | && `` \textrm{\textbf{ function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \textrm{ with mixed } eqns \} \\
+& && && \{ fun(p_1, ..., p_n) = \\
+& && &&\quad \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{gensym}(\langle p_1 \rangle^{vars}, ..., \langle p_n \rangle^{vars}) \\
+& && && | ~ `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \in eqns \} \\
+& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with mixed } eqns \} \\
+&\cup && \{ && \textrm{\textbf{function }} \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{gensym} (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && \{ \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{gensym}(\\
+& && &&\quad \langle p_1 \rangle^{vars}, ..., \langle p_n \rangle^{vars} \\
+& && &&\quad ).des(p'_1, ..., p'_k) = t \\
+& && && | ~ `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \in eqns \} \\
+& && | && `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \in eqns \textrm{ with } \\
+& && &&\quad `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma " \in prg, eqns \textrm{ mixed } \} \\
 &\cup && \{ && def ~ | ~ def \in prg, ~ def \textrm{ is (co)data definition or non-mixed function def. } \}
 \end{alignat*}
 

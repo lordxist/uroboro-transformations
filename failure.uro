@@ -1,0 +1,18 @@
+codata Val where
+  Val.apply(Val) : Val
+
+function nilval(): Val where
+
+data Nat where
+  zero() : Nat
+  succ(Nat) : Nat
+
+data Exp where
+  app(Exp, Exp) : Exp
+  fun(Exp) : Exp
+  var(Nat) : Exp
+
+function eval(Exp): Val where
+  eval(app(exp1, exp2)).apply(val) = val
+  eval(fun(exp)).apply(val) = val
+  eval(var(nat)) = nilval()
