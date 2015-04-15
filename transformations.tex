@@ -32,6 +32,7 @@
 % These packages are all incorporated in the memoir class to one degree or another...
 
 \usepackage{amsmath}
+\usepackage{listings}
 
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
@@ -50,6 +51,10 @@
 \usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
 \renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
 \renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+\lstset{
+frame = single
+}
 
 %%% END Article customizations
 
@@ -74,7 +79,7 @@ Note: More detailed notes are available in a separate file.
 
 \item In the following, a function definition (or its equations) is called mixed if it has both destructor and hole patterns.
 
-\item $\langle arg^*, prg \rangle^{gensym}$ simply maps $arg^*$ uniquely to a fresh (in $prg$) identifier.
+\item $\langle arg^*, prg \rangle^{autogen}$ simply maps $arg^*$ uniquely to a fresh (in $prg$) identifier.
 
 \item $\langle p \rangle^{name\_pattern}$ gives a pattern a unique name, unique modulo the variable names.
 
@@ -83,6 +88,19 @@ Note: More detailed notes are available in a separate file.
 \item $\langle p, \tau \rangle^{vartypes}$ gives the types of the variables appearing in the pattern (from left to right) by going recursively through the pattern's constructor calls. If the pattern $p$ is a variable itself, returns only $\tau$.
 
 \item Implemented in \texttt{UroboroTransformations.defunc}. (But see the comments before \texttt{roboroTransformations.MixedDefs.Defunc.namePattern} and \texttt{constructorTypes} for limitations.)
+
+\item For the examples below the following data types will be used (as if they were in a standard library):
+\begin{lstlisting}
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+data Bool where
+  true(): Bool
+  false(): Bool
+
+\end{lstlisting}
 \end{itemize}
 
 Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle prg \rangle^{extract\_des} \rangle^{d'}$
@@ -91,13 +109,13 @@ Extract destructor calls from mixed function defs into helper functions:
 \begin{alignat*}{3}
 \langle prg \rangle^{extract\_des} & = ~&&\{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n):\sigma \textrm{\textbf{ where }} \\
 & && && \{ fun(p_1, ..., p_n) = \\
-& && &&\quad \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{gensym}(\langle p_1 \rangle^{vars}, ..., \langle p_n \rangle^{vars}) \\
+& && &&\quad \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle p_1 \rangle^{vars}, ..., \langle p_n \rangle^{vars}) \\
 & && && | ~ `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \in eqns \} \\
 & && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with mixed } eqns \} \\
-&\cup && \{ && \textrm{\textbf{function }} \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{gensym} (\\
+&\cup && \{ && \textrm{\textbf{function }} \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{autogen} (\\
 & && &&\quad \langle p_1, \tau_1 \rangle^{vartypes}, ..., \langle p_n, \tau_n \rangle^{vartypes} \\
 & && &&): \sigma \textrm{\textbf{ where }} \\
-& && && \{ \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{gensym}(\\
+& && && \{ \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{autogen}(\\
 & && &&\quad \langle p_1 \rangle^{vars}, ..., \langle p_n \rangle^{vars} \\
 & && &&\quad ).des(p'_1, ..., p'_k) = t \\
 & && && | ~ `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \in eqns \} \\
@@ -106,12 +124,51 @@ Extract destructor calls from mixed function defs into helper functions:
 &\cup && \{ && def ~ | ~ def \in prg, ~ def \textrm{ is (co)data definition or non-mixed function def. } \}
 \end{alignat*}
 
+Example:
+
+\begin{lstlisting}  
+
+codata List where
+  List.elemAt(Nat): Nat
+  List.isEmpty(): Bool
+
+function foo(Nat): List where
+  foo(zero()) = bar()
+  foo(succ(zero())) = bar()
+  foo(succ(succ(n))).elemAt(m) = n
+
+function bar(): List where
+  bar().elemAt(n) = zero()
+  bar().isEmpty() = true()
+
+\end{lstlisting}
+
+... is transformed to:
+
+\begin{lstlisting}[mathescape]
+
+codata List where
+  ...
+
+function foo(Nat): List where
+  foo(zero()) = bar()
+  foo(succ(zero)) = bar()
+  foo(succ(succ(n))) = $\langle foo(succ(succ(\_))) \rangle^{name\_pattern}$(n)
+
+function $\langle foo(succ(succ(\_))) \rangle^{name\_pattern}$(Nat): List where
+  $\langle foo(succ(succ(\_))) \rangle^{name\_pattern}$(n).elemAt(m) = n
+
+function bar(): List where
+  ...
+
+\end{lstlisting}
+
 Defunctionalizing programs without mixed function defs: $\langle prg \rangle^{d'} = \langle \langle prg \rangle^{disentangle} \rangle^{d''}$
 
 Disentangling (extract undesired pattern matching into helper functions):
 \begin{alignat*}{3}
 \langle prg \rangle^{disentangle} & = ~&&\{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && \{ fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = \langle fun, des, prg \rangle^{gensym}(x_1, ..., x_n, x'_1, ..., x'_k) \\
+& && && \{ fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = \langle fun, des, prg \rangle^{autogen}(x_1, ..., x_n, x'_1, ..., x'_k) \\
 & && && | ~ `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = ... " \in eqns \textrm{ with } \\
 & && &&\quad \exists p \in \{p_1, ..., p_n, p'_1, ..., p'_k\}: p \textrm{ is constructor application} \} \\
 & && \cup && \{ fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t \\
@@ -119,14 +176,44 @@ Disentangling (extract undesired pattern matching into helper functions):
 & && &&\quad \not\exists p \in \{p_1, ..., p_n, p'_1, ..., p'_k\}: p \textrm{ is constructor application} \} \\
 & && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } eqns \neq \emptyset \textrm{ and } \\
 & && &&\quad \forall e \in eqns: e \textrm{ has destructor pattern }  \} \\
-&\cup && \{ && \textrm{\textbf{function }} \langle fun, des, prg \rangle^{gensym}(\sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k): \sigma \textrm{\textbf{ where }} \\
-& && && \{ \langle fun, des, prg \rangle^{gensym}(p_1, ..., p_n, p'_1, ..., p'_k) = t \\
+&\cup && \{ && \textrm{\textbf{function }} \langle fun, des, prg \rangle^{autogen}(\sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k): \sigma \textrm{\textbf{ where }} \\
+& && && \{ \langle fun, des, prg \rangle^{autogen}(p_1, ..., p_n, p'_1, ..., p'_k) = t \\
 & && && | ~ `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \in eqns \} \\
 & && | && `` \textrm{\textbf{function }} fun(\sigma_1, ..., \sigma_n): \tau \textrm{\textbf{ where }} eqns ", `` \tau.des(\sigma'_1,...,\sigma'_k): \sigma " \in prg \\
 & && &&\quad \textrm{ with } \exists e \in eqns: e = `` fun(p_1, ..., p_n).des(p'_1,..., p'_k) = t ", \\
 & && &&\qquad \exists p \in \{p_1, ..., p_n, p'_1, ..., p'_k\}: p \textrm{ is constructor application } \} \\
 & \cup && \{ && def ~ | ~ def \in prg, def \textrm{ is (co)data def. or function def. without destructor patterns } \}
 \end{alignat*}
+
+Example:
+
+\begin{lstlisting}
+
+codata List where
+  List.elemAt(Nat): Nat
+  List.isEmpty(): Bool
+
+function repeat(Nat): List where
+  repeat(zero()).elemAt(n) = zero()
+  repeat(succ(m)).elemAt(n) = succ(m)
+
+\end{lstlisting}
+
+... is transformed to:
+
+\begin{lstlisting}[mathescape]
+
+codata List where
+  ...
+
+function repeat(Nat): List where
+  repeat(x0).elemAt(x1) = $\langle repeat, elemAt \rangle^{autogen}$(x0, x1)
+
+function $\langle repeat, elemAt \rangle^{autogen}$(Nat, Nat): Nat
+  $\langle repeat, elemAt \rangle^{autogen}$(zero(), n) = zero()
+  $\langle repeat, elemAt \rangle^{autogen}$(succ(m), n) = succ(m)
+
+\end{lstlisting}
 
 Actual defunctionalization (for programs without mixed function defs and without constructor applications in destructor patterns):
 \begin{alignat*}{3}
@@ -143,6 +230,41 @@ Actual defunctionalization (for programs without mixed function defs and without
 & \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ p = \langle t \rangle^d ~ | ~ "p = t" \in eqns \} \\
 & && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } \forall e \in eqns: e \textrm{ has hole pattern}\} 
 \end{alignat*}
+
+Example:
+
+\begin{lstlisting}
+
+codata List where
+  List.elemAt(Nat): Nat
+  List.isEmpty(): Bool
+
+function repeat(Nat): List where
+  repeat(n).elemAt(m) = n
+  repeat(n).isEmpty() = false()
+
+function retrieve(List, Nat) where
+  retrieve(ls, n) = ls.elemAt(n)
+
+\end{lstlisting}
+
+... is transformed to:
+
+\begin{lstlisting}
+
+data List where
+  repeat(Nat): List
+
+function elemAt(List, Nat): Nat
+  elemAt(repeat(n), m) = n
+
+function isEmpty(List): Bool
+  isEmpty(repeat(n)) = false()
+
+function retrieve(List, Nat) where
+  retrieve(ls, n) = elemAt(ls, n)
+
+\end{lstlisting}
 
 Defunctionalizing terms: \\
 $\langle x \rangle^d = x$ \\
