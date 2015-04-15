@@ -14,7 +14,7 @@ isMixedRules (PTFun _ _ _ _ rs) =
 isMixedRules _ = False
 
 collectVars :: PP -> [PP]
-collectVars (PPCon _ _ pps) = pps
+collectVars (PPCon _ _ pps) = concatMap collectVars pps
 collectVars v = [v]
 
 helperFunRule :: Identifier -> PTRule -> PTRule
