@@ -80,7 +80,7 @@ Note: More detailed notes are available in a separate file.
 
 \item $\langle p \rangle^{vars}$ gives all variables appearing in the pattern (from left to right) as a list.
 
-\item $\langle p \rangle^{vartypes}$ gives the types of the variables appearing in the pattern (from left to right) by going recursively through the pattern's constructor calls.
+\item $\langle p, \tau \rangle^{vartypes}$ gives the types of the variables appearing in the pattern (from left to right) by going recursively through the pattern's constructor calls. If the pattern $p$ is a variable itself, returns only $\tau$.
 
 \item Implemented in \texttt{UroboroTransformations.defunc}. (But see the comments before \texttt{roboroTransformations.MixedDefs.Defunc.namePattern} and \texttt{constructorTypes} for limitations.)
 \end{itemize}
@@ -95,7 +95,7 @@ Extract destructor calls from mixed function defs into helper functions:
 & && && | ~ `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \in eqns \} \\
 & && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with mixed } eqns \} \\
 &\cup && \{ && \textrm{\textbf{function }} \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{gensym} (\\
-& && &&\quad \langle p_1 \rangle^{vartypes}, ..., \langle p_n \rangle^{vartypes} \\
+& && &&\quad \langle p_1, \tau_1 \rangle^{vartypes}, ..., \langle p_n, \tau_n \rangle^{vartypes} \\
 & && &&): \sigma \textrm{\textbf{ where }} \\
 & && && \{ \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{gensym}(\\
 & && &&\quad \langle p_1 \rangle^{vars}, ..., \langle p_n \rangle^{vars} \\
