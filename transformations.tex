@@ -82,7 +82,7 @@ Note: More detailed notes are available in a separate file.
 
 \item $\langle p \rangle^{vartypes}$ gives the types of the variables appearing in the pattern (from left to right) by going recursively through the pattern's constructor calls.
 
-\item Implemented in \texttt{UroboroTransformations.defunc}. TODO: Reflect the changes in $extract\_des$.
+\item Implemented in \texttt{UroboroTransformations.defunc}. (But see the comments before \texttt{roboroTransformations.MixedDefs.Defunc.namePattern} and \texttt{constructorTypes} for limitations.)
 \end{itemize}
 
 Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle prg \rangle^{extract\_des} \rangle^{d'}$
