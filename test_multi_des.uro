@@ -1,0 +1,16 @@
+-- Test for multiple destructors in a pattern
+
+codata A where
+  A.desa1(): A
+  A.desa2(): B
+
+data B where
+  conb1(): B
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+function multi(A, Nat):A where
+  multi(a, zero()).desa1().desa2() = conb1()
+  multi(a, succ(n)).desa1() = multi(a, n)

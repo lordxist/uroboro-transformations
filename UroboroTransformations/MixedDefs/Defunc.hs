@@ -13,42 +13,10 @@ isMixedRules (PTFun _ _ _ _ rs) =
     (any EntangledD.illegalDesPatternRule rs) && (any EntangledD.illegalHolePatternRule rs)
 isMixedRules _ = False
 
-collectVars :: PP -> [PP]
-collectVars (PPCon _ _ pps) = concatMap collectVars pps
-collectVars v = [v]
-
 helperFunRule :: Identifier -> PTRule -> PTRule
 helperFunRule id (PTRule l (PQDes l' id' pps (PQApp l'' _ pps')) e) =
     PTRule l (PQDes l' id' pps (PQApp l'' id (concatMap collectVars pps'))) e
 helperFunRule _ _ = undefined
-
--- Problem: not a unique mapping. Can be made to be one, but ideally the names should then
--- be simplified to a nicer form whenever there are no conflicts.
-namePattern :: PQ -> String
-namePattern (PQApp _ id pps) = id ++ "_" ++ (intercalate "__" (map namePPPattern pps))
-
-namePPPattern :: PP -> String
-namePPPattern (PPVar _ _) = ""
-namePPPattern (PPCon _ id pps) = id ++ "_" ++ (intercalate "__" (map namePPPattern pps))
-
--- Requires globally unique constructor names. Otherwise collectVarTypes needs to be implemented
--- using typed syntax trees (and the transformation is run on the typecheck result).
-constructorTypes :: Identifier -> [PT] -> [Type]
-constructorTypes id pts = types ((concatMap getConstructorForId pts) !! 0)
-  where
-    getConstructorForId (PTPos l t ((con@(PTCon _ _ id' _)):cons))
-        | id' == id = [con]
-        | otherwise = getConstructorForId (PTPos l t cons)
-    getConstructorForId _ = []
-
-    types (PTCon _ _ _ ts) = ts
-
-collectVarTypes :: [PT] -> [Type] -> PQ -> [Type]
-collectVarTypes pts ts (PQApp _ _ pps) = concatMap varTypes (zip pps ts)
-  where
-    varTypes ((PPVar _ _), t)       = [t]
-    varTypes ((PPCon _ id pps'), _) = concatMap varTypes (zip pps' (constructorTypes id pts))
-collectVarTypes _ _ _ = undefined
 
 helperFun :: [PT] -> (PT, [PTRule]) -> PT
 helperFun pts ((PTFun _ _ ts t _), rs@((PTRule l (PQDes _ _ _ pq) _):_)) =
