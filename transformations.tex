@@ -119,7 +119,7 @@ Extract outer destructor calls (a destructor call after a destructor call) into 
 & && \cup &&\{ e ~ | ~ e \in eqns \textrm{ without outer destructor call in pattern } \} \\
 & && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
 &\cup && \{ && \textrm{\textbf{function }} \langle `` \textrm{extract} ", \langle q \rangle^{name\_pattern}, prg \rangle^{autogen} (\langle q \rangle^{vartypes}): \tau \textrm{\textbf{ where }} \\
-& && && \{ \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}).des'(p''_1, ..., p''_k) = t' \\
+& && && \{ \langle `` \textrm{extract} ", \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}).des'(p''_1, ..., p''_k) = t' \\
 & && && | ~ `` q.des'(p''_1, ..., p''_k) = t' " \in eqns \} \\
 & && | && ``q.des(p'_1, ..., p'_k) = t " \in eqns \textrm{ with }\\
 & && &&\quad `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns" \in prg,\\
