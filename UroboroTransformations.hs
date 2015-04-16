@@ -76,6 +76,5 @@ elimMultiDes pts
     | otherwise                = pts
 
 -- |Defunctionalize an Uroboro program
--- At the moment, doesn't work with copatterns with multiple destructor calls
 defunc :: [PT] -> Maybe [PT]
 defunc pts = EntangledD.defuncLegal $ MixedDefsD.desExtract $ elimMultiDes pts
