@@ -8,23 +8,25 @@ import Uroboro.Checker
 
 import UroboroTransformations
 
+import System.IO
+import System.Environment
+
 -- |At the moment this is just a test: 
--- parses, typechecks, defuncs eval1.uro, then typechecks and pretty-prints result
+-- parses, typechecks, defuncs the input, then typechecks and pretty-prints result
 -- For this to work, uroboro.cabal needs to be edited to expose Uroboro.PrettyPrint
 main :: IO ()
 main = do
-    let path = "eval1.uro"
-    input <- readFile path
-    putStrLn $ "Defunctionalizing " ++ path ++ " ..."
-    let ptsOrError = parseFile path input
+    input <- getContents
+    hPutStrLn stderr "Defunctionalizing... "
+    let ptsOrError = parseFile "stdin" input
     case ptsOrError of
-        Left e -> putStrLn $ unlines ["Parse Error: ", show e]
+        Left e -> hPutStrLn stderr $ unlines ["Parse Error: ", show e]
         Right pts -> case typecheck pts of
-            Left e -> putStrLn $ unlines ["Typecheck Error: ", show e]
+            Left e -> hPutStrLn stderr $ unlines ["Typecheck Error: ", show e]
             Right _p -> do
                 case defunc pts of
-                    Nothing -> putStrLn $ "Transform Error: Not in correct Fragment"
+                    Nothing -> hPutStrLn stderr $ "Transform Error: Not in correct Fragment"
                     Just t -> case typecheck t of
-                        Left e -> putStrLn $ unlines ["Typecheck Error in transformed program: ", show e]
+                        Left e -> hPutStrLn stderr $ unlines ["Typecheck Error in transformed program: ", show e]
                         Right _ -> putStrLn $ renderProgram t
-    putStrLn "Ready."
+    hPutStrLn stderr "Ready."
