@@ -16,20 +16,6 @@ con :: PP -> Bool
 con (PPCon _ _ _) = True
 con _             = False
 
-isEntangledDesRule :: PTDes -> PTRule -> Bool
-isEntangledDesRule des (PTRule _ (PQDes _ id pps (PQApp _ _ pps')) _) =
-    (id == (desIdentifier des)) && (any con (pps ++ pps'))
-isEntangledDesRule _ _ = False
-
-entangledDesRulesInPT :: PTDes -> PT -> [([PTRule], PT)]
-entangledDesRulesInPT des fun@(PTFun _ _ _ _ rs)
-    | any (isEntangledDesRule des) rs = [(filter (isEntangledDesRule des) rs, fun)]
-    | otherwise = []
-entangledDesRulesInPT _ _ = []
-
-entangledDesRules :: [PT] -> PTDes -> ([([PTRule], PT)], PTDes)
-entangledDesRules pts des = (concatMap (entangledDesRulesInPT des) pts, des)
-
 newtype HelperFuns = HelperFuns { getHelperFuns :: [PT] }
 
 instance Monoid HelperFuns where
