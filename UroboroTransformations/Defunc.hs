@@ -8,48 +8,19 @@ import qualified UroboroTransformations.FragmentsForDefunc.MixedDefs.Defunc as M
 import qualified UroboroTransformations.FragmentsForDefunc.Entangled.Defunc as EntangledD
 
 import UroboroTransformations.Util
+import UroboroTransformations.Util.HelperFuns
 
-import Data.List(groupBy)
+import Control.Monad(liftM)
+import Control.Monad.Trans.Writer.Lazy
 
-helperFunRule :: Identifier -> PTRule -> PTRule
-helperFunRule id (PTRule l (PQDes l' id' pps pq@(PQDes l'' _ _ _)) e) =
-    PTRule l (PQDes l' id' pps (PQApp l'' id (collectVarsPQ pq))) e
-helperFunRule _ _ = undefined
-
-helperFun :: [PT] -> (PT, [PTRule]) -> PT
-helperFun pts ((PTFun _ _ ts t _), rs@((PTRule l (PQDes _ _ _ pq@(PQDes _ des _ _)) _):_)) =
-    PTFun l helperFunId (collectVarTypes pts ts pq) (destructorReturnType des pts) (map (helperFunRule helperFunId) rs)
+helperFun :: [PT] -> PT -> PTRule -> HelperFuns
+helperFun pts (PTFun _ _ ts t _) (PTRule l (PQDes l' id' pps pq@(PQDes l'' des _ _)) e) =
+    HelperFuns $ [PTFun l helperFunId (collectVarTypes pts ts pq) (destructorReturnType des pts) [r]]
   where
     helperFunId = gensym "extract" (namePattern pq) pts
-helperFun _ _ = undefined
 
-helperFuns :: [PT] -> [PT]
-helperFuns pts = map (helperFun pts) $ concatMap outerDesRulesGroupedByPattern $ filter isFun pts
-  where
-    outerDesRulesGroupedByPattern fun@(PTFun _ _ _ _ rs) =
-        map ((,) fun) $ groupBy hasSamePatternAs $ filter isOuterDesRule rs
-
-    isOuterDesRule (PTRule _ (PQDes _ _ _ (PQDes _ _ _ _)) _) = True
-    isOuterDesRule _ = False
-
-    hasSamePatternAs :: PTRule -> PTRule -> Bool
-    (PTRule _ (PQDes _ _ _ pq) _) `hasSamePatternAs` (PTRule _ (PQDes _ _ _ pq') _) =
-        pq `isSamePatternAs` pq'
-    _ `hasSamePatternAs` _ = False
-
-    isSamePatternAs :: PQ -> PQ -> Bool
-    (PQApp _ _ pps) `isSamePatternAs` (PQApp _ _ pps') = and $ zipWith isSamePPPatternAs pps pps'
-    (PQDes _ _ pps pq) `isSamePatternAs` (PQDes _ _ pps' pq') =
-        (and $ zipWith isSamePPPatternAs pps pps') && (pq `isSamePatternAs` pq')
-
-    isSamePPPatternAs :: PP -> PP -> Bool
-    (PPVar _ _) `isSamePPPatternAs` (PPVar _ _) = True
-    (PPCon _ id pps) `isSamePPPatternAs` (PPCon _ id' pps') =
-        (id == id') && (and $ zipWith isSamePPPatternAs pps pps')
-    _ `isSamePPPatternAs` _ = False
-
-    isFun (PTFun _ _ _ _ _) = True
-    isFun _ = False
+    r = PTRule l (PQDes l' id' pps (PQApp l'' helperFunId (collectVarsPQ pq))) e
+helperFun _ _ _ = undefined
 
 containsMultiDes :: PT -> Bool
 containsMultiDes (PTFun _ _ _ _ rs) = any ruleContainsMultiDes rs
@@ -58,17 +29,20 @@ containsMultiDes (PTFun _ _ _ _ rs) = any ruleContainsMultiDes rs
     ruleContainsMultiDes _ = False
 containsMultiDes _ = False
 
-extractOuterDesCallsInRule :: [PT] -> PTRule -> PTRule
-extractOuterDesCallsInRule pts r@(PTRule l (PQDes _ _ _ pq@(PQDes l' _ _ _)) _e) =
-    PTRule l pq (PApp l' (gensym "extract" (namePattern pq) pts) (map toExpr $ collectVarsPQ pq))
-extractOuterDesCallsInRule _ r = r
+extractOuterDesCallsInRule :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
+extractOuterDesCallsInRule pts pt r@(PTRule l (PQDes _ _ _ pq@(PQDes l' _ _ _)) _e) =
+    writer (replacedRule, helperFun pts pt r)
+  where
+    replacedRule =
+        PTRule l pq (PApp l' (gensym "extract" (namePattern pq) pts) (map toExpr $ collectVarsPQ pq))
+extractOuterDesCallsInRule _ _ r = return r
 
-extractOuterDesCalls :: [PT] -> PT -> PT
-extractOuterDesCalls pts (PTFun l id ts t rs) = PTFun l id ts t (map (extractOuterDesCallsInRule pts) rs)
-extractOuterDesCalls _ pt = pt
+extractOuterDesCalls :: [PT] -> PT -> Writer HelperFuns PT
+extractOuterDesCalls pts pt@(PTFun l id ts t rs) = liftM (PTFun l id ts t) (mapM (extractOuterDesCallsInRule pts pt) rs)
+extractOuterDesCalls _ pt = return pt
 
 extractOuterDes :: [PT] -> [PT]
-extractOuterDes pts = (map (extractOuterDesCalls pts) pts) ++ (helperFuns pts)
+extractOuterDes pts = (\(x, y) -> x ++ (getHelperFuns y)) $ runWriter $ mapM (extractOuterDesCalls pts) pts
 
 elimMultiDes :: [PT] -> [PT]
 elimMultiDes pts
