@@ -13,6 +13,10 @@ toExpr :: PP -> PExp
 toExpr (PPVar l id) = PVar l id
 toExpr (PPCon l id pps) = PApp l id (map toExpr pps)
 
+con :: PP -> Bool
+con (PPCon _ _ _) = True
+con _             = False
+
 conIdentifier :: PTCon -> Identifier
 conIdentifier (PTCon _ _ id _) = id
 

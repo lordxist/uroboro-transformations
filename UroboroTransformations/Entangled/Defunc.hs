@@ -13,10 +13,6 @@ import Control.Monad
 import Control.Monad.State.Lazy
 import Control.Monad.Trans.Writer.Lazy
 
-con :: PP -> Bool
-con (PPCon _ _ _) = True
-con _             = False
-
 newtype HelperFuns = HelperFuns { getHelperFuns :: [PT] }
 
 instance Monoid HelperFuns where
