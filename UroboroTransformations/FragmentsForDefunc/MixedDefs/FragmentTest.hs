@@ -1,8 +1,8 @@
-module UroboroTransformations.MixedDefs.FragmentTest where
+module UroboroTransformations.FragmentsForDefunc.MixedDefs.FragmentTest where
 
 import Uroboro.Tree
 
-import qualified UroboroTransformations.Entangled.FragmentTest as EntangledTest
+import qualified UroboroTransformations.FragmentsForDefunc.Entangled.FragmentTest as EntangledTest
 
 import Control.Monad(liftM2)
 

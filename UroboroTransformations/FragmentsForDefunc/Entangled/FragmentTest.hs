@@ -1,4 +1,4 @@
-module UroboroTransformations.Entangled.FragmentTest where
+module UroboroTransformations.FragmentsForDefunc.Entangled.FragmentTest where
 
 import Uroboro.Tree
 

@@ -4,8 +4,8 @@ import Data.Maybe
 
 import Uroboro.Tree
 
-import qualified UroboroTransformations.MixedDefs.Defunc as MixedDefsD
-import qualified UroboroTransformations.Entangled.Defunc as EntangledD
+import qualified UroboroTransformations.FragmentsForDefunc.MixedDefs.Defunc as MixedDefsD
+import qualified UroboroTransformations.FragmentsForDefunc.Entangled.Defunc as EntangledD
 
 import UroboroTransformations.Util
 

@@ -1,12 +1,12 @@
-module UroboroTransformations.MixedDefs.Defunc where
+module UroboroTransformations.FragmentsForDefunc.MixedDefs.Defunc where
 
 import Uroboro.Tree
 
 import UroboroTransformations.Util
-import qualified UroboroTransformations.Entangled.Defunc as EntangledD
-import qualified UroboroTransformations.Entangled.FragmentTest as EntangledTest
+import qualified UroboroTransformations.FragmentsForDefunc.Entangled.Defunc as EntangledD
+import qualified UroboroTransformations.FragmentsForDefunc.Entangled.FragmentTest as EntangledTest
 
-import UroboroTransformations.MixedDefs.FragmentTest
+import UroboroTransformations.FragmentsForDefunc.MixedDefs.FragmentTest
 
 import Data.List(groupBy, intercalate)
 

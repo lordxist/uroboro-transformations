@@ -1,10 +1,10 @@
-module UroboroTransformations.Entangled.Defunc where
+module UroboroTransformations.FragmentsForDefunc.Entangled.Defunc where
 
 import Uroboro.Tree
 import Uroboro.Error
 
 import UroboroTransformations.Util
-import UroboroTransformations.Entangled.FragmentTest
+import UroboroTransformations.FragmentsForDefunc.Entangled.FragmentTest
 
 import qualified UroboroTransformations.CoDataDefsDisj.Defunc as CoDataDefsDisjD
 
