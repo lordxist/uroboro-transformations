@@ -10,6 +10,7 @@ import qualified UroboroTransformations.CoDataDefsDisj.Defunc as CoDataDefsDisjD
 import Data.List(nubBy, groupBy)
 import Data.Monoid
 import Control.Monad
+import Control.Monad.State.Lazy
 import Control.Monad.Trans.Writer.Lazy
 
 con :: PP -> Bool
@@ -42,17 +43,17 @@ helperFunRule id (PTRule l (PQDes _ _ pps (PQApp l' _ pps')) e) =
     Just $ PTRule l (PQApp l' id (pps' ++ pps)) e
 helperFunRule _ _ = Nothing
 
-convertToVars :: [PP] -> Int -> ([PP], Int)
-convertToVars [] n = ([], n)
-convertToVars (pp:pps) n = do
-    let (vars, n') = convertToVars pps (n+1)
-    ((PPVar dummyLocation ("x"++(show n))):vars, n')
+convertToVar :: PP -> State Int PP
+convertToVar _ = do
+    n <- get
+    modify (+1)
+    return $ PPVar dummyLocation ("x"++(show n))
 
 extractPatternMatchingInRule :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
 extractPatternMatchingInRule pts fun r@(PTRule l (PQDes l' id pps (PQApp l'' id' pps')) e)
     | any con (pps ++ pps') = do
-        let (vars', n) = convertToVars pps' 0
-        let (vars, _) = convertToVars pps n
+        let (vars', n) = runState (mapM convertToVar pps') 0
+        let vars = evalState (mapM convertToVar pps) n
         let helperFunName = gensym id id' pts
         let expr = PApp dummyLocation helperFunName $ map toExpr (vars' ++ vars)
         let newRule = PTRule l (PQDes l' id vars (PQApp l'' id' vars')) expr
