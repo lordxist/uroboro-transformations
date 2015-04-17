@@ -7,7 +7,10 @@ import UroboroTransformations.Util
 
 import qualified UroboroTransformations.CoDataDefsDisj.Defunc as CoDataDefsDisjD
 
-import Data.List(nubBy)
+import Data.List(nubBy, groupBy)
+import Data.Monoid
+import Control.Monad
+import Control.Monad.Trans.Writer.Lazy
 
 con :: PP -> Bool
 con (PPCon _ _ _) = True
@@ -27,24 +30,31 @@ entangledDesRulesInPT _ _ = []
 entangledDesRules :: [PT] -> PTDes -> ([([PTRule], PT)], PTDes)
 entangledDesRules pts des = (concatMap (entangledDesRulesInPT des) pts, des)
 
-helperFunRule :: Identifier -> PTRule -> PTRule
-helperFunRule id (PTRule l (PQDes _ _ pps (PQApp l' _ pps')) e) =
-    PTRule l (PQApp l' id (pps' ++ pps)) e
-helperFunRule _ _ = undefined
+newtype HelperFuns = HelperFuns { getHelperFuns :: [PT] }
 
-helperFuns :: [PT] -> [PT]
-helperFuns pts = do
-    (desFunRs, des) <- map (entangledDesRules pts) (concatMap destructors pts)
-    (desRs, fun) <- desFunRs
-    let name = gensym (desIdentifier des) (funIdentifier fun) pts
-    let rs = map (helperFunRule name) desRs
-    return $ PTFun dummyLocation name ((funArgTypes fun) ++ (desArgTypes des)) (desReturnType des) rs
+instance Monoid HelperFuns where
+    (HelperFuns pts) `mappend` (HelperFuns pts2) = HelperFuns $ map merge $ groupBy sameFun (pts ++ pts2)
+      where
+        (PTFun _ id ts t _) `sameFun` (PTFun _ id' ts' t' _) = (id == id') && (ts == ts') && (t == t')
+
+        merge funs@((PTFun l id ts t _):_) = PTFun l id ts t (concatMap rules funs)
+
+        rules (PTFun _ _ _ _ rs) = rs
+
+    mempty = HelperFuns []
+
+ruleToHelperFuns :: PT -> [Type] -> Type -> Maybe PTRule -> HelperFuns
+ruleToHelperFuns fun desTs desRT (Just r@(PTRule l (PQApp _ id _) _)) =
+    HelperFuns [(PTFun l id ((funArgTypes fun) ++ desTs) desRT [r])]
   where
-    desArgTypes (PTDes _ _ _ ts _) = ts
-
     funArgTypes (PTFun _ _ ts _ _) = ts
+ruleToHelperFuns _ _ _ Nothing = mempty
+ruleToHelperFuns _ _ _ _ = undefined
 
-    desReturnType (PTDes _ t _ _ _) = t
+helperFunRule :: Identifier -> PTRule -> Maybe PTRule
+helperFunRule id (PTRule l (PQDes _ _ pps (PQApp l' _ pps')) e) =
+    Just $ PTRule l (PQApp l' id (pps' ++ pps)) e
+helperFunRule _ _ = Nothing
 
 convertToVars :: [PP] -> Int -> ([PP], Int)
 convertToVars [] n = ([], n)
@@ -52,22 +62,25 @@ convertToVars (pp:pps) n = do
     let (vars, n') = convertToVars pps (n+1)
     ((PPVar dummyLocation ("x"++(show n))):vars, n')
 
-extractPatternMatchingInRule :: [PT] -> PTRule -> PTRule
-extractPatternMatchingInRule pts r@(PTRule l (PQDes l' id pps (PQApp l'' id' pps')) e)
+extractPatternMatchingInRule :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
+extractPatternMatchingInRule pts fun r@(PTRule l (PQDes l' id pps (PQApp l'' id' pps')) e)
     | any con (pps ++ pps') = do
         let (vars', n) = convertToVars pps' 0
         let (vars, _) = convertToVars pps n
         let helperFunName = gensym id id' pts
         let expr = PApp dummyLocation helperFunName $ map toExpr (vars' ++ vars)
-        PTRule l (PQDes l' id vars (PQApp l'' id' vars')) expr
-    | otherwise = r
-extractPatternMatchingInRule _ r = r
+        let newRule = PTRule l (PQDes l' id vars (PQApp l'' id' vars')) expr
+        let desTs = destructorTypes id pts
+        let desRT = destructorReturnType id pts
+        writer (newRule, (ruleToHelperFuns fun desTs desRT $ helperFunRule helperFunName r))
+    | otherwise = writer (r, mempty)
+extractPatternMatchingInRule _ _ r = writer (r, mempty)
 
-extractPatternMatching :: [PT] -> PT -> PT
-extractPatternMatching pts (PTFun l id ts t rs) =
-    PTFun l id ts t $ nubBy isSameRuleAs (map (extractPatternMatchingInRule pts) rs)
+extractPatternMatchingInRules :: [PT] -> PT -> [PTRule] -> Writer HelperFuns [PTRule]
+extractPatternMatchingInRules pts fun rs =
+    liftM (nubBy hasSamePatternAs) (mapM (extractPatternMatchingInRule pts fun) rs)
   where
-    (PTRule _ pq e) `isSameRuleAs` (PTRule _ pq2 e2) = (pq `pqEq` pq2)
+    (PTRule _ pq e) `hasSamePatternAs` (PTRule _ pq2 e2) = (pq `pqEq` pq2)
 
     (PQApp _ id pps) `pqEq` (PQApp _ id2 pps2) =
         (id == id2) && (pps `ppsEq` pps2)
@@ -80,10 +93,14 @@ extractPatternMatching pts (PTFun l id ts t rs) =
     _ `ppEq` _ = False
 
     pps `ppsEq` pps2 = ((length pps) == (length pps2)) && (and $ zipWith ppEq pps pps2)
-extractPatternMatching _ pt = pt
+
+extractPatternMatching :: [PT] -> PT -> Writer HelperFuns PT
+extractPatternMatching pts fun@(PTFun l id ts t rs) =
+    liftM (PTFun l id ts t) (extractPatternMatchingInRules pts fun rs)
+extractPatternMatching _ pt = return pt
 
 disentangle :: [PT] -> [PT]
-disentangle pts = (map (extractPatternMatching pts) pts) ++ (helperFuns pts)
+disentangle pts = (\(x, y) -> x ++ (getHelperFuns y)) $ runWriter (mapM (extractPatternMatching pts) pts)
 
 nested :: PP -> Bool
 nested (PPCon _ _ pps) = any con pps
