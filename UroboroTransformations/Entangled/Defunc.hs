@@ -60,8 +60,8 @@ extractPatternMatchingInRule pts fun r@(PTRule l (PQDes l' id pps (PQApp l'' id'
         let desTs = destructorTypes id pts
         let desRT = destructorReturnType id pts
         writer (newRule, (ruleToHelperFuns fun desTs desRT $ helperFunRule helperFunName r))
-    | otherwise = writer (r, mempty)
-extractPatternMatchingInRule _ _ r = writer (r, mempty)
+    | otherwise = return r
+extractPatternMatchingInRule _ _ r = return r
 
 extractPatternMatchingInRules :: [PT] -> PT -> [PTRule] -> Writer HelperFuns [PTRule]
 extractPatternMatchingInRules pts fun rs =
