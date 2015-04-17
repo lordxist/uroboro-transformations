@@ -4,28 +4,15 @@ import Uroboro.Tree
 import Uroboro.Error
 
 import UroboroTransformations.Util
+import UroboroTransformations.Util.HelperFuns
 import UroboroTransformations.FragmentsForDefunc.Entangled.FragmentTest
 
 import qualified UroboroTransformations.CoDataDefsDisj.Defunc as CoDataDefsDisjD
 
 import Data.List(nubBy, groupBy)
 import Data.Monoid
-import Control.Monad
 import Control.Monad.State.Lazy
 import Control.Monad.Trans.Writer.Lazy
-
-newtype HelperFuns = HelperFuns { getHelperFuns :: [PT] }
-
-instance Monoid HelperFuns where
-    (HelperFuns pts) `mappend` (HelperFuns pts2) = HelperFuns $ map merge $ groupBy sameFun (pts ++ pts2)
-      where
-        (PTFun _ id ts t _) `sameFun` (PTFun _ id' ts' t' _) = (id == id') && (ts == ts') && (t == t')
-
-        merge funs@((PTFun l id ts t _):_) = PTFun l id ts t (concatMap rules funs)
-
-        rules (PTFun _ _ _ _ rs) = rs
-
-    mempty = HelperFuns []
 
 ruleToHelperFuns :: PT -> [Type] -> Type -> Maybe PTRule -> HelperFuns
 ruleToHelperFuns fun desTs desRT (Just r@(PTRule l (PQApp _ id _) _)) =
