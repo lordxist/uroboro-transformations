@@ -7,17 +7,17 @@ import UroboroTransformations.Util
 
 import UroboroTransformations.CoDataFragments
 
-defuncExp :: PExp -> PExp
-defuncExp v@(PVar _ _) = v
-defuncExp (PApp l id es) = PApp l id (map defuncExp es)
-defuncExp (PDes l id es e) = PApp l id (map defuncExp (e:es))
-
 illegalRule :: PTRule -> Bool
 illegalRule (PTRule _ (PQApp l _ _) _) = True
 illegalRule (PTRule _ (PQDes _ _ pps pq) _) = (any con pps) || (illegalPQ pq)
   where
     illegalPQ (PQDes l _ _ _) = True
     illegalPQ (PQApp _ _ pps)   = any con pps
+
+defuncExp :: PExp -> PExp
+defuncExp v@(PVar _ _) = v
+defuncExp (PApp l id es) = PApp l id (map defuncExp es)
+defuncExp (PDes l id es e) = PApp l id (map defuncExp (e:es))
 
 defuncFunSig :: (Location, Identifier, [Type], Type) -> PTCon
 defuncFunSig (l, id, ts, t) = PTCon l t id ts

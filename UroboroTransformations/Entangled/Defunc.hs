@@ -4,6 +4,7 @@ import Uroboro.Tree
 import Uroboro.Error
 
 import UroboroTransformations.Util
+import UroboroTransformations.Entangled.FragmentTest
 
 import qualified UroboroTransformations.CoDataDefsDisj.Defunc as CoDataDefsDisjD
 
@@ -84,23 +85,6 @@ extractPatternMatching _ pt = return pt
 
 disentangle :: [PT] -> [PT]
 disentangle pts = (\(x, y) -> x ++ (getHelperFuns y)) $ runWriter (mapM (extractPatternMatching pts) pts)
-
-nested :: PP -> Bool
-nested (PPCon _ _ pps) = any con pps
-nested _ = False
-
-illegalHolePatternRule :: PTRule -> Bool
-illegalHolePatternRule (PTRule _ (PQDes _ _ _ _) _) = True
-illegalHolePatternRule (PTRule _ (PQApp _ _ []) _) = True
-illegalHolePatternRule (PTRule _ (PQApp _ _ (pp:pps)) _) = (any nested (pp:pps)) || ((not . con) pp)
-
-illegalDesPatternRule :: PTRule -> Bool
-illegalDesPatternRule (PTRule _ (PQDes _ _ pps (PQApp _ _ pps')) _) = any nested (pps ++ pps')
-illegalDesPatternRule _ = True
-
-hasIllegalRules :: PT -> Bool
-hasIllegalRules (PTFun _ _ _ _ rs) = (any illegalDesPatternRule rs) && (any illegalHolePatternRule rs)
-hasIllegalRules _ = False
 
 defuncLegal :: [PT] -> Maybe [PT]
 defuncLegal pts = CoDataDefsDisjD.defuncLegal (disentangle pts)

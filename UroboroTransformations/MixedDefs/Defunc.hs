@@ -4,13 +4,15 @@ import Uroboro.Tree
 
 import UroboroTransformations.Util
 import qualified UroboroTransformations.Entangled.Defunc as EntangledD
+import qualified UroboroTransformations.Entangled.FragmentTest as EntangledTest
 
-import Control.Monad(liftM2)
+import UroboroTransformations.MixedDefs.FragmentTest
+
 import Data.List(groupBy, intercalate)
 
 isMixedRules :: PT -> Bool
 isMixedRules (PTFun _ _ _ _ rs) =
-    (any EntangledD.illegalDesPatternRule rs) && (any EntangledD.illegalHolePatternRule rs)
+    (any EntangledTest.illegalDesPatternRule rs) && (any EntangledTest.illegalHolePatternRule rs)
 isMixedRules _ = False
 
 helperFunRule :: Identifier -> PTRule -> PTRule
@@ -61,11 +63,6 @@ extractDesCalls _ pt = pt
 
 desExtract :: [PT] -> [PT]
 desExtract pts = (map (extractDesCalls pts) pts) ++ (helperFuns pts)
-
-hasIllegalRules :: PT -> Bool
-hasIllegalRules (PTFun _ _ _ _ rs) =
-    any (liftM2 (&&) EntangledD.illegalHolePatternRule EntangledD.illegalDesPatternRule) rs
-hasIllegalRules _ = False
 
 defunc :: [PT] -> Maybe [PT]
 defunc pts

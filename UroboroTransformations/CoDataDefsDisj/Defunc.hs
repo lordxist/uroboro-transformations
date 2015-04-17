@@ -2,12 +2,10 @@ module UroboroTransformations.CoDataDefsDisj.Defunc where
 
 import Uroboro.Tree
 
+import UroboroTransformations.CoDataDefsDisj.FragmentTest
+
 import qualified UroboroTransformations.CoDataFragments.Defunc as CoDataD
 import qualified UroboroTransformations.CoDataFragments.Refunc as CoDataR
-
-hasIllegalRules :: PT -> Bool
-hasIllegalRules (PTFun _ _ _ _ rs) = (any CoDataD.illegalRule rs) && (any CoDataR.illegalRule rs)
-hasIllegalRules _ = False
 
 hasHolePattern :: PTRule -> Bool
 hasHolePattern (PTRule _ (PQApp _ _ _) _) = True
