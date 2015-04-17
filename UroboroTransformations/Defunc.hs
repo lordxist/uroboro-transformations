@@ -1,4 +1,4 @@
-module UroboroTransformations where
+module UroboroTransformations.Defunc where
 
 import Data.Maybe
 

@@ -5,7 +5,7 @@ import Test.Hspec
 
 import Uroboro.Parser(parseFile)
 
-import UroboroTransformations
+import UroboroTransformations.Defunc
 import PrettyPrint(renderProgram)
 
 import Str

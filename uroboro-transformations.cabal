@@ -16,7 +16,7 @@ test-suite tests
   type:             exitcode-stdio-1.0
   hs-source-dirs:   ., test
   main-is:          Spec.hs
-  other-modules:    Spec, UroboroTransformations, Str
+  other-modules:    Spec, UroboroTransformations.Defunc, Str
   build-depends:
       base    == 4.*
     , uroboro
