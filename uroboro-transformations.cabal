@@ -9,7 +9,7 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:   PrettyPrint, UroboroTransformations.CoDataFragments, UroboroTransformations.CoDataFragments.Defunc, UroboroTransformations.CoDataFragments.Refunc
-  build-depends:     base >= 4.7 && < 4.8, uroboro, transformers
+  build-depends:     base >= 4.7 && < 4.8, uroboro, transformers, mtl
   default-language:  Haskell2010
 
 test-suite tests
@@ -23,10 +23,11 @@ test-suite tests
     , parsec
     , hspec
     , transformers
+    , mtl
     , template-haskell
   default-language:    Haskell2010
 
 executable uroboro-transformations
   main-is:           Main.hs
-  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
   default-language:  Haskell2010
