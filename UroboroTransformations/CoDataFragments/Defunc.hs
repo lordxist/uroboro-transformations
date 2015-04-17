@@ -3,6 +3,8 @@ module UroboroTransformations.CoDataFragments.Defunc where
 import Uroboro.Tree
 import Uroboro.Error
 
+import UroboroTransformations.Util
+
 import UroboroTransformations.CoDataFragments
 
 defuncExp :: PExp -> PExp
@@ -14,9 +16,6 @@ illegalRule :: PTRule -> Bool
 illegalRule (PTRule _ (PQApp l _ _) _) = True
 illegalRule (PTRule _ (PQDes _ _ pps pq) _) = (any con pps) || (illegalPQ pq)
   where
-    con (PPCon l _ _) = True
-    con _             = False
-
     illegalPQ (PQDes l _ _ _) = True
     illegalPQ (PQApp _ _ pps)   = any con pps
 
