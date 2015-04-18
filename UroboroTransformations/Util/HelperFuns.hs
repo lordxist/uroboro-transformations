@@ -5,6 +5,9 @@ import Uroboro.Tree
 import Data.List(groupBy)
 import Data.Monoid
 
+import Control.Arrow(second)
+import Control.Monad.Trans.Writer.Lazy
+
 newtype HelperFuns = HelperFuns { getHelperFuns :: [PT] }
 
 instance Monoid HelperFuns where
@@ -17,3 +20,9 @@ instance Monoid HelperFuns where
         rules (PTFun _ _ _ _ rs) = rs
 
     mempty = HelperFuns []
+
+runExtraction :: Writer HelperFuns [PT] -> [PT]
+runExtraction = (uncurry (++)) . (second getHelperFuns) . runWriter
+
+extractHelperFuns :: ([PT] -> PT -> Writer HelperFuns PT) -> [PT] -> [PT]
+extractHelperFuns f pts = runExtraction $ mapM (f pts) pts

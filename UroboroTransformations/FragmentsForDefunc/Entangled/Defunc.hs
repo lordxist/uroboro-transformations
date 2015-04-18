@@ -71,7 +71,7 @@ extractPatternMatching pts fun@(PTFun l id ts t rs) =
 extractPatternMatching _ pt = return pt
 
 disentangle :: [PT] -> [PT]
-disentangle pts = (\(x, y) -> x ++ (getHelperFuns y)) $ runWriter (mapM (extractPatternMatching pts) pts)
+disentangle = extractHelperFuns extractPatternMatching
 
 defuncLegal :: [PT] -> Maybe [PT]
 defuncLegal pts = CoDataDefsDisjD.defuncLegal (disentangle pts)

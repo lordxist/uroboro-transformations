@@ -42,7 +42,7 @@ extractOuterDesCalls pts pt@(PTFun l id ts t rs) = liftM (PTFun l id ts t) (mapM
 extractOuterDesCalls _ pt = return pt
 
 extractOuterDes :: [PT] -> [PT]
-extractOuterDes pts = (\(x, y) -> x ++ (getHelperFuns y)) $ runWriter $ mapM (extractOuterDesCalls pts) pts
+extractOuterDes = extractHelperFuns extractOuterDesCalls
 
 elimMultiDes :: [PT] -> [PT]
 elimMultiDes pts

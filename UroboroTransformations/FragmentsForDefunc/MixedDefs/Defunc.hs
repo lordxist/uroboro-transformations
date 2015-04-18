@@ -45,7 +45,7 @@ extractDesCalls pts pt@(PTFun l id ts t rs)
 extractDesCalls _ pt  = return pt
 
 desExtract :: [PT] -> [PT]
-desExtract pts = (\(x, y) -> x ++ (getHelperFuns y)) $ runWriter $ mapM (extractDesCalls pts) pts
+desExtract = extractHelperFuns extractDesCalls
 
 defunc :: [PT] -> Maybe [PT]
 defunc pts
