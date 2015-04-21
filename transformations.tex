@@ -294,4 +294,79 @@ $\langle s.des(t_1, ..., t_n) \rangle^d = \langle des \rangle^d (\langle s \rang
 $\langle fun(t_1, ..., t_n) \rangle^d = \langle fun \rangle^d (\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)$ \\
 $\langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)$ \\
 
+\section{Refunctionalization of Uroboro}
+
+TODO: Handle mixed defs (by extracting destructor calls similar to how it's done in defunctionalization)
+
+Refunctionalizing programs without mixed function defs: $\langle prg \rangle^{r'} = \langle \langle \langle prg \rangle^{disentangle} \rangle^{move\_to\_front} \rangle^{r''}$
+
+Disentangling (extract undesired pattern matching into helper functions):
+\begin{alignat*}{2}
+\langle prg \rangle^{disentangle} & = \langle \langle prg \rangle^{extract\_patterns} \rangle^{disentangle} &&\textrm{, if } prg \textrm{ contains constructor applications in} \\
+\quad \textrm{destructor patterns or, with the exception of a left-most outer contructor, in hole patterns } \span\span\span \\
+\langle prg \rangle^{disentangle} & = prg &&\textrm{, otherwise}
+\end{alignat*}
+
+One-step pattern extraction:
+
+$cons_q$ uniquely names the recursive chain of constructors to and including the left-most inner-most constructor occurring in the (co)pattern $q$; $cons'_q$ means the same as $cons_q$, but ignores (but not in the naming chain) a possible left-most outer constructor (as $con$ in $fun(con(...), ...)$); for a (co)pattern $q$, $q^{-con}$ means $q$ with its left-most inner-most constructor occurrence replaced by its variables, those are added at the end of the pattern directly surrounding the constructor occurrence; $q^{-con'}$ is the same as $q^{-con}$, but ignores a left-most outer constructor
+
+\begin{alignat*}{4}
+\langle prg \rangle^{extract\_patterns} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \{ eqn ~ | ~ \big\langle eqn, heqn \big\rangle \in \langle fun, eqns \rangle^{extract} \} \} \\
+& && && \cup && \{ \textrm{\textbf{function }} hfun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && &&\quad \{ heqn ~ | ~ \big\langle eqn, heqn \big\rangle \in \langle fun, eqns \rangle^{extract} \textrm{ with } heqn = `` hfun(...) = ... " \} \\
+& && && && | ~ \big\langle eqn, `` hfun(...) = ... " \big\rangle \in \langle fun, eqns \rangle^{extract} \} \\
+& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
+& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
+\end{alignat*}
+
+Extraction from (the equations of) a single function (returns pairs of the changed original equation and the helper function equation):
+\begin{alignat*}{2}
+\langle fun, eqns \rangle^{extract} & = ~&& \{ \big\langle `` q^{-con} = \langle fun, cons_q, prg \rangle^{autogen}(p'_1, ..., p'_n).des(p'_{n+1}, ..., p'_{n+k}) ", \\
+& &&\quad `` \langle fun, cons_q, prg \rangle^{autogen}(p'_1, ..., p'_n).des(p'_{n+1}, ..., p'_{n+k}) = e " \big\rangle \\
+& &&\quad \textrm{with } q^{-con} = fun(p'_1, ..., p'_{n}).des(p'_{n+1}, ..., p'_{n+k}) \\
+& && | ~ `` q = e " \in eqns \textrm{ with } q = fun(p_1, ..., p_n).des(p_{n+1}, ..., p_{n+k}) \textrm{ with} \\
+& &&\quad \exists p \in \{p_1, ..., p_{n+k}\}: p \textrm{ is constructor application} \} \\
+& \cup && \{ \big\langle `` q^{-con'} = \langle fun, cons'_q, prg \rangle^{autogen}(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) ", \\
+& &&\quad `` \langle fun, cons'_q, prg \rangle^{autogen}(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) = e " \big\rangle \\
+& &&\quad \textrm{with } q^{-con'} = fun(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) \\
+& && | ~ `` q = e " \in eqns \textrm{ with } q = fun(x_0, ..., x_m, con(p^0_1, ..., p^0_k), p_1, ..., p_n) \textrm{ with} \\
+& &&\quad \exists p \in \{p^0_1, ..., p^0_k, p_1, ..., p_n\}: p \textrm{ is constructor application} \} \\
+& \cup && \{ ~ \big\langle `` q = t ", \varepsilon \big\rangle \\
+& && | ~ `` q = t " \in eqns \textrm{ with } \\
+& &&\quad q = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)\\
+& &&\quad \textrm{or } q = fun(con(x_1, ..., x_m), x'_1, ..., x'_n) \} \\
+\end{alignat*}
+
+TODO: extraction from multiple destructor calls (analogous to the single destructor case)
+
+Note: extraction into a helper function is basically a specialization to $cons_q$ or $cons'_q$: the constructor is eliminated from the \underline{pattern} by including it in the \underline{name} of the helper function
+
+TODO: move\_to\_front: move singular outer constructor calls to the front of the argument list (as in "fun(..., con(...), ...)" -> "fun(con(...), ...)")
+
+Actual refunctionalization (for programs without mixed function defs and with constructor applications only in the first argument of a hole pattern):
+\begin{alignat*}{3}
+\langle prg \rangle^{r''} & = ~&& \{ ~&& \textrm{\textbf{codata }} \sigma \textrm{\textbf{ where }} \\
+& && && \{ \sigma .\langle fun, prg \rangle^r (\tau_1, ..., \tau_n): \tau \\
+& && && | ~ `` fun (\sigma, \tau_1, ..., \tau_n): \tau \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } eqns \neq \emptyset \textrm{ and } \\
+& && &&\quad \forall e \in eqns: e \textrm{ has no destructor pattern }  \} \\
+& && | && "\textrm{\textbf{data }} \sigma ..." \in prg \} \\
+& \cup && \{ && \textrm{\textbf{function }} \langle con \rangle^r (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && \{ \langle con \rangle^r (x_1, ..., x_n) .\langle fun \rangle^r (y_1, ..., y_k) = \langle t, prg \rangle^r \\
+& && && | ~ `` fun(con(x_1, ..., x_n), y_1, ..., y_k) = t " \in prg \} \\
+& && | && `` con(\tau_1, ... \tau_n): \sigma " \in prg \} \\
+& \cup && \{ && \textrm{\textbf{codata }} ... ~ | ~ `` \textrm{\textbf{codata }} ... " \in prg \} \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \{ p = \langle t, prg \rangle^r ~ | ~ "p = t" \in eqns \} \\
+& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } \forall e \in eqns: e \textrm{ has destr. pattern}\} 
+\end{alignat*}
+
+Refunctionalizing terms: \\
+$\langle x, prg \rangle^r = x$ \\
+$\langle s.des(t_1, ..., t_n), prg \rangle^r = \langle s, prg \rangle^r .des(\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
+$\langle fun(t_1, ..., t_n), prg \rangle^r = fun(\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$, \\
+if ``\textbf{function} $fun(\tau_n, ..., \tau_n): \sigma$ \textbf{where} $eqns$" $\in prg$  with $\forall e \in eqns: e$ has destructor pattern  \\
+$\langle fun(t_1, ..., t_n), prg \rangle^r = \langle t_1, prg \rangle^r .\langle fun, prg \rangle^r (\langle t_2, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$, \\
+otherwise (all constructor patterns) \\
+$\langle con(t_1, ..., t_n), prg \rangle^r = \langle con, prg \rangle^r (\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
+
 \end{document}
