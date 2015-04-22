@@ -74,14 +74,14 @@ Note: More detailed notes are available in a separate file.
 
 \begin{itemize}
 
-\item \textbf{Helper extraction:} For a function $e$ that takes an equation $eqn$ and a set of helper functions $H$ and returns $\langle eqn, H \rangle^e := \big\langle eqn', H \big\rangle$, with $eqn'$ the changed equation and $H'$ the changed set of helper functions, define $extract\_helpers(e)$ as follows:
+\item \textbf{Helper extraction:} For a function $e$ that takes an equation $eqn$ and a set of helper functions $H$ and returns $\langle eqn, H \rangle^e := \big\langle eqn', H' \big\rangle$, with $eqn'$ the changed equation and $H'$ the changed set of helper functions, define $extract\_helpers(e)$ as follows:
 
 \begin{alignat*}{4}
 \langle prg \rangle^{extract\_helpers(e)} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
 & && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{e} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
 & && && \cup && \{ \textrm{\textbf{function }} hfun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ heqn \in H_{eqns} ~ | ~ heqn = `` hfun(...) = ... " \} \\
-& && && && | ~  `` hfun(...) = ... " \in H_{eqns} \} \\
+& && && &&\quad \{ heqn \in H_{eqns} ~ | ~ heqn = `` hfun(...) ... = ... " \} \\
+& && && && | ~  `` hfun(...) ... = ... " \in H_{eqns} \} \\
 & && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
 & \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
 \end{alignat*}
