@@ -70,10 +70,9 @@ frame = single
 
 Note: More detailed notes are available in a separate file.
 
-\section{Defunctionalization of Uroboro}
+\section{Preliminaries}
 
 \begin{itemize}
-\item Can defunc. \texttt{eval1.uro} into something very similar to \texttt{eval3.uro}. The only difference between the result and \texttt{eval3.uro} is that the function \texttt{nil} is treated as already defunctionalized. This is because all functions with empty definitions are treated as defunctionalized.
 
 \item In the following, a function definition (or its equations) is called mixed if it has both destructor and hole patterns.
 
@@ -84,8 +83,6 @@ Note: More detailed notes are available in a separate file.
 \item $\langle q \rangle^{vars}$ gives all variables appearing in the (co)pattern (from left to right) as a list.
 
 \item $\langle q, \tau \rangle^{vartypes}$ gives the types of the variables appearing in the copattern (from left to right) by going recursively through the pattern's constructor and destructor calls. If the pattern $q$ is a variable itself, returns only $\tau$. This second argument is optional if unnecessary (when $q$ can't be a variable).
-
-\item Implemented in \texttt{UroboroTransformations.defunc}. (But see the comments before \texttt{UroboroTransformations.Util.namePattern} and \texttt{constructorTypes} for limitations.)
 
 \item For the examples below the following data types will be used (as if they were in a standard library):
 \begin{lstlisting}
@@ -99,6 +96,16 @@ data Bool where
   false(): Bool
 
 \end{lstlisting}
+
+\end{itemize}
+
+\section{Defunctionalization of Uroboro}
+
+\begin{itemize}
+\item Can defunc. \texttt{eval1.uro} into something very similar to \texttt{eval3.uro}. The only difference between the result and \texttt{eval3.uro} is that the function \texttt{nil} is treated as already defunctionalized. This is because all functions with empty definitions are treated as defunctionalized.
+
+\item Implemented in \texttt{UroboroTransformations.defunc}. (But see the comments before \texttt{UroboroTransformations.Util.namePattern} and \texttt{constructorTypes} for limitations.)
+
 \end{itemize}
 
 Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle \langle prg \rangle^{elim\_multi\_des} \rangle^{extract\_des} \rangle^{d'}$
