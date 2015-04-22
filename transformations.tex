@@ -106,25 +106,34 @@ data Bool where
 Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle \langle prg \rangle^{elim\_multi\_des} \rangle^{extract\_des} \rangle^{d'}$
 
 Eliminate multiple destructor calls:
-\begin{alignat*}{2}
-\langle prg \rangle^{elim\_multi\_des} & = \langle \langle prg \rangle^{extract\_outer\_des} \rangle^{elim\_multi\_des} &&\textrm{, if } prg \textrm{ contains multiple destructor calls } \\
-\langle prg \rangle^{elim\_multi\_des} & = prg &&\textrm{, otherwise}
+
+\begin{alignat*}{4}
+\langle prg \rangle^{elim\_multi\_des} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{extract\_outer\_des} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
+& && && \cup && \{ \textrm{\textbf{function }} hfun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && &&\quad \{ heqn \in H_{eqns} ~ | ~ heqn = `` hfun(...) = ... " \} \\
+& && && && | ~  `` hfun(...) = ... " \in H_{eqns} \} \\
+& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
+& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
 \end{alignat*}
 
-Extract outer destructor calls (a destructor call after a destructor call) into helper functions:
-\begin{alignat*}{3}
-\langle prg \rangle^{extract\_outer\_des} & = ~&&\{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n):\sigma \textrm{\textbf{ where }} \\
-& && && \{ q = \langle `` \textrm{extract} ", \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}) \\
-& && && | ~ `` q.des(p'_1, ..., p'_k) = t " \in eqns \textrm{ with } q \textrm{ destructor pattern } \} \\
-& && \cup &&\{ e ~ | ~ e \in eqns \textrm{ without outer destructor call in pattern } \} \\
-& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
-&\cup && \{ && \textrm{\textbf{function }} \langle `` \textrm{extract} ", \langle q \rangle^{name\_pattern}, prg \rangle^{autogen} (\langle q \rangle^{vartypes}): \tau \textrm{\textbf{ where }} \\
-& && && \{ \langle `` \textrm{extract} ", \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}).des'(p''_1, ..., p''_k) = t' \\
-& && && | ~ `` q.des'(p''_1, ..., p''_k) = t' " \in eqns \} \\
-& && | && ``q.des(p'_1, ..., p'_k) = t " \in eqns \textrm{ with }\\
-& && &&\quad `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns" \in prg,\\
-& && &&\quad q \textrm{ destructor pattern with rightmost destructor return type } \tau \} \\
-&\cup && \{ && def ~ | ~ def \in prg, ~ def \textrm{ is (co)data definition } \}
+where
+\begin{itemize}
+\item $H_{eqns} = \{ heqn \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{extract\_outer\_des} ~ | ~ eqn \in eqns \}$
+
+\item $\langle eqn \rangle^{extract\_outer\_des}$ is short for $\langle eqn, \emptyset \rangle^{extract\_outer\_des}$
+\end{itemize}
+
+Extract outer destructor calls of a single equation (a destructor call after a destructor call) into helper functions:
+\begin{alignat*}{2}
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} \span\span \\
+&\quad = &&\langle `` q = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars})  ", \\
+& &&\quad \{`` \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  "\} \cup H \rangle^{extract\_outer\_des}, \\
+&\quad \textrm{ if $q$ is destructor pattern } \span\span \\
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} = \big\langle `` q.des(p_1, ..., p_k) = t ", H \big\rangle, \span\span \\
+&\quad \textrm{otherwise} \span\span \\
+& \langle q, H \rangle^{extract\_outer\_des} = \big\langle q, H \big\rangle, \span\span \\
+&\quad \textrm{if $q$ is hole pattern} \span\span
 \end{alignat*}
 
 Extract destructor calls from mixed function defs into helper functions:
