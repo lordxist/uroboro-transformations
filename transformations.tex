@@ -74,6 +74,25 @@ Note: More detailed notes are available in a separate file.
 
 \begin{itemize}
 
+\item \textbf{Helper extraction:} For a function $e$ that takes an equation $eqn$ and a set of helper functions $H$ and returns $\langle eqn, H \rangle^e := \big\langle eqn', H \big\rangle$, with $eqn'$ the changed equation and $H'$ the changed set of helper functions, define $extract\_helpers(e)$ as follows:
+
+\begin{alignat*}{4}
+\langle prg \rangle^{extract\_helpers(e)} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{e} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
+& && && \cup && \{ \textrm{\textbf{function }} hfun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && &&\quad \{ heqn \in H_{eqns} ~ | ~ heqn = `` hfun(...) = ... " \} \\
+& && && && | ~  `` hfun(...) = ... " \in H_{eqns} \} \\
+& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
+& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
+\end{alignat*}
+
+where
+\begin{itemize}
+\item $H_{eqns} = \{ heqn \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{e} ~ | ~ eqn \in eqns \}$
+
+\item $\langle eqn \rangle^{e}$ is short for $\langle eqn, \emptyset \rangle^{e}$
+\end{itemize}
+
 \item In the following, a function definition (or its equations) is called mixed if it has both destructor and hole patterns.
 
 \item $\langle arg^*, prg \rangle^{autogen}$ simply maps $arg^*$ uniquely to a fresh (in $prg$) identifier.
@@ -110,24 +129,7 @@ data Bool where
 
 Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle \langle prg \rangle^{elim\_multi\_des} \rangle^{extract\_des} \rangle^{d'}$
 
-Eliminate multiple destructor calls:
-
-\begin{alignat*}{4}
-\langle prg \rangle^{elim\_multi\_des} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{extract\_outer\_des} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
-& && && \cup && \{ \textrm{\textbf{function }} hfun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ heqn \in H_{eqns} ~ | ~ heqn = `` hfun(...) = ... " \} \\
-& && && && | ~  `` hfun(...) = ... " \in H_{eqns} \} \\
-& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
-& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
-\end{alignat*}
-
-where
-\begin{itemize}
-\item $H_{eqns} = \{ heqn \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{extract\_outer\_des} ~ | ~ eqn \in eqns \}$
-
-\item $\langle eqn \rangle^{extract\_outer\_des}$ is short for $\langle eqn, \emptyset \rangle^{extract\_outer\_des}$
-\end{itemize}
+Eliminate multiple destructor calls: $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$
 
 Extract outer destructor calls of a single equation (a destructor call after a destructor call) into helper functions:
 \begin{alignat*}{2}
@@ -315,24 +317,8 @@ TODO: Handle mixed defs (by extracting destructor calls similar to how it's done
 Refunctionalizing programs without mixed function defs: $\langle prg \rangle^{r'} = \langle \langle \langle prg \rangle^{disentangle} \rangle^{move\_to\_front} \rangle^{r''}$
 
 Disentangling (extract undesired pattern matching into helper functions):
-\begin{alignat*}{4}
-\langle prg \rangle^{disentangle} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{extract} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
-& && && \cup && \{ \textrm{\textbf{function }} hfun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ heqn \in H_{eqns} ~ | ~ heqn = `` hfun(...) = ... " \} \\
-& && && && | ~  `` hfun(...) = ... " \in H_{eqns} \} \\
-& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
-& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
-\end{alignat*}
 
-where
-\begin{itemize}
-\item $H_{eqns} = \{ heqn \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{extract} ~ | ~ eqn \in eqns \}$
-
-\item $\langle eqn \rangle^{extract}$ is short for $\langle eqn, \emptyset \rangle^{extract}$
-\end{itemize}
-
-(identical to elim\_multi\_des in section 1 with extract\_outer\_des replaced with extract)
+$disentangle = extract\_helpers(extract)$
 
 Extraction from one equation into helper functions (returns a pair of the changed original equation and the set of the helper functions):
 
