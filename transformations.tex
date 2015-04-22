@@ -310,41 +310,42 @@ TODO: Handle mixed defs (by extracting destructor calls similar to how it's done
 Refunctionalizing programs without mixed function defs: $\langle prg \rangle^{r'} = \langle \langle \langle prg \rangle^{disentangle} \rangle^{move\_to\_front} \rangle^{r''}$
 
 Disentangling (extract undesired pattern matching into helper functions):
-\begin{alignat*}{2}
-\langle prg \rangle^{disentangle} & = \langle \langle prg \rangle^{extract\_patterns} \rangle^{disentangle} &&\textrm{, if } prg \textrm{ contains constructor applications in} \\
-\quad \textrm{destructor patterns or, with the exception of a left-most outer contructor, in hole patterns } \span\span\span \\
-\langle prg \rangle^{disentangle} & = prg &&\textrm{, otherwise}
-\end{alignat*}
-
-One-step pattern extraction:
-
-$cons_q$ uniquely names the recursive chain of constructors to and including the left-most inner-most constructor occurring in the (co)pattern $q$; $cons'_q$ means the same as $cons_q$, but ignores (but not in the naming chain) a possible left-most outer constructor (as $con$ in $fun(con(...), ...)$); for a (co)pattern $q$, $q^{-con}$ means $q$ with its left-most inner-most constructor occurrence replaced by its variables, those are added at the end of the pattern directly surrounding the constructor occurrence; $q^{-con'}$ is the same as $q^{-con}$, but ignores a left-most outer constructor
-
 \begin{alignat*}{4}
-\langle prg \rangle^{extract\_patterns} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \{ eqn ~ | ~ \big\langle eqn, heqn \big\rangle \in \langle fun, eqns \rangle^{extract} \} \} \\
+\langle prg \rangle^{disentangle} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{extract} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
 & && && \cup && \{ \textrm{\textbf{function }} hfun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ heqn ~ | ~ \big\langle eqn, heqn \big\rangle \in \langle fun, eqns \rangle^{extract} \textrm{ with } heqn = `` hfun(...) = ... " \} \\
-& && && && | ~ \big\langle eqn, `` hfun(...) = ... " \big\rangle \in \langle fun, eqns \rangle^{extract} \} \\
+& && && &&\quad \{ heqn \in H_{eqns} ~ | ~ heqn = `` hfun(...) = ... " \} \\
+& && && && | ~  `` hfun(...) = ... " \in H_{eqns} \} \\
 & && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
 & \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
 \end{alignat*}
 
-Extraction from (the equations of) a single function (returns pairs of the changed original equation and the helper function equation):
+where
+\begin{itemize}
+\item $H_{eqns} = \{ heqn \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{extract} ~ | ~ eqn \in eqns \}$
+
+\item $\langle eqn \rangle^{extract}$ is short for $\langle eqn, \emptyset \rangle^{extract}$
+\end{itemize}
+
+(identical to elim\_multi\_des in section 1 with extract\_outer\_des replaced with extract)
+
+Extraction from one equation into helper functions (returns a pair of the changed original equation and the set of the helper functions):
+
+$cons_q$ uniquely names the recursive chain of constructors to and including the left-most inner-most constructor occurring in the (co)pattern $q$; $cons'_q$ means the same as $cons_q$, but ignores (but not in the naming chain) a possible left-most outer constructor (as $con$ in $fun(con(...), ...)$); for a (co)pattern $q$, $q^{-con}$ means $q$ with its left-most inner-most constructor occurrence replaced by its variables, those are added at the end of the pattern directly surrounding the constructor occurrence; $q^{-con'}$ is the same as $q^{-con}$, but ignores a left-most outer constructor
+
 \begin{alignat*}{2}
-\langle fun, eqns \rangle^{extract} & = ~&& \{ \big\langle `` q^{-con} = \langle fun, cons_q, prg \rangle^{autogen}(p'_1, ..., p'_n).des(p'_{n+1}, ..., p'_{n+k}) ", \\
-& &&\quad `` \langle fun, cons_q, prg \rangle^{autogen}(p'_1, ..., p'_n).des(p'_{n+1}, ..., p'_{n+k}) = e " \big\rangle \\
-& &&\quad \textrm{with } q^{-con} = fun(p'_1, ..., p'_{n}).des(p'_{n+1}, ..., p'_{n+k}) \\
-& && | ~ `` q = e " \in eqns \textrm{ with } q = fun(p_1, ..., p_n).des(p_{n+1}, ..., p_{n+k}) \textrm{ with} \\
-& &&\quad \exists p \in \{p_1, ..., p_{n+k}\}: p \textrm{ is constructor application} \} \\
-& \cup && \{ \big\langle `` q^{-con'} = \langle fun, cons'_q, prg \rangle^{autogen}(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) ", \\
-& &&\quad `` \langle fun, cons'_q, prg \rangle^{autogen}(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) = e " \big\rangle \\
-& &&\quad \textrm{with } q^{-con'} = fun(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) \\
-& && | ~ `` q = e " \in eqns \textrm{ with } q = fun(x_0, ..., x_m, con(p^0_1, ..., p^0_k), p_1, ..., p_n) \textrm{ with} \\
-& &&\quad \exists p \in \{p^0_1, ..., p^0_k, p_1, ..., p_n\}: p \textrm{ is constructor application} \} \\
-& \cup && \{ ~ \big\langle `` q = t ", \varepsilon \big\rangle \\
-& && | ~ `` q = t " \in eqns \textrm{ with } \\
-& &&\quad q = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)\\
-& &&\quad \textrm{or } q = fun(con(x_1, ..., x_m), x'_1, ..., x'_n) \} \\
+& \langle `` q = t ", H \rangle^{extract} = \\
+&\quad \langle `` q^{-con} = \langle fun, cons_q, prg \rangle^{autogen}(p'_1, ..., p'_n).des(p'_{n+1}, ..., p'_{n+k}) ", \{heqn\} \cup H' \cup H \rangle^{extract} \\
+&\quad \textrm{with } \langle `` \langle fun, cons_q, prg \rangle^{autogen}(p'_1, ..., p'_n).des(p'_{n+1}, ..., p'_{n+k}) = t " \rangle^{extract} = \big\langle heqn, H' \big\rangle \\
+&\quad \textrm{and } q^{-con} = fun(p'_1, ..., p'_{n}).des(p'_{n+1}, ..., p'_{n+k}), \\
+&\quad \textrm{if } q = fun(p_1, ..., p_n).des(p_{n+1}, ..., p_{n+k})\textrm{ and } \exists p \in \{p_1, ..., p_{n+k}\}: p \textrm{ is constructor application} \\
+& \langle ``q = t ", H \rangle^{extract} = \\
+&\quad \langle `` q^{-con'} = \langle fun, cons'_q, prg \rangle^{autogen}(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) ", \{heqn\} \cup H' \cup H \rangle^{extract} \\
+&\quad \textrm{with } \langle `` \langle fun, cons'_q, prg \rangle^{autogen}(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) = t " \rangle^{extract} = \big\langle heqn, H' \big\rangle \\
+&\quad \textrm{and } q^{-con'} = fun(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n), \\
+&\quad \textrm{if } q = fun(x_0, ..., x_m, con(p^0_1, ..., p^0_k), p_1, ..., p_n) \textrm{ and } \exists p \in \{p^0_1, ..., p^0_k, p_1, ..., p_n\}: p \textrm{ is constr. application} \\
+& \langle `` q = t ", H \rangle^{extract} = \big\langle ``q = t ", H \big\rangle, \\
+&\quad \textrm{otherwise}
 \end{alignat*}
 
 TODO: extraction from multiple destructor calls (analogous to the single destructor case)
