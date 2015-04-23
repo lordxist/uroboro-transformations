@@ -1,5 +1,5 @@
 {-# LANGUAGE QuasiQuotes #-}
-module TestSpec where
+module DefuncSpec where
 
 import Test.Hspec
 
