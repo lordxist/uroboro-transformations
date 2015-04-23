@@ -74,21 +74,27 @@ Note: More detailed notes are available in a separate file.
 
 \begin{itemize}
 
-\item \textbf{Helper extraction:} For a function $e$ that takes an equation $eqn$ and a set of helper functions $H$ and returns $\langle eqn, H \rangle^e := \big\langle eqn', H' \big\rangle$, with $eqn'$ the changed equation and $H'$ the changed set of helper functions, define $extract\_helpers(e)$ as follows:
+\item In the following, when a function $f1$ is defined like this
+
+$\langle prg \rangle^{f1} = ... \langle ... \rangle^{f2}$ ...
+
+it is always assumed (without explicitly placing an argument for $prg$) that the arguments of $f2$ will include the whole program $prg$ if $f2$ needs it
+
+\item \textbf{Helper extraction:} For a function $e$ that takes (along with the whole program $prg$, which will be omitted for brevity) an equation $eqn$ and a set $H$, that contains pairs of helper equations and signatures, and returns $\langle eqn, H \rangle^e := \big\langle eqn', H' \big\rangle$, with $eqn'$ the changed equation and $H'$ the changed helpers set, define $extract\_helpers(e)$ as follows:
 
 \begin{alignat*}{4}
 \langle prg \rangle^{extract\_helpers(e)} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
 & && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{e} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
-& && && \cup && \{ \textrm{\textbf{function }} hfun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ heqn \in H_{eqns} ~ | ~ heqn = `` hfun(...) ... = ... " \} \\
-& && && && | ~  `` hfun(...) ... = ... " \in H_{eqns} \} \\
+& && && \cup && \{ \textrm{\textbf{function }} sig \textrm{\textbf{ where }} \\
+& && && &&\quad \{ heqn ~ | ~ \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
+& && && && | ~  \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
 & && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
 & \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
 \end{alignat*}
 
 where
 \begin{itemize}
-\item $H_{eqns} = \{ heqn \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{e} ~ | ~ eqn \in eqns \}$
+\item $H_{eqns} = \{ \big\langle hsig, heqn \big\rangle \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{e} ~ | ~ eqn \in eqns \}$
 
 \item $\langle eqn \rangle^{e}$ is short for $\langle eqn, \emptyset \rangle^{e}$
 \end{itemize}
@@ -102,6 +108,8 @@ where
 \item $\langle q \rangle^{vars}$ gives all variables appearing in the (co)pattern (from left to right) as a list.
 
 \item $\langle q, \tau \rangle^{vartypes}$ gives the types of the variables appearing in the copattern (from left to right) by going recursively through the pattern's constructor and destructor calls. If the pattern $q$ is a variable itself, returns only $\tau$. This second argument is optional if unnecessary (when $q$ can't be a variable).
+
+\item $\langle fun \rangle^{sig}$ gives the signature of the function $fun$ (as defined in the whole program that is assumed as an argument)
 
 \item For the examples below the following data types will be used (as if they were in a standard library):
 \begin{lstlisting}
@@ -133,14 +141,14 @@ Eliminate multiple destructor calls: $elim\_multi\_des = extract\_helpers(extrac
 
 Extract outer destructor calls of a single equation (a destructor call after a destructor call) into helper functions:
 \begin{alignat*}{2}
-& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} \span\span \\
-&\quad = &&\langle `` q = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars})  ", \\
-& &&\quad \{`` \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  "\} \cup H \rangle^{extract\_outer\_des}, \\
-&\quad \textrm{ if $q$ is destructor pattern } \span\span \\
-& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} = \big\langle `` q.des(p_1, ..., p_k) = t ", H \big\rangle, \span\span \\
-&\quad \textrm{otherwise} \span\span \\
-& \langle q, H \rangle^{extract\_outer\_des} = \big\langle q, H \big\rangle, \span\span \\
-&\quad \textrm{if $q$ is hole pattern} \span\span
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} \\
+&\quad = \langle `` q = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \rangle^{extract\_outer\_des} \\
+&\quad \textrm{with } hsig = \langle fun \rangle^{sig} , heqn = `` \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \\
+&\quad \textrm{if $q = fun(...) ...$ is destructor pattern } \\
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} = \big\langle `` q.des(p_1, ..., p_k) = t ", H \big\rangle, \\
+&\quad \textrm{otherwise} \\
+& \langle q, H \rangle^{extract\_outer\_des} = \big\langle q, H \big\rangle, \\
+&\quad \textrm{if $q$ is hole pattern}
 \end{alignat*}
 
 Extract destructor calls from mixed function defs into helper functions:
@@ -161,6 +169,18 @@ Extract destructor calls from mixed function defs into helper functions:
 & && &&\quad `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns" \in prg, eqns \textrm{ mixed } \} \\
 &\cup && \{ && def ~ | ~ def \in prg, ~ def \textrm{ is (co)data definition or non-mixed function def. } \}
 \end{alignat*}
+
+%-- under construction
+
+\begin{alignat*}{2}
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{eqn\_extract\_des} \span\span \\
+&\quad = &&\langle `` q = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars})  ", \\
+& &&\quad \{`` \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  "\} \cup H \rangle^{eqn\_extract\_des} \\
+& \langle q, H \rangle^{eqn\_extract\_des} = \big\langle q, H \big\rangle, \span\span \\
+&\quad \textrm{if $q$ is hole pattern} \span\span
+\end{alignat*}
+
+%--
 
 Example:
 
@@ -322,26 +342,31 @@ $disentangle = extract\_helpers(extract)$
 
 Extraction from one equation into helper functions (returns a pair of the changed original equation and the set of the helper functions):
 
-$cons_q$ uniquely names the recursive chain of constructors to and including the left-most inner-most constructor occurring in the (co)pattern $q$; $cons'_q$ means the same as $cons_q$, but ignores (but not in the naming chain) a possible left-most outer constructor (as $con$ in $fun(con(...), ...)$); for a (co)pattern $q$, $q^{-con}$ means $q$ with its left-most inner-most constructor occurrence replaced by its variables, those are added at the end of the pattern directly surrounding the constructor occurrence; $q^{-con'}$ is the same as $q^{-con}$, but ignores a left-most outer constructor
+Define the following for a copattern $q$:
 
-\begin{alignat*}{2}
-& \langle `` q = t ", H \rangle^{extract} = \\
-&\quad \langle `` q^{-con} = \langle fun, cons_q, prg \rangle^{autogen}(p'_1, ..., p'_n).des(p'_{n+1}, ..., p'_{n+k}) ", \{heqn\} \cup H' \cup H \rangle^{extract} \\
-&\quad \textrm{with } \langle `` \langle fun, cons_q, prg \rangle^{autogen}(p'_1, ..., p'_n).des(p'_{n+1}, ..., p'_{n+k}) = t " \rangle^{extract} = \big\langle heqn, H' \big\rangle \\
-&\quad \textrm{and } q^{-con} = fun(p'_1, ..., p'_{n}).des(p'_{n+1}, ..., p'_{n+k}), \\
-&\quad \textrm{if } q = fun(p_1, ..., p_n).des(p_{n+1}, ..., p_{n+k})\textrm{ and } \exists p \in \{p_1, ..., p_{n+k}\}: p \textrm{ is constructor application} \\
-& \langle ``q = t ", H \rangle^{extract} = \\
-&\quad \langle `` q^{-con'} = \langle fun, cons'_q, prg \rangle^{autogen}(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) ", \{heqn\} \cup H' \cup H \rangle^{extract} \\
-&\quad \textrm{with } \langle `` \langle fun, cons'_q, prg \rangle^{autogen}(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n) = t " \rangle^{extract} = \big\langle heqn, H' \big\rangle \\
-&\quad \textrm{and } q^{-con'} = fun(x_0, ..., x_m, con({p'}_1^0, ..., {p'}_k^0), p'_1, ..., p'_n), \\
-&\quad \textrm{if } q = fun(x_0, ..., x_m, con(p^0_1, ..., p^0_k), p_1, ..., p_n) \textrm{ and } \exists p \in \{p^0_1, ..., p^0_k, p_1, ..., p_n\}: p \textrm{ is constr. application} \\
-& \langle `` q = t ", H \rangle^{extract} = \big\langle ``q = t ", H \big\rangle, \\
-&\quad \textrm{otherwise}
+\begin{itemize}
+\item $q^{-con}$ means $q$ with its left-most inner-most constructor pattern occurrence replaced by a variable;
+\item $q^{-con}_{vars}$ gives the following patterns: the variables in $q$, but the left-most inner-most constructor pattern is kept;
+\item $q^{-con'}$ is the same as $q^{-con}$, but ignores a left-most outer constructor pattern;
+\item $q^{-con'}_{vars}$ is in the same way analogous to $q^{-con}_{vars}$
+\end{itemize}
+
+\begin{alignat*}{3}
+&\langle `` q = t ", H \rangle^{extract} = \langle `` q^{-con} = hname (\langle q^{-con} \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract} \span\span \\
+&\quad \textrm{with } && hname = \langle \langle q^{-con} \rangle^{name\_pattern} \rangle^{autogen}, \\
+&\quad && hsig = `` hname(\langle q^{-con} \rangle^{vartypes}): \sigma ", \\
+&\quad && heqn = `` hname(q^{-con}_{vars}) = t ", \\
+&\quad && `` fun(...): \sigma " = \langle fun \rangle^{sig}, \\
+&\quad \textrm{if } q = fun(p_1^0, ..., p_n^0).des_1(p_1^1, ..., p_{n_1}^1)...des_k(p_1^k, ..., p_{n_k}^k), k \geq 1 \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
+&\langle `` q = t ", H \rangle^{extract} = \langle `` q^{-con'} = hname (\langle q^{-con'} \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract} \span\span \\
+&\quad \textrm{with } && hname = \langle \langle q^{-con'} \rangle^{name\_pattern} \rangle^{autogen}, \\
+&\quad && hsig = `` hname(\langle q^{-con'} \rangle^{vartypes}): \sigma ", \\
+&\quad && heqn = `` hname(q^{-con'}_{vars}) = t ", \\
+&\quad && `` fun(...): \sigma " = \langle fun \rangle^{sig}, \\
+&\quad \textrm{if } q = fun(x_0, ..., x_m, con(p_1^0, ..., p_k^0), p^1_1, ..., p^1_n) \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
+&\langle `` q = t ", H \rangle^{extract} = \big\langle `` q = t ", H \big\rangle, \span\span \\
+&\quad \textrm{otherwise} \span\span
 \end{alignat*}
-
-TODO: extraction from multiple destructor calls (analogous to the single destructor case)
-
-Note: extraction into a helper function is basically a specialization to $cons_q$ or $cons'_q$: the constructor is eliminated from the \underline{pattern} by including it in the \underline{name} of the helper function
 
 TODO: move\_to\_front: move singular outer constructor calls to the front of the argument list (as in "fun(..., con(...), ...)" -> "fun(con(...), ...)")
 
@@ -369,5 +394,7 @@ if ``\textbf{function} $fun(\tau_n, ..., \tau_n): \sigma$ \textbf{where} $eqns$"
 $\langle fun(t_1, ..., t_n), prg \rangle^r = \langle t_1, prg \rangle^r .\langle fun, prg \rangle^r (\langle t_2, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$, \\
 otherwise (all constructor patterns) \\
 $\langle con(t_1, ..., t_n), prg \rangle^r = \langle con, prg \rangle^r (\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
+
+Note: the case distinction above is only necessary because of the special syntax for destructors ($q(...).des(...)$ instead of $des(..., ...)$)
 
 \end{document}
