@@ -109,7 +109,7 @@ where
 
 \item $\langle q, \tau \rangle^{vartypes}$ gives the types of the variables appearing in the copattern (from left to right) by going recursively through the pattern's constructor and destructor calls. If the pattern $q$ is a variable itself, returns only $\tau$. This second argument is optional if unnecessary (when $q$ can't be a variable).
 
-\item $\langle fun \rangle^{sig}$ gives the signature of the function $fun$ (as defined in the whole program that is assumed as an argument)
+\item $\langle fun \rangle^{sig}, \langle con \rangle^{sig}, \langle des \rangle^{sig}$ give the signatures of the function $fun$, the constructor $con$ and the destructor $des$, respectively (as defined in the whole program that is assumed as an argument)
 
 \item For the examples below the following data types will be used (as if they were in a standard library):
 \begin{lstlisting}
@@ -356,7 +356,7 @@ Define the following for a copattern $q$:
 &\quad \textrm{with } && hname = \langle \langle q^{-con} \rangle^{name\_pattern} \rangle^{autogen}, \\
 &\quad && hsig = `` hname(\langle q^{-con} \rangle^{vartypes}): \sigma ", \\
 &\quad && heqn = `` hname(q^{-con}_{vars}) = t ", \\
-&\quad && `` fun(...): \sigma " = \langle fun \rangle^{sig}, \\
+&\quad && `` \tau.des_k(...): \sigma " = \langle des_k \rangle^{sig}, \\
 &\quad \textrm{if } q = fun(p_1^0, ..., p_n^0).des_1(p_1^1, ..., p_{n_1}^1)...des_k(p_1^k, ..., p_{n_k}^k), k \geq 1 \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
 &\langle `` q = t ", H \rangle^{extract} = \langle `` q^{-con'} = hname (\langle q^{-con'} \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract} \span\span \\
 &\quad \textrm{with } && hname = \langle \langle q^{-con'} \rangle^{name\_pattern} \rangle^{autogen}, \\
