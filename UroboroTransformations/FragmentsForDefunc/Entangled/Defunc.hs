@@ -59,7 +59,7 @@ extractPatternMatchingInRules pts fun rs =
         (id == id2) && (pq `pqEq` pq2) && (pps `ppsEq` pps2)        
     _ `pqEq` _ = False
 
-    (PPVar _ id) `ppEq` (PPVar _ id2) = id == id2
+    (PPVar _ _) `ppEq` (PPVar _ _) = True
     (PPCon _ id pps) `ppEq` (PPCon _ id2 pps2) = (id == id2) && (pps `ppsEq` pps2)
     _ `ppEq` _ = False
 
