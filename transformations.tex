@@ -143,9 +143,10 @@ Eliminate multiple destructor calls: $elim\_multi\_des = extract\_helpers(extrac
 
 Extract outer destructor calls of a single equation (a destructor call after a destructor call) into helper functions:
 \begin{alignat*}{2}
-& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} \\
-&\quad = \langle `` q = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \rangle^{extract\_outer\_des} \\
-&\quad \textrm{with } hsig = \langle fun \rangle^{sig} , heqn = `` \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \\
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} = \langle `` q = hname(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \rangle^{extract\_outer\_des} \\
+&\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
+&\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, \\
+&\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \\
 &\quad \textrm{if $q = fun(...) ...$ is destructor pattern } \\
 & \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} = \big\langle `` q.des(p_1, ..., p_k) = t ", H \big\rangle, \\
 &\quad \textrm{otherwise} \\
