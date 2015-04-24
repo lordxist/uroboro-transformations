@@ -113,6 +113,15 @@ where
 
 \item $\langle fun \rangle^{sig}, \langle con \rangle^{sig}, \langle des \rangle^{sig}$ give the signatures of the function $fun$, the constructor $con$ and the destructor $des$, respectively (as defined in the whole program that is assumed as an argument)
 
+\item Define the extraction of the final destructor in the given copattern as follows:
+\begin{alignat*}{2}
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \big\rangle \\
+&\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
+&\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, q = fun(...) [...]\\
+&\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \\
+& \langle q, H \rangle^{extract\_des} = \big\langle q, H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
+\end{alignat*}
+
 \item For the examples below the following data types will be used (as if they were in a standard library):
 \begin{lstlisting}
 
@@ -134,16 +143,6 @@ data Bool where
 \item Can defunc. \texttt{eval1.uro} into something very similar to \texttt{eval3.uro}. The only difference between the result and \texttt{eval3.uro} is that the function \texttt{nil} is treated as already defunctionalized. This is because all functions with empty definitions are treated as defunctionalized.
 
 \item Implemented in \texttt{UroboroTransformations.defunc}. (But see the comments before \texttt{UroboroTransformations.Util.namePattern} and \texttt{constructorTypes} for limitations.)
-
-\item Define the extraction of the final destructor in the given copattern as follows:
-
-\begin{alignat*}{2}
-& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \big\rangle \\
-&\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
-&\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, q = fun(...) [...]\\
-&\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \\
-& \langle q, H \rangle^{extract\_des} = \big\langle q, H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
-\end{alignat*}
 
 \end{itemize}
 
@@ -317,7 +316,20 @@ $\langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle 
 
 \section{Refunctionalization of Uroboro}
 
-TODO: Handle mixed defs (by extracting destructor calls similar to how it's done in defunctionalization)
+Refunctionalizing programs: $\langle prg \rangle^r = \langle \langle prg \rangle^{unmix} \rangle^{r'}$
+
+Extract destructor calls from mixed function defs into helper functions:
+\begin{alignat*}{3}
+\langle prg \rangle^{unmix} & = ~&& \langle \{ && def \in prg ~ | ~ def \textrm{ is (co)data definition or mixed function def.} \} \rangle^{extract\_helpers(extract\_all\_des)} \\
+&\cup && \{ && def \in prg ~ | ~ def \textrm{ is non-mixed function def. } \}
+\end{alignat*}
+
+Here $extract\_all\_des$ is simply the iterated version of $extract\_des$:
+
+\begin{alignat*}{2}
+\langle `` q.des(...) = t ", H \rangle^{extract\_all\_des} & = \langle \langle `` q.des(...) = t ", H \rangle^{extract\_des} \rangle^{extract\_all\_des} \\
+\langle `` q = t ", H \rangle^{extract\_all\_des} & = \big\langle `` q = t ", H \big\rangle, \textrm{ if $q$ is hole pattern}
+\end{alignat*}
 
 Refunctionalizing programs without mixed function defs: $\langle prg \rangle^{r'} = \langle \langle \langle prg \rangle^{disentangle} \rangle^{split} \rangle^{r''}$
 
