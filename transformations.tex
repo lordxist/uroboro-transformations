@@ -137,7 +137,7 @@ data Bool where
 
 \end{itemize}
 
-Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle \langle prg \rangle^{elim\_multi\_des} \rangle^{extract\_des} \rangle^{d'}$
+Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle \langle prg \rangle^{elim\_multi\_des} \rangle^{unmix} \rangle^{d'}$
 
 Eliminate multiple destructor calls: $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$
 
@@ -156,34 +156,20 @@ Extract outer destructor calls of a single equation (a destructor call after a d
 
 Extract destructor calls from mixed function defs into helper functions:
 \begin{alignat*}{3}
-\langle prg \rangle^{extract\_des} & = ~&&\{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n):\sigma \textrm{\textbf{ where }} \\
-& && && \{ fun(p_1, ..., p_n) = \\
-& && &&\quad \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle p_1 \rangle^{vars}, ..., \langle p_n \rangle^{vars}) \\
-& && && | ~ `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \in eqns \} \\
-& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with mixed } eqns \} \\
-&\cup && \{ && \textrm{\textbf{function }} \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{autogen} (\\
-& && &&\quad \langle p_1, \tau_1 \rangle^{vartypes}, ..., \langle p_n, \tau_n \rangle^{vartypes} \\
-& && &&): \sigma \textrm{\textbf{ where }} \\
-& && && \{ \langle `` \textrm{extract} ", \langle fun(p_1, ..., p_n) \rangle^{name\_pattern}, prg \rangle^{autogen}(\\
-& && &&\quad \langle p_1 \rangle^{vars}, ..., \langle p_n \rangle^{vars} \\
-& && &&\quad ).des'(p''_1, ..., p''_{k'}) = t' \\
-& && && | ~ `` fun(p_1, ..., p_n).des'(p''_1, ..., p''_k) = t' " \in eqns \} \\
-& && | && `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \in eqns \textrm{ with } \\
-& && &&\quad `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns" \in prg, eqns \textrm{ mixed } \} \\
-&\cup && \{ && def ~ | ~ def \in prg, ~ def \textrm{ is (co)data definition or non-mixed function def. } \}
+\langle prg \rangle^{unmix} & = ~&& \langle \{ && def \in prg ~ | ~ def \textrm{ is (co)data definition or mixed function def.} \} \rangle^{extract\_helpers(extract\_des)} \\
+&\cup && \{ && def \in prg ~ | ~ def \textrm{ is non-mixed function def. } \}
 \end{alignat*}
 
-%-- under construction
-
+Extract destructor calls from a single equation into helper functions:
 \begin{alignat*}{2}
-& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{eqn\_extract\_des} \span\span \\
-&\quad = &&\langle `` q = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars})  ", \\
-& &&\quad \{`` \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  "\} \cup H \rangle^{eqn\_extract\_des} \\
-& \langle q, H \rangle^{eqn\_extract\_des} = \big\langle q, H \big\rangle, \span\span \\
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des} \span\span \\
+&\quad = \big\langle `` q = hname(\langle q \rangle^{vars})  ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle \\
+&\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
+&\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, q = fun(...), \span\span \\
+&\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \span\span \\
+& \langle q, H \rangle^{extract\_des} = \big\langle q, H \big\rangle, \span\span \\
 &\quad \textrm{if $q$ is hole pattern} \span\span
 \end{alignat*}
-
-%--
 
 Example:
 
