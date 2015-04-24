@@ -33,6 +33,8 @@
 
 \usepackage{amsmath}
 \usepackage{listings}
+\usepackage{bussproofs}
+\usepackage{fixltx2e}
 
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
@@ -396,5 +398,69 @@ otherwise (all constructor patterns) \\
 $\langle con(t_1, ..., t_n), prg \rangle^r = \langle con, prg \rangle^r (\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
 
 Note: the case distinction above is only necessary because of the special syntax for destructors ($q(...).des(...)$ instead of $des(..., ...)$)
+
+\section{Small-step Operational Semantics}
+
+orients itself on and borrows notations from paper ``Copatterns" (Abel et al.), section 4
+
+$t =^? p \searrow \sigma$ means that term t matches with pattern $p$ under substitution $\sigma$.
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{PM\textsubscript{Var}}
+\UnaryInfC{$t =^? x \searrow t/x$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\RightLabel{PM\textsubscript{Con}}
+\UnaryInfC{$con(t_1, ..., t_n) =^? con(p_1, ..., p_n) \searrow \bigcup_{i \in \{1, ..., n\}} \sigma_i$}
+\end{prooftree}
+
+$t =^? q \searrow \sigma$ means that term $t$ matches copattern $q$ returning substitution $\sigma$.
+
+\begin{prooftree}
+\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\RightLabel{PM\textsubscript{App}}
+\UnaryInfC{$fun(t_1, ..., t_n) =^? fun(p_1, ..., p_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t =^? q \searrow \sigma$}
+\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\RightLabel{PM\textsubscript{Des}}
+\BinaryInfC{$t.des(t_1, ...t_n) =^? q.des(p_1, ..., p_n) \searrow \sigma, \bigcup_{i \in \{1, ..., n\}} \sigma_i$}
+\end{prooftree}
+
+$\longrightarrow$ is the one-step reduction function for closed terms, which is assumed to be used with respect to the rules $(q, t) \in \textrm{Rules}(prg)$ of a program $prg$, where $q$ is a copattern (left-hand side of the rule) and $t$ a term (right-hand side of the rule).
+
+\begin{prooftree}
+\AxiomC{$\forall i < j: \not\exists t: t_i \longrightarrow t$}
+\AxiomC{$t_j \longrightarrow t'_j$}
+\RightLabel{$\longrightarrow$\textsubscript{Con}}
+\BinaryInfC{$con(t_1, ... t_j, ..., t_n) \longrightarrow con(t_1, ..., t'_j, ..., t_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\forall i < j: \not\exists t: t_i \longrightarrow t$}
+\AxiomC{$t_j \longrightarrow t'_j$}
+\RightLabel{$\longrightarrow$\textsubscript{Fun}}
+\BinaryInfC{$fun(t_1, ... t_j, ..., t_n) \longrightarrow fun(t_1, ..., t'_j, ..., t_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\forall i < j: \not\exists t: t_i \longrightarrow t$}
+\AxiomC{$t_j \longrightarrow t'_j$}
+\RightLabel{$\longrightarrow$\textsubscript{Des}}
+\BinaryInfC{$t_1.des(t_2, ... t_j, ..., t_n) \longrightarrow t_1.des(t_2, ..., t'_j, ..., t_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t =^? p \searrow \sigma$ with $(p, t') = min \{ (p_2, t'_2) \in prg ~ | ~ t =^? p_2 \searrow \sigma_2 \}$}
+\RightLabel{Subst}
+\UnaryInfC{$t \longrightarrow t'[s]$}
+\end{prooftree}
+
+Here $(p_1, t_1) < (p_2, t_2)$ means that the first rule appears in $prg$ before the second, the minimum of a set of rules is defined accordingly.
 
 \end{document}
