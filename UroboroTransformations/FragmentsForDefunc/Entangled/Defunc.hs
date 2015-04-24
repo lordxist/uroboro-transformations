@@ -33,8 +33,8 @@ convertToVar _ = do
     modify (+1)
     return $ PPVar dummyLocation ("x"++(show n))
 
-extractPatternMatchingInRule :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
-extractPatternMatchingInRule pts fun r@(PTRule l (PQDes l' id pps (PQApp l'' id' pps')) e)
+extractPatternMatching :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
+extractPatternMatching pts fun r@(PTRule l (PQDes l' id pps (PQApp l'' id' pps')) e)
     | any con (pps ++ pps') = do
         let (vars', n) = runState (mapM convertToVar pps') 0
         let vars = evalState (mapM convertToVar pps) n
@@ -45,30 +45,7 @@ extractPatternMatchingInRule pts fun r@(PTRule l (PQDes l' id pps (PQApp l'' id'
         let desRT = destructorReturnType id pts
         writer (newRule, (ruleToHelperFuns fun desTs desRT $ helperFunRule helperFunName r))
     | otherwise = return r
-extractPatternMatchingInRule _ _ r = return r
-
-extractPatternMatchingInRules :: [PT] -> PT -> [PTRule] -> Writer HelperFuns [PTRule]
-extractPatternMatchingInRules pts fun rs =
-    liftM (nubBy hasSamePatternAs) (mapM (extractPatternMatchingInRule pts fun) rs)
-  where
-    (PTRule _ pq e) `hasSamePatternAs` (PTRule _ pq2 e2) = (pq `pqEq` pq2)
-
-    (PQApp _ id pps) `pqEq` (PQApp _ id2 pps2) =
-        (id == id2) && (pps `ppsEq` pps2)
-    (PQDes _ id pps pq) `pqEq` (PQDes _ id2 pps2 pq2) =
-        (id == id2) && (pq `pqEq` pq2) && (pps `ppsEq` pps2)        
-    _ `pqEq` _ = False
-
-    (PPVar _ _) `ppEq` (PPVar _ _) = True
-    (PPCon _ id pps) `ppEq` (PPCon _ id2 pps2) = (id == id2) && (pps `ppsEq` pps2)
-    _ `ppEq` _ = False
-
-    pps `ppsEq` pps2 = ((length pps) == (length pps2)) && (and $ zipWith ppEq pps pps2)
-
-extractPatternMatching :: [PT] -> PT -> Writer HelperFuns PT
-extractPatternMatching pts fun@(PTFun l id ts t rs) =
-    liftM (PTFun l id ts t) (extractPatternMatchingInRules pts fun rs)
-extractPatternMatching _ pt = return pt
+extractPatternMatching _ _ r = return r
 
 disentangle :: [PT] -> [PT]
 disentangle = extractHelperFuns extractPatternMatching

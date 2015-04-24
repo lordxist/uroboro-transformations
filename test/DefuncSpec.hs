@@ -59,8 +59,6 @@ app(Exp, Exp): Exp
 fun(Exp): Exp
 var(Nat): Exp
 
-function nil(): Env where
-
 function eval(Exp, Env): Val where
 eval(app(exp1, exp2), env) = apply(eval(exp1, env), eval(exp2, env))
 eval(fun(exp), env) = autogen0_extract_eval_fun___(exp, env)
@@ -68,6 +66,8 @@ eval(var(nat), env) = lookup(env, nat)
 
 function interpret(Exp): Val where
 interpret(exp) = eval(exp, nil())
+
+function nil(): Env where
 
 function autogen0_lookup_cons(Val, Env, Nat): Val where
 autogen0_lookup_cons(val, env, zero()) = val
@@ -156,9 +156,7 @@ function eval(Exp): Val where
 |]
 
 failure_result :: String
-failure_result = [str|function nilval(): Val where
-
-data Nat where
+failure_result = [str|data Nat where
 zero(): Nat
 succ(Nat): Nat
 
@@ -171,6 +169,8 @@ function eval(Exp): Val where
 eval(app(exp1, exp2)) = autogen0_extract_eval_app___(exp1, exp2)
 eval(fun(exp)) = autogen0_extract_eval_fun_(exp)
 eval(var(nat)) = nilval()
+
+function nilval(): Val where
 
 data Val where
 autogen0_extract_eval_app___(Exp, Exp): Val
