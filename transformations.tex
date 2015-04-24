@@ -336,7 +336,7 @@ $\langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle 
 
 TODO: Handle mixed defs (by extracting destructor calls similar to how it's done in defunctionalization)
 
-Refunctionalizing programs without mixed function defs: $\langle prg \rangle^{r'} = \langle \langle \langle prg \rangle^{disentangle} \rangle^{move\_to\_front} \rangle^{r''}$
+Refunctionalizing programs without mixed function defs: $\langle prg \rangle^{r'} = \langle \langle \langle prg \rangle^{disentangle} \rangle^{split} \rangle^{r''}$
 
 Disentangling (extract undesired pattern matching into helper functions):
 
@@ -368,6 +368,20 @@ Define the following for a copattern $q$:
 &\quad \textrm{if } q = fun(con(p_1^0, ..., p_k^0), p^1_1, ..., p^1_n) \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
 &\langle `` q = t ", H \rangle^{extract} = \big\langle `` q = t ", H \big\rangle, \span\span \\
 &\quad \textrm{otherwise} \span\span
+\end{alignat*}
+
+Splitting of the first argument in hole patterns
+
+(as in $fun(x,...) = t \rightarrow \{fun(con_1(...),...) = t, fun(con_2(...),...) = t\}$):
+
+\begin{alignat*}{4}
+\langle prg \rangle^{split} & = ~&& \{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \span\span \\
+& && && \bigcup && \{ \{ fun(con(y_1, ..., y_k), x_2, ..., x_n) = t[con(y_1, ..., y_k)/x_1] ~ | ~ `` con(y_1, ..., y_k): \tau_1 " \in prg \} \\
+& && && && | ~ `` fun(x_1, x_2, ..., x_n) = t " \in eqns \} \\
+& && && \cup \{ fun(con(...), ...) = t ~ | ~ `` fun(con(...), ...) = t " \in eqns \} \span\span \\
+& && && \cup \{ q.des(...) = t ~ | ~ `` q.des(...) = t " \in eqns \} \span\span \\
+& && | `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \span\span\span\span \\
+& \cup && \{ && def \in prg ~ | ~ def \textrm{ is (co)data def.} \} \span\span
 \end{alignat*}
 
 Actual refunctionalization (for programs without mixed function defs and with constructor applications only in the first argument of a hole pattern):
