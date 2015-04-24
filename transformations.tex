@@ -365,12 +365,10 @@ Define the following for a copattern $q$:
 &\quad && hsig = `` hname(\langle q^{-con'} \rangle^{vartypes}): \sigma ", \\
 &\quad && heqn = `` hname(q^{-con'}_{vars}) = t ", \\
 &\quad && `` fun(...): \sigma " = \langle fun \rangle^{sig}, \\
-&\quad \textrm{if } q = fun(x_0, ..., x_m, con(p_1^0, ..., p_k^0), p^1_1, ..., p^1_n) \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
+&\quad \textrm{if } q = fun(con(p_1^0, ..., p_k^0), p^1_1, ..., p^1_n) \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
 &\langle `` q = t ", H \rangle^{extract} = \big\langle `` q = t ", H \big\rangle, \span\span \\
 &\quad \textrm{otherwise} \span\span
 \end{alignat*}
-
-TODO: move\_to\_front: move singular outer constructor calls to the front of the argument list (as in "fun(..., con(...), ...)" -> "fun(con(...), ...)")
 
 Actual refunctionalization (for programs without mixed function defs and with constructor applications only in the first argument of a hole pattern):
 \begin{alignat*}{3}
