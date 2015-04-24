@@ -135,6 +135,16 @@ data Bool where
 
 \item Implemented in \texttt{UroboroTransformations.defunc}. (But see the comments before \texttt{UroboroTransformations.Util.namePattern} and \texttt{constructorTypes} for limitations.)
 
+\item Define the extraction of the final destructor in the given copattern as follows:
+
+\begin{alignat*}{2}
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \big\rangle \\
+&\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
+&\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, q = fun(...) [...]\\
+&\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \\
+& \langle q, H \rangle^{extract\_des} = \big\langle q, H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
+\end{alignat*}
+
 \end{itemize}
 
 Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle \langle prg \rangle^{elim\_multi\_des} \rangle^{unmix} \rangle^{d'}$
@@ -143,11 +153,8 @@ Eliminate multiple destructor calls: $elim\_multi\_des = extract\_helpers(extrac
 
 Extract outer destructor calls of a single equation (a destructor call after a destructor call) into helper functions:
 \begin{alignat*}{2}
-& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} = \langle `` q = hname(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \rangle^{extract\_outer\_des} \\
-&\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
-&\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, \\
-&\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \\
-&\quad \textrm{if $q = fun(...) ...$ is destructor pattern } \\
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} = \langle \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
+&\quad \textrm{if $q$ is destructor pattern } \\
 & \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} = \big\langle `` q.des(p_1, ..., p_k) = t ", H \big\rangle, \\
 &\quad \textrm{otherwise} \\
 & \langle q, H \rangle^{extract\_outer\_des} = \big\langle q, H \big\rangle, \\
@@ -158,17 +165,6 @@ Extract destructor calls from mixed function defs into helper functions:
 \begin{alignat*}{3}
 \langle prg \rangle^{unmix} & = ~&& \langle \{ && def \in prg ~ | ~ def \textrm{ is (co)data definition or mixed function def.} \} \rangle^{extract\_helpers(extract\_des)} \\
 &\cup && \{ && def \in prg ~ | ~ def \textrm{ is non-mixed function def. } \}
-\end{alignat*}
-
-Extract destructor calls from a single equation into helper functions:
-\begin{alignat*}{2}
-& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des} \span\span \\
-&\quad = \big\langle `` q = hname(\langle q \rangle^{vars})  ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle \\
-&\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
-&\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, q = fun(...), \span\span \\
-&\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \span\span \\
-& \langle q, H \rangle^{extract\_des} = \big\langle q, H \big\rangle, \span\span \\
-&\quad \textrm{if $q$ is hole pattern} \span\span
 \end{alignat*}
 
 Example:
