@@ -119,7 +119,7 @@ where
 &\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
 &\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, q = fun(...) [...]\\
 &\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \\
-& \langle q, H \rangle^{extract\_des} = \big\langle q, H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
+& \langle `` q = t ", H \rangle^{extract\_des} = \big\langle `` q = t ", H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
 \end{alignat*}
 
 \item For the examples below the following data types will be used (as if they were in a standard library):
@@ -156,7 +156,7 @@ Extract outer destructor calls of a single equation (a destructor call after a d
 &\quad \textrm{if $q$ is destructor pattern } \\
 & \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_outer\_des} = \big\langle `` q.des(p_1, ..., p_k) = t ", H \big\rangle, \\
 &\quad \textrm{otherwise} \\
-& \langle q, H \rangle^{extract\_outer\_des} = \big\langle q, H \big\rangle, \\
+& \langle `` q = t ", H \rangle^{extract\_outer\_des} = \big\langle `` q = t ", H \big\rangle, \\
 &\quad \textrm{if $q$ is hole pattern}
 \end{alignat*}
 
