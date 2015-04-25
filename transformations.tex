@@ -146,7 +146,7 @@ data Bool where
 
 \end{itemize}
 
-Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle \langle prg \rangle^{elim\_multi\_des} \rangle^{unmix} \rangle^{d'}$
+Defunctionalizing programs: $\langle prg \rangle^d = \langle \langle \langle prg \rangle^{elim\_multi\_des} \rangle^{unmix_d} \rangle^{d'}$
 
 Eliminate multiple destructor calls: $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$
 
@@ -162,7 +162,7 @@ Extract outer destructor calls of a single equation (a destructor call after a d
 
 Extract destructor calls from mixed function defs into helper functions:
 \begin{alignat*}{3}
-\langle prg \rangle^{unmix} & = ~&& \langle \{ && def \in prg ~ | ~ def \textrm{ is (co)data definition or mixed function def.} \} \rangle^{extract\_helpers(extract\_des)} \\
+\langle prg \rangle^{unmix_d} & = ~&& \langle \{ && def \in prg ~ | ~ def \textrm{ is (co)data definition or mixed function def.} \} \rangle^{extract\_helpers(extract\_des)} \\
 &\cup && \{ && def \in prg ~ | ~ def \textrm{ is non-mixed function def. } \}
 \end{alignat*}
 
@@ -205,11 +205,11 @@ function bar(): List where
 
 \end{lstlisting}
 
-Defunctionalizing programs without mixed function defs: $\langle prg \rangle^{d'} = \langle \langle prg \rangle^{disentangle} \rangle^{d''}$
+Defunctionalizing programs without mixed function defs: $\langle prg \rangle^{d'} = \langle \langle prg \rangle^{disentangle_d} \rangle^{d''}$
 
 Disentangling (extract undesired pattern matching into helper functions):
 \begin{alignat*}{3}
-\langle prg \rangle^{disentangle} & = ~&&\{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+\langle prg \rangle^{disentangle_d} & = ~&&\{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
 & && && \{ fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = \langle fun, des, prg \rangle^{autogen}(x_1, ..., x_n, x'_1, ..., x'_k) \\
 & && && | ~ `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = ... " \in eqns \textrm{ with } \\
 & && &&\quad \exists p \in \{p_1, ..., p_n, p'_1, ..., p'_k\}: p \textrm{ is constructor application} \} \\
@@ -316,11 +316,11 @@ $\langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle 
 
 \section{Refunctionalization of Uroboro}
 
-Refunctionalizing programs: $\langle prg \rangle^r = \langle \langle prg \rangle^{unmix} \rangle^{r'}$
+Refunctionalizing programs: $\langle prg \rangle^r = \langle \langle prg \rangle^{unmix_r} \rangle^{r'}$
 
 Extract destructor calls from mixed function defs into helper functions:
 \begin{alignat*}{3}
-\langle prg \rangle^{unmix} & = ~&& \langle \{ && def \in prg ~ | ~ def \textrm{ is (co)data definition or mixed function def.} \} \rangle^{extract\_helpers(extract\_all\_des)} \\
+\langle prg \rangle^{unmix_r} & = ~&& \langle \{ && def \in prg ~ | ~ def \textrm{ is (co)data definition or mixed function def.} \} \rangle^{extract\_helpers(extract\_all\_des)} \\
 &\cup && \{ && def \in prg ~ | ~ def \textrm{ is non-mixed function def. } \}
 \end{alignat*}
 
@@ -331,11 +331,11 @@ Here $extract\_all\_des$ is simply the iterated version of $extract\_des$:
 \langle `` q = t ", H \rangle^{extract\_all\_des} & = \big\langle `` q = t ", H \big\rangle, \textrm{ if $q$ is hole pattern}
 \end{alignat*}
 
-Refunctionalizing programs without mixed function defs: $\langle prg \rangle^{r'} = \langle \langle \langle prg \rangle^{disentangle} \rangle^{split} \rangle^{r''}$
+Refunctionalizing programs without mixed function defs: $\langle prg \rangle^{r'} = \langle \langle \langle prg \rangle^{disentangle_r} \rangle^{split} \rangle^{r''}$
 
 Disentangling (extract undesired pattern matching into helper functions):
 
-$disentangle = extract\_helpers(extract)$
+$disentangle_r = extract\_helpers(extract)$
 
 Extraction from one equation into helper functions (returns a pair of the changed original equation and the set of the helper functions):
 
