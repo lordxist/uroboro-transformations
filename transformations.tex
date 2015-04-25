@@ -406,6 +406,32 @@ $\langle con(t_1, ..., t_n), prg \rangle^r = \langle con, prg \rangle^r (\langle
 
 Note: the case distinction above is only necessary because of the special syntax for destructors ($q(...).des(...)$ instead of $des(..., ...)$)
 
+\section{Symmetries and alternative transformations}
+
+A certain symmetry can be observed by laying the compositional sequences of the operations comprising defunctionalization and refunctionalization (preprocessing steps, then $d''$ or $r''$, respectively) next to each other:
+
+\begin{alignat*}{4}
+&\textrm{defunc.: } &&\textrm{ALL} \rightarrow  elim\_outer\_des \rightarrow && unmix_d \rightarrow disentangle_d && \rightarrow d'' \rightarrow \textrm{DEFUNC'ED} \\
+&\textrm{refunc.: } &&\textrm{ALL} \rightarrow && unmix_r \rightarrow disentangle_r \rightarrow split && \rightarrow r'' \rightarrow \textrm{REFUNC'ED}
+\end{alignat*}
+
+ALL stands for all of Uroboro, DEFUNC'ED and REFUNC'ED stand for the fragments of Uroboro the respective transformation results in. These two fragments can be transformed into one another as follows:
+
+\begin{alignat*}{3}
+&\textrm{REFUNC'ED} \rightarrow && elim\_outer\_des &&\rightarrow d'' \rightarrow \textrm{DEFUNC'ED} \\
+&\textrm{DEFUNC'ED} \rightarrow && disentangle_r \rightarrow split && \rightarrow r'' \rightarrow \textrm{REFUNC'ED}
+\end{alignat*}
+
+Observe that, when defunctionalizing REFUNC'EDs, only the first step $elim\_outer\_des$ of the preprocessing steps above is needed. Symmetrically, the first step $unmix_r$ of the preprocessing steps can be omitted when refunctionalizing DEFUNC'EDs.
+
+From this symmetry one can derive an alternative defunctionalization and refunctionalization by using the respective other transformation:
+
+$\langle prg \rangle^{d_{alt}} = \langle \langle prg \rangle^r \rangle^{elim\_outer\_des} \rangle^{d''}$
+
+$\langle prg \rangle^{r_{alt}} = \langle \langle \langle prg \rangle^d \rangle^{disentangle_r} \rangle^{split} \rangle^{r''}$
+
+In both cases, one step of the original transformation can be saved by the above observed connection between REFUNC'ED and DEFUNC'ED. But this comes at the expense of having to run the entire refunctionalization before defunctionalizing and vice versa.
+
 \section{Small-step Operational Semantics}
 
 orients itself on and borrows notations from paper ``Copatterns" (Abel et al.), section 4
