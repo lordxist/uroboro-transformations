@@ -39,10 +39,13 @@ renderSignature (PTNeg _ t _) = "codata " ++ (renderType t)
 renderSignature (PTFun _ id ts t _) = 
   "function " ++ id ++ (args ts renderType) ++ ": " ++ (renderType t)
 
+indent :: String -> String
+indent s = "  " ++ s
+
 renderDefs :: PT -> String
-renderDefs (PTPos _ _ cons)   = unlines (map renderCon cons)
-renderDefs (PTNeg _ _ dess)   = unlines (map renderDes dess)
-renderDefs (PTFun _ _ _ _ rs) = unlines (map renderRule rs)
+renderDefs (PTPos _ _ cons)   = unlines (map (indent . renderCon) cons)
+renderDefs (PTNeg _ _ dess)   = unlines (map (indent . renderDes) dess)
+renderDefs (PTFun _ _ _ _ rs) = unlines (map (indent . renderRule) rs)
 
 renderDefinition :: PT -> String
 renderDefinition pt = (renderSignature pt) ++ " where\n" ++ (renderDefs pt)

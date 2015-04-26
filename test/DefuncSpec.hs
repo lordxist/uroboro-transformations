@@ -51,39 +51,39 @@ function interpret(Exp) : Val where
 
 eval1_result :: String
 eval1_result = [str|data Nat where
-zero(): Nat
-succ(Nat): Nat
+  zero(): Nat
+  succ(Nat): Nat
 
 data Exp where
-app(Exp, Exp): Exp
-fun(Exp): Exp
-var(Nat): Exp
+  app(Exp, Exp): Exp
+  fun(Exp): Exp
+  var(Nat): Exp
 
 function eval(Exp, Env): Val where
-eval(app(exp1, exp2), env) = apply(eval(exp1, env), eval(exp2, env))
-eval(fun(exp), env) = autogen0_extract_eval_fun___(exp, env)
-eval(var(nat), env) = lookup(env, nat)
+  eval(app(exp1, exp2), env) = apply(eval(exp1, env), eval(exp2, env))
+  eval(fun(exp), env) = autogen0_extract_eval_fun___(exp, env)
+  eval(var(nat), env) = lookup(env, nat)
 
 function interpret(Exp): Val where
-interpret(exp) = eval(exp, nil())
+  interpret(exp) = eval(exp, nil())
 
 function nil(): Env where
 
 function autogen0_lookup_cons(Val, Env, Nat): Val where
-autogen0_lookup_cons(val, env, zero()) = val
-autogen0_lookup_cons(val, env, succ(nat)) = lookup(env, nat)
+  autogen0_lookup_cons(val, env, zero()) = val
+  autogen0_lookup_cons(val, env, succ(nat)) = lookup(env, nat)
 
 data Val where
-autogen0_extract_eval_fun___(Exp, Env): Val
+  autogen0_extract_eval_fun___(Exp, Env): Val
 
 data Env where
-cons(Val, Env): Env
+  cons(Val, Env): Env
 
 function apply(Val, Val): Val where
-apply(autogen0_extract_eval_fun___(exp, env), val) = eval(exp, cons(val, env))
+  apply(autogen0_extract_eval_fun___(exp, env), val) = eval(exp, cons(val, env))
 
 function lookup(Env, Nat): Val where
-lookup(cons(x0, x1), x2) = autogen0_lookup_cons(x0, x1, x2)
+  lookup(cons(x0, x1), x2) = autogen0_lookup_cons(x0, x1, x2)
 
 |]
 
@@ -109,25 +109,25 @@ function multi(A, Nat):A where
 
 test_multi_des_result :: String
 test_multi_des_result = [str|data B where
-conb1(): B
+  conb1(): B
 
 data Nat where
-zero(): Nat
-succ(Nat): Nat
+  zero(): Nat
+  succ(Nat): Nat
 
 function autogen0_desa1_multi(A, Nat): A where
-autogen0_desa1_multi(a, zero()) = autogen0_extract_desa1___multi___zero_(a)
-autogen0_desa1_multi(a, succ(n)) = multi(a, n)
+  autogen0_desa1_multi(a, zero()) = autogen0_extract_desa1___multi___zero_(a)
+  autogen0_desa1_multi(a, succ(n)) = multi(a, n)
 
 data A where
-multi(A, Nat): A
-autogen0_extract_desa1___multi___zero_(A): A
+  multi(A, Nat): A
+  autogen0_extract_desa1___multi___zero_(A): A
 
 function desa1(A): A where
-desa1(multi(x0, x1)) = autogen0_desa1_multi(x0, x1)
+  desa1(multi(x0, x1)) = autogen0_desa1_multi(x0, x1)
 
 function desa2(A): B where
-desa2(autogen0_extract_desa1___multi___zero_(a)) = conb1()
+  desa2(autogen0_extract_desa1___multi___zero_(a)) = conb1()
 
 |]
 
@@ -157,28 +157,28 @@ function eval(Exp): Val where
 
 failure_result :: String
 failure_result = [str|data Nat where
-zero(): Nat
-succ(Nat): Nat
+  zero(): Nat
+  succ(Nat): Nat
 
 data Exp where
-app(Exp, Exp): Exp
-fun(Exp): Exp
-var(Nat): Exp
+  app(Exp, Exp): Exp
+  fun(Exp): Exp
+  var(Nat): Exp
 
 function eval(Exp): Val where
-eval(app(exp1, exp2)) = autogen0_extract_eval_app___(exp1, exp2)
-eval(fun(exp)) = autogen0_extract_eval_fun_(exp)
-eval(var(nat)) = nilval()
+  eval(app(exp1, exp2)) = autogen0_extract_eval_app___(exp1, exp2)
+  eval(fun(exp)) = autogen0_extract_eval_fun_(exp)
+  eval(var(nat)) = nilval()
 
 function nilval(): Val where
 
 data Val where
-autogen0_extract_eval_app___(Exp, Exp): Val
-autogen0_extract_eval_fun_(Exp): Val
+  autogen0_extract_eval_app___(Exp, Exp): Val
+  autogen0_extract_eval_fun_(Exp): Val
 
 function apply(Val, Val): Val where
-apply(autogen0_extract_eval_app___(exp1, exp2), val) = val
-apply(autogen0_extract_eval_fun_(exp), val) = val
+  apply(autogen0_extract_eval_app___(exp1, exp2), val) = val
+  apply(autogen0_extract_eval_fun_(exp), val) = val
 
 |]
 

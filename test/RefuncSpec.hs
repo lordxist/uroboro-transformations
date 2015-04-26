@@ -35,21 +35,21 @@ function repeat(Nat): List where
 
 simple_refunc_test_result :: String
 simple_refunc_test_result = [str|codata List where
-List.head(): Nat
-List.tail(): List
+  List.head(): Nat
+  List.tail(): List
 
 function repeat(Nat): List where
-repeat(zero).head() = zero.autogen0_extract_head___repeat_()
-repeat(n).tail() = repeat(n)
+  repeat(zero).head() = zero.autogen0_extract_head___repeat_()
+  repeat(n).tail() = repeat(n)
 
 codata Nat where
-Nat.autogen0_extract_head___repeat_(): Nat
+  Nat.autogen0_extract_head___repeat_(): Nat
 
 function zero(): Nat where
-zero().autogen0_extract_head___repeat_() = zero()
+  zero().autogen0_extract_head___repeat_() = zero()
 
 function succ(Nat): Nat where
-succ(n).autogen0_extract_head___repeat_() = succ(n)
+  succ(n).autogen0_extract_head___repeat_() = succ(n)
 
 |]
 
