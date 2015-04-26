@@ -12,6 +12,7 @@ library
   exposed-modules:
       PrettyPrint
     , UroboroTransformations.Defunc
+    , UroboroTransformations.Refunc
     , UroboroTransformations.CoDataFragments
     , UroboroTransformations.CoDataFragments.Defunc
     , UroboroTransformations.CoDataFragments.Refunc
@@ -22,6 +23,7 @@ library
     , UroboroTransformations.FragmentsForDefunc.Entangled.Defunc
     , UroboroTransformations.FragmentsForDefunc.MixedDefs.FragmentTest
     , UroboroTransformations.FragmentsForDefunc.MixedDefs.Defunc
+    , UroboroTransformations.FragmentsForRefunc.Entangled.Refunc
     , UroboroTransformations.Util
     , UroboroTransformations.Util.HelperFuns
     , UroboroTransformations.Util.DesExtraction
@@ -30,7 +32,7 @@ library
 
 test-suite tests
   type:             exitcode-stdio-1.0
-  hs-source-dirs:   ., test
+  hs-source-dirs:   lib-src, test
   main-is:          Spec.hs
   other-modules:    Spec, UroboroTransformations.Defunc, Str
   build-depends:
@@ -44,7 +46,61 @@ test-suite tests
   default-language:    Haskell2010
 
 executable defunc
-  hs-source-dirs:    main-defunc-src
-  main-is:           Main.hs
+  hs-source-dirs:    main-src
+  main-is:           Defunc.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable elim-multi-des
+  hs-source-dirs:    main-src
+  main-is:           ElimMultiDes.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable unmix-d
+  hs-source-dirs:    main-src
+  main-is:           UnmixD.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable disentangle-d
+  hs-source-dirs:    main-src
+  main-is:           DisentangleD.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable defunc-core
+  hs-source-dirs:    main-src
+  main-is:           DefuncCore.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable refunc
+  hs-source-dirs:    main-src
+  main-is:           Refunc.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable unmix-r
+  hs-source-dirs:    main-src
+  main-is:           UnmixR.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable disentangle-r
+  hs-source-dirs:    main-src
+  main-is:           DisentangleR.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable split
+  hs-source-dirs:    main-src
+  main-is:           Split.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable refunc-core
+  hs-source-dirs:    main-src
+  main-is:           RefuncCore.hs
   build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
   default-language:  Haskell2010
