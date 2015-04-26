@@ -68,5 +68,8 @@ extractPatternMatching pts fun r@(PTRule _ (PQApp _ _ pps) _)
 disentangle :: [PT] -> [PT]
 disentangle = extractHelperFuns extractPatternMatching
 
+split :: [PT] -> [PT]
+split = id -- TODO: implement
+
 refuncLegal :: [PT] -> Maybe [PT]
-refuncLegal pts = CoDataDefsDisjR.refunc (disentangle pts)
+refuncLegal pts = CoDataDefsDisjR.refunc $ split $ disentangle pts

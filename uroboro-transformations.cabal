@@ -8,7 +8,23 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:   PrettyPrint, UroboroTransformations.CoDataFragments, UroboroTransformations.CoDataFragments.Defunc, UroboroTransformations.CoDataFragments.Refunc
+  hs-source-dirs:    lib-src
+  exposed-modules:
+      PrettyPrint
+    , UroboroTransformations.Defunc
+    , UroboroTransformations.CoDataFragments
+    , UroboroTransformations.CoDataFragments.Defunc
+    , UroboroTransformations.CoDataFragments.Refunc
+    , UroboroTransformations.CoDataDefsDisj.FragmentTest
+    , UroboroTransformations.CoDataDefsDisj.Defunc
+    , UroboroTransformations.CoDataDefsDisj.Refunc
+    , UroboroTransformations.FragmentsForDefunc.Entangled.FragmentTest
+    , UroboroTransformations.FragmentsForDefunc.Entangled.Defunc
+    , UroboroTransformations.FragmentsForDefunc.MixedDefs.FragmentTest
+    , UroboroTransformations.FragmentsForDefunc.MixedDefs.Defunc
+    , UroboroTransformations.Util
+    , UroboroTransformations.Util.HelperFuns
+    , UroboroTransformations.Util.DesExtraction
   build-depends:     base >= 4.7 && < 4.8, uroboro, transformers, mtl
   default-language:  Haskell2010
 
@@ -27,7 +43,8 @@ test-suite tests
     , template-haskell
   default-language:    Haskell2010
 
-executable uroboro-transformations
+executable defunc
+  hs-source-dirs:    main-defunc-src
   main-is:           Main.hs
   build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
   default-language:  Haskell2010
