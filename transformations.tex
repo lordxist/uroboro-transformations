@@ -343,22 +343,23 @@ Define the following for a copattern $q$:
 
 \begin{itemize}
 \item $q^{-con}$ means $q$ with its left-most inner-most constructor pattern occurrence replaced by a variable;
-\item $q^{-con}_{vars}$ gives the following patterns: the variables in $q$, but the left-most inner-most constructor pattern is kept;
+\item $q^{-con}_{vars^-}$ gives the following patterns: the variables in $q$ minus those occuring in the left-most inner-most constructor pattern, and this pattern in front of them;
+\item $q^{-con}_{vars^+}$ gives the following patterns: the variables in $q$ minus those occuring in the left-most inner-most constructor pattern, and a variable replacing this pattern in front of them;
 \item $q^{-con'}$ is the same as $q^{-con}$, but ignores a left-most outer constructor pattern;
-\item $q^{-con'}_{vars}$ is in the same way analogous to $q^{-con}_{vars}$
+\item $q^{-con'}_{vars^-}$ and $q^{-con'}_{vars^+}$ are in the same way analogous to $q^{-con}_{vars^-}$ and $q^{-con}_{vars^+}$
 \end{itemize}
 
 \begin{alignat*}{3}
-&\langle `` q = t ", H \rangle^{extract} = \langle `` q^{-con} = hname (\langle q^{-con} \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract} \span\span \\
+&\langle `` q = t ", H \rangle^{extract} = \langle `` q^{-con} = hname (q^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract} \span\span \\
 &\quad \textrm{with } && hname = \langle \langle q^{-con} \rangle^{name\_pattern} \rangle^{autogen}, \\
-&\quad && hsig = `` hname(\langle q^{-con} \rangle^{vartypes}): \sigma ", \\
-&\quad && heqn = `` hname(q^{-con}_{vars}) = t ", \\
+&\quad && hsig = `` hname(\langle q^{-con}_{vars^+} \rangle^{vartypes}): \sigma ", \\
+&\quad && heqn = `` hname(q^{-con}_{vars^-}) = t ", \\
 &\quad && `` \tau.des_k(...): \sigma " = \langle des_k \rangle^{sig}, \\
 &\quad \textrm{if } q = fun(p_1^0, ..., p_n^0).des_1(p_1^1, ..., p_{n_1}^1)...des_k(p_1^k, ..., p_{n_k}^k), k \geq 1 \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
-&\langle `` q = t ", H \rangle^{extract} = \langle `` q^{-con'} = hname (\langle q^{-con'} \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract} \span\span \\
+&\langle `` q = t ", H \rangle^{extract} = \langle `` q^{-con'} = hname (q^{-con'}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract} \span\span \\
 &\quad \textrm{with } && hname = \langle \langle q^{-con'} \rangle^{name\_pattern} \rangle^{autogen}, \\
-&\quad && hsig = `` hname(\langle q^{-con'} \rangle^{vartypes}): \sigma ", \\
-&\quad && heqn = `` hname(q^{-con'}_{vars}) = t ", \\
+&\quad && hsig = `` hname(\langle q^{-con'}_{vars^+} \rangle^{vartypes}): \sigma ", \\
+&\quad && heqn = `` hname(q^{-con'}_{vars^-}) = t ", \\
 &\quad && `` fun(...): \sigma " = \langle fun \rangle^{sig}, \\
 &\quad \textrm{if } q = fun(con(p_1^0, ..., p_k^0), p^1_1, ..., p^1_n) \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
 &\langle `` q = t ", H \rangle^{extract} = \big\langle `` q = t ", H \big\rangle, \span\span \\
