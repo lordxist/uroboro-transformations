@@ -1,0 +1,20 @@
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+data Bool where
+  true(): Bool
+  false(): Bool
+
+codata List where
+  List.elemAt(Nat): Nat
+  List.isEmpty(): Bool
+
+function foo(Nat): List where
+  foo(zero()) = bar()
+  foo(succ(zero())) = bar()
+  foo(succ(succ(n))).elemAt(m) = n
+
+function bar(): List where
+  bar().elemAt(n) = zero()
+  bar().isEmpty() = true()

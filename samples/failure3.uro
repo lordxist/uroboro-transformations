@@ -1,0 +1,15 @@
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+data Bool where
+  true(): Bool
+  false(): Bool
+
+codata List where
+  List.elemAt(Nat): Nat
+  List.isEmpty(): Bool
+
+function repeat(Nat): List where
+  repeat(zero()).elemAt(n) = zero()
+  repeat(succ(m)).elemAt(n) = succ(m)

@@ -1,0 +1,26 @@
+Preprocessing library uroboro-transformations-0.0...
+In-place registering uroboro-transformations-0.0...
+Preprocessing executable 'uroboro-transformations' for
+uroboro-transformations-0.0...
+data B where
+conb1(): B
+
+data Nat where
+zero(): Nat
+succ(Nat): Nat
+
+function autogen0_desa1_multi(A, Nat): A where
+autogen0_desa1_multi(a, zero()) = autogen0_extract_desa1___multi___zero_(a)
+autogen0_desa1_multi(a, succ(n)) = multi(a, n)
+
+data A where
+multi(A, Nat): A
+autogen0_extract_desa1___multi___zero_(A): A
+
+function desa1(A): A where
+desa1(multi(x0, x1)) = autogen0_desa1_multi(x0, x1)
+
+function desa2(A): B where
+desa2(autogen0_extract_desa1___multi___zero_(a)) = conb1()
+
+

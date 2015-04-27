@@ -1,0 +1,40 @@
+Preprocessing library uroboro-transformations-0.0...
+In-place registering uroboro-transformations-0.0...
+Preprocessing executable 'uroboro-transformations' for
+uroboro-transformations-0.0...
+data Nat where
+zero(): Nat
+succ(Nat): Nat
+
+data Exp where
+app(Exp, Exp): Exp
+fun(Exp): Exp
+var(Nat): Exp
+
+function nil(): Env where
+
+function eval(Exp, Env): Val where
+eval(app(exp1, exp2), env) = apply(eval(exp1, env), eval(exp2, env))
+eval(fun(exp), env) = autogen0_extract_eval_fun___(exp, env)
+eval(var(nat), env) = lookup(env, nat)
+
+function interpret(Exp): Val where
+interpret(exp) = eval(exp, nil())
+
+function autogen0_lookup_cons(Val, Env, Nat): Val where
+autogen0_lookup_cons(val, env, zero()) = val
+autogen0_lookup_cons(val, env, succ(nat)) = lookup(env, nat)
+
+data Val where
+autogen0_extract_eval_fun___(Exp, Env): Val
+
+data Env where
+cons(Val, Env): Env
+
+function apply(Val, Val): Val where
+apply(autogen0_extract_eval_fun___(exp, env), val) = eval(exp, cons(val, env))
+
+function lookup(Env, Nat): Val where
+lookup(cons(x0, x1), x2) = autogen0_lookup_cons(x0, x1, x2)
+
+
