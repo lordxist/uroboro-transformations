@@ -86,14 +86,8 @@ splitRule pts t (PTRule l (PQApp l' id ((PPVar _ id'):pps)) e) =
         otherVars <- mapM convertToVar pps
         return $ [ppCon] ++ otherVars
 
-    typeToVar _ = convertToVar (PPVar dummyLocation "")
+    typeToVar _ = convertToVar ()
 splitRule _ _ r = [r]
-
-convertToVar :: PP -> State Int PP
-convertToVar _ = do
-    n <- get
-    modify (+1)
-    return $ PPVar dummyLocation ("x"++(show n))
 
 split :: [PT] -> [PT]
 split pts = map splitInPT pts

@@ -4,10 +4,17 @@ import Uroboro.Tree
 import Uroboro.Error
 
 import Data.List(intercalate)
+import Control.Monad.State.Lazy
 
 -- At the moment, locations aren't correctly stored after transformations anyway
 dummyLocation :: Location
 dummyLocation = MakeLocation "" (-1) (-1)
+
+convertToVar :: a -> State Int PP
+convertToVar _ = do
+    n <- get
+    modify (+1)
+    return $ PPVar dummyLocation ("x"++(show n))
 
 toExpr :: PP -> PExp
 toExpr (PPVar l id) = PVar l id

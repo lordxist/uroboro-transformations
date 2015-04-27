@@ -27,12 +27,6 @@ helperFunRule id (PTRule l (PQDes _ _ pps (PQApp l' _ pps')) e) =
     Just $ PTRule l (PQApp l' id (pps' ++ pps)) e
 helperFunRule _ _ = Nothing
 
-convertToVar :: PP -> State Int PP
-convertToVar _ = do
-    n <- get
-    modify (+1)
-    return $ PPVar dummyLocation ("x"++(show n))
-
 extractPatternMatching :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
 extractPatternMatching pts fun r@(PTRule l (PQDes l' id pps (PQApp l'' id' pps')) e)
     | any con (pps ++ pps') = do
