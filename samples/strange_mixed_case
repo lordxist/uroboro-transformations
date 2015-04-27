@@ -1,0 +1,27 @@
+codata A where
+  A.bar(): A
+
+function foo(A): A where
+  foo(a).bar() = a
+  foo(a) = a
+
+-- problem: what to transform this into?
+-- unmixing creates the following:
+
+codata A where ...
+
+function foo(A): A where
+  foo(a) = some_helper(a)
+
+function some_helper(A): A where
+  helper(a).bar() = a
+
+-- this is because the rule with the duplicate foo(a) pattern is dropped
+-- so that the rules aren't mixed anymore
+-- but then the rule
+
+foo(a) = a
+
+-- has no equivalent in the transformation result
+-- question: is this a problem for semantics preservation?
+-- and: if yes, can this even be avoided?
