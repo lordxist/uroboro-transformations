@@ -9,6 +9,7 @@ import UroboroTransformations.Util.HelperFuns
 
 import Data.List(nubBy, groupBy)
 import Control.Monad(liftM)
+import Control.Monad.State.Lazy
 import Control.Monad.Trans.Writer.Lazy
 
 extractWith :: (PQ -> PQ) -> (PQ -> [PP]) ->[PT] -> PT -> PTRule -> Writer HelperFuns PTRule
@@ -68,8 +69,37 @@ extractPatternMatching pts fun r@(PTRule _ (PQApp _ _ pps) _)
 disentangle :: [PT] -> [PT]
 disentangle = extractHelperFuns extractPatternMatching
 
+splitRule :: [PT] -> Type -> PTRule -> [PTRule]
+splitRule pts t (PTRule l (PQApp l' id ((PPVar _ id'):pps)) e) =
+    map makeRuleForCon $ consForType pts
+  where
+    consForType ((PTPos _ _ cons@((PTCon _ t' _ _):_)):pts')
+        | t == t' = cons
+        | otherwise          = consForType pts'
+    consForType (_:pts') = consForType pts'
+
+    makeRuleForCon c = (PTRule l (PQApp l' id (convertPPs c)) e)
+
+    convertPPs (PTCon _ _ cId ts) = flip evalState 0 $ do
+        varsForCon <- mapM typeToVar ts
+        let ppCon = PPCon l cId varsForCon
+        otherVars <- mapM convertToVar pps
+        return $ [ppCon] ++ otherVars
+
+    typeToVar _ = convertToVar (PPVar dummyLocation "")
+splitRule _ _ r = [r]
+
+convertToVar :: PP -> State Int PP
+convertToVar _ = do
+    n <- get
+    modify (+1)
+    return $ PPVar dummyLocation ("x"++(show n))
+
 split :: [PT] -> [PT]
-split = id -- TODO: implement
+split pts = map splitInPT pts
+  where
+    splitInPT (PTFun l id ts@(t':ts') t rs) = PTFun l id ts t $ concatMap (splitRule pts t') rs
+    splitInPT pt = pt
 
 refuncLegal :: [PT] -> Maybe [PT]
 refuncLegal pts = CoDataDefsDisjR.refunc $ split $ disentangle pts

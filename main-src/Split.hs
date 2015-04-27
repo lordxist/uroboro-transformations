@@ -11,8 +11,7 @@ import UroboroTransformations.FragmentsForRefunc.Entangled.Refunc
 import System.IO
 import System.Environment
 
--- |Not implemented yet, later it:
--- parses, typechecks, input undergoes "split" transformation, then typechecks and pretty-prints result
+-- |Parses, typechecks, input undergoes "split" transformation, then typechecks and pretty-prints result
 -- For this to work, uroboro.cabal needs to be edited to expose Uroboro.PrettyPrint
 main :: IO ()
 main = do
