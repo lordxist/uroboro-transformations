@@ -39,7 +39,7 @@ simple_refunc_test_result = [str|codata List where
   List.tail(): List
 
 function repeat(Nat): List where
-  repeat(zero).head() = zero.autogen0_extract_head___repeat_()
+  repeat(x0).head() = x0.autogen0_extract_head___repeat_()
   repeat(n).tail() = repeat(n)
 
 codata Nat where

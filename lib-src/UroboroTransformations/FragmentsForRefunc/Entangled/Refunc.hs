@@ -25,13 +25,15 @@ extractWith removeLeftCon varsAndLeftCon pts (PTFun l id ts t _) r@(PTRule l' pq
 
 extractPatternMatching :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
 extractPatternMatching pts fun r@(PTRule _ (PQDes _ _ pps pq) _)
-    | any con (pps ++ (ppsForPQ pq)) = extractWith removeLeftCon varsAndLeftCon pts fun r
+    | any con (pps ++ (ppsForPQ pq)) = do
+        replacedRule <- extractWith removeLeftCon varsAndLeftCon pts fun r
+        extractPatternMatching pts fun replacedRule
     | otherwise = return r
   where
-    removeLeftCon (PQApp l id pps) = PQApp l id (removeLeftConPPs pps)
+    removeLeftCon (PQApp l id pps) = PQApp l id (evalState (removeLeftConPPs pps) 0)
     removeLeftCon (PQDes l id pps pq)
         | conInPQ pq = PQDes l id pps (removeLeftCon pq)
-        | otherwise  = PQDes l id (removeLeftConPPs pps) pq
+        | otherwise  = PQDes l id (evalState (removeLeftConPPs pps) 0) pq
 
     varsAndLeftCon (PQApp _ _ pps) = varsAndLeftConPPs pps
     varsAndLeftCon (PQDes _ _ pps pq)
@@ -47,11 +49,23 @@ extractPatternMatching pts fun r@(PTRule _ (PQDes _ _ pps pq) _)
     conInPQ (PQDes _ _ pps pq) = (any con pps) || (conInPQ pq)
     conInPQ (PQApp _ _ pps)    = any con pps
 
-    removeLeftConPPs ((v@(PPVar _ _)):pps) = v:(removeLeftConPPs pps)
+    removeLeftConPPs ((v@(PPVar _ _)):pps) = do
+        newV <- convertToVar v
+        newPPs <- removeLeftConPPs pps
+        return $ newV:newPPs
     removeLeftConPPs ((c@(PPCon l id pps)):pps')
-        | any con pps = (PPCon l id (removeLeftConPPs pps)):pps'
-        | otherwise   = (PPVar l id):pps' -- TODO: after this, all variable names need to be renamed
-    removeLeftConPPs [] = []
+        | any con pps = do
+            newPPs <- removeLeftConPPs pps
+            newPPs' <- mapM renameVars pps'
+            return $ (PPCon l id newPPs):newPPs'
+        | otherwise = do
+            newV <- convertToVar c
+            newPPs' <- mapM renameVars pps'
+            return $ newV:newPPs'
+    removeLeftConPPs [] = return []
+
+    renameVars v@(PPVar _ _) = convertToVar v
+    renameVars (PPCon l id pps) = liftM (PPCon l id) $ mapM renameVars pps
 
     ppsForPQ (PQDes _ _ pps pq) = pps ++ (ppsForPQ pq)
     ppsForPQ (PQApp _ _ pps)    = pps
@@ -96,4 +110,4 @@ split pts = map splitInPT pts
     splitInPT pt = pt
 
 refuncLegal :: [PT] -> Maybe [PT]
-refuncLegal pts = CoDataDefsDisjR.refunc $ split $ disentangle pts
+refuncLegal pts = CoDataDefsDisjR.refuncLegal $ split $ disentangle pts
