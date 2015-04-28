@@ -45,6 +45,47 @@ extractWith removeLeftCon isolateLeftCon pts (PTFun l id ts t _) r@(PTRule l' pq
             newVs2 <- mapM convertToVar vs2
             return $ v:(newVs1 ++ newVs2)
 
+removeLeftConPPs :: [PP] -> State Int [PP]
+removeLeftConPPs ((v@(PPVar _ _)):pps) = do
+    newV <- convertToVar v
+    newPPs <- removeLeftConPPs pps
+    return $ newV:newPPs
+removeLeftConPPs ((c@(PPCon l id pps)):pps')
+    | any con pps = do
+        newPPs <- removeLeftConPPs pps
+        newPPs' <- mapM renameVars pps'
+        return $ (PPCon l id newPPs):newPPs'
+    | otherwise = do
+        newV <- convertToVar c
+        newPPs' <- mapM renameVars pps'
+        return $ newV:newPPs'
+  where
+    renameVars v@(PPVar _ _) = convertToVar v
+    renameVars (PPCon l id pps) = liftM (PPCon l id) $ mapM renameVars pps
+removeLeftConPPs [] = return []
+
+removeLeftCon :: PQ -> PQ
+removeLeftCon (PQApp l id pps) = PQApp l id (evalState (removeLeftConPPs pps) 0)
+removeLeftCon (PQDes l id pps pq)
+    | conInPQ pq = PQDes l id pps (removeLeftCon pq)
+    | otherwise  = PQDes l id (evalState (removeLeftConPPs pps) 0) pq    
+
+isolateLeftConPPs :: [PP] -> (PP, ([PP], [PP]))
+isolateLeftConPPs ((v@(PPVar _ _)):pps) = second (first (v:)) (isolateLeftConPPs pps)
+isolateLeftConPPs ((c@(PPCon l id pps)):pps')
+    | any con pps = second (second (++(concatMap collectVars pps'))) (isolateLeftConPPs pps)
+    | otherwise   = (c, ([], (concatMap collectVars pps')))
+
+isolateLeftCon :: PQ -> (PP, ([PP], [PP]))
+isolateLeftCon (PQApp _ _ pps) = isolateLeftConPPs pps
+isolateLeftCon (PQDes _ _ pps pq)
+    | conInPQ pq = second (second (++(concatMap collectVars pps))) (isolateLeftCon pq)
+    | otherwise  = second (first ((collectVarsPQ pq)++)) (isolateLeftConPPs pps)    
+
+conInPQ :: PQ -> Bool
+conInPQ (PQDes _ _ pps pq) = (any con pps) || (conInPQ pq)
+conInPQ (PQApp _ _ pps)    = any con pps
+
 extractPatternMatching :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
 extractPatternMatching pts fun r@(PTRule _ (PQDes _ _ pps pq) _)
     | any con (pps ++ (ppsForPQ pq)) = do
@@ -52,44 +93,6 @@ extractPatternMatching pts fun r@(PTRule _ (PQDes _ _ pps pq) _)
         extractPatternMatching pts fun replacedRule
     | otherwise = return r
   where
-    removeLeftCon :: PQ -> PQ
-    removeLeftCon (PQApp l id pps) = PQApp l id (evalState (removeLeftConPPs pps) 0)
-    removeLeftCon (PQDes l id pps pq)
-        | conInPQ pq = PQDes l id pps (removeLeftCon pq)
-        | otherwise  = PQDes l id (evalState (removeLeftConPPs pps) 0) pq
-
-    removeLeftConPPs ((v@(PPVar _ _)):pps) = do
-        newV <- convertToVar v
-        newPPs <- removeLeftConPPs pps
-        return $ newV:newPPs
-    removeLeftConPPs ((c@(PPCon l id pps)):pps')
-        | any con pps = do
-            newPPs <- removeLeftConPPs pps
-            newPPs' <- mapM renameVars pps'
-            return $ (PPCon l id newPPs):newPPs'
-        | otherwise = do
-            newV <- convertToVar c
-            newPPs' <- mapM renameVars pps'
-            return $ newV:newPPs'
-    removeLeftConPPs [] = return []
-
-    renameVars v@(PPVar _ _) = convertToVar v
-    renameVars (PPCon l id pps) = liftM (PPCon l id) $ mapM renameVars pps
-
-    isolateLeftCon :: PQ -> (PP, ([PP], [PP]))
-    isolateLeftCon (PQApp _ _ pps) = isolateLeftConPPs pps
-    isolateLeftCon (PQDes _ _ pps pq)
-        | conInPQ pq = second (second (++(concatMap collectVars pps))) (isolateLeftCon pq)
-        | otherwise  = second (first ((collectVarsPQ pq)++)) (isolateLeftConPPs pps)
-
-    isolateLeftConPPs ((v@(PPVar _ _)):pps) = second (first (v:)) (isolateLeftConPPs pps)
-    isolateLeftConPPs ((c@(PPCon l id pps)):pps')
-        | any con pps = second (second (++(concatMap collectVars pps'))) (isolateLeftConPPs pps)
-        | otherwise   = (c, ([], (concatMap collectVars pps')))
-
-    conInPQ (PQDes _ _ pps pq) = (any con pps) || (conInPQ pq)
-    conInPQ (PQApp _ _ pps)    = any con pps
-
     ppsForPQ (PQDes _ _ pps pq) = pps ++ (ppsForPQ pq)
     ppsForPQ (PQApp _ _ pps)    = pps
 
