@@ -35,16 +35,16 @@ extractWithFlag flag pts (PTFun l id ts t _) r@(PTRule l' pq e) = do
         where
             varTypes = collectVarTypes pts ts $ removeLeftCon pq flag
             (c, (vs1, vs2)) = isolateLeftCon pq flag
-            zipped1 = zip ((concatMap collectVars vs1)++[c]) varTypes
+            zipped1 = zip (vs1++[c]) varTypes
             rZipped1 = reverse zipped1
-            zipped2 = zip (reverse (concatMap collectVars vs2)) (reverse varTypes)
+            zipped2 = zip (reverse vs2) (reverse varTypes)
 
     varsReplaceLeftCon pq = recombine $ isolateLeftCon pq flag
       where
         recombine (con, (vs1, vs2)) = flip evalState 0 $ do
-            newVs1 <- mapM convertToVar $ concatMap collectVars vs1
+            newVs1 <- mapM convertToVar vs1
             v <- convertToVar con
-            newVs2 <- mapM convertToVar $ concatMap collectVars vs2
+            newVs2 <- mapM convertToVar vs2
             return $ v:(newVs1 ++ newVs2)
 
 removeLeftConPPs :: [PP] -> ExtractFlag -> State Int [PP]
@@ -61,7 +61,9 @@ removeLeftConPPs ((c@(PPCon l id pps)):pps') flag
         newVOrOldC <- if flag == NormalExtract
                       then convertToVar c
                       else return c
-        newPPs' <- mapM renameVars pps'
+        newPPs' <- if flag == NormalExtract
+                   then mapM renameVars pps'
+                   else removeLeftConPPs pps' NormalExtract
         return $ newVOrOldC:newPPs'
   where
     renameVars v@(PPVar _ _) = convertToVar v
@@ -81,7 +83,7 @@ isolateLeftConPPs ((c@(PPCon l id pps)):pps') flag
     | any con pps = second (second (++(concatMap collectVars pps'))) (isolateLeftConPPs pps NormalExtract)
     | otherwise   = if flag == NormalExtract
                     then (c, ([], (concatMap collectVars pps')))
-                    else second (first (c:)) (isolateLeftConPPs pps' NormalExtract)
+                    else second (first ((collectVars c)++)) (isolateLeftConPPs pps' NormalExtract)
 
 isolateLeftCon :: PQ -> ExtractFlag -> (PP, ([PP], [PP]))
 isolateLeftCon (PQApp _ _ pps) flag = isolateLeftConPPs pps flag
