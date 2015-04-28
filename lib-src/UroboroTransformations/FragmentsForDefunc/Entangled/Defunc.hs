@@ -16,7 +16,7 @@ import Control.Monad.Trans.Writer.Lazy
 
 ruleToHelperFuns :: PT -> [Type] -> Type -> Maybe PTRule -> HelperFuns
 ruleToHelperFuns fun desTs desRT (Just r@(PTRule l (PQApp _ id _) _)) =
-    HelperFuns [(PTFun l id ((funArgTypes fun) ++ desTs) desRT [r])]
+    makeHelperFuns $ (PTFun l id ((funArgTypes fun) ++ desTs) desRT [r])
   where
     funArgTypes (PTFun _ _ ts _ _) = ts
 ruleToHelperFuns _ _ _ Nothing = mempty

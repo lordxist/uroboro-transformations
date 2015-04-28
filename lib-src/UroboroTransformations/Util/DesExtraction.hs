@@ -17,7 +17,7 @@ helperFunRule _ _ = undefined
 
 helperFun :: [PT] -> PT -> PTRule -> HelperFuns
 helperFun pts (PTFun _ _ ts t _) r@(PTRule l (PQDes _ _ _ pq) _) =
-    HelperFuns [PTFun l helperFunId (collectVarTypes pts ts pq) t [(helperFunRule helperFunId r)]]
+    makeHelperFuns $ PTFun l helperFunId (collectVarTypes pts ts pq) t [(helperFunRule helperFunId r)]
   where
     helperFunId = gensym "extract" (namePattern pq) pts
 helperFun _ _ _ = undefined

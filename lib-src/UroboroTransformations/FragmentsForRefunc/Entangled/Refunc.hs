@@ -21,7 +21,7 @@ extractWithFlag flag pts (PTFun l id ts t _) r@(PTRule l' pq e) = do
     let helperRule = PTRule l (PQApp l' helperFunName (varsAndLeftCon pq)) e
     let rt = case pq of (PQDes _ des _ _) -> destructorReturnType des pts
                         (PQApp _ _ _)     -> t
-    let helperFuns = HelperFuns [PTFun l helperFunName (varsAndLeftConTypes pq) rt [helperRule]]
+    let helperFuns = makeHelperFuns $ PTFun l helperFunName (varsAndLeftConTypes pq) rt [helperRule]
     tell helperFuns
     return $ PTRule l (removeLeftCon pq flag) (PApp dummyLocation helperFunName $ map toExpr $ varsReplaceLeftCon pq)
   where

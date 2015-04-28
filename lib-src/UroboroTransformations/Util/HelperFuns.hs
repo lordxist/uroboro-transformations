@@ -1,26 +1,39 @@
 module UroboroTransformations.Util.HelperFuns where
 
 import Uroboro.Tree
+import Uroboro.Error
 
+import qualified Data.Map.Lazy as Map
 import Data.List(nubBy, groupBy)
+import Data.Maybe(fromJust)
 import Data.Monoid
 
 import Control.Arrow(second)
 import Control.Monad(liftM)
 import Control.Monad.Trans.Writer.Lazy
 
-newtype HelperFuns = HelperFuns { getHelperFuns :: [PT] }
+newtype HelperFuns = HelperFuns (Map.Map FunSig [PTRule])
+
+newtype FunSig = FunSig { getFunSig :: (Location, Identifier, [Type], Type) }
+
+makeHelperFuns :: PT -> HelperFuns
+makeHelperFuns (PTFun l id ts t rs) = HelperFuns $ Map.singleton (FunSig (l, id, ts, t)) rs
+
+getHelperFuns :: HelperFuns -> [PT]
+getHelperFuns (HelperFuns hmap) = map merge $ Map.keys hmap
+  where
+    merge k@(FunSig (l, id, ts, t)) = PTFun l id ts t (fromJust $ Map.lookup k hmap)
+
+instance Eq FunSig where
+    (FunSig (_, id, ts, t)) == (FunSig (_, id', ts', t')) = (id == id') && (ts == ts') && (t == t')
+
+instance Ord FunSig where
+    (FunSig (_, id, ts, t)) <= (FunSig (_, id', ts', t')) = id <= id'
 
 instance Monoid HelperFuns where
-    (HelperFuns pts) `mappend` (HelperFuns pts2) = HelperFuns $ map merge $ groupBy sameFun (pts ++ pts2)
-      where
-        (PTFun _ id ts t _) `sameFun` (PTFun _ id' ts' t' _) = (id == id') && (ts == ts') && (t == t')
+    (HelperFuns map1) `mappend` (HelperFuns map2) = HelperFuns $ Map.unionWith (++) map1 map2
 
-        merge funs@((PTFun l id ts t _):_) = PTFun l id ts t (concatMap rules funs)
-
-        rules (PTFun _ _ _ _ rs) = rs
-
-    mempty = HelperFuns []
+    mempty = HelperFuns Map.empty
 
 runExtraction :: Writer HelperFuns [PT] -> [PT]
 runExtraction = (uncurry (++)) . (second getHelperFuns) . runWriter

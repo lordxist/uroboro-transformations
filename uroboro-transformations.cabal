@@ -27,7 +27,7 @@ library
     , UroboroTransformations.Util
     , UroboroTransformations.Util.HelperFuns
     , UroboroTransformations.Util.DesExtraction
-  build-depends:     base >= 4.7 && < 4.8, uroboro, transformers, mtl
+  build-depends:     base >= 4.7 && < 4.8, uroboro, transformers, mtl, containers
   default-language:  Haskell2010
 
 test-suite tests
@@ -43,6 +43,7 @@ test-suite tests
     , transformers
     , mtl
     , template-haskell
+    , containers
   default-language:    Haskell2010
 
 executable defunc
