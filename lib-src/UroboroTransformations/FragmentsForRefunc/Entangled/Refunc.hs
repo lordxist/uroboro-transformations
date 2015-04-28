@@ -108,7 +108,9 @@ extractPatternMatching pts fun r@(PTRule _ (PQDes _ _ pps pq) _)
     ppsForPQ (PQDes _ _ pps pq) = pps ++ (ppsForPQ pq)
     ppsForPQ (PQApp _ _ pps)    = pps
 extractPatternMatching pts fun r@(PTRule _ pq@(PQApp _ _ pps) _)
-    | conInPQ pq IgnoreLeftExtract = extractWithFlag IgnoreLeftExtract pts fun r
+    | conInPQ pq IgnoreLeftExtract = do
+        replacedRule <- extractWithFlag IgnoreLeftExtract pts fun r
+        extractPatternMatching pts fun replacedRule
     | otherwise = return r
 
 disentangle :: [PT] -> [PT]
