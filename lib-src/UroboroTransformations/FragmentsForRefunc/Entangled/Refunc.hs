@@ -13,98 +13,101 @@ import Control.Monad(liftM)
 import Control.Monad.State.Lazy
 import Control.Monad.Trans.Writer.Lazy
 
-extractWith :: (PQ -> PQ) -> (PQ -> (PP, ([PP], [PP]))) ->[PT] -> PT -> PTRule -> Writer HelperFuns PTRule
-extractWith removeLeftCon isolateLeftCon pts (PTFun l id ts t _) r@(PTRule l' pq e) = do
+data ExtractFlag = NormalExtract | IgnoreLeftExtract
+                 deriving (Eq)
+
+extractWithFlag :: ExtractFlag -> [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
+extractWithFlag flag pts (PTFun l id ts t _) r@(PTRule l' pq e) = do
     let helperRule = PTRule l (PQApp l' helperFunName (varsAndLeftCon pq)) e
     let rt = case pq of (PQDes _ des _ _) -> destructorReturnType des pts
                         (PQApp _ _ _)     -> t
     let helperFuns = HelperFuns [PTFun l helperFunName (varsAndLeftConTypes pq) rt [helperRule]]
     tell helperFuns
-    return $ PTRule l (removeLeftCon pq) (PApp dummyLocation helperFunName $ map toExpr $ varsReplaceLeftCon pq)
+    return $ PTRule l (removeLeftCon pq flag) (PApp dummyLocation helperFunName $ map toExpr $ varsReplaceLeftCon pq)
   where
-    helperFunName = gensym "extract" (namePattern (removeLeftCon pq)) pts
+    helperFunName = gensym "extract" (namePattern (removeLeftCon pq flag)) pts
 
-    varsAndLeftCon pq = recombine $ isolateLeftCon pq
+    varsAndLeftCon pq = recombine $ isolateLeftCon pq flag
       where
         recombine (c, (vs1, vs2)) = c:(vs1 ++ vs2)
 
     varsAndLeftConTypes pq = map snd $ (head rZipped1):((reverse $ tail rZipped1) ++ zipped2)
         where
-            varTypes = collectVarTypes pts ts $ removeLeftCon pq
-            (c, (vs1, vs2)) = isolateLeftCon pq
-            zipped1 = zip (vs1++[c]) varTypes
+            varTypes = collectVarTypes pts ts $ removeLeftCon pq flag
+            (c, (vs1, vs2)) = isolateLeftCon pq flag
+            zipped1 = zip ((concatMap collectVars vs1)++[c]) varTypes
             rZipped1 = reverse zipped1
-            zipped2 = zip (reverse vs2) (reverse varTypes)
+            zipped2 = zip (reverse (concatMap collectVars vs2)) (reverse varTypes)
 
-
-    varsReplaceLeftCon pq = recombine $ isolateLeftCon pq
+    varsReplaceLeftCon pq = recombine $ isolateLeftCon pq flag
       where
         recombine (con, (vs1, vs2)) = flip evalState 0 $ do
-            newVs1 <- mapM convertToVar vs1
+            newVs1 <- mapM convertToVar $ concatMap collectVars vs1
             v <- convertToVar con
-            newVs2 <- mapM convertToVar vs2
+            newVs2 <- mapM convertToVar $ concatMap collectVars vs2
             return $ v:(newVs1 ++ newVs2)
 
-removeLeftConPPs :: [PP] -> State Int [PP]
-removeLeftConPPs ((v@(PPVar _ _)):pps) = do
+removeLeftConPPs :: [PP] -> ExtractFlag -> State Int [PP]
+removeLeftConPPs ((v@(PPVar _ _)):pps) flag = do
     newV <- convertToVar v
-    newPPs <- removeLeftConPPs pps
+    newPPs <- removeLeftConPPs pps NormalExtract
     return $ newV:newPPs
-removeLeftConPPs ((c@(PPCon l id pps)):pps')
+removeLeftConPPs ((c@(PPCon l id pps)):pps') flag
     | any con pps = do
-        newPPs <- removeLeftConPPs pps
+        newPPs <- removeLeftConPPs pps NormalExtract
         newPPs' <- mapM renameVars pps'
         return $ (PPCon l id newPPs):newPPs'
     | otherwise = do
-        newV <- convertToVar c
+        newVOrOldC <- if flag == NormalExtract
+                      then convertToVar c
+                      else return c
         newPPs' <- mapM renameVars pps'
-        return $ newV:newPPs'
+        return $ newVOrOldC:newPPs'
   where
     renameVars v@(PPVar _ _) = convertToVar v
     renameVars (PPCon l id pps) = liftM (PPCon l id) $ mapM renameVars pps
-removeLeftConPPs [] = return []
+removeLeftConPPs [] _ = return []
 
-removeLeftCon :: PQ -> PQ
-removeLeftCon (PQApp l id pps) = PQApp l id (evalState (removeLeftConPPs pps) 0)
-removeLeftCon (PQDes l id pps pq)
-    | conInPQ pq = PQDes l id pps (removeLeftCon pq)
-    | otherwise  = PQDes l id (evalState (removeLeftConPPs pps) 0) pq    
+removeLeftCon :: PQ -> ExtractFlag -> PQ
+removeLeftCon (PQApp l id pps) flag = PQApp l id (evalState (removeLeftConPPs pps flag) 0)
+removeLeftCon (PQDes l id pps pq) NormalExtract
+    | conInPQ pq NormalExtract = PQDes l id pps (removeLeftCon pq NormalExtract)
+    | otherwise  = PQDes l id (evalState (removeLeftConPPs pps NormalExtract) 0) pq
+removeLeftCon _ _ = error "can't go here"
 
-isolateLeftConPPs :: [PP] -> (PP, ([PP], [PP]))
-isolateLeftConPPs ((v@(PPVar _ _)):pps) = second (first (v:)) (isolateLeftConPPs pps)
-isolateLeftConPPs ((c@(PPCon l id pps)):pps')
-    | any con pps = second (second (++(concatMap collectVars pps'))) (isolateLeftConPPs pps)
-    | otherwise   = (c, ([], (concatMap collectVars pps')))
+isolateLeftConPPs :: [PP] -> ExtractFlag -> (PP, ([PP], [PP]))
+isolateLeftConPPs ((v@(PPVar _ _)):pps) flag = second (first (v:)) (isolateLeftConPPs pps NormalExtract)
+isolateLeftConPPs ((c@(PPCon l id pps)):pps') flag
+    | any con pps = second (second (++(concatMap collectVars pps'))) (isolateLeftConPPs pps NormalExtract)
+    | otherwise   = if flag == NormalExtract
+                    then (c, ([], (concatMap collectVars pps')))
+                    else second (first (c:)) (isolateLeftConPPs pps' NormalExtract)
 
-isolateLeftCon :: PQ -> (PP, ([PP], [PP]))
-isolateLeftCon (PQApp _ _ pps) = isolateLeftConPPs pps
-isolateLeftCon (PQDes _ _ pps pq)
-    | conInPQ pq = second (second (++(concatMap collectVars pps))) (isolateLeftCon pq)
-    | otherwise  = second (first ((collectVarsPQ pq)++)) (isolateLeftConPPs pps)    
+isolateLeftCon :: PQ -> ExtractFlag -> (PP, ([PP], [PP]))
+isolateLeftCon (PQApp _ _ pps) flag = isolateLeftConPPs pps flag
+isolateLeftCon (PQDes _ _ pps pq) NormalExtract
+    | conInPQ pq NormalExtract = second (second (++(concatMap collectVars pps))) (isolateLeftCon pq NormalExtract)
+    | otherwise       = second (first ((collectVarsPQ pq)++)) (isolateLeftConPPs pps NormalExtract)    
+isolateLeftCon _ _ = error "can't go here"
 
-conInPQ :: PQ -> Bool
-conInPQ (PQDes _ _ pps pq) = (any con pps) || (conInPQ pq)
-conInPQ (PQApp _ _ pps)    = any con pps
+conInPQ :: PQ -> ExtractFlag -> Bool
+conInPQ (PQDes _ _ pps pq) flag                              = (any con pps) || (conInPQ pq flag)
+conInPQ (PQApp _ _ pps) NormalExtract                        = any con pps
+conInPQ (PQApp _ _ ((PPVar _ _):pps)) IgnoreLeftExtract      = any con pps
+conInPQ (PQApp _ _ ((PPCon _ _ pps'):pps)) IgnoreLeftExtract = (any con pps) || (any con pps')
 
 extractPatternMatching :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
 extractPatternMatching pts fun r@(PTRule _ (PQDes _ _ pps pq) _)
     | any con (pps ++ (ppsForPQ pq)) = do
-        replacedRule <- extractWith removeLeftCon isolateLeftCon pts fun r
+        replacedRule <- extractWithFlag NormalExtract pts fun r
         extractPatternMatching pts fun replacedRule
     | otherwise = return r
   where
     ppsForPQ (PQDes _ _ pps pq) = pps ++ (ppsForPQ pq)
     ppsForPQ (PQApp _ _ pps)    = pps
-
-extractPatternMatching pts fun r@(PTRule _ (PQApp _ _ pps) _)
-    | hasTwoCons pps = extractWith removeLeftCon isolateLeftCon pts fun r
+extractPatternMatching pts fun r@(PTRule _ pq@(PQApp _ _ pps) _)
+    | conInPQ pq IgnoreLeftExtract = extractWithFlag IgnoreLeftExtract pts fun r
     | otherwise = return r
-  where
-    removeLeftCon = undefined
-
-    isolateLeftCon = undefined
-
-    hasTwoCons = undefined
 
 disentangle :: [PT] -> [PT]
 disentangle = extractHelperFuns extractPatternMatching
