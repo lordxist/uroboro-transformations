@@ -8,46 +8,55 @@ import UroboroTransformations.Util
 import UroboroTransformations.Util.HelperFuns
 
 import Data.List(nubBy, groupBy)
+import Control.Arrow
 import Control.Monad(liftM)
 import Control.Monad.State.Lazy
 import Control.Monad.Trans.Writer.Lazy
 
-extractWith :: (PQ -> PQ) -> (PQ -> [PP]) ->[PT] -> PT -> PTRule -> Writer HelperFuns PTRule
-extractWith removeLeftCon varsAndLeftCon pts (PTFun l id ts t _) r@(PTRule l' pq e) = do
+extractWith :: (PQ -> PQ) -> (PQ -> (PP, ([PP], [PP]))) ->[PT] -> PT -> PTRule -> Writer HelperFuns PTRule
+extractWith removeLeftCon isolateLeftCon pts (PTFun l id ts t _) r@(PTRule l' pq e) = do
     let helperRule = PTRule l (PQApp l' helperFunName (varsAndLeftCon pq)) e
     let rt = case pq of (PQDes _ des _ _) -> destructorReturnType des pts
                         (PQApp _ _ _)     -> t
-    let helperFuns = HelperFuns [PTFun l helperFunName (collectVarTypes pts ts (removeLeftCon pq)) rt [helperRule]]
+    let helperFuns = HelperFuns [PTFun l helperFunName (varsAndLeftConTypes pq) rt [helperRule]]
     tell helperFuns
-    return $ PTRule l (removeLeftCon pq) (PApp dummyLocation helperFunName $ map toExpr $ collectVarsPQ (removeLeftCon pq))
+    return $ PTRule l (removeLeftCon pq) (PApp dummyLocation helperFunName $ map toExpr $ varsReplaceLeftCon pq)
   where
     helperFunName = gensym "extract" (namePattern (removeLeftCon pq)) pts
+
+    varsAndLeftCon pq = recombine $ isolateLeftCon pq
+      where
+        recombine (c, (vs1, vs2)) = c:(vs1 ++ vs2)
+
+    varsAndLeftConTypes pq = map snd $ (head rZipped1):((reverse $ tail rZipped1) ++ zipped2)
+        where
+            varTypes = collectVarTypes pts ts $ removeLeftCon pq
+            (c, (vs1, vs2)) = isolateLeftCon pq
+            zipped1 = zip (vs1++[c]) varTypes
+            rZipped1 = reverse zipped1
+            zipped2 = zip (reverse vs2) (reverse varTypes)
+
+
+    varsReplaceLeftCon pq = recombine $ isolateLeftCon pq
+      where
+        recombine (con, (vs1, vs2)) = flip evalState 0 $ do
+            newVs1 <- mapM convertToVar vs1
+            v <- convertToVar con
+            newVs2 <- mapM convertToVar vs2
+            return $ v:(newVs1 ++ newVs2)
 
 extractPatternMatching :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
 extractPatternMatching pts fun r@(PTRule _ (PQDes _ _ pps pq) _)
     | any con (pps ++ (ppsForPQ pq)) = do
-        replacedRule <- extractWith removeLeftCon varsAndLeftCon pts fun r
+        replacedRule <- extractWith removeLeftCon isolateLeftCon pts fun r
         extractPatternMatching pts fun replacedRule
     | otherwise = return r
   where
+    removeLeftCon :: PQ -> PQ
     removeLeftCon (PQApp l id pps) = PQApp l id (evalState (removeLeftConPPs pps) 0)
     removeLeftCon (PQDes l id pps pq)
         | conInPQ pq = PQDes l id pps (removeLeftCon pq)
         | otherwise  = PQDes l id (evalState (removeLeftConPPs pps) 0) pq
-
-    varsAndLeftCon (PQApp _ _ pps) = varsAndLeftConPPs pps
-    varsAndLeftCon (PQDes _ _ pps pq)
-        | conInPQ pq = (varsAndLeftCon pq) ++ (concatMap collectVars pps)
-        | otherwise  = (collectVarsPQ pq) ++ (varsAndLeftConPPs pps)
-
-    varsAndLeftConPPs ((v@(PPVar _ _)):pps) = v:(varsAndLeftConPPs pps)
-    varsAndLeftConPPs ((c@(PPCon l id pps)):pps')
-        | any con pps = (varsAndLeftConPPs pps) ++ (concatMap collectVars pps')
-        | otherwise   = c:(concatMap collectVars pps')
-    varsAndLeftConPPs [] = []
-
-    conInPQ (PQDes _ _ pps pq) = (any con pps) || (conInPQ pq)
-    conInPQ (PQApp _ _ pps)    = any con pps
 
     removeLeftConPPs ((v@(PPVar _ _)):pps) = do
         newV <- convertToVar v
@@ -67,16 +76,30 @@ extractPatternMatching pts fun r@(PTRule _ (PQDes _ _ pps pq) _)
     renameVars v@(PPVar _ _) = convertToVar v
     renameVars (PPCon l id pps) = liftM (PPCon l id) $ mapM renameVars pps
 
+    isolateLeftCon :: PQ -> (PP, ([PP], [PP]))
+    isolateLeftCon (PQApp _ _ pps) = isolateLeftConPPs pps
+    isolateLeftCon (PQDes _ _ pps pq)
+        | conInPQ pq = second (second (++(concatMap collectVars pps))) (isolateLeftCon pq)
+        | otherwise  = second (first ((collectVarsPQ pq)++)) (isolateLeftConPPs pps)
+
+    isolateLeftConPPs ((v@(PPVar _ _)):pps) = second (first (v:)) (isolateLeftConPPs pps)
+    isolateLeftConPPs ((c@(PPCon l id pps)):pps')
+        | any con pps = second (second (++(concatMap collectVars pps'))) (isolateLeftConPPs pps)
+        | otherwise   = (c, ([], (concatMap collectVars pps')))
+
+    conInPQ (PQDes _ _ pps pq) = (any con pps) || (conInPQ pq)
+    conInPQ (PQApp _ _ pps)    = any con pps
+
     ppsForPQ (PQDes _ _ pps pq) = pps ++ (ppsForPQ pq)
     ppsForPQ (PQApp _ _ pps)    = pps
 
 extractPatternMatching pts fun r@(PTRule _ (PQApp _ _ pps) _)
-    | hasTwoCons pps = extractWith removeLeftCon varsAndLeftCon pts fun r
+    | hasTwoCons pps = extractWith removeLeftCon isolateLeftCon pts fun r
     | otherwise = return r
   where
     removeLeftCon = undefined
 
-    varsAndLeftCon = undefined
+    isolateLeftCon = undefined
 
     hasTwoCons = undefined
 
