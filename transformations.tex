@@ -101,7 +101,7 @@ where
 \item $\langle eqn \rangle^{e}$ is short for $\langle eqn, \emptyset \rangle^{e}$
 \end{itemize}
 
-\item In the following, a function definition (or its equations) is called mixed if it has both destructor and hole patterns.
+\item In the following, a function definition (or its equations) is called mixed if it contains a rule where the copattern is a destructor pattern and another rule where the copattern is a hole pattern.
 
 \item $\langle arg^*, prg \rangle^{autogen}$ simply maps $arg^*$ uniquely to a fresh (in $prg$) identifier.
 
@@ -344,7 +344,7 @@ Define the following for a copattern $q$:
 \begin{itemize}
 \item $q^{-con}$ means $q$ with its left-most inner-most constructor pattern occurrence replaced by a variable;
 \item $q^{-con}_{vars^-}$ gives the following patterns: the variables in $q$ minus those occuring in the left-most inner-most constructor pattern, and this pattern in front of them;
-\item $q^{-con}_{vars^+}$ gives the following patterns: the variables in $q$ minus those occuring in the left-most inner-most constructor pattern, and a variable replacing this pattern in front of them;
+\item $q^{-con}_{vars^+}$ gives the following patterns: the variables in $q$ minus those occuring in the left-most inner-most constructor pattern, and the variable replacing this pattern in front of them;
 \item $q^{-con'}$ is the same as $q^{-con}$, but ignores a left-most outer constructor pattern;
 \item $q^{-con'}_{vars^-}$ and $q^{-con'}_{vars^+}$ are in the same way analogous to $q^{-con}_{vars^-}$ and $q^{-con}_{vars^+}$
 \end{itemize}
@@ -448,7 +448,7 @@ $t =^? p \searrow \sigma$ means that term t matches with pattern $p$ under subst
 \begin{prooftree}
 \AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
 \RightLabel{PM\textsubscript{Con}}
-\UnaryInfC{$con(t_1, ..., t_n) =^? con(p_1, ..., p_n) \searrow \bigcup_{i \in \{1, ..., n\}} \sigma_i$}
+\UnaryInfC{$con(t_1, ..., t_n) =^? con(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
 \end{prooftree}
 
 $t =^? q \searrow \sigma$ means that term $t$ matches copattern $q$ returning substitution $\sigma$.
@@ -456,45 +456,46 @@ $t =^? q \searrow \sigma$ means that term $t$ matches copattern $q$ returning su
 \begin{prooftree}
 \AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
 \RightLabel{PM\textsubscript{App}}
-\UnaryInfC{$fun(t_1, ..., t_n) =^? fun(p_1, ..., p_n)$}
+\UnaryInfC{$fun(t_1, ..., t_n) =^? fun(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
 \end{prooftree}
 
 \begin{prooftree}
 \AxiomC{$t =^? q \searrow \sigma$}
 \AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
 \RightLabel{PM\textsubscript{Des}}
-\BinaryInfC{$t.des(t_1, ...t_n) =^? q.des(p_1, ..., p_n) \searrow \sigma, \bigcup_{i \in \{1, ..., n\}} \sigma_i$}
+\BinaryInfC{$t.des(t_1, ...t_n) =^? q.des(p_1, ..., p_n) \searrow \sigma, \sigma_1, ..., \sigma_n$}
 \end{prooftree}
 
-$\longrightarrow$ is the one-step reduction function for closed terms, which is assumed to be used with respect to the rules $(q, t) \in \textrm{Rules}(prg)$ of a program $prg$, where $q$ is a copattern (left-hand side of the rule) and $t$ a term (right-hand side of the rule).
+$\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule).
 
 \begin{prooftree}
-\AxiomC{$\forall i < j: \not\exists t: t_i \longrightarrow t$}
 \AxiomC{$t_j \longrightarrow t'_j$}
 \RightLabel{$\longrightarrow$\textsubscript{Con}}
-\BinaryInfC{$con(t_1, ... t_j, ..., t_n) \longrightarrow con(t_1, ..., t'_j, ..., t_n)$}
+\UnaryInfC{$con(t_1, ... t_j, ..., t_n) \longrightarrow con(t_1, ..., t'_j, ..., t_n)$}
 \end{prooftree}
 
 \begin{prooftree}
-\AxiomC{$\forall i < j: \not\exists t: t_i \longrightarrow t$}
 \AxiomC{$t_j \longrightarrow t'_j$}
 \RightLabel{$\longrightarrow$\textsubscript{Fun}}
-\BinaryInfC{$fun(t_1, ... t_j, ..., t_n) \longrightarrow fun(t_1, ..., t'_j, ..., t_n)$}
+\UnaryInfC{$fun(t_1, ... t_j, ..., t_n) \longrightarrow fun(t_1, ..., t'_j, ..., t_n)$}
 \end{prooftree}
 
 \begin{prooftree}
-\AxiomC{$\forall i < j: \not\exists t: t_i \longrightarrow t$}
 \AxiomC{$t_j \longrightarrow t'_j$}
-\RightLabel{$\longrightarrow$\textsubscript{Des}}
-\BinaryInfC{$t_1.des(t_2, ... t_j, ..., t_n) \longrightarrow t_1.des(t_2, ..., t'_j, ..., t_n)$}
+\RightLabel{$\longrightarrow$\textsubscript{Des\textsubscript{P}}}
+\UnaryInfC{$t.des(t_1, ... t_j, ..., t_n) \longrightarrow t.des(t_1, ..., t'_j, ..., t_n)$}
 \end{prooftree}
 
 \begin{prooftree}
-\AxiomC{$t =^? p \searrow \sigma$ with $(p, t') = min \{ (p_2, t'_2) \in prg ~ | ~ t =^? p_2 \searrow \sigma_2 \}$}
-\RightLabel{Subst}
-\UnaryInfC{$t \longrightarrow t'[s]$}
+\AxiomC{$t \longrightarrow t'$}
+\RightLabel{$\longrightarrow$\textsubscript{Des\textsubscript{Args}}}
+\UnaryInfC{$t.des(t_1, ..., t_n) \longrightarrow t'.des(t_1, ..., t_n)$}
 \end{prooftree}
 
-Here $(p_1, t_1) < (p_2, t_2)$ means that the first rule appears in $prg$ before the second, the minimum of a set of rules is defined accordingly.
+\begin{prooftree}
+\AxiomC{$t =^? q \searrow \sigma$ with $(q, t') \in \textrm{Rules}(prg)$}
+\RightLabel{Subst}
+\UnaryInfC{$t \longrightarrow t'[\sigma]$}
+\end{prooftree}
 
 \end{document}
