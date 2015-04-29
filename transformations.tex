@@ -498,4 +498,133 @@ $\longrightarrow$ is the one-step reduction relation for closed terms, which is 
 \UnaryInfC{$t \longrightarrow t'[\sigma]$}
 \end{prooftree}
 
+Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
+
+\section{Semantics preservation}
+
+In this section it is shown that the transformations above preserve the semantics of programs. That is, for a transformation indicated by angular brackets, it holds for all closed input terms $s, t$ and all programs $prg$ that:
+
+$s \longrightarrow_{prg}^* t ~ \Leftrightarrow ~ \langle s \rangle \longrightarrow_{\langle prg \rangle}^* \langle t \rangle $
+
+This will be shown for each transformation by showing
+
+$s \longrightarrow_{prg} t \Rightarrow \langle s \rangle \longrightarrow_{\langle prg \rangle}^* \langle t \rangle$ (1)
+
+and
+
+$\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle \Rightarrow s \longrightarrow_{prg}^* t$ (2)
+
+It's always assumed that the program that is transformed is well-typed.
+
+Note/TODO: The well-typedness of the transformed program will be shown in a separate section.
+
+(1) is always shown in the following way:
+
+Suppose that: $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, \\
+show that: there exist derivations $\mathcal{D}_1, ..., \mathcal{D}_n$ for $\langle s \rangle \longrightarrow_{prg} t_1, t_1 \longrightarrow_{prg} t_2, ..., t_{n-1} \longrightarrow_{prg} \langle t \rangle$, respectively
+
+(2) is always shown analogously.
+
+Exemplary, the proof of (1) for the transformation $split$ is given below.
+
+\subsection{Split}
+
+Proof of (1): by induction on the structure of $\mathcal{D}$.
+
+\begin{enumerate}
+\item \textbf{``Axiom" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = t$; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
+
+It will be shown: there exists a derivation $\mathcal{D}_2$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$; it is $\langle s \rangle = s$ and $\langle t \rangle = t$ ($split$ doesn't change input terms).
+
+For this, define $\mathcal{D}_2$ as follows:
+
+\begin{prooftree}
+\AxiomC{$s =^? q_2 \searrow \sigma_2$ with $(q_2, s'_2) \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$s \longrightarrow s'_2[\sigma_2]$}
+\end{prooftree}
+
+with the rule $(q_2, s'_2) \in \textrm{Rules}(\langle prg \rangle)$ such that $s'_2[\sigma_2] = t$. Next, it will be shown that such a rule exists in $\textrm{Rules}(\langle prg \rangle)$.
+
+\begin{itemize}
+\item \underline{Case 1}: $q = q'.des(x_1, ..., x_k)$:
+
+Then there is a $(q, s')$ in Rules$(\langle prg \rangle)$ as well as in Rules$(prg)$, since $split$ doesn't change rules where the copattern has this form. This can be seen directly in the definition of $split$.
+
+Thus, set $q_2 := q$. It follows that $s'_2 = s', \sigma_2 = \sigma$ and finally $s'_2[\sigma_2] = s'[\sigma] = t$.
+
+\item \underline{Case 2}: $q = fun(con(x_1, ..., x_k), y_1, ..., y_k)$:
+
+The argument here is identical to that in Case 1.
+
+\item \underline{Case 3}: $q = fun(x_1, x_2, ..., x_n)$:
+
+Since $(q, s') \in \textrm{Rules}(prg)$ there exists a $(q_2, s_2') \in \textrm{Rules}(\langle prg \rangle)$ with $q_2 = fun(con(y_1, ..., y_k), x_2, ..., x_n)$ and $s'_2 = s'[con(y_1, ..., y_k) / x_1]$ for every constructor $con$ with the correct type (i.e. with return type equal to the type of the first argument of $fun$). This can also be seen directly in the definition of $split$. The concrete choice of $q_2$ depends upon the choice of $con$ -- below, $con$ will be chosen as needed.
+
+It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 2}$ such that:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}, 2}$}
+\UnaryInfC{$s =^? q_2 \searrow \sigma_2$}
+\end{prooftree}
+
+Remember that $s'_2[\sigma_2] = t$ has to hold.
+
+We know there exists $\mathcal{D}_{\textrm{PM}}$ such that:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}, 2}$}
+\UnaryInfC{$s =^? q \searrow \sigma$}
+\end{prooftree}
+
+By inversion (TODO: proofs for inversion lemmas) we have the following form for $\mathcal{D}_{\textrm{PM}}$:
+
+\begin{prooftree}
+\AxiomC{$t_1 =^? x_1 \searrow t_1 / x_1$}
+\AxiomC{...}
+\AxiomC{$t_n =^? x_n \searrow t_n / x_n$}
+\TrinaryInfC{$fun(t_1, ..., t_n) =^? q \searrow t_1 / x_1, ..., t_n / x_n$}
+\end{prooftree}
+
+With that, we also know the form of $s$: $s = fun(t_1, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}}$ as follows:
+
+\begin{prooftree}
+\AxiomC{$t_1^1 =^? y_1 \searrow t_1^1 / y_1$}
+\AxiomC{...}
+\AxiomC{$t_k^1 =^? y_k \searrow t_k^1 / y_k$}
+\TrinaryInfC{$t_1 =^? con(y_1, ..., y_k) \searrow t_1^1 / y_1, ..., t_k^1 / y_k$}
+\AxiomC{$t_2 =^? x_2 \searrow t_2 / x_2$ ...}
+% change to this as soon as I have the new bussproofs package
+% \AxiomC{...}
+% ...
+% \QuaternaryInfC{...
+\AxiomC{$t_n =^? x_2 \searrow t_n / x_n$}
+\TrinaryInfC{$fun(t_1, ..., t_n) =^? q_2 \searrow t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  t_n / x_n$}
+\end{prooftree}
+
+Remember that the choice of $con$ and, depending upon that, $q_2$, was left open until needed. This is now the place where $con$ needs to be chosen such that $t_1 = con(t^1_1, ..., t^1_k)$, with the result that the derivation $\mathcal{D}_{\textrm{PM}}$ given above is correct.
+
+In the derivation above, $\sigma_2 = t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  t_n / x_n$ and thus:
+
+$s'_2[\sigma_2] = s'[con(y_1, ..., y_k) / x_1][\sigma_2] \\
+= s'[con(t_1^1, ... t_k^1) / x_1, t_2 / x_2, ..., t_n / x_n] = s'[t_1 / x_1, t_2 / x_2, ..., t_n / x_n] = s'[\sigma] = t$
+
+\end{itemize}
+
+This concludes the proof for the ``Axiom" case.
+
+\item \textbf{``Constructor" case}:
+
+TODO
+
+\end{enumerate}
+
+
 \end{document}
