@@ -19,9 +19,12 @@ helperFunRule _ _ = undefined
 
 helperFun :: [PT] -> PT -> PTRule -> HelperFuns
 helperFun pts (PTFun _ _ ts t _) r@(PTRule l (PQDes _ _ _ pq) _) =
-    makeHelperFuns $ PTFun l helperFunId (collectVarTypes pts ts pq) t [(helperFunRule helperFunId r)]
+    makeHelperFuns $ PTFun l helperFunId (collectVarTypes pts ts pq) rt [(helperFunRule helperFunId r)]
   where
     helperFunId = gensym "extract" (namePattern pq) pts
+
+    rt = case pq of (PQApp _ _ _) -> t
+                    (PQDes _ dId _ _) -> destructorReturnType dId pts
 helperFun _ _ _ = undefined
 
 extractDesCalls :: PT -> PTRule -> ReaderT [PT] (Writer HelperFuns) PTRule

@@ -118,10 +118,12 @@ where
 
 \item Define the extraction of the final destructor in the given copattern as follows:
 \begin{alignat*}{2}
-& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \big\rangle \\
-&\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
-&\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, q = fun(...) [...]\\
-&\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \\
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \big\rangle \span\span \\
+&\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \span\span \\
+&\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \span\span \\
+&\quad \textrm{ where } && fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig} \textrm{ if } q = fun(...)\\
+&\quad && \tau.des(\tau_1, ..., \tau_k) : \sigma = \langle des \rangle^{sig} \textrm{ if } q = q'.des(...) \\
+&\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \span\span \\
 & \langle `` q = t ", H \rangle^{extract\_des} = \big\langle `` q = t ", H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
 \end{alignat*}
 
