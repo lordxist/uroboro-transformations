@@ -593,21 +593,20 @@ By inversion (TODO: proofs for inversion lemmas) we have the following form for 
 \TrinaryInfC{$fun(t_1, ..., t_n) =^? q \searrow t_1 / x_1, ..., t_n / x_n$}
 \end{prooftree}
 
-With that, we also know the form of $s$: $s = fun(t_1, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}}$ as follows:
+With that, we also know the form of $s$: $s = fun(t_1, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}}$ as follows:\\
 
-\begin{prooftree}
+{\setlength{\parindent}{-\leftmargin}
 \AxiomC{$t_1^1 =^? y_1 \searrow t_1^1 / y_1$}
 \AxiomC{...}
 \AxiomC{$t_k^1 =^? y_k \searrow t_k^1 / y_k$}
 \TrinaryInfC{$t_1 =^? con(y_1, ..., y_k) \searrow t_1^1 / y_1, ..., t_k^1 / y_k$}
-\AxiomC{$t_2 =^? x_2 \searrow t_2 / x_2$ ...}
-% change to this as soon as I have the new bussproofs package
-% \AxiomC{...}
-% ...
-% \QuaternaryInfC{...
+\AxiomC{$t_2 =^? x_2 \searrow t_2 / x_2$}
+\AxiomC{...}
 \AxiomC{$t_n =^? x_2 \searrow t_n / x_n$}
-\TrinaryInfC{$fun(t_1, ..., t_n) =^? q_2 \searrow t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  t_n / x_n$}
-\end{prooftree}
+\QuaternaryInfC{$fun(t_1, ..., t_n) =^? q_2 \searrow t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  
+t_n / x_n$}
+\DisplayProof
+}
 
 Remember that the choice of $con$ and, depending upon that, $q_2$, was left open until needed. This is now the place where $con$ needs to be chosen such that $t_1 = con(t^1_1, ..., t^1_k)$, with the result that the derivation $\mathcal{D}_{\textrm{PM}}$ given above is correct.
 
