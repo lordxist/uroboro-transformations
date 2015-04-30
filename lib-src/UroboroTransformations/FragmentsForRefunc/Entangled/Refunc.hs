@@ -8,6 +8,7 @@ import UroboroTransformations.Util
 import UroboroTransformations.Util.HelperFuns
 
 import Data.List(nubBy, groupBy)
+import Data.Maybe(fromJust)
 import Control.Arrow
 import Control.Monad(liftM)
 import Control.Monad.State.Lazy
@@ -117,7 +118,7 @@ disentangle :: [PT] -> [PT]
 disentangle = extractHelperFuns extractPatternMatching
 
 splitRule :: [PT] -> Type -> PTRule -> [PTRule]
-splitRule pts t (PTRule l (PQApp l' id ((PPVar _ id'):pps)) e) =
+splitRule pts t (PTRule l pq@(PQApp l' id ((PPVar _ id'):pps)) e) =
     map makeRuleForCon $ consForType pts
   where
     consForType ((PTPos _ _ cons@((PTCon _ t' _ _):_)):pts')
@@ -125,7 +126,14 @@ splitRule pts t (PTRule l (PQApp l' id ((PPVar _ id'):pps)) e) =
         | otherwise          = consForType pts'
     consForType (_:pts') = consForType pts'
 
-    makeRuleForCon c = (PTRule l (PQApp l' id (convertPPs c)) e)
+    makeRuleForCon c =
+        (PTRule l (PQApp l' id (convertPPs c))
+            (substituteVars
+                (zip (map getId (collectVarsPQ pq))
+                    ((head $ convertPPs c):(concatMap collectVars $ tail $ convertPPs c)))
+                e))
+      where
+        getId (PPVar _ vid) = vid
 
     convertPPs (PTCon _ _ cId ts) = flip evalState 0 $ do
         varsForCon <- mapM typeToVar ts
@@ -134,6 +142,9 @@ splitRule pts t (PTRule l (PQApp l' id ((PPVar _ id'):pps)) e) =
         return $ [ppCon] ++ otherVars
 
     typeToVar _ = convertToVar ()
+
+    substituteVars pps (PApp l id es) = PApp l id (map (substituteVars pps) es)
+    substituteVars pps (PVar l id) = toExpr $ fromJust $ lookup id pps
 splitRule _ _ r = [r]
 
 split :: [PT] -> [PT]
