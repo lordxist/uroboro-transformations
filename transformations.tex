@@ -368,14 +368,15 @@ Splitting of the first argument in hole patterns
 
 (as in $fun(x,...) = t \rightarrow \{fun(con_1(...),...) = t, fun(con_2(...),...) = t\}$):
 
-\begin{alignat*}{4}
-\langle prg \rangle^{split} & = ~&& \{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \span\span \\
-& && && \bigcup && \{ \{ fun(con(y_1, ..., y_k), x_2, ..., x_n) = t[con(y_1, ..., y_k)/x_1] ~ | ~ `` con(y_1, ..., y_k): \tau_1 " \in prg \} \\
-& && && && | ~ `` fun(x_1, x_2, ..., x_n) = t " \in eqns \} \\
-& && && \cup \{ fun(con(...), ...) = t ~ | ~ `` fun(con(...), ...) = t " \in eqns \} \span\span \\
-& && && \cup \{ q.des(...) = t ~ | ~ `` q.des(...) = t " \in eqns \} \span\span \\
-& && | `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \span\span\span\span \\
-& \cup && \{ && def \in prg ~ | ~ def \textrm{ is (co)data def.} \} \span\span
+\begin{alignat*}{5}
+\langle prg \rangle^{split} & = ~&& \{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \span\span\span\span \\
+& && && \bigcup && \{ && \{ fun(con(y_1, ..., y_k), x_2, ..., x_n) = t[con(y_1, ..., y_k)/x_1] \\
+& && && && && | ~ `` con(\sigma_1, ..., \sigma_k): \tau_1 " \in prg; ~ y_1, ..., y_k, x_2, ..., x_n \textrm{ all distinct} \} \\
+& && && && | ~ `` fun(x_1, x_2, ..., x_n) = t " \in eqns \} \span\span \\
+& && && \cup \{ fun(con(...), ...) = t ~ | ~ `` fun(con(...), ...) = t " \in eqns \} \span\span\span\span \\
+& && && \cup \{ q.des(...) = t ~ | ~ `` q.des(...) = t " \in eqns \} \span\span\span\span \\
+& && | `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \span\span\span\span\span\span \\
+& \cup && \{ && def \in prg ~ | ~ def \textrm{ is (co)data def.} \} \span\span\span\span
 \end{alignat*}
 
 Actual refunctionalization (for programs without mixed function defs and with constructor applications only in the first argument of a hole pattern):
@@ -612,6 +613,8 @@ In the derivation above, $\sigma_2 = t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, 
 
 $s'_2[\sigma_2] = s'[con(y_1, ..., y_k) / x_1][\sigma_2] \\
 = s'[con(t_1^1, ... t_k^1) / x_1, t_2 / x_2, ..., t_n / x_n] = s'[t_1 / x_1, t_2 / x_2, ..., t_n / x_n] = s'[\sigma] = t$
+
+There is no conflict between the substitutions for, e.g., $x_2$ and $y_1$, since all variables that are substituted are distinct, as can be seen in the definition of $split$.
 
 \end{itemize}
 
