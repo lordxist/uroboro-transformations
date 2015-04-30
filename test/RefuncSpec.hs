@@ -108,6 +108,63 @@ function succ(Nat): Nat where
 
 |]
 
+mixed_test :: String
+mixed_test = [str|data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+codata List where
+  List.head(): Nat
+  List.tail(): List
+  List.bar(): List
+
+function foo(Nat): List where
+  foo(zero()).bar().head() = zero()
+  foo(succ(n)).bar().head() = n
+  foo(n).bar().tail() = foo(n)
+  foo(n) = foo(n).tail()
+  foo(n).tail() = foo(succ(n))
+
+|]
+
+mixed_test_result :: String
+mixed_test_result = [str|codata List where
+  List.head(): Nat
+  List.tail(): List
+  List.bar(): List
+
+function autogen0_extract_bar___foo_(Nat): List where
+  autogen0_extract_bar___foo_(n).tail() = n.foo()
+
+function autogen0_extract_bar___foo_succ_(Nat): List where
+  autogen0_extract_bar___foo_succ_(n).head() = n
+
+function autogen0_extract_bar___foo_zero_(): List where
+  autogen0_extract_bar___foo_zero_().head() = zero()
+
+function autogen0_extract_foo_(Nat): List where
+  autogen0_extract_foo_(n).bar() = autogen0_extract_bar___foo_(n)
+  autogen0_extract_foo_(n).tail() = succ(n).foo()
+
+function autogen0_extract_foo_succ_(Nat): List where
+  autogen0_extract_foo_succ_(n).bar() = autogen0_extract_bar___foo_succ_(n)
+
+function autogen0_extract_foo_zero_(): List where
+  autogen0_extract_foo_zero_().bar() = autogen0_extract_bar___foo_zero_()
+
+codata Nat where
+  Nat.foo(): List
+
+function zero(): Nat where
+  zero().foo() = autogen0_extract_foo_zero_()
+  zero().foo() = autogen0_extract_foo_(zero())
+
+function succ(Nat): Nat where
+  succ(n).foo() = autogen0_extract_foo_succ_(n)
+  succ(x0).foo() = autogen0_extract_foo_(succ(x0))
+
+|]
+
 spec :: Spec
 spec = do
     describe "refunc" $ do
@@ -119,3 +176,7 @@ spec = do
             let ptOrError = parseFile "here" entangled_test
             let pt = (rights [ptOrError]) !! 0
             (renderProgram (fromJust (refunc pt))) `shouldBe` entangled_test_result
+        it "transforms mixed_test.uro into mixed_test_result.uro" $ do
+            let ptOrError = parseFile "here" mixed_test
+            let pt = (rights [ptOrError]) !! 0
+            (renderProgram (fromJust (refunc pt))) `shouldBe` mixed_test_result
