@@ -3,7 +3,7 @@ module UroboroTransformations.Util where
 import Uroboro.Tree
 import Uroboro.Error
 
-import Data.List(intercalate)
+import Data.List(intercalate, isPrefixOf)
 import Control.Monad.State.Lazy
 
 -- At the moment, locations aren't correctly stored after transformations anyway
@@ -46,11 +46,11 @@ gensym :: Identifier -> Identifier -> [PT] -> Identifier
 gensym id1 id2 pts = (findUnusedIdPrefix 0) ++ "_" ++ id1 ++ "_" ++ id2
   where
     findUnusedIdPrefix n
-        | not (pref `elem` usedPrefixes) = pref
+        | not (any (isPrefixOf pref) usedNames) = pref
         | otherwise = findUnusedIdPrefix (n+1)
         where pref = "autogen" ++ (show n)
 
-    usedPrefixes = (map desIdentifier (concatMap destructors pts)) ++
+    usedNames = (map desIdentifier (concatMap destructors pts)) ++
                     (map conIdentifier (concatMap constructors pts)) ++
                     (map funIdentifier (filter isFunctionDef pts))
 

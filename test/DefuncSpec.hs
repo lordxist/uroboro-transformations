@@ -69,9 +69,9 @@ function interpret(Exp): Val where
 
 function nil(): Env where
 
-function autogen0_lookup_cons(Val, Env, Nat): Val where
-  autogen0_lookup_cons(val, env, zero()) = val
-  autogen0_lookup_cons(val, env, succ(nat)) = lookup(env, nat)
+function autogen1_lookup_cons(Val, Env, Nat): Val where
+  autogen1_lookup_cons(val, env, zero()) = val
+  autogen1_lookup_cons(val, env, succ(nat)) = lookup(env, nat)
 
 data Val where
   autogen0_extract_eval_fun___(Exp, Env): Val
@@ -83,7 +83,7 @@ function apply(Val, Val): Val where
   apply(autogen0_extract_eval_fun___(exp, env), val) = eval(exp, cons(val, env))
 
 function lookup(Env, Nat): Val where
-  lookup(cons(x0, x1), x2) = autogen0_lookup_cons(x0, x1, x2)
+  lookup(cons(x0, x1), x2) = autogen1_lookup_cons(x0, x1, x2)
 
 |]
 
@@ -115,16 +115,16 @@ data Nat where
   zero(): Nat
   succ(Nat): Nat
 
-function autogen0_desa1_multi(A, Nat): A where
-  autogen0_desa1_multi(a, zero()) = autogen0_extract_desa1___multi___zero_(a)
-  autogen0_desa1_multi(a, succ(n)) = multi(a, n)
+function autogen1_desa1_multi(A, Nat): A where
+  autogen1_desa1_multi(a, zero()) = autogen0_extract_desa1___multi___zero_(a)
+  autogen1_desa1_multi(a, succ(n)) = multi(a, n)
 
 data A where
   multi(A, Nat): A
   autogen0_extract_desa1___multi___zero_(A): A
 
 function desa1(A): A where
-  desa1(multi(x0, x1)) = autogen0_desa1_multi(x0, x1)
+  desa1(multi(x0, x1)) = autogen1_desa1_multi(x0, x1)
 
 function desa2(A): B where
   desa2(autogen0_extract_desa1___multi___zero_(a)) = conb1()
