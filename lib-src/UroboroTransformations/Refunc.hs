@@ -9,6 +9,7 @@ import qualified UroboroTransformations.FragmentsForRefunc.Entangled.Refunc as E
 
 import Data.List(partition)
 import Control.Arrow(first)
+import Control.Monad.Trans.Reader
 import Control.Monad.Trans.Writer.Lazy
 
 isMixedRules :: PT -> Bool
@@ -21,11 +22,11 @@ isMixedRules (PTFun _ _ _ _ rs) = (any hasDesPattern rs) && (any hasConPattern r
     hasConPattern _                          = False
 isMixedRules _                  = True
 
-extractAllDesCalls :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
-extractAllDesCalls pts fun r@(PTRule _ (PQDes _ _ _ _) _) = do
-    replacedRule <- extractDesCalls pts fun r
-    extractAllDesCalls pts fun replacedRule
-extractAllDesCalls _ _ r = return r
+extractAllDesCalls :: PT -> PTRule -> ReaderT [PT] (Writer HelperFuns) PTRule
+extractAllDesCalls fun r@(PTRule _ (PQDes _ _ _ _) _) = do
+    replacedRule <- extractDesCalls fun r
+    extractAllDesCalls fun replacedRule
+extractAllDesCalls _ r = return r
 
 elimDesFromMixeds :: [PT] -> [PT]
 elimDesFromMixeds pts = uncurry (++) $ first (extractHelperFuns extractAllDesCalls) $ partition isMixedRules pts

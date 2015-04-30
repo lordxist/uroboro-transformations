@@ -12,13 +12,14 @@ import UroboroTransformations.Util.HelperFuns
 import UroboroTransformations.Util.DesExtraction
 
 import Control.Monad(liftM)
+import Control.Monad.Trans.Reader
 import Control.Monad.Trans.Writer.Lazy
 
-extractOuterDesCalls :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
-extractOuterDesCalls pts pt r@(PTRule l (PQDes _ _ _ pq@(PQDes l' _ _ _)) _e) = do
-    replacedRule <- extractDesCalls pts pt r
-    extractOuterDesCalls pts pt replacedRule
-extractOuterDesCalls _ _ r = return r
+extractOuterDesCalls :: PT -> PTRule -> ReaderT [PT] (Writer HelperFuns) PTRule
+extractOuterDesCalls pt r@(PTRule l (PQDes _ _ _ pq@(PQDes l' _ _ _)) _e) = do
+    replacedRule <- extractDesCalls pt r
+    extractOuterDesCalls pt replacedRule
+extractOuterDesCalls _ r = return r
 
 elimMultiDes :: [PT] -> [PT]
 elimMultiDes = extractHelperFuns extractOuterDesCalls

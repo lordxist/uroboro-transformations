@@ -12,27 +12,29 @@ import Data.Maybe(fromJust)
 import Control.Arrow
 import Control.Monad(liftM)
 import Control.Monad.State.Lazy
+import Control.Monad.Trans.Class(lift)
+import Control.Monad.Trans.Reader
 import Control.Monad.Trans.Writer.Lazy
 
 data ExtractFlag = NormalExtract | IgnoreLeftExtract
                  deriving (Eq)
 
-extractWithFlag :: ExtractFlag -> [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
-extractWithFlag flag pts (PTFun l id ts t _) r@(PTRule l' pq e) = do
+extractWithFlag :: ExtractFlag -> PT -> PTRule -> ReaderT [PT] (Writer HelperFuns) PTRule
+extractWithFlag flag (PTFun l id ts t _) r@(PTRule l' pq e) = do
+    pts <- ask
+    let helperFunName = gensym "extract" (namePattern (removeLeftCon pq flag)) pts
     let helperRule = PTRule l (PQApp l' helperFunName (varsAndLeftCon pq)) e
     let rt = case pq of (PQDes _ des _ _) -> destructorReturnType des pts
                         (PQApp _ _ _)     -> t
-    let helperFuns = makeHelperFuns $ PTFun l helperFunName (varsAndLeftConTypes pq) rt [helperRule]
-    tell helperFuns
-    return $ PTRule l (removeLeftCon pq flag) (PApp dummyLocation helperFunName $ map toExpr $ varsReplaceLeftCon pq)
+    let helperFuns = makeHelperFuns $ PTFun l helperFunName (varsAndLeftConTypes pts pq) rt [helperRule]
+    lift $ tell helperFuns
+    return $ PTRule l (removeLeftCon pq flag) (PApp dummyLocation helperFunName $ map toExpr $ varsReplaceLeftCon pq)    
   where
-    helperFunName = gensym "extract" (namePattern (removeLeftCon pq flag)) pts
-
     varsAndLeftCon pq = recombine $ isolateLeftCon pq flag
       where
         recombine (c, (vs1, vs2)) = c:(vs1 ++ vs2)
 
-    varsAndLeftConTypes pq = map snd $ (head rZipped1):((reverse $ tail rZipped1) ++ zipped2)
+    varsAndLeftConTypes pts pq = map snd $ (head rZipped1):((reverse $ tail rZipped1) ++ zipped2)
         where
             varTypes = collectVarTypes pts ts $ removeLeftCon pq flag
             (c, (vs1, vs2)) = isolateLeftCon pq flag
@@ -99,19 +101,19 @@ conInPQ (PQApp _ _ pps) NormalExtract                        = any con pps
 conInPQ (PQApp _ _ ((PPVar _ _):pps)) IgnoreLeftExtract      = any con pps
 conInPQ (PQApp _ _ ((PPCon _ _ pps'):pps)) IgnoreLeftExtract = (any con pps) || (any con pps')
 
-extractPatternMatching :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
-extractPatternMatching pts fun r@(PTRule _ (PQDes _ _ pps pq) _)
+extractPatternMatching :: PT -> PTRule -> ReaderT [PT] (Writer HelperFuns) PTRule
+extractPatternMatching fun r@(PTRule _ (PQDes _ _ pps pq) _)
     | any con (pps ++ (ppsForPQ pq)) = do
-        replacedRule <- extractWithFlag NormalExtract pts fun r
-        extractPatternMatching pts fun replacedRule
+        replacedRule <- extractWithFlag NormalExtract fun r
+        extractPatternMatching fun replacedRule
     | otherwise = return r
   where
     ppsForPQ (PQDes _ _ pps pq) = pps ++ (ppsForPQ pq)
     ppsForPQ (PQApp _ _ pps)    = pps
-extractPatternMatching pts fun r@(PTRule _ pq@(PQApp _ _ pps) _)
+extractPatternMatching fun r@(PTRule _ pq@(PQApp _ _ pps) _)
     | conInPQ pq IgnoreLeftExtract = do
-        replacedRule <- extractWithFlag IgnoreLeftExtract pts fun r
-        extractPatternMatching pts fun replacedRule
+        replacedRule <- extractWithFlag IgnoreLeftExtract fun r
+        extractPatternMatching fun replacedRule
     | otherwise = return r
 
 disentangle :: [PT] -> [PT]

@@ -6,6 +6,8 @@ import UroboroTransformations.Util
 import UroboroTransformations.Util.HelperFuns
 
 import Control.Monad(liftM)
+import Control.Monad.Trans.Class(lift)
+import Control.Monad.Trans.Reader
 import Control.Monad.Trans.Writer.Lazy
 
 import Debug.Trace(trace)
@@ -22,10 +24,10 @@ helperFun pts (PTFun _ _ ts t _) r@(PTRule l (PQDes _ _ _ pq) _) =
     helperFunId = gensym "extract" (namePattern pq) pts
 helperFun _ _ _ = undefined
 
-extractDesCalls :: [PT] -> PT -> PTRule -> Writer HelperFuns PTRule
-extractDesCalls pts fun r@(PTRule l (PQDes l' _ _ pq) _e) =
-    writer (replacedRule, (helperFun pts fun r))
-  where
-    replacedRule =
-        PTRule l pq (PApp l' (gensym "extract" (namePattern pq) pts) (map toExpr $ collectVarsPQ pq))
-extractDesCalls _ _ r = return r
+extractDesCalls :: PT -> PTRule -> ReaderT [PT] (Writer HelperFuns) PTRule
+extractDesCalls fun r@(PTRule l (PQDes l' _ _ pq) _e) = do
+    pts <- ask
+    let replacedRule = PTRule l pq (PApp l' (gensym "extract" (namePattern pq) pts) (map toExpr $ collectVarsPQ pq))
+    lift $ tell $ helperFun pts fun r
+    return replacedRule    
+extractDesCalls _ r = return r
