@@ -1,0 +1,30 @@
+-- Fibonacci stream example
+-- from paper "Copatterns" (Abel et al.)
+-- adapted for Uroboro
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+codata List where
+  List.head(): Nat
+  List.tail(): List
+
+codata FunOfFunOfNatsAndListsToList where
+  FunOfFunOfNatsAndListsToList.apply1(FunOfNats,List,List): List
+
+function zipWith(): FunOfFunOfNatsAndListsToList where
+  zipWith().apply1(f, l1, l2).head() = f.apply2(l1.head(), l2.head())
+  zipWith().apply1(f, l1, l2).tail() = zipWith().apply1(f, l1.tail(), l2.tail())
+
+codata FunOfNats where
+  FunOfNats.apply2(Nat,Nat): Nat
+
+function add(): FunOfNats where
+  add().apply2(zero(), n) = n
+  add().apply2(succ(n), m) = succ(add().apply2(n, m))
+
+function fib(): List where
+  fib().head() = zero()
+  fib().tail().head() = succ(zero())
+  fib().tail().tail() = zipWith().apply1(add(), fib(), fib().tail())
