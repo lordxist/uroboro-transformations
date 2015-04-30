@@ -37,6 +37,8 @@
 \usepackage{bussproofs}
 \usepackage{fixltx2e}
 
+\newtheorem{lemma}{Lemma}
+
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
 \pagestyle{fancy} % options: empty , plain , fancy
@@ -525,6 +527,67 @@ show that: there exist derivations $\mathcal{D}_1, ..., \mathcal{D}_n$ for $\lan
 
 (2) is always shown analogously.
 
+For the proofs of these properties the following lemma will be needed:
+
+\begin{lemma}[Inversion lemma for pattern matching]
+
+Let $\mathcal{D}$ be a derivation of $t =^? q \searrow \sigma$.
+
+\begin{enumerate}
+
+\item If $q = x$ then $\mathcal{D}$ has this form:
+
+\begin{prooftree}
+\AxiomC{}
+\UnaryInfC{$t =^? x \searrow t/x$}
+\end{prooftree}
+
+\item If $q = con(p_1, ..., p_n)$ then $t = con(t_1, ..., t_n)$, and $\mathcal{D}$ has this form:
+
+\begin{prooftree}
+\AxiomC{\vdots}
+\UnaryInfC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\UnaryInfC{$con(t_1, ..., t_n) =^? con(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
+\end{prooftree}
+
+\item If $q = fun(p_1, ..., p_n)$ then $t = fun(t_1, ..., t_n)$, and $\mathcal{D}$ has this form:
+
+\begin{prooftree}
+\AxiomC{\vdots}
+\UnaryInfC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\UnaryInfC{$fun(t_1, ..., t_n) =^? fun(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
+\end{prooftree}
+
+\item If $q = q'.des(p_1, ..., p_n)$ then $t = t'.des(t_1, ..., t_n)$, and $\mathcal{D}$ has this form:
+
+\begin{prooftree}
+\AxiomC{\vdots}
+\UnaryInfC{$t =^? q \searrow \sigma$}
+\AxiomC{\vdots}
+\UnaryInfC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\BinaryInfC{$t.des(t_1, ...t_n) =^? q.des(p_1, ..., p_n) \searrow \sigma, \sigma_1, ..., \sigma_n$}
+\end{prooftree}
+
+\end{enumerate}
+
+\begin{proof}~
+
+\begin{enumerate}
+
+\item A matched pattern that is a variable doesn't appear in the conclusion of a rule for pattern matching except for the rule PM\textsubscript{Var}. Thus the derivation can only be the result of the application of this single rule.
+
+\item A matched pattern that is a constructor application doesn't appear in the conclusion of a rule for pattern matching except for the rule PM\textsubscript{Con}. Thus the derivation can only be the result of the application of this rule, and of the rules leading to the premises of this rule.
+
+\item Analogous to 2.
+
+\item Analogous to 2.
+
+\end{enumerate}
+
+\end{proof}
+
+\end{lemma}
+
 Exemplary, the proof of (1) for the transformation $split$ is given below.
 
 \subsection{Split}
@@ -579,7 +642,7 @@ Remember that $s'_2[\sigma_2] = t$ has to hold.
 
 We know there exists a derivation $\mathcal{D}_{\textrm{PM}}$ for $s =^? q \searrow \sigma$.
 
-By inversion (TODO: proofs for inversion lemmas) we have the following form for $\mathcal{D}_{\textrm{PM}}$:
+By inversion (Lemma 1) we have the following form for $\mathcal{D}_{\textrm{PM}}$:
 
 \begin{prooftree}
 \AxiomC{$t_1 =^? x_1 \searrow t_1 / x_1$}
