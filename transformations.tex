@@ -441,6 +441,23 @@ In both cases, one step of the original transformation can be saved by the above
 
 This section identifies the relevant input fragments for the transformation steps given in section 2 and 3. Those are chosen such that the image of one step (under its relevant input fragment) is a subset of the input fragment for the next step. For each respective follow-up fragment, this can be seen directly in the definition of the previous transformation.
 
+It can therefore be presumed that the input of a certain step comes only from its respective relevant input fragment. This will be used in the proofs of semantic preservation for the transformations steps in section 7.
+
+Common syntax for the fragments:\\
+$\sigma, \sigma_i, \tau, \tau_j = $ type names\\
+$con = $ constructor names\\
+$des = $ destructor names\\
+$fun = $ function names\\
+$x, y, x_i, y_j = $ variable names\\
+$prg ::= (ddef ~ | ~ coddef ~ | ~  fdef)^*$\\
+$ddef ::= \textbf{data } \sigma \textbf{ where } csig^*$\\
+$coddef ::= \textbf{codata } \sigma \textbf{ where } dsig^*$\\
+$csig ::= con(\tau^*): \tau$
+$dsig ::= \sigma.des(\tau^*): \tau$
+$s, t ::= x ~ | ~ fun(t^*) ~ | ~ con(t^*) ~ | ~ s.des(t^*)$\\
+
+A fragment will be defined by giving the respective EBNF rule for $fdef$, which stands for function definitions.
+
 \subsection{Fragments for defunc.}
 
 This subsection gives the relevant input fragments for the defunctionalization steps. The domain for the first step, $elim\_multi\_des$, is simply the set of all Uroboro programs. Thus the entire defunc. transformation is indeed applicable to any Uroboro program.
@@ -449,19 +466,35 @@ This subsection gives the relevant input fragments for the defunctionalization s
 
 This is the input fragment for $unmix_d$. Informally, it consists of (co)data definitions and function definitions that may not contain multiple destructor calls in their copatterns but are otherwise unrestricted. 
 
-TODO: formal definition
+Formal rules for function definitions:\\
+$fdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } eqn^*$\\
+$eqn ::= q = t$\\
+$q ::= fun(p^*) ~ | ~ fun(p^*).des(p^*)$\\
+$p ::= x ~ | ~ con(p^*) $\\
 
 \subsubsection{Entangled fragment}
 
 This is the input fragment for $disentangle_d$. Informally, it consists of (co)data definitions and function definitions that may neither contain multiple destructor calls nor be mixed, but are otherwise unrestricted.
 
-TODO: formal definition
+Formal rules for function definitions:\\
+$fdef ::= dfdef ~ | ~ codfdef$\\
+$dfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } dfeqn^*$\\
+$dfeqn ::= fun(p^*) = t$\\
+$codfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } codfeqn^*$\\
+$codfeqn ::= fun(p^*).des(p^*) = t$\\
+$p ::= x ~ | ~ con(p^*) $\\
 
 \subsubsection{Actual defunc. fragment}
 
 This is the input fragment for actual defunctionalization, i.e. $d''$. Informally, it consists of (co)data definitions and function definitions where each satisfies the following property: It either is (1) in already defunctionalized form, i.e. the left-hand sides of its rules all are hole copatterns, or (2) are in the form that the core defunctionalization from the paper of Rendel, Trieflinger, and Ostermann can be applied to, i.e. the left-hand sides of its rules all are destructor copatterns, and these copatterns do not contain any constructor pattern matching.
 
-TODO: formal definition
+Formal rules for function definitions:\\
+$fdef ::= dfdef ~ | ~ codfdef$\\
+$dfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } dfeqn^*$\\
+$dfeqn ::= fun(p^*) = t$\\
+$codfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } codfeqn^*$\\
+$codfeqn ::= fun(x^*).des(y^*) = t$\\
+$p ::= x ~ | ~ con(p^*) $\\
 
 \subsection{Fragments for refunc.}
 
@@ -471,19 +504,40 @@ This subsection gives the relevant input fragments for the refunctionalization s
 
 This is the input fragment for $disentangle_r$. Informally, it consists of (co)data definitions and function definitions that may not be mixed, but are otherwise unrestricted.
 
-TODO: formal definition
+Formal rules for function definitions:\\
+$fdef ::= dfdef ~ | ~ codfdef$\\
+$dfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } dfeqn^*$\\
+$dfeqn ::= fun(p^*) = t$\\
+$codfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } codfeqn^*$\\
+$codfeqn ::= q.des(p^*) = t$\\
+$q ::= fun(p^*) ~ | ~ q.des(p^*)$\\
+$p ::= x ~ | ~ con(p^*) $\\
 
 \subsubsection{Unsplit fragment}
 
 This is the input fragment for $split$. Informally, it consists of (co)data definitions and function definitions where each may not be mixed and must satisfy the following property: For every copattern $q$ that is the left-hand side of one of its rules it holds that: Either $q$ is (1) a hole pattern, then it may contain at maximum one constructor application, and this at the left-most outer-most position, or $q$ is (2) a destructor pattern, then it must not contain any constructor applications.
 
-TODO: formal definition
+Formal rules for function definitions:\\
+$fdef ::= dfdef ~ | ~ codfdef$\\
+$dfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } dfeqn^*$\\
+$defeqn ::= dfeqn1 ~ | ~ dfeqn0$\\
+$dfeqn1 ::= fun(con(x), y^*) = t$\\
+$dfeqn0 ::= fun(x^*) = t$\\
+$codfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } codfeqn^*$\\
+$codfeqn ::= q.des(x^*) = t$\\
+$q ::= fun(x^*) ~ | ~ q.des(x^*)$
 
 \subsubsection{Actual refunc. fragment}
 
 This is the input fragment for actual refunctionalization, i.e. $r''$. Informally, it is identical to the last fragment with the following difference: Where it said ``at maximum one constructor application" in the last section, for this fragment ``exactly one constructor application" has to hold. As such, every one of its function definitions is either (1) already in refunctionalized form, i.e. the left-hand sides of its rules are destructor copatterns which contain no constructor applications, or (2) core refunctionalization (Rendel, Trieflinger, Ostermann) can be applied to it.
 
-TODO: formal definition
+Formal rules for function definitions:\\
+$fdef ::= dfdef ~ | ~ codfdef$\\
+$dfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } dfeqn^*$\\
+$dfeqn ::= fun(con(x), y^*) = t$\\
+$codfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } codfeqn^*$\\
+$codfeqn ::= q.des(x^*) = t$\\
+$q ::= fun(x^*) ~ | ~ q.des(x^*)$
 
 \section{Small-step Operational Semantics}
 
