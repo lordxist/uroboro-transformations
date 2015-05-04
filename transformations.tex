@@ -38,6 +38,7 @@
 \usepackage{fixltx2e}
 
 \newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
 
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
@@ -631,7 +632,7 @@ show that: there exist derivations $\mathcal{D}_1, ..., \mathcal{D}_n$ for $\lan
 
 (2) is always shown analogously.
 
-For the proofs of these properties the following lemma will be needed:
+For the proofs of these properties the following lemmas will be needed:
 
 \begin{lemma}[Inversion lemma for pattern matching]
 
@@ -687,6 +688,28 @@ Let $\mathcal{D}$ be a derivation of $t =^? q \searrow \sigma$.
 \item Analogous to 2.
 
 \end{enumerate}
+
+\end{proof}
+
+\end{lemma}
+
+\begin{definition}[Pattern matching chain] A pattern matching chain from a closed term $s$ to a closed term $t$ with respect to a set $R$ of rules of the form $`` q_i = s_i "$ with $q_i$ copattern, $s_i$ term, is a series $`` q_1 = s_1 ", ..., `` q_n = s_n "$ of rules in $R$ such that:
+
+$s =^? q_1 \searrow \sigma_1$, $s_1[\sigma_1] =^? q_2 \searrow \sigma_2$, ..., $s_{n-1}[\sigma_{n-1}] =^? q_n \searrow \sigma_n$, $s_n[\sigma_n] = t$
+
+\end{definition}
+
+Note that it follows directly from the definitions of pattern matching chains and pattern matching that if there is a pattern matching chain from $s$ to $t$, then $s \longrightarrow^* t$ with respect to any program containing at least the rules of the chain.
+
+\begin{lemma} Let $e$ be a helper extraction function, i.e. a function that can be an argument of $extract\_helpers$ as defined in section 1. For any program $prg$ and any two closed terms $s,t$ with $s =^? q \searrow \sigma$, $s'[\sigma] = t$ for a rule $(q, s') \in \textrm{Rules}(prg)$ it holds that:
+
+If $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is a pattern matching chain from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$,
+
+then $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
+
+\begin{proof}
+
+Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. As there is a pattern matching chain from $s$ to $t$ with respect to all these equations, it can be equivalently stated that there is such a pattern matching chain with respect to the equations of the transformed program. Thus, as noted above, it follows $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
 
 \end{proof}
 
