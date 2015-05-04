@@ -827,4 +827,128 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \end{proof}
 
+\begin{proof}[Proof of (2)] By induction on the structure of $\mathcal{D}$.
+
+\begin{enumerate}
+\item \textbf{``Axiom" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$\langle s \rangle =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$\langle s \rangle \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = \langle t \rangle$ ($\langle s \rangle = s, \langle t \rangle = t$); $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
+
+It will be shown: there exists a derivation $\mathcal{D}_2$ for $s \longrightarrow_{prg} t$.
+
+For this, define $\mathcal{D}_2$ as follows:
+
+\begin{prooftree}
+\AxiomC{$s =^? q_2 \searrow \sigma_2$ with $(q_2, s'_2) \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow_{prg} s'_2[\sigma_2]$}
+\end{prooftree}
+
+with the rule $(q_2, s'_2) \in \textrm{Rules}(prg)$ such that $s'_2[\sigma_2] = t$. Next, it will be shown that such a rule exists in $\textrm{Rules}(prg)$.
+
+\begin{itemize}
+\item \underline{Case 1}: $q = q'.des(x_1, ..., x_k)$:
+
+Then there is a $(q, s')$ in Rules$(prg)$ as well as in Rules$(\langle prg \rangle)$, since the result of $split$ doesn't contain a rule where the left-hand side copattern has this form unless the input of $split$ already contains this rule. This can be seen directly in the definition of $split$.
+
+Thus, set $q_2 := q$. It follows that $s'_2 = s', \sigma_2 = \sigma$ and finally $s'_2[\sigma_2] = s'[\sigma] = t$.
+
+\item \underline{Case 2}: $q = fun(con(x_1, ..., x_k), y_2, ..., y_n)$:
+
+Then there either exists $(q, s')$ in Rules($prg$) as well, in this case proceed as in Case 1, or there exists $q_2 := fun(y_1, y_2, ..., y_n)$, ($q_2, s'_2) \in \textrm{Rules}(prg)$, $s' = s'_2[con(x_1, ..., x_k) / y_1]$. This is because these are the only cases in which a rule with left-hand side copattern $q$ of this form is present in Rules($\langle prg \rangle$), as can be seen directly in the definition of $split$.
+
+It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 2}$ such that:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}, 2}$}
+\UnaryInfC{$s =^? q_2 \searrow \sigma_2$}
+\end{prooftree}
+
+Remember that $s'_2[\sigma_2] = t$ has to hold.
+
+We know there exists a derivation $\mathcal{D}_{\textrm{PM}}$ for $s =^? q \searrow \sigma$.
+
+By inversion (Lemma 1) we have the following form for $\mathcal{D}_{\textrm{PM}}$:\\
+
+{\setlength{\parindent}{-\leftmargin}
+\AxiomC{$t^1_1 =^? x_1 \searrow t^1_1 / x_1$}
+\AxiomC{...}
+\AxiomC{$t^1_k =^? x_k \searrow t^1_k / x_k$}
+\TrinaryInfC{$con(t^1_1, ..., t^1_k) =^? con(x_1, ..., x_k) \searrow t^1_1 / x_1, ..., t^1_k / x_k$}
+\AxiomC{$t_2 =^? y_2 \searrow t_2 / y_2$}
+\AxiomC{...}
+\AxiomC{$t_n =^? y_n \searrow t_n / y_n$}
+\QuaternaryInfC{$fun(con(t^1_1, ..., t^1_k), t_2 ..., t_n) =^? q \searrow t^1_1 / x_1, ..., t^1_k / x_k, t_2 / y_2, ..., t_n / y_n$}
+\DisplayProof
+}
+
+With that, $\sigma = t^1_1 / x_1, ..., t^1_k / x_k, t_2 / y_2, ..., t_n / y_n$ and we also know the form of $s$: $s = fun(con(t^1_1, ..., t^1_k), t_2, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}, 2}$ as follows:
+
+\begin{prooftree}
+\AxiomC{$con(t^1_1, ..., t^1_k) =^? y_1 \searrow con(t^1_1, ..., t^1_k) / y_1$}
+\AxiomC{$t_2 =^? y_2 \searrow t_2 / y_2$}
+\AxiomC{...}
+\AxiomC{$t_n =^? y_n \searrow t_n / y_n$}
+\QuaternaryInfC{$fun(con(t^1_1, ..., t^1_k), t_2, ..., t_n) =^? q_2 \searrow \sigma_2$}
+\end{prooftree}
+
+In the derivation above, $\sigma_2 = con(t_1^1 ..., t_k^1) / y_1,  t_2 / y_2, ...,  t_n / y_n$ and thus:
+
+$t = s'[\sigma] = s'_2[con(x_1, ..., x_k) / y_1][\sigma] = s'_2[con(t^1_1, ..., t^1_k) / y_1, t_2 / y_2, ..., t_n / y_n] = s'_2[\sigma_2]$
+
+There is no conflict between the substitutions for, e.g., $x_1$ and $y_2$, since all variables that are substituted are distinct, as can be seen in the definition of $split$.
+
+\end{itemize}
+
+Other cases don't appear in the image of $split$, as can be seen directly in its definition. This concludes the proof for the ``Axiom" case.
+
+\item \textbf{``Constructor" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D'}$}
+\UnaryInfC{$\langle t_j \rangle \longrightarrow_{\langle prg \rangle} \langle t'_j \rangle$}
+\UnaryInfC{$con(t_1, ..., \langle t_j \rangle, ..., t_n) \longrightarrow con(t_1, ..., \langle t'_j \rangle, ..., t_n)$}
+\end{prooftree}
+
+with $\langle s \rangle = s = con(t_1, ..., t_j, ..., t_n), \langle t \rangle = t = con(t_1, ..., t'_j, ..., t_n)$ and $\langle t_j \rangle = t_j, \langle t'_j \rangle = t'_j$.
+
+It will be shown; there exists a derivation $\mathcal{D}_2$ for $s \longrightarrow_{prg} t$.
+
+From the induction hypothesis it follows that, since there is a derivation $\mathcal{D'}$ (see above), there exists a derivation $\mathcal{D'}_2$ for $t_j \longrightarrow_{prg} t'_j $.
+
+Thus we can define $\mathcal{D}_2$ as follows:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D'}_2$}
+\UnaryInfC{$t_j \longrightarrow_{prg} t'_j$}
+\UnaryInfC{$con(t_1, ..., t_j, ..., t_n) \longrightarrow_{prg} con(t_1, ..., t'_j, ..., t_n)$}
+\end{prooftree}
+
+\item \textbf{``Function" case}:
+
+Completely analogous to ``Constructor" case, substitute $fun$ for $con$.
+
+\item \textbf{``Destructor arguments" case}:
+
+Analogous to ``Constructor" case, with the arguments (to the right) of the destructor as the $t_j$.
+
+\item \textbf{``Destructor applied expression" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D'}$}
+\UnaryInfC{$t_0 \longrightarrow_{\langle prg \rangle} t_0'$}
+\UnaryInfC{$t_0.des(t_1, ..., t_n) \longrightarrow_{\langle prg \rangle} t'_0.des(t_1, ..., t_n)$}
+\end{prooftree}
+
+Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j$.
+
+\end{enumerate}
+
+\end{proof}
+
 \end{document}
