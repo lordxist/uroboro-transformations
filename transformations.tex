@@ -715,6 +715,20 @@ Let the conditions be satisfied. As we can see in the definition of $extract\_he
 
 \end{lemma}
 
+\begin{lemma}
+
+If there is a pattern matching chain from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$ for a pair $\big\langle r, H \big\rangle$,
+
+then there is a pattern matching chain from $s$ to $t$ with respect to $\langle r, H \rangle^{extract\_des}$.
+
+\begin{proof}
+
+TODO
+
+\end{proof}
+
+\end{lemma}
+
 Exemplary, the proof of (1) for the transformation $split$ is given below.
 
 \subsection{Split}
@@ -971,6 +985,65 @@ Analogous to ``Constructor" case, with the arguments (to the right) of the destr
 Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j$.
 
 \end{enumerate}
+
+\end{proof}
+
+\subsection{Eliminate multiple destructors}
+
+For step $elim\_multi\_des$.
+
+\begin{proof}[Proof of (1)] By induction on the structure of $\mathcal{D}$.
+
+\begin{enumerate}
+\item \textbf{``Axiom" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = t$; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
+
+It will be shown: there exists a pattern matching chain from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract\_outer\_des}$. Using Lemma 2 for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
+
+Such a pattern matching chain with respect to $\{ `` q = s' " \}$ trivially exists ($s =^? q \searrow \sigma$, $s'[\sigma] = t$), and thus also the chain with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, for some helpers set $H$. Therefore the existence of the pattern matching chain follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
+
+If there exists a pattern matching chain from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also exists such a pattern matching chain with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_outer\_des}$.
+
+Proof by induction:
+
+\begin{itemize}
+
+\item \underline{Case 1}: $q$ is hole pattern:
+
+$\langle `` q = s' ", H \rangle^{extract\_outer\_des} = \big\langle `` q = s' ", H \big\rangle$
+
+Thus the resulting equations are the same as the original equations, for which we already know that the desired pattern matching chain exists.
+
+\item \underline{Case 2}: $q = q'.des(p_1, ..., p_k)$, $q'$ is hole pattern:
+
+The argument is identical to that in Case 1.
+
+\item \underline{Case 3}: $q = q'.des(p_1, ..., p_k)$, $q'$ is destructor pattern:
+
+$\langle `` q = s' ", H \rangle^{extract\_outer\_des} = \langle \langle `` q = s' ", H \rangle^{extract\_des} \rangle^{extract\_outer\_des}$
+
+By Lemma 3, since there is a pattern matching chain from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also is such a pattern matching chain with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_des}$. 
+
+From the definition of $extract\_des$ we have that:
+
+$\langle `` q = s' ", H \rangle^{extract\_des} = \langle `` q'.des(p_1, ..., p_k) = s' ", H \rangle^{extract\_des} = \big\langle `` q' = t_h ", H' \big\rangle$ for some term $t_h$ and some helpers set $H'$. 
+
+We thus have a pattern matching chain from $s$ to $t$ with respect to the equations within $\big\langle `` q' = t_h ", H' \big\rangle$. By the induction hypothesis, applied to $q'$, we have the pattern matching chain with respect to $\langle `` q' = t_h ", H' \rangle^{extract\_outer\_des}$, which is the desired chain.
+
+\end{itemize}
+
+This concludes the proof for the ``Axiom" case.
+
+\end{enumerate}
+
+TODO: the other cases
 
 \end{proof}
 
