@@ -605,6 +605,8 @@ $\longrightarrow$ is the one-step reduction relation for closed terms, which is 
 \UnaryInfC{$t \longrightarrow t'[\sigma]$}
 \end{prooftree}
 
+TODO: There is the following problem with the Subst rule: Substitution may only occur when there are no other possible reductions for $t$.
+
 Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
 
 \section{Semantics preservation}
