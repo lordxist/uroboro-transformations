@@ -809,6 +809,8 @@ t_n / x_n$}
 
 Remember that the choice of $con$ and, depending upon that, $q_2$, was left open until needed. This is now the place where $con$ needs to be chosen such that $t_1 = con(t^1_1, ..., t^1_k)$, with the result that the derivation $\mathcal{D}_{\textrm{PM}}$ given above is correct.
 
+TODO: Exclude cases where $t_1$ isn't a constructor application at all. Clear for variables: If $t_1$ is a variable, then $s$ isn't a closed term, which is excluded by definition. But for the case that $t_1$ is a destructor application, the statements (1) and (2) need be more restrictive, because they simply don't hold in this case.
+
 In the derivation above, $\sigma_2 = t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  t_n / x_n$ and thus:
 
 $s'_2[\sigma_2] = s'[con(y_1, ..., y_k) / x_1][\sigma_2] \\
