@@ -381,16 +381,18 @@ Splitting of the first argument in hole patterns
 & && && && | ~ `` fun(x_1, x_2, ..., x_n) = t " \in eqns \} \span\span \\
 & && && \cup \{ fun(con(...), ...) = t ~ | ~ `` fun(con(...), ...) = t " \in eqns \} \span\span\span\span \\
 & && && \cup \{ q.des(...) = t ~ | ~ `` q.des(...) = t " \in eqns \} \span\span\span\span \\
-& && | `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \span\span\span\span\span\span \\
+& && | `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg, n > 0 \textrm{ and } \tau_1 \textrm{ is data type} \} \span\span\span\span\span\span \\
+& \cup && \{ && def \in prg ~ | ~ def \textrm{ is function def. with signature } fun(\tau_1, ..., \tau_n): \sigma, \span\span\span\span \\
+& && &&\quad \textrm{ with } n = 0 \textrm{ or } \tau_1 \textrm{ is codata type} \} \span\span\span\span \\
 & \cup && \{ && def \in prg ~ | ~ def \textrm{ is (co)data def.} \} \span\span\span\span
 \end{alignat*}
 
-Actual refunctionalization (for programs without mixed function defs and with constructor applications only in the first argument of a hole pattern):
+Actual refunctionalization (for programs without mixed function defs and with constructor applications only in the first data type argument of a hole pattern):
 \begin{alignat*}{3}
 \langle prg \rangle^{r''} & = ~&& \{ ~&& \textrm{\textbf{codata }} \sigma \textrm{\textbf{ where }} \\
 & && && \{ \sigma .\langle fun, prg \rangle^r (\tau_1, ..., \tau_n): \tau \\
 & && && | ~ `` fun (\sigma, \tau_1, ..., \tau_n): \tau \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } eqns \neq \emptyset \textrm{ and } \\
-& && &&\quad \forall e \in eqns: e \textrm{ has no destructor pattern }  \} \\
+& && &&\quad \forall e \in eqns: e \textrm{ has no destructor pattern and } \sigma \textrm{ is data type}  \} \\
 & && | && "\textrm{\textbf{data }} \sigma ..." \in prg \} \\
 & \cup && \{ && \textrm{\textbf{function }} \langle con \rangle^r (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
 & && && \{ \langle con \rangle^r (x_1, ..., x_n) .\langle fun \rangle^r (y_1, ..., y_k) = \langle t, prg \rangle^r \\
@@ -398,16 +400,17 @@ Actual refunctionalization (for programs without mixed function defs and with co
 & && | && `` con(\tau_1, ... \tau_n): \sigma " \in prg \} \\
 & \cup && \{ && \textrm{\textbf{codata }} ... ~ | ~ `` \textrm{\textbf{codata }} ... " \in prg \} \\
 & \cup && \{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \{ p = \langle t, prg \rangle^r ~ | ~ "p = t" \in eqns \} \\
-& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } \forall e \in eqns: e \textrm{ has destr. pattern}\} 
+& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } \forall e \in eqns: e \textrm{ has destr. pattern} \\
+& && &&\quad \textrm{or where } n = 0 \textrm{ or where } \tau_1 \textrm{ is codata type} \} 
 \end{alignat*}
 
 Refunctionalizing terms: \\
 $\langle x, prg \rangle^r = x$ \\
 $\langle s.des(t_1, ..., t_n), prg \rangle^r = \langle s, prg \rangle^r .des(\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
 $\langle fun(t_1, ..., t_n), prg \rangle^r = fun(\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$, \\
-if ``\textbf{function} $fun(\tau_n, ..., \tau_n): \sigma$ \textbf{where} $eqns$" $\in prg$  with $\forall e \in eqns: e$ has destructor pattern  \\
+if ``\textbf{function} $fun(\tau_n, ..., \tau_n): \sigma$ \textbf{where} $eqns$" $\in prg$  with $\forall e \in eqns: e$ has destructor pattern or where $n = 0$ or where $\tau_1$ is codata type  \\
 $\langle fun(t_1, ..., t_n), prg \rangle^r = \langle t_1, prg \rangle^r .\langle fun, prg \rangle^r (\langle t_2, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$, \\
-otherwise (all constructor patterns) \\
+otherwise \\
 $\langle con(t_1, ..., t_n), prg \rangle^r = \langle con, prg \rangle^r (\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
 
 Note: the case distinction above is only necessary because of the special syntax for destructors ($q(...).des(...)$ instead of $des(..., ...)$)
