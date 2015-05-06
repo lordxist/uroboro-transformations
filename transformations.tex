@@ -609,6 +609,80 @@ TODO: There is the following problem with the Subst rule: Substitution may only 
 
 Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
 
+\section{Values}
+
+This section formalizes the notion of value for Uroboro. Unlike in the usual case, but not unlike other languages with copattern such as that of Abel et al., some values can be reduced. Not all reductions of values are preserved by the transformations above. Intuitively, values are terms which don't gain information by reducing them.
+
+The notion of value for Uroboro is not quite the same as that of the language of Abel et al. The difference comes from the fact that Uroboro allows underspecified functions. Consider a term that contains as a subterm an application of an underspecified function. After a program transformation, it's not always possible to reduce such a term by pattern-matching on this subterm.
+
+The key idea is that this isn't problematic for the preservation of semantics because such a term cannot gain information about this application subterm. This is because, in a reduction by pattern-matching step, the information about the function application is necessarily lost. An instance of this case is given below. 
+
+\begin{lstlisting}
+
+data A where
+  a1(): A
+  a2(): A
+
+function a(): A where
+
+data B where
+  b(): B
+
+function foo(A): B where
+  foo(a) = b()
+
+\end{lstlisting}
+
+With respect to this program, the input term \texttt{foo(a())} reduces to \texttt{b()}. \texttt{a()} is not a constructor application and doesn't reduce to one since the function \texttt{a()} is underspecified. Thus the information that this term of type \texttt{A} is an application of this function is necessarily lost in the reduction by pattern matching from \texttt{foo(a())} to \texttt{b()}.
+
+Now consider the result of transforming the above program with $split$, shown below. With respect to this program, \texttt{foo(a())} does not reduce to \texttt{b()}. But this doesn't change the information gained by a possible reduction. Before the transformation, there was a possible reduction without gain of information, afterwards, there was no possible reduction and still no gain of information.
+
+\begin{lstlisting}
+
+data A where
+  a1(): A
+  a2(): A
+
+function a(): A where
+
+data B where
+  b(): B
+
+function foo(A): B where
+  foo(a1()) = b()
+  foo(a2()) = b()
+
+\end{lstlisting}
+
+As is the case with the language of Abel et al., whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed. As illustrated above, the judgement also depends upon the rules of the program, Rules($prg$), which will also be presupposed.
+
+$\vdash_v t$ means that the closed term $t$ is a value. This notation is also borrowed from `Copatterns" (Abel et al.), section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
+
+$\vdash_v t$ if $t$ has codata type (V\textsubscript{CodT})
+
+~\\
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\TrinaryInfC{$\vdash_v fun(t_1, ..., t_n)$}
+\DisplayProof, if no matching rule for $fun(t_1, ..., t_n)$ in Rules($prg$) (V\textsubscript{Fun})
+
+\begin{prooftree}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{Con}}
+\TrinaryInfC{$\vdash_v con(t_1, ..., t_n)$}
+\end{prooftree}
+
+~\\
+\AxiomC{$\vdash_v t_0$}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\QuaternaryInfC{$\vdash_v t_0.des(t_1, ..., t_n)$}
+\DisplayProof, if no matching rule for $t_0.des(t_1, ..., t_n)$ in Rules($prg$) (V\textsubscript{Des})
+
 \section{Semantics preservation}
 
 In this section it is shown that the transformations above preserve the semantics of programs. That is, for a transformation indicated by angular brackets, it holds for all closed input terms $s, t$ and all programs $prg$ that:
