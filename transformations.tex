@@ -900,7 +900,7 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 \begin{proof}[Proof of (2)] By induction on the structure of $\mathcal{D}$.
 
 \begin{enumerate}
-\item \textbf{``Axiom" case}:
+\item \textbf{``Subst" case}:
 
 \begin{prooftree}
 \AxiomC{$\mathcal{D}_{\textrm{PM}}$}
@@ -908,7 +908,7 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 \UnaryInfC{$\langle s \rangle \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = \langle t \rangle$ ($\langle s \rangle = s, \langle t \rangle = t$); $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
+with $s'[\sigma] = \langle t \rangle$ ($\langle s \rangle = s, \langle t \rangle = t$); the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
 
 It will be shown: there exists a derivation $\mathcal{D}_2$ for $s \longrightarrow_{prg} t$.
 
@@ -928,7 +928,11 @@ Then there is a $(q, s')$ in Rules$(prg)$ as well as in Rules$(\langle prg \rang
 
 Thus, set $q_2 := q$. It follows that $s'_2 = s', \sigma_2 = \sigma$ and finally $s'_2[\sigma_2] = s'[\sigma] = t$.
 
-\item \underline{Case 2}: $q = fun(con(x_1, ..., x_k), y_2, ..., y_n)$:
+\item \underline{Case 2}: $q = fun(x_1, ..., x_n)$:
+
+The argument is identical to that in Case 1.
+
+\item \underline{Case 3}: $q = fun(con(x_1, ..., x_k), y_2, ..., y_n)$:
 
 Then there either exists $(q, s')$ in Rules($prg$) as well, in this case proceed as in Case 1, or there exists $q_2 := fun(y_1, y_2, ..., y_n)$, ($q_2, s'_2) \in \textrm{Rules}(prg)$, $s' = s'_2[con(x_1, ..., x_k) / y_1]$. This is because these are the only cases in which a rule with left-hand side copattern $q$ of this form is present in Rules($\langle prg \rangle$), as can be seen directly in the definition of $split$.
 
@@ -975,7 +979,7 @@ There is no conflict between the substitutions for, e.g., $x_1$ and $y_2$, since
 
 \end{itemize}
 
-Other cases don't appear in the image of $split$, as can be seen directly in its definition. This concludes the proof for the ``Axiom" case.
+This concludes the proof for the ``Subst" case.
 
 \item \textbf{``Constructor" case}:
 
@@ -1028,7 +1032,7 @@ For step $elim\_multi\_des$.
 \begin{proof}[Proof of (1)] By induction on the structure of $\mathcal{D}$.
 
 \begin{enumerate}
-\item \textbf{``Axiom" case}:
+\item \textbf{``Subst" case}:
 
 \begin{prooftree}
 \AxiomC{$\mathcal{D}_{\textrm{PM}}$}
@@ -1036,7 +1040,7 @@ For step $elim\_multi\_des$.
 \UnaryInfC{$s \longrightarrow s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = t$; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
 
 It will be shown: there exists a pattern matching chain from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract\_outer\_des}$. Using Lemma 2 for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
 
@@ -1072,7 +1076,7 @@ We thus have a pattern matching chain from $s$ to $t$ with respect to the equati
 
 \end{itemize}
 
-This concludes the proof for the ``Axiom" case.
+This concludes the proof for the ``Subst" case.
 
 \end{enumerate}
 
