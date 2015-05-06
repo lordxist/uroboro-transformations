@@ -537,15 +537,16 @@ $q ::= fun(x^*) ~ | ~ q.des(x^*)$
 
 \subsubsection{Actual refunc. fragment}
 
-This is the input fragment for actual refunctionalization, i.e. $r''$. Informally, it is identical to the last fragment with the following difference: Where it said ``at maximum one constructor application" in the last section, for this fragment ``exactly one constructor application" has to hold. As such, every one of its function definitions is either (1) already in refunctionalized form, i.e. the left-hand sides of its rules are destructor copatterns which contain no constructor applications, or (2) core refunctionalization (Rendel, Trieflinger, Ostermann) can be applied to it.
+This is the input fragment for actual refunctionalization, i.e. $r''$. Informally, it is identical to the last fragment with the following difference: Where it said ``at maximum one constructor application" in the last section, for this fragment ``exactly one constructor application" has to hold. As such, every one of its function definitions is either (1) already in refunctionalized form, i.e. the left-hand sides of its rules contain no constructor applications and they are either all destructor patterns or the function has no arguments or its first argument has codata type, or (2) core refunctionalization (Rendel, Trieflinger, Ostermann) can be applied to it.
 
 Formal rules for function definitions:\\
-$fdef ::= dfdef ~ | ~ codfdef$\\
-$dfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } dfeqn^*$\\
+$fdef ::= dfdef ~ | ~ codfdef $\\
+$dfdef ::= \textbf{function } fun(\sigma, \tau^*): \tau \textbf{ where } dfeqn^*$\\
 $dfeqn ::= fun(con(x), y^*) = t$\\
-$codfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } codfeqn^*$\\
-$codfeqn ::= q.des(x^*) = t$\\
-$q ::= fun(x^*) ~ | ~ q.des(x^*)$
+$codfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } copeqn^* ~ | ~ nopeqn^*$\\
+$copeqn ::= q.des(x^*) = t$\\
+$q ::= fun(x^*) ~ | ~ q.des(x^*)$\\
+$nopeqn ::= fun(x^*) = t$
 
 \section{Values}
 
