@@ -751,7 +751,29 @@ then there is a pattern matching chain from $s$ to $t$ with respect to $\langle 
 
 \begin{proof}
 
-TODO
+\begin{itemize}
+
+\item \underline{Case 1}: There exists a pattern matching chain from $s$ to $t$ with respect to $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$.
+
+It is $\langle r, H \rangle^{extract\_des} = \big\langle r', H' \cup H \big\rangle$ for some (possibly empty) helpers set H' and some (possibly equal to r) equation r'. Thus the equations in this result are a superset of $H$ and therefore the pattern matching chain that exists with respect to H exists also with respect to this superset.
+
+\item \underline{Case 2}: The pattern matching chain from $s$ to $t$ contains the equation $r$.
+
+Let this pattern matching chain be:
+
+$`` q_1 = s_1 ", ..., `` q_n = s_n "$
+
+In the case where $\langle r, H \rangle^{extract\_des} = \big\langle r, H \big\rangle$, that is, the left-hand side of $r$ is hole pattern, the resulting equations have not changed and thus the pattern matching chain trivially exists with respect to them.
+
+Next, consider the case where the left-hand side of $r$ is $q.des(p_1, ..., p_k)$, and thus $\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle$, with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. The chain with respect to the equations in this result can be constructed as follows:
+
+Let $I \subseteq \{1, ..., n\}$ be the set of indices $j$ where $r = `` q_j = s_j "$. For all indices $k \not\in I$, $`` q_k = s_k "$ is within $H$. In the original chain above, for every $j \in I$, replace $`` q_j = s_j "$ with the two equations $`` q = hname(\langle q \rangle^{vars}) ", heqn$, in this order.
+
+It is obvious that these equations are contained within $\langle r, H \rangle^{extract\_des}$ since the not-replaced equations are from $H$, which is a subset of the resulting helpers set, and the new equations can also be seen directly in the definition.
+
+To see that the constructed chain goes from $s$ to $t$: TODO
+
+\end{itemize}
 
 \end{proof}
 
