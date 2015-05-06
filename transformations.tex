@@ -611,61 +611,13 @@ Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrigh
 
 \section{Values}
 
-This section formalizes the notion of value for Uroboro. Unlike in the usual case, but not unlike other languages with copattern such as that of Abel et al., some values can be reduced. Not all reductions of values are preserved by the transformations above. Intuitively, values are terms which don't gain information by reducing them.
+This section formalizes the notion of value for Uroboro. Unlike in the usual case, but not unlike other languages with copattern such as that of Abel et al., some values can be reduced. Not all reductions of values are preserved by the transformations above. 
 
-The notion of value for Uroboro is not quite the same as that of the language of Abel et al. The difference comes from the fact that Uroboro allows underspecified functions. Consider a term that contains as a subterm an application of an underspecified function. After a program transformation, it's not always possible to reduce such a term by pattern-matching on this subterm.
-
-The key idea is that this isn't problematic for the preservation of semantics because such a term cannot gain information about this application subterm. This is because, in a reduction by pattern-matching step, the information about the function application is necessarily lost. An instance of this case is given below. 
-
-\begin{lstlisting}
-
-data A where
-  a1(): A
-  a2(): A
-
-function a(): A where
-
-data B where
-  b(): B
-
-function foo(A): B where
-  foo(a) = b()
-
-\end{lstlisting}
-
-With respect to this program, the input term \texttt{foo(a())} reduces to \texttt{b()}. \texttt{a()} is not a constructor application and doesn't reduce to one since the function \texttt{a()} is underspecified. Thus the information that this term of type \texttt{A} is an application of this function is necessarily lost in the reduction by pattern matching from \texttt{foo(a())} to \texttt{b()}.
-
-Now consider the result of transforming the above program with $split$, shown below. With respect to this program, \texttt{foo(a())} does not reduce to \texttt{b()}. But this doesn't change the information gained by a possible reduction. Before the transformation, there was a possible reduction without gain of information, afterwards, there was no possible reduction and still no gain of information.
-
-\begin{lstlisting}
-
-data A where
-  a1(): A
-  a2(): A
-
-function a(): A where
-
-data B where
-  b(): B
-
-function foo(A): B where
-  foo(a1()) = b()
-  foo(a2()) = b()
-
-\end{lstlisting}
-
-As is the case with the language of Abel et al., whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed. As illustrated above, the judgement also depends upon the rules of the program, Rules($prg$), which will also be presupposed.
+As is the case with the language of Abel et al., whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed.
 
 $\vdash_v t$ means that the closed term $t$ is a value. This notation is also borrowed from `Copatterns" (Abel et al.), section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
 
 $\vdash_v t$ if $t$ has codata type (V\textsubscript{CodT})
-
-~\\
-\AxiomC{$\vdash_v t_1$}
-\AxiomC{...}
-\AxiomC{$\vdash_v t_n$}
-\TrinaryInfC{$\vdash_v fun(t_1, ..., t_n)$}
-\DisplayProof, if no matching rule for $fun(t_1, ..., t_n)$ in Rules($prg$) (V\textsubscript{Fun})
 
 \begin{prooftree}
 \AxiomC{$\vdash_v t_1$}
@@ -674,14 +626,6 @@ $\vdash_v t$ if $t$ has codata type (V\textsubscript{CodT})
 \RightLabel{V\textsubscript{Con}}
 \TrinaryInfC{$\vdash_v con(t_1, ..., t_n)$}
 \end{prooftree}
-
-~\\
-\AxiomC{$\vdash_v t_0$}
-\AxiomC{$\vdash_v t_1$}
-\AxiomC{...}
-\AxiomC{$\vdash_v t_n$}
-\QuaternaryInfC{$\vdash_v t_0.des(t_1, ..., t_n)$}
-\DisplayProof, if no matching rule for $t_0.des(t_1, ..., t_n)$ in Rules($prg$) (V\textsubscript{Des})
 
 \section{Semantics preservation}
 
@@ -699,7 +643,7 @@ $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle \Righ
 
 TODO: Restrict these statements. First idea: they hold only for $s$ which are non-values (a transformation may destroy reductions for value terms, but never for non-value terms)
 
-It's always assumed that the program that is transformed is well-typed.
+It's always assumed that the program that is transformed is well-typed. It also is assumed that no term is stuck, i.e., it can either be reduced or is a value.
 
 Note/TODO: The well-typedness of the transformed program will be shown in a separate section.
 
