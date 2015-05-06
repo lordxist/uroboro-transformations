@@ -540,6 +540,24 @@ $codfdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } codfeqn^*$\\
 $codfeqn ::= q.des(x^*) = t$\\
 $q ::= fun(x^*) ~ | ~ q.des(x^*)$
 
+\section{Values}
+
+This section formalizes the notion of value for Uroboro. Unlike in the usual case, but not unlike other languages with copattern such as that of Abel et al., some values can be reduced. Not all reductions of values are preserved by the transformations above. 
+
+As is the case with the language of Abel et al., whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed.
+
+$\vdash_v t$ means that the closed term $t$ is a value. This notation is borrowed from `Copatterns" (Abel et al.), section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
+
+$\vdash_v t$ if $t$ has codata type (V\textsubscript{CodT})
+
+\begin{prooftree}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{Con}}
+\TrinaryInfC{$\vdash_v con(t_1, ..., t_n)$}
+\end{prooftree}
+
 \section{Small-step Operational Semantics}
 
 orients itself on and borrows notations from paper ``Copatterns" (Abel et al.), section 4
@@ -605,27 +623,9 @@ $\longrightarrow$ is the one-step reduction relation for closed terms, which is 
 \UnaryInfC{$t \longrightarrow t'[\sigma]$}
 \end{prooftree}
 
-TODO: There is the following problem with the Subst rule: Substitution may only occur when there are no other possible reductions for $t$.
+where the following holds: If $t = fun(t_1, ..., t_n)$ or $t = con(t_1, ..., t_n)$, then $\vdash_v t_i$ for $i = 1,...,n$. If $t = t_0.des(t_1, ..., t_n)$, then $\vdash_v t_i$ for $i = 0,1,...,n$.
 
 Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
-
-\section{Values}
-
-This section formalizes the notion of value for Uroboro. Unlike in the usual case, but not unlike other languages with copattern such as that of Abel et al., some values can be reduced. Not all reductions of values are preserved by the transformations above. 
-
-As is the case with the language of Abel et al., whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed.
-
-$\vdash_v t$ means that the closed term $t$ is a value. This notation is also borrowed from `Copatterns" (Abel et al.), section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
-
-$\vdash_v t$ if $t$ has codata type (V\textsubscript{CodT})
-
-\begin{prooftree}
-\AxiomC{$\vdash_v t_1$}
-\AxiomC{...}
-\AxiomC{$\vdash_v t_n$}
-\RightLabel{V\textsubscript{Con}}
-\TrinaryInfC{$\vdash_v con(t_1, ..., t_n)$}
-\end{prooftree}
 
 \section{Semantics preservation}
 
