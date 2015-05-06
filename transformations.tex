@@ -761,7 +761,7 @@ Exemplary, the proof of (1) for the transformation $split$ is given below.
 \begin{proof}[Proof of (1)] By induction on the structure of $\mathcal{D}$.
 
 \begin{enumerate}
-\item \textbf{``Axiom" case}:
+\item \textbf{``Subst" case}:
 
 \begin{prooftree}
 \AxiomC{$\mathcal{D}_{\textrm{PM}}$}
@@ -769,7 +769,7 @@ Exemplary, the proof of (1) for the transformation $split$ is given below.
 \UnaryInfC{$s \longrightarrow s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = t$; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
 
 It will be shown: there exists a derivation $\mathcal{D}_2$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$; it is $\langle s \rangle = s$ and $\langle t \rangle = t$ ($split$ doesn't change input terms).
 
@@ -793,7 +793,11 @@ Thus, set $q_2 := q$. It follows that $s'_2 = s', \sigma_2 = \sigma$ and finally
 
 The argument here is identical to that in Case 1.
 
-\item \underline{Case 3}: $q = fun(x_1, x_2, ..., x_n)$:
+\item \underline{Case 3}: $q = fun(x_1, x_2, ..., x_n)$, where $x_1$ has codata type or $n = 0$:
+
+The argument here is identical to that in Case 1.
+
+\item \underline{Case 4}: $q = fun(x_1, x_2, ..., x_n)$, where $n > 0$, $x_1$ has data type:
 
 Since $(q, s') \in \textrm{Rules}(prg)$ there exists a $(q_2, s_2') \in \textrm{Rules}(\langle prg \rangle)$ with $q_2 = fun(con(y_1, ..., y_k), x_2, ..., x_n)$ and $s'_2 = s'[con(y_1, ..., y_k) / x_1]$ for every constructor $con$ with the correct type (i.e. with return type equal to the type of the first argument of $fun$). This can also be seen directly in the definition of $split$. The concrete choice of $q_2$ depends upon the choice of $con$ -- below, $con$ will be chosen as needed.
 
@@ -834,7 +838,7 @@ t_n / x_n$}
 
 Remember that the choice of $con$ and, depending upon that, $q_2$, was left open until needed. This is now the place where $con$ needs to be chosen such that $t_1 = con(t^1_1, ..., t^1_k)$, with the result that the derivation $\mathcal{D}_{\textrm{PM}}$ given above is correct.
 
-TODO: Exclude cases where $t_1$ isn't a constructor application at all. Clear for variables: If $t_1$ is a variable, then $s$ isn't a closed term, which is excluded by definition. But for the case that $t_1$ is a destructor application, the statements (1) and (2) need be more restrictive, because they simply don't hold in this case.
+It is still open why $t_1$ can be chosen that way at all. To see this, consider the following cases: If $t_1$ is a variable, $s$ isn't a closed term, which is excluded by definition. If $t_1$ isn't a variable but also not a value, then the ``Subst" rule wouldn't even apply. The only case that remains is that $t_1$ is a value that has data type. By inversion (TODO: prove lemma of inversion for values) we know that $t_1$ is a constructor application of a constructor $con$. Since $t_1$ has the correct type, this same constructor $con$ can simply be chosen, as stated above.
 
 In the derivation above, $\sigma_2 = t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  t_n / x_n$ and thus:
 
@@ -845,7 +849,7 @@ There is no conflict between the substitutions for, e.g., $x_2$ and $y_1$, since
 
 \end{itemize}
 
-Other cases for $q$ are outside the relevant input fragment for $split$. (TODO: Define this fragment and others and prove for every transformation: that the image of this transformation is a subset of the relevant input fragment of the next transformation.) This concludes the proof for the ``Axiom" case.
+Other cases for $q$ are outside the relevant input fragment for $split$. (TODO: Define this fragment and others and prove for every transformation: that the image of this transformation is a subset of the relevant input fragment of the next transformation.) This concludes the proof for the ``Subst" case.
 
 \item \textbf{``Constructor" case}:
 
