@@ -731,13 +731,13 @@ Note that it follows directly from the definitions of pattern matching chains an
 
 \begin{lemma} Let $e$ be a helper extraction function, i.e. a function that can be an argument of $extract\_helpers$ as defined in section 1. For any program $prg$ and any two closed terms $s,t$ with $s =^? q \searrow \sigma$, $s'[\sigma] = t$ for a rule $(q, s') \in \textrm{Rules}(prg)$ it holds that:
 
-If $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is a pattern matching chain from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$,
+If $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is a reduction sequence from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$,
 
 then $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
 
 \begin{proof}
 
-Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. As there is a pattern matching chain from $s$ to $t$ with respect to all these equations, it can be equivalently stated that there is such a pattern matching chain with respect to the equations of the transformed program. Thus, as noted above, it follows $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
+Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. Thus there is a reduction sequence from $s$ to $t$ with respect to the equations of the transformed program: $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
 
 \end{proof}
 
@@ -745,33 +745,63 @@ Let the conditions be satisfied. As we can see in the definition of $extract\_he
 
 \begin{lemma}
 
-If there is a pattern matching chain from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$ for a pair $\big\langle r, H \big\rangle$,
+If there is a reduction sequence from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$ for a pair $\big\langle r, H \big\rangle$,
 
-then there is a pattern matching chain from $s$ to $t$ with respect to $\langle r, H \rangle^{extract\_des}$.
+then there is a reduction sequence from $s$ to $t$ with respect to $\langle r, H \rangle^{extract\_des}$.
 
 \begin{proof}
 
 \begin{itemize}
 
-\item \underline{Case 1}: There exists a pattern matching chain from $s$ to $t$ with respect to $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$.
+\item \underline{Case 1}: There exists a reduction sequence from $s$ to $t$ with respect to $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$.
 
-It is $\langle r, H \rangle^{extract\_des} = \big\langle r', H' \cup H \big\rangle$ for some (possibly empty) helpers set H' and some (possibly equal to r) equation r'. Thus the equations in this result are a superset of $H$ and therefore the pattern matching chain that exists with respect to H exists also with respect to this superset.
+It is $\langle r, H \rangle^{extract\_des} = \big\langle r', H' \cup H \big\rangle$ for some (possibly empty) helpers set H' and some (possibly equal to r) equation r'. Thus the equations in this result are a superset of those within $H$. Since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the reduction sequence that exists with respect to the equations within H exists also with respect to this superset.
 
-\item \underline{Case 2}: The pattern matching chain from $s$ to $t$ contains the equation $r$.
+\item \underline{Case 2}: The reduction sequence from $s$ to $t$ depends upon the equation $r$. It therefore contains at least one reduction step where the derivation contains an application of the ``Subst" rule for $r$.
 
-Let this pattern matching chain be:
+Let $r := `` q' = s' "$, and the reduction sequence be:
 
-$`` q_1 = s_1 ", ..., `` q_n = s_n "$
+$t_1 \longrightarrow t_2 \longrightarrow ... \longrightarrow t_{n-1} \longrightarrow t$
 
-In the case where $\langle r, H \rangle^{extract\_des} = \big\langle r, H \big\rangle$, that is, the left-hand side of $r$ is hole pattern, the resulting equations have not changed and thus the pattern matching chain trivially exists with respect to them.
+with $t_1 = s$, $t_n = t$.
 
-Next, consider the case where the left-hand side of $r$ is $q.des(p_1, ..., p_k)$, and thus $\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle$, with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. The chain with respect to the equations in this result can be constructed as follows:
+In the case where $\langle r, H \rangle^{extract\_des} = \big\langle r, H \big\rangle$, that is, $q'$ is hole pattern, the resulting equations have not changed and thus a reduction sequence trivially exists with respect to them: It is the same sequence as given above.
 
-Let $I \subseteq \{1, ..., n\}$ be the set of indices $j$ where $r = `` q_j = s_j "$. For all indices $k \not\in I$, $`` q_k = s_k "$ is within $H$. In the original chain above, for every $j \in I$, replace $`` q_j = s_j "$ with the two equations $`` q = hname(\langle q \rangle^{vars}) ", heqn$, in this order.
+Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$, and thus $\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle$, with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. The sequence with respect to the equations in this result can be constructed as follows:
 
-It is obvious that these equations are contained within $\langle r, H \rangle^{extract\_des}$ since the not-replaced equations are from $H$, which is a subset of the resulting helpers set, and the new equations can also be seen directly in the definition.
+\begin{enumerate}
 
-To see that the constructed chain goes from $s$ to $t$: TODO
+\item Let $I \subseteq \{1, ..., n - 1\}$ be the set of indices $j$ where $t_j \longrightarrow t_{j+1}$ contains an application of the ``Subst" rule for $r$. For all indices $k \not\in I$, $t_k \longrightarrow t_{k+1}$ is with respect to the equations within $H$.
+
+\item Without loss of generality, let there be only one application of the ``Subst" rule for $r$ in the derivation. When there is more than one such application, simply repeat this construction until they are all dealt with. For a $j \in I$, by inversion, we know the derivation of $t_j \longrightarrow t_{j+1}$ looks as follows:
+
+\begin{prooftree}
+\AxiomC{$t^0_j =^? q' \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $(q', s')$}
+\UnaryInfC{$t^0_j \longrightarrow s'[\sigma]$}
+\UnaryInfC{$\mathcal{D'}$}
+\UnaryInfC{$t_j \longrightarrow t_{j+1}$}
+\end{prooftree}
+
+for some intermediate derivation $\mathcal{D'}$ and a subterm $t^0_j$ of $t_j$. By inversion, we know that $t^0_j = t'^0_j.des(t^{1,1}_j, ..., t^{1,k}_j)$.
+
+\item In the original sequence above, for every $j \in I$, replace $t_j \longrightarrow t_{j+1}$ with the two reduction steps $t_j \longrightarrow t'_j$, $t'_j \longrightarrow t_{j+1}$, in this order, with the following derivations:
+
+\begin{prooftree}
+\AxiomC{$t'^0_j =^? q \searrow \sigma'$}
+\RightLabel{\scriptsize Subst with $(q, `` hname(\langle q \rangle^{vars}) ")$}
+\UnaryInfC{$t'^0_j \longrightarrow `` hname(\langle q \rangle^{vars}) "[\sigma']$}
+\RightLabel{\scriptsize $\longrightarrow$\textsubscript{Des\textsubscript{P}}}
+\UnaryInfC{$t^0_j \longrightarrow `` hname(\langle q \rangle^{vars}) "[\sigma'].des(t^{1,1}_j, ..., t^{1,k}_j)$}
+\UnaryInfC{$\mathcal{D'}_2$}
+\UnaryInfC{$t_j \longrightarrow t'_j$}
+\end{prooftree}
+
+where $\mathcal{D'}_2$ is $\mathcal{D'}$ where all the occurences of $s'[\sigma]$ that stem from the reduction of $t^0_j$ to it are replaced by $`` hname(\langle q \rangle^{vars}) "[\sigma'].des(t^{1,1}_j, ..., t^{1,k}_j)$. $t'_j$ is defined respectively.
+
+TODO: the rest of the proof
+
+\end{enumerate}
 
 \end{itemize}
 
@@ -1065,11 +1095,11 @@ For step $elim\_multi\_des$.
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
 
-It will be shown: there exists a pattern matching chain from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract\_outer\_des}$. Using Lemma 2 for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
+It will be shown: there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract\_outer\_des}$. Using Lemma 2 for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
 
-Such a pattern matching chain with respect to $\{ `` q = s' " \}$ trivially exists ($s =^? q \searrow \sigma$, $s'[\sigma] = t$), and thus also the chain with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, for some helpers set $H$. Therefore the existence of the pattern matching chain follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
+By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
 
-If there exists a pattern matching chain from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also exists such a pattern matching chain with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_outer\_des}$.
+If there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also exists such a reduction sequence with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_outer\_des}$.
 
 Proof by induction:
 
@@ -1079,7 +1109,7 @@ Proof by induction:
 
 $\langle `` q = s' ", H \rangle^{extract\_outer\_des} = \big\langle `` q = s' ", H \big\rangle$
 
-Thus the resulting equations are the same as the original equations, for which we already know that the desired pattern matching chain exists.
+Thus the resulting equations are the same as the original equations, for which we already know that the desired reduction sequence exists.
 
 \item \underline{Case 2}: $q = q'.des(p_1, ..., p_k)$, $q'$ is hole pattern:
 
@@ -1089,13 +1119,13 @@ The argument is identical to that in Case 1.
 
 $\langle `` q = s' ", H \rangle^{extract\_outer\_des} = \langle \langle `` q = s' ", H \rangle^{extract\_des} \rangle^{extract\_outer\_des}$
 
-By Lemma 3, since there is a pattern matching chain from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also is such a pattern matching chain with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_des}$. 
+By Lemma 3, since there is a reduction sequence from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also is such a reduction sequence with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_des}$. 
 
 From the definition of $extract\_des$ we have that:
 
 $\langle `` q = s' ", H \rangle^{extract\_des} = \langle `` q'.des(p_1, ..., p_k) = s' ", H \rangle^{extract\_des} = \big\langle `` q' = t_h ", H' \big\rangle$ for some term $t_h$ and some helpers set $H'$. 
 
-We thus have a pattern matching chain from $s$ to $t$ with respect to the equations within $\big\langle `` q' = t_h ", H' \big\rangle$. By the induction hypothesis, applied to $q'$, we have the pattern matching chain with respect to $\langle `` q' = t_h ", H' \rangle^{extract\_outer\_des}$, which is the desired chain.
+We thus have a reduction sequence from $s$ to $t$ with respect to the equations within $\big\langle `` q' = t_h ", H' \big\rangle$. By the induction hypothesis, applied to $q'$, we have the reduction sequence with respect to $\langle `` q' = t_h ", H' \rangle^{extract\_outer\_des}$, which is the desired sequence.
 
 \end{itemize}
 
