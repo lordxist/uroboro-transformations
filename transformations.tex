@@ -767,7 +767,7 @@ with $t_1 = s$, $t_n = t$.
 
 In the case where $\langle r, H \rangle^{extract\_des} = \big\langle r, H \big\rangle$, that is, $q'$ is hole pattern, the resulting equations have not changed and thus a reduction sequence trivially exists with respect to them: It is the same sequence as given above.
 
-Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$, and thus $\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle$, with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. The sequence with respect to the equations in this result can be constructed as follows:
+Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$, and thus $\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle$, with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. Especially it is $heqn = `` q_h = s' "$, with $q_h$ defined as $hname(\langle q \rangle^{vars}).des(p_1, ..., p_k)$. The sequence with respect to the equations in this result can be constructed as follows:
 
 \begin{enumerate}
 
@@ -776,30 +776,54 @@ Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$, and thus $\langle 
 \item Without loss of generality, let there be only one application of the ``Subst" rule for $r$ in the derivation. When there is more than one such application, simply repeat this construction until they are all dealt with. For a $j \in I$, by inversion, we know the derivation of $t_j \longrightarrow t_{j+1}$ looks as follows:
 
 \begin{prooftree}
-\AxiomC{$t^0_j =^? q' \searrow \sigma$}
+\AxiomC{$t'^0_j =^? q \searrow \sigma_0$}
+\AxiomC{$t^{1,1}_j =^? p_1 \searrow \sigma_1$}
+\AxiomC{...}
+\AxiomC{$t^{1,k}_j =^? p_k \searrow \sigma_k$}
+\RightLabel{\scriptsize PM\textsubscript{Des}}
+\QuaternaryInfC{$t^0_j =^? q' \searrow \sigma$}
 \RightLabel{\scriptsize Subst with $(q', s')$}
 \UnaryInfC{$t^0_j \longrightarrow s'[\sigma]$}
 \UnaryInfC{$\mathcal{D'}$}
 \UnaryInfC{$t_j \longrightarrow t_{j+1}$}
 \end{prooftree}
 
-for some intermediate derivation $\mathcal{D'}$ and a subterm $t^0_j$ of $t_j$. By inversion, we know that $t^0_j = t'^0_j.des(t^{1,1}_j, ..., t^{1,k}_j)$.
+with $\sigma = ?, \sigma_1, ..., \sigma_k$, for some intermediate derivation $\mathcal{D'}$ and a subterm $t^0_j$ of $t_j$. By inversion, we know that $t^0_j = t'^0_j.des(t^{1,1}_j, ..., t^{1,k}_j)$.
 
 \item In the original sequence above, for every $j \in I$, replace $t_j \longrightarrow t_{j+1}$ with the two reduction steps $t_j \longrightarrow t'_j$, $t'_j \longrightarrow t_{j+1}$, in this order, with the following derivations:
 
+Derivation for $t_j \longrightarrow t'_j$:
 \begin{prooftree}
-\AxiomC{$t'^0_j =^? q \searrow \sigma'$}
+\AxiomC{$t'^0_j =^? q \searrow \sigma_0$}
 \RightLabel{\scriptsize Subst with $(q, `` hname(\langle q \rangle^{vars}) ")$}
-\UnaryInfC{$t'^0_j \longrightarrow `` hname(\langle q \rangle^{vars}) "[\sigma']$}
+\UnaryInfC{$t'^0_j \longrightarrow `` hname(\langle q \rangle^{vars}) "[\sigma_0]$}
 \RightLabel{\scriptsize $\longrightarrow$\textsubscript{Des\textsubscript{P}}}
-\UnaryInfC{$t^0_j \longrightarrow `` hname(\langle q \rangle^{vars}) "[\sigma'].des(t^{1,1}_j, ..., t^{1,k}_j)$}
-\UnaryInfC{$\mathcal{D'}_2$}
+\UnaryInfC{$t^0_j \longrightarrow t_h$}
+\UnaryInfC{$\mathcal{D'}_1$}
 \UnaryInfC{$t_j \longrightarrow t'_j$}
 \end{prooftree}
 
-where $\mathcal{D'}_2$ is $\mathcal{D'}$ where all the occurences of $s'[\sigma]$ that stem from the reduction of $t^0_j$ to it are replaced by $`` hname(\langle q \rangle^{vars}) "[\sigma'].des(t^{1,1}_j, ..., t^{1,k}_j)$. $t'_j$ is defined respectively.
+where $\mathcal{D'}_1$ is $\mathcal{D'}$ where all the occurrences of $s'[\sigma]$ that stem from the reduction by substitution of $t^0_j$ to it are replaced by $t_h := `` hname(\langle q \rangle^{vars}) "[\sigma'].des(t^{1,1}_j, ..., t^{1,k}_j)$. $t'_j$ is defined accordingly.
 
-TODO: the rest of the proof
+For the next derivation, remember that $q_h = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) "$ and $heqn = `` q_h = s'  "$. 
+
+Derivation for $t'_j \longrightarrow t_{j+1}$:
+{\setlength{\parindent}{-\leftmargin}
+
+\AxiomC{$`` hname(\langle q \rangle^{vars}) "[\sigma_0] =^? `` hname(\langle q \rangle^{vars}) " \searrow \sigma_0$}
+\AxiomC{$t^{1,1}_j =^? p_1 \searrow \sigma_1$}
+\AxiomC{...}
+\AxiomC{$t^{1,k}_j =^? p_k \searrow \sigma_k$}
+\RightLabel{\scriptsize PM\textsubscript{Des}}
+\QuaternaryInfC{$t_h =^? q_h \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $(q_h, s')$}
+\UnaryInfC{$t_h \longrightarrow s'[\sigma]$}
+\UnaryInfC{$\mathcal{D'}_2$}
+\UnaryInfC{$t'_j \longrightarrow t_{j+1}$}
+\DisplayProof
+}
+
+where $\mathcal{D'}_2$ is $\mathcal{D'}$ where all the occurrences of $t^0_j$ that stem from its reduction by substitution to $s'[\sigma]$ are replaced by $t_h$.
 
 \end{enumerate}
 
