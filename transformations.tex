@@ -655,7 +655,7 @@ $s \longrightarrow^*_{prg} t \implies \langle s \rangle \longrightarrow^*_{\lang
 
 and
 
-$\langle s \rangle \longrightarrow^*_{\langle prg \rangle} \langle t \rangle \implies \exists t': \langle t \rangle \longrightarrow^*_{\langle prg \rangle} \langle t' \rangle \land s \longrightarrow^*_{prg} t'$ (2)
+$\langle s \rangle \longrightarrow^*_{\langle prg \rangle} \langle t \rangle \implies \exists s', t': \langle s' \rangle \longrightarrow^*_{\langle prg \rangle} \langle s \rangle \land \langle t \rangle \longrightarrow^*_{\langle prg \rangle} \langle t' \rangle \land s' \longrightarrow^*_{prg} t'$ (2)
 
 The first statement follows from (1) as given below by the transitivity of the reduction relation.
 
@@ -670,7 +670,7 @@ For some transformations the following holds:
 
 $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle \implies s \longrightarrow^*_{prg} t$ (2')
 
-(2') implies the second bisimulation statement (2) (by transitivity and by choosing $t' = t$) and is therefore shown in its stead whenever possible. (2') is always shown analogously to (1).
+(2') implies the second bisimulation statement (2) (by transitivity and by choosing $s' = s, t' = t$) and is therefore shown in its stead whenever possible. (2') is always shown analogously to (1).
 
 It's always assumed that the program that is transformed is well-typed. It also is assumed that no term is stuck, i.e., it can either be reduced or is a value.
 
@@ -1223,7 +1223,11 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \end{proof}
 
-\begin{proof}[Proof of (2)] By induction on the structure of $\mathcal{D}$.
+\begin{proof}[Proof of (2)] By showing
+
+$\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle \implies \exists s', t': \langle s' \rangle \longrightarrow^*_{\langle prg \rangle} \langle s \rangle \land \langle t \rangle \longrightarrow^*_{\langle prg \rangle} \langle t' \rangle \land s' \longrightarrow^*_{prg} t'$,
+
+from which (2) follows by transitivity. In turn, this statement is shown by induction on the structure of its derivation $\mathcal{D}$.
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
@@ -1236,7 +1240,7 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-It will be shown: there exists a term $t'$ and reduction sequences from $s$ to $t'$ and from $t$ to $t'$, which both use only an equation $r$ for which it holds that $`` q = s' "$ is within $\langle r \rangle^{extract\_outer\_des}$. Using Lemma 2b for $e = extract\_outer\_des$, this gives us the desired $t \longrightarrow^*_{\langle prg \rangle} t'$ and $s \longrightarrow^*_{prg} t'$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
+It will be shown: there exist terms $s'', t'$ and reduction sequences from $s''$ to $t'$, from $s''$ to $s$, and from $t$ to $t'$. The first of those uses only an equation $r$ for which it holds that $`` q = s' "$ is within $\langle r \rangle^{extract\_outer\_des}$. The other sequences use only the equations within $\langle r \rangle^{extract\_outer\_des}$. Using Lemma 2b for $e = extract\_outer\_des$, this gives us the desired $s'' \longrightarrow^*_{\langle prg \rangle} s$, $t \longrightarrow^*_{\langle prg \rangle} t'$ and $s'' \longrightarrow^*_{prg} t'$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
 
 Let $r = `` q_2 = s'_2 "$.
 
@@ -1246,7 +1250,7 @@ Let $r = `` q_2 = s'_2 "$.
 
 $\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle$
 
-Since it is the only equation in the result, $r = `` q = s' "$. We already know there exists a reduction sequence from $s$ to $t$ which only uses $`` q = s' "$. Thus we can simply set $t' = t$.
+Since it is the only equation in the result, $r = `` q = s' "$. We already know there exists a reduction sequence from $s$ to $t$ which only uses $`` q = s' "$. Thus we can simply set $s'' = s$, $t' = t$.
 
 \item \underline{Case 2}: $q_2 = q'.des(p_1, ..., p_k)$, $q'$ is hole pattern:
 
@@ -1259,7 +1263,15 @@ $= \langle `` q' = hname(\langle q' \rangle^{vars}) ", \{ \big\langle hsig, heqn
 
 with $hname, hsig, heqn$ as in the definition of $extract\_des$.
 
-TODO: complete the proof.
+Depending upon $q'$, $`` q = s' "$ is either one of $q' = hname(\langle q' \rangle^{vars})$, $heqn$ or within $\langle `` q' = hname(\langle q' \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \rangle^{extract\_outer\_des}$.
+
+\begin{itemize}
+
+\item Case 3.1: $`` q = s' " = `` q' = hname(\langle q' \rangle^{vars}) "$:
+
+TODO: complete with proof
+
+\end{itemize}
 
 \end{itemize}
 
