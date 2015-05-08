@@ -656,7 +656,7 @@ Note/TODO: The well-typedness of the transformed program will be shown in a sepa
 (1) is always shown in the following way:
 
 Suppose that: $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, \\
-show that: there exist derivations $\mathcal{D}_1, ..., \mathcal{D}_n$ for $\langle s \rangle \longrightarrow_{prg} t_1, t_1 \longrightarrow_{prg} t_2, ..., t_{n-1} \longrightarrow_{prg} \langle t \rangle$, respectively
+show that: there exist derivations $\mathcal{D}_1, ..., \mathcal{D}_n$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} t_1, t_1 \longrightarrow_{\langle prg \rangle} t_2, ..., t_{n-1} \longrightarrow_{\langle prg \rangle} \langle t \rangle$, respectively
 
 (2) is always shown analogously.
 
@@ -837,7 +837,9 @@ Exemplary, the proof of (1) for the transformation $split$ is given below.
 
 \subsection{Split}
 
-\begin{proof}[Proof of (1)] By induction on the structure of $\mathcal{D}$.
+\begin{proof}[Proof of (1)] This will be done by proving the following special case of (1) by induction on the structure of $\mathcal{D}$:
+
+If $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, there exists a derivation $\mathcal{D}_2$ for $s \longrightarrow_{\langle prg \rangle} t$.
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
@@ -974,7 +976,9 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \end{proof}
 
-\begin{proof}[Proof of (2)] By induction on the structure of $\mathcal{D}$.
+\begin{proof}[Proof of (2)] This will be done by proving the following special case of (2) by induction on the structure of $\mathcal{D}$:
+
+If $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, there exists a derivation $\mathcal{D}_2$ for $s \longrightarrow_{\langle prg \rangle} t$.
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
