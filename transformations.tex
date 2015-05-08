@@ -1225,8 +1225,6 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \begin{proof}[Proof of (2)] By induction on the structure of $\mathcal{D}$.
 
-TODO: Change this to fit with the new definition of (2) and complete the proof.
-
 \begin{enumerate}
 \item \textbf{``Subst" case}:
 
@@ -1238,7 +1236,7 @@ TODO: Change this to fit with the new definition of (2) and complete the proof.
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-It will be shown: there exists a reduction sequence from $s$ to $t$ which uses only an equation $r$ for which it holds that $`` q = s' "$ is within $\langle r \rangle^{extract\_outer\_des}$. Using Lemma 2b for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow^*_{prg} t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
+It will be shown: there exists a term $t'$ and reduction sequences from $s$ to $t'$ and from $t$ to $t'$, which both use only an equation $r$ for which it holds that $`` q = s' "$ is within $\langle r \rangle^{extract\_outer\_des}$. Using Lemma 2b for $e = extract\_outer\_des$, this gives us the desired $t \longrightarrow^*_{\langle prg \rangle} t'$ and $s \longrightarrow^*_{prg} t'$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
 
 Let $r = `` q_2 = s'_2 "$.
 
@@ -1248,7 +1246,7 @@ Let $r = `` q_2 = s'_2 "$.
 
 $\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle$
 
-Since it is the only equation in the result, $r = `` q = s' "$. We already know there exists a reduction sequence from $s$ to $t$ which only uses $`` q = s' "$.
+Since it is the only equation in the result, $r = `` q = s' "$. We already know there exists a reduction sequence from $s$ to $t$ which only uses $`` q = s' "$. Thus we can simply set $t' = t$.
 
 \item \underline{Case 2}: $q_2 = q'.des(p_1, ..., p_k)$, $q'$ is hole pattern:
 
@@ -1260,6 +1258,8 @@ $\langle r \rangle^{extract\_outer\_des} = \langle \langle r, \emptyset \rangle^
 $= \langle `` q' = hname(\langle q' \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \rangle^{extract\_outer\_des}$
 
 with $hname, hsig, heqn$ as in the definition of $extract\_des$.
+
+TODO: complete the proof.
 
 \end{itemize}
 
