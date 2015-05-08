@@ -141,6 +141,18 @@ data Bool where
 
 \end{lstlisting}
 
+\item In general, the implementations of defunctionalization and refunctionalization only work with programs which don't depend upon the order of their rules. Especially, that means that a function such as the following won't be transformed correctly:
+\begin{lstlisting}
+
+function foo where
+  foo(zero()) = zero()
+  foo(succ(zero()) = zero()
+  foo(x) = x
+
+\end{lstlisting}
+
+Thanks are due to Yufei Cai and Paolo Giarrusso for this observation. Future work might add a transformation from rule-order dependent to rule-order independent programs.
+
 \end{itemize}
 
 \section{Defunctionalization of Uroboro}
@@ -1202,6 +1214,25 @@ Analogous to ``Constructor" case, with the arguments (to the right) of the destr
 \end{prooftree}
 
 Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j$.
+
+\end{enumerate}
+
+\end{proof}
+
+\begin{proof}[Proof of (2)] By induction on the structure of $\mathcal{D}$.
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$s \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+We have that there exists a one-step reduction from $s$ to $t$ with respect to the equations within $\langle $
 
 \end{enumerate}
 
