@@ -649,13 +649,15 @@ Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrigh
 
 \section{Semantics preservation}
 
-In this section it is shown that the transformations above preserve the semantics of programs in a kind of weak bisimulation. Precisely, for all transformations indicated by angular brackets, it holds for all closed input terms $s, t$ and all programs $prg$ that:
+In this section it is shown that the transformations above preserve the semantics of programs in a kind of weak bisimulation. Precisely, for all transformations indicated by angular brackets, it holds for all closed input terms $s$ and all programs $prg$ that:
 
-$s \longrightarrow^*_{prg} t \implies \langle s \rangle \longrightarrow^*_{\langle prg \rangle} \langle t \rangle$
+For all closed terms $t$: $s \longrightarrow^*_{prg} t \implies \langle s \rangle \longrightarrow^*_{\langle prg \rangle} \langle t \rangle$
 
 and
 
-$\langle s \rangle \longrightarrow^*_{\langle prg \rangle} \langle t \rangle \implies \exists s', t': \langle s' \rangle \longrightarrow^*_{\langle prg \rangle} \langle s \rangle \land \langle t \rangle \longrightarrow^*_{\langle prg \rangle} \langle t' \rangle \land s' \longrightarrow^*_{prg} t'$ (2)
+if there is an infinite reduction sequence in $\langle prg \rangle$ starting with s, i.e., it holds for all $s_1$ in the sequence that there exists an $s_2$ in the sequence with $s_1 \longrightarrow_{\langle prg \rangle} s_2$, then:
+
+$\exists t, s_0: s \longrightarrow^*_{\langle prg \rangle} t \land s_0 \longrightarrow^*_{\langle prg \rangle} s \land s_0 \longrightarrow^*_{prg} t$ (2)
 
 The first statement follows from (1) as given below by the transitivity of the reduction relation.
 
@@ -666,11 +668,11 @@ This also holds for all transformations and is therefore proved instead of the f
 Suppose that: $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, \\
 show that: there exist derivations $\mathcal{D}_1, ..., \mathcal{D}_n$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} t_1, t_1 \longrightarrow_{\langle prg \rangle} t_2, ..., t_{n-1} \longrightarrow_{\langle prg \rangle} \langle t \rangle$, respectively
 
-For some transformations the following holds:
+For some transformations the following holds for all closed terms $s, t$:
 
 $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle \implies s \longrightarrow^*_{prg} t$ (2')
 
-(2') implies the second bisimulation statement (2) (by transitivity and by choosing $s' = s, t' = t$) and is therefore shown in its stead whenever possible. (2') is always shown analogously to (1).
+(2') implies the second bisimulation statement (2) (by transitivity and by choosing $t$ arbitrarily from the infinite reduction sequence and $s_0 = s$) and is therefore shown in its stead whenever possible. (2') is always shown analogously to (1).
 
 It's always assumed that the program that is transformed is well-typed. It also is assumed that no term is stuck, i.e., it can either be reduced or is a value.
 
@@ -1223,11 +1225,7 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \end{proof}
 
-\begin{proof}[Proof of (2)] By showing
-
-$\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle \implies \exists s', t': \langle s' \rangle \longrightarrow^*_{\langle prg \rangle} \langle s \rangle \land \langle t \rangle \longrightarrow^*_{\langle prg \rangle} \langle t' \rangle \land s' \longrightarrow^*_{prg} t'$,
-
-from which (2) follows by transitivity. In turn, this statement is shown by induction on the structure of its derivation $\mathcal{D}$.
+\begin{proof}[Proof of (2)] By induction on the structure of the derivation $\mathcal{D}$ of the first step $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle s_1 \rangle$ of the infinite reduction sequence.
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
@@ -1238,19 +1236,23 @@ from which (2) follows by transitivity. In turn, this statement is shown by indu
 \UnaryInfC{$s \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+with $s'[\sigma] = s_1$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle s_1 \rangle = s_1$.
 
-It will be shown: there exist terms $s'', t'$ and reduction sequences from $s''$ to $t'$, from $s''$ to $s$, and from $t$ to $t'$. The first of those uses only an equation $r$ for which it holds that $`` q = s' "$ is within $\langle r \rangle^{extract\_outer\_des}$. The other sequences use only the equations within $\langle r \rangle^{extract\_outer\_des}$. Using Lemma 2b for $e = extract\_outer\_des$, this gives us the desired $s'' \longrightarrow^*_{\langle prg \rangle} s$, $t \longrightarrow^*_{\langle prg \rangle} t'$ and $s'' \longrightarrow^*_{prg} t'$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
+It will be shown: There exists an equation $r$ for which it holds that $`` q = s' "$ is within $\langle r \rangle^{extract\_outer\_des}$ such that there exist terms $t, s_0$ and reduction sequences from $s_0$ to $t$, from $s$ to $t$, and from $s_0$ to $s$. The first of those uses only $r$ . The other sequences use only the equations within $\langle r \rangle^{extract\_outer\_des}$. Using Lemma 2b for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow^*_{\langle prg \rangle} t$, $s_0 \longrightarrow^*_{\langle prg \rangle} s$ and $s_0 \longrightarrow^*_{prg} t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
 
-Let $r = `` q_2 = s'_2 "$.
+The property above follows from the statement below:
+
+For all equations $r$ and all helpers sets $H$ (possibly empty) for which it holds that $`` q = s' "$ is within $\langle r, H \rangle^{extract\_outer\_des}$ there exist terms $t, s_0$ and reduction sequences from $s_0$ to $t$, from $s$ to $t$, and from $s_0$ to $s$. The first of those uses only $r$ and the equations within $H$. The other sequences use only the equations within $\langle r, H \rangle^{extract\_outer\_des}$.
+
+Let $r = `` q_2 = s'_2 "$. The last statement is proved by induction on the structure of $q_2$.
 
 \begin{itemize}
 
 \item \underline{Case 1}: $q_2$ is hole pattern:
 
-$\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle$
+$\langle r, H \rangle^{extract\_outer\_des} = \big\langle r, H \big\rangle$
 
-Since it is the only equation in the result, $r = `` q = s' "$. We already know there exists a reduction sequence from $s$ to $t$ which only uses $`` q = s' "$. Thus we can simply set $s'' = s$, $t' = t$.
+Since those are the only equations in the result, $r = `` q = s' "$ or $`` q = s' "$ is within $H$. We already know there exists a reduction sequence from $s$ to $s_1$ which only uses $`` q = s' "$. Thus we can simply set $s_0 = s$, $t = s_1$.
 
 \item \underline{Case 2}: $q_2 = q'.des(p_1, ..., p_k)$, $q'$ is hole pattern:
 
@@ -1258,20 +1260,12 @@ The argument is identical to that in Case 1.
 
 \item \underline{Case 3}: $q_2 = q'.des(p_1, ..., p_k)$, $q'$ is destructor pattern:
 
-$\langle r \rangle^{extract\_outer\_des} = \langle \langle r, \emptyset \rangle^{extract\_des} \rangle^{extract\_outer\_des}$\\
-$= \langle `` q' = hname(\langle q' \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \rangle^{extract\_outer\_des}$
+$\langle r, H \rangle^{extract\_outer\_des} = \langle \langle r, H \rangle^{extract\_des} \rangle^{extract\_outer\_des}$\\
+$= \langle `` q' = hname(\langle q' \rangle^{vars}) ", H \cup \{ \big\langle hsig, heqn \big\rangle \} \rangle^{extract\_outer\_des}$
 
 with $hname, hsig, heqn$ as in the definition of $extract\_des$.
 
-Depending upon $q'$, $`` q = s' "$ is either one of $q' = hname(\langle q' \rangle^{vars})$, $heqn$ or within $\langle `` q' = hname(\langle q' \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \rangle^{extract\_outer\_des}$.
-
-\begin{itemize}
-
-\item Case 3.1: $`` q = s' " = `` q' = hname(\langle q' \rangle^{vars}) "$:
-
-TODO: complete with proof
-
-\end{itemize}
+TODO: complete the proof
 
 \end{itemize}
 
