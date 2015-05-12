@@ -649,30 +649,30 @@ Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrigh
 
 \section{Semantics preservation}
 
-In this section it is shown that the transformations above preserve the semantics of programs in a kind of weak bisimulation. Precisely, for all transformations indicated by angular brackets, it holds for all closed input terms $s$ and all programs $prg$ that:
+TODO: The bisimulation statement presupposes that the one-step reduction relation is a partial function. Change it accordingly.
 
-For all closed terms $t$: $s \longrightarrow^*_{prg} t \implies \langle s \rangle \longrightarrow^*_{\langle prg \rangle} \langle t \rangle$
-
-and
-
-if there is an infinite reduction sequence in $\langle prg \rangle$ starting with s, i.e., it holds for all $s_1$ in the sequence that there exists an $s_2$ in the sequence with $s_1 \longrightarrow_{\langle prg \rangle} s_2$, then:
-
-$\exists t, s_0: s \longrightarrow^*_{\langle prg \rangle} t \land s_0 \longrightarrow^*_{\langle prg \rangle} s \land s_0 \longrightarrow^*_{prg} t$ (2)
-
-The first statement follows from (1) as given below by the transitivity of the reduction relation.
+In this section it is shown that the transformations above preserve the semantics of programs in a kind of weak bisimulation. Precisely, for all transformations indicated by angular brackets, it holds for all closed input terms $s, t$ and all programs $prg$ that:
 
 $s \longrightarrow_{prg} t \implies \langle s \rangle \longrightarrow_{\langle prg \rangle}^* \langle t \rangle$ (1)
 
-This also holds for all transformations and is therefore proved instead of the first bisimulation statement. (1) is always shown in the following way:
+and
+
+the reduction sequence from $\langle s \rangle$ to $\langle t \rangle$ in (1), contains no terms, except possibly $\langle s \rangle$ and $\langle t \rangle$, that typecheck against $prg$ (2)
+
+and
+
+when $s$ doesn't reduce to anything in $prg$, then there is no infinite reduction sequence starting with $\langle s \rangle$ in $prg$ (3)
+
+(1) is always shown in the following way:
 
 Suppose that: $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, \\
 show that: there exist derivations $\mathcal{D}_1, ..., \mathcal{D}_n$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} t_1, t_1 \longrightarrow_{\langle prg \rangle} t_2, ..., t_{n-1} \longrightarrow_{\langle prg \rangle} \langle t \rangle$, respectively
 
-For some transformations the following holds for all closed terms $s, t$:
+For some transformations, strong bisimulation holds, precisely, the following holds for all closed terms $s, t$:
 
-$\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle \implies s \longrightarrow^*_{prg} t$ (2')
+$ s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$
 
-(2') implies the second bisimulation statement (2) (by transitivity and by choosing $t$ arbitrarily from the infinite reduction sequence and $s_0 = s$) and is therefore shown in its stead whenever possible. (2') is always shown analogously to (1).
+Strong bisimulation implies the weak kind of bisimulation as given by (1) and (2). It is always shown in its stead whenever possible. The proof of each side of strong bisimulation proceeds analogously to that of (1) (but always with $n = 1$).
 
 It's always assumed that the program that is transformed is well-typed. It also is assumed that no term is stuck, i.e., it can either be reduced or is a value.
 
@@ -851,13 +851,11 @@ where $\mathcal{D'}_2$ is $\mathcal{D'}$ where all the occurrences of $t^0_j$ th
 
 \end{lemma}
 
-Exemplary, the proof of (1) for the transformation $split$ is given below.
+Exemplary, the proof of strong bisimulation for the transformation $split$ is given below.
 
 \subsection{Split}
 
-\begin{proof}[Proof of (1)] This will be done by proving the following special case of (1) by induction on the structure of $\mathcal{D}$:
-
-If $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, there exists a derivation $\mathcal{D}_2$ for $s \longrightarrow_{\langle prg \rangle} t$.
+\begin{proof}[Proof of strong bisimulation, ``$\Rightarrow$"] ~
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
@@ -870,9 +868,9 @@ If $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, there exists a d
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
 
-It will be shown: there exists a derivation $\mathcal{D}_2$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$; it is $\langle s \rangle = s$ and $\langle t \rangle = t$ ($split$ doesn't change input terms).
+It will be shown: there exists a derivation $\mathcal{D}_1$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$; it is $\langle s \rangle = s$ and $\langle t \rangle = t$ ($split$ doesn't change input terms).
 
-For this, define $\mathcal{D}_2$ as follows:
+For this, define $\mathcal{D}_1$ as follows:
 
 \begin{prooftree}
 \AxiomC{$s =^? q_2 \searrow \sigma_2$ with $(q_2, s'_2) \in \textrm{Rules}(\langle prg \rangle)$}
@@ -900,10 +898,10 @@ The argument here is identical to that in Case 1.
 
 Since $(q, s') \in \textrm{Rules}(prg)$ there exists a $(q_2, s_2') \in \textrm{Rules}(\langle prg \rangle)$ with $q_2 = fun(con(y_1, ..., y_k), x_2, ..., x_n)$ and $s'_2 = s'[con(y_1, ..., y_k) / x_1]$ for every constructor $con$ with the correct type (i.e. with return type equal to the type of the first argument of $fun$). This can also be seen directly in the definition of $split$. The concrete choice of $q_2$ depends upon the choice of $con$ -- below, $con$ will be chosen as needed.
 
-It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 2}$ such that:
+It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 1}$ such that:
 
 \begin{prooftree}
-\AxiomC{$\mathcal{D}_{\textrm{PM}, 2}$}
+\AxiomC{$\mathcal{D}_{\textrm{PM}, 1}$}
 \UnaryInfC{$s =^? q_2 \searrow \sigma_2$}
 \end{prooftree}
 
@@ -920,7 +918,7 @@ By inversion (Lemma 1) we have the following form for $\mathcal{D}_{\textrm{PM}}
 \TrinaryInfC{$fun(t_1, ..., t_n) =^? q \searrow t_1 / x_1, ..., t_n / x_n$}
 \end{prooftree}
 
-With that, we also know the form of $s$: $s = fun(t_1, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}, 2}$ as follows:\\
+With that, we also know the form of $s$: $s = fun(t_1, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}, 1}$ as follows:\\
 
 {\setlength{\parindent}{-\leftmargin}
 \AxiomC{$t_1^1 =^? y_1 \searrow t_1^1 / y_1$}
@@ -935,7 +933,7 @@ t_n / x_n$}
 \DisplayProof
 }
 
-Remember that the choice of $con$ and, depending upon that, $q_2$, was left open until needed. This is now the place where $con$ needs to be chosen such that $t_1 = con(t^1_1, ..., t^1_k)$, with the result that the derivation $\mathcal{D}_{\textrm{PM}}$ given above is correct.
+Remember that the choice of $con$ and, depending upon that, $q_2$, was left open until needed. This is now the place where $con$ needs to be chosen such that $t_1 = con(t^1_1, ..., t^1_k)$, with the result that the derivation $\mathcal{D}_{\textrm{PM}, 1}$ given above is correct.
 
 It is still open why $t_1$ can be chosen that way at all. To see this, consider the following cases: If $t_1$ is a variable, $s$ isn't a closed term, which is excluded by definition. If $t_1$ isn't a variable but also not a value, then the ``Subst" rule wouldn't even apply. The only case that remains is that $t_1$ is a value that has data type. By inversion (TODO: prove lemma of inversion for values) we know that $t_1$ is a constructor application of a constructor $con$. Since $t_1$ has the correct type, this same constructor $con$ can simply be chosen, as stated above.
 
@@ -960,14 +958,14 @@ Other cases for $q$ are outside the relevant input fragment for $split$. (TODO: 
 
 with $s = con(t_1, ..., t_j, ..., t_n), t = con(t_1, ..., t'_j, ..., t_n)$.
 
-It will be shown; there exists a derivation $\mathcal{D}_2$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ (again, $\langle s \rangle = s, \langle t \rangle = t$).
+It will be shown; there exists a derivation $\mathcal{D}_1$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ (again, $\langle s \rangle = s, \langle t \rangle = t$).
 
-From the induction hypothesis it follows that, since there is a derivation $\mathcal{D'}$ (see above), there exists a derivation $\mathcal{D'}_2$ for $\langle t_j \rangle \longrightarrow_{\langle prg \rangle} \langle t'_j \rangle$ ($\langle t_j \rangle = t_j, \langle t'_j \rangle = t'_j$).
+From the induction hypothesis it follows that, since there is a derivation $\mathcal{D'}$ (see above), there exists a derivation $\mathcal{D'}_1$ for $\langle t_j \rangle \longrightarrow_{\langle prg \rangle} \langle t'_j \rangle$ ($\langle t_j \rangle = t_j, \langle t'_j \rangle = t'_j$).
 
-Thus we can define $\mathcal{D}_2$ as follows:
+Thus we can define $\mathcal{D}_1$ as follows:
 
 \begin{prooftree}
-\AxiomC{$\mathcal{D'}_2$}
+\AxiomC{$\mathcal{D'}_1$}
 \UnaryInfC{$t_j \longrightarrow_{\langle prg \rangle} t'_j$}
 \UnaryInfC{$con(t_1, ..., t_j, ..., t_n) \longrightarrow_{\langle prg \rangle} con(t_1, ..., t'_j, ..., t_n)$}
 \end{prooftree}
@@ -994,9 +992,7 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \end{proof}
 
-\begin{proof}[Proof of (2')] This will be done by proving the following special case of (2') by induction on the structure of $\mathcal{D}$:
-
-If $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, there exists a derivation $\mathcal{D}_2$ for $s \longrightarrow_{\langle prg \rangle} t$.
+\begin{proof}[Proof of strong bisimulation, ``$\Leftarrow$"] ~
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
@@ -1009,9 +1005,9 @@ If $s \longrightarrow_{prg} t$ with a derivation $\mathcal{D}$, there exists a d
 
 with $s'[\sigma] = \langle t \rangle$ ($\langle s \rangle = s, \langle t \rangle = t$); the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
 
-It will be shown: there exists a derivation $\mathcal{D}_2$ for $s \longrightarrow_{prg} t$.
+It will be shown: there exists a derivation $\mathcal{D}_1$ for $s \longrightarrow_{prg} t$.
 
-For this, define $\mathcal{D}_2$ as follows:
+For this, define $\mathcal{D}_1$ as follows:
 
 \begin{prooftree}
 \AxiomC{$s =^? q_2 \searrow \sigma_2$ with $(q_2, s'_2) \in \textrm{Rules}(prg)$}
@@ -1035,10 +1031,10 @@ The argument is identical to that in Case 1.
 
 Then there either exists $(q, s')$ in Rules($prg$) as well, in this case proceed as in Case 1, or there exists $q_2 := fun(y_1, y_2, ..., y_n)$, ($q_2, s'_2) \in \textrm{Rules}(prg)$, $s' = s'_2[con(x_1, ..., x_k) / y_1]$. This is because these are the only cases in which a rule with left-hand side copattern $q$ of this form is present in Rules($\langle prg \rangle$), as can be seen directly in the definition of $split$.
 
-It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 2}$ such that:
+It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 1}$ such that:
 
 \begin{prooftree}
-\AxiomC{$\mathcal{D}_{\textrm{PM}, 2}$}
+\AxiomC{$\mathcal{D}_{\textrm{PM}, 1}$}
 \UnaryInfC{$s =^? q_2 \searrow \sigma_2$}
 \end{prooftree}
 
@@ -1060,7 +1056,7 @@ By inversion (Lemma 1) we have the following form for $\mathcal{D}_{\textrm{PM}}
 \DisplayProof
 }
 
-With that, $\sigma = t^1_1 / x_1, ..., t^1_k / x_k, t_2 / y_2, ..., t_n / y_n$ and we also know the form of $s$: $s = fun(con(t^1_1, ..., t^1_k), t_2, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}, 2}$ as follows:
+With that, $\sigma = t^1_1 / x_1, ..., t^1_k / x_k, t_2 / y_2, ..., t_n / y_n$ and we also know the form of $s$: $s = fun(con(t^1_1, ..., t^1_k), t_2, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}, 1}$ as follows:
 
 \begin{prooftree}
 \AxiomC{$con(t^1_1, ..., t^1_k) =^? y_1 \searrow con(t^1_1, ..., t^1_k) / y_1$}
@@ -1090,14 +1086,14 @@ This concludes the proof for the ``Subst" case.
 
 with $\langle s \rangle = s = con(t_1, ..., t_j, ..., t_n), \langle t \rangle = t = con(t_1, ..., t'_j, ..., t_n)$ and $\langle t_j \rangle = t_j, \langle t'_j \rangle = t'_j$.
 
-It will be shown; there exists a derivation $\mathcal{D}_2$ for $s \longrightarrow_{prg} t$.
+It will be shown; there exists a derivation $\mathcal{D}_1$ for $s \longrightarrow_{prg} t$.
 
-From the induction hypothesis it follows that, since there is a derivation $\mathcal{D'}$ (see above), there exists a derivation $\mathcal{D'}_2$ for $t_j \longrightarrow_{prg} t'_j $.
+From the induction hypothesis it follows that, since there is a derivation $\mathcal{D'}$ (see above), there exists a derivation $\mathcal{D'}_1$ for $t_j \longrightarrow_{prg} t'_j $.
 
-Thus we can define $\mathcal{D}_2$ as follows:
+Thus we can define $\mathcal{D}_1$ as follows:
 
 \begin{prooftree}
-\AxiomC{$\mathcal{D'}_2$}
+\AxiomC{$\mathcal{D'}_1$}
 \UnaryInfC{$t_j \longrightarrow_{prg} t'_j$}
 \UnaryInfC{$con(t_1, ..., t_j, ..., t_n) \longrightarrow_{prg} con(t_1, ..., t'_j, ..., t_n)$}
 \end{prooftree}
@@ -1126,7 +1122,7 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \subsection{Eliminate multiple destructors}
 
-For step $elim\_multi\_des$.
+For step $elim\_multi\_des$, the described kind of weak bisimulation holds.
 
 \begin{proof}[Proof of (1)] By induction on the structure of $\mathcal{D}$.
 
@@ -1225,51 +1221,13 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \end{proof}
 
-\begin{proof}[Proof of (2)] By induction on the structure of the derivation $\mathcal{D}$ of the first step $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle s_1 \rangle$ of the infinite reduction sequence.
+\begin{proof}[Proof of (2)] By inspecting the proof of (1). In Lemma 3 the relevant part of the construction of the sequence from $\langle s \rangle$ to $\langle t \rangle$ is carried out. A one-step reduction that contains application of the ``Subst" rule is always replaced by two one-step reductions (step 3 in Case 2 of the lemma). The first of those starts at a term containing a call to a helper function which has a fresh name (different from all in $prg$) and therefore doesn't typecheck against $prg$. The second reduction both starts and ends at a term containing a call to this helper functions and therefore doesn't typecheck against $prg$, either.
 
-\begin{enumerate}
-\item \textbf{``Subst" case}:
+TODO: Make Lemma 3 fit better with statement (1) (left-hand side: only one-step reduction) and, based on this, clarify this proof.
 
-\begin{prooftree}
-\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
-\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
-\UnaryInfC{$s \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
-\end{prooftree}
+\end{proof}
 
-with $s'[\sigma] = s_1$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle s_1 \rangle = s_1$.
-
-It will be shown: There exists an equation $r$ for which it holds that $`` q = s' "$ is within $\langle r \rangle^{extract\_outer\_des}$ such that there exist terms $t, s_0$ and reduction sequences from $s_0$ to $t$, from $s$ to $t$, and from $s_0$ to $s$. The first of those uses only $r$ . The other sequences use only the equations within $\langle r \rangle^{extract\_outer\_des}$. Using Lemma 2b for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow^*_{\langle prg \rangle} t$, $s_0 \longrightarrow^*_{\langle prg \rangle} s$ and $s_0 \longrightarrow^*_{prg} t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
-
-The property above follows from the statement below:
-
-For all equations $r$ and all helpers sets $H$ (possibly empty) for which it holds that $`` q = s' "$ is within $\langle r, H \rangle^{extract\_outer\_des}$ there exist terms $t, s_0$ and reduction sequences from $s_0$ to $t$, from $s$ to $t$, and from $s_0$ to $s$. The first of those uses only $r$ and the equations within $H$. The other sequences use only the equations within $\langle r, H \rangle^{extract\_outer\_des}$.
-
-Let $r = `` q_2 = s'_2 "$. The last statement is proved by induction on the structure of $q_2$.
-
-\begin{itemize}
-
-\item \underline{Case 1}: $q_2$ is hole pattern:
-
-$\langle r, H \rangle^{extract\_outer\_des} = \big\langle r, H \big\rangle$
-
-Since those are the only equations in the result, $r = `` q = s' "$ or $`` q = s' "$ is within $H$. We already know there exists a reduction sequence from $s$ to $s_1$ which only uses $`` q = s' "$. Thus we can simply set $s_0 = s$, $t = s_1$.
-
-\item \underline{Case 2}: $q_2 = q'.des(p_1, ..., p_k)$, $q'$ is hole pattern:
-
-The argument is identical to that in Case 1.
-
-\item \underline{Case 3}: $q_2 = q'.des(p_1, ..., p_k)$, $q'$ is destructor pattern:
-
-$\langle r, H \rangle^{extract\_outer\_des} = \langle \langle r, H \rangle^{extract\_des} \rangle^{extract\_outer\_des}$\\
-$= \langle `` q' = hname(\langle q' \rangle^{vars}) ", H \cup \{ \big\langle hsig, heqn \big\rangle \} \rangle^{extract\_outer\_des}$
-
-with $hname, hsig, heqn$ as in the definition of $extract\_des$.
-
-TODO: complete the proof
-
-\end{itemize}
-
-\end{enumerate}
+\begin{proof}[Proof of (3)] TODO
 
 \end{proof}
 
