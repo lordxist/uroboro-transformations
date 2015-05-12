@@ -1223,9 +1223,25 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \end{proof}
 
-\begin{proof}[Proof of (2)] By inspecting the proof of (1). In Lemma 3 the relevant part of the construction of the sequence from $\langle s \rangle$ to $\langle t \rangle$ is carried out. A one-step reduction that contains application of the ``Subst" rule is always replaced by two one-step reductions (step 3 in Case 2 of the lemma). The first of those starts at a term containing a call to a helper function which has a fresh name (different from all in $prg$) and therefore doesn't typecheck against $prg$. The second reduction both starts and ends at a term containing a call to this helper functions and therefore doesn't typecheck against $prg$, either.
+\begin{proof}[Proof of (2)] By inspecting the proof of (1).
 
-TODO: Make Lemma 3 fit better with statement (1) (left-hand side: only one-step reduction) and, based on this, clarify this proof.
+\begin{enumerate}
+
+\item \textbf{``Subst" case}:
+
+Lemma 2 returns the relevant sequence by leaving the sequence constructed in the rest of the proof unchanged.
+
+This sequence is constructed inductively, on the structure of $q$, starting with the original single-step sequence $s \longrightarrow_{prg} t$. In Case 1 and 2 of this induction, the sequence returned is the one from the induction hypothesis, unchanged.
+
+The interesting case is Case 3, where the sequence is constructed by Lemma 3 from the one from the induction hypothesis. Lemma 3 itself is only interesting when $extract\_des$ changes the equations, otherwise, it returns the sequence it is given. The relevant construction is described in the lemma in three steps.
+
+The first partitions the given sequence steps. The ones that don't contain an application of the relevant ``Subst" rule are left unchanged. But they only use equations within $H$, the given helpers set. Again, by inspecting this proof, one can see that only the equations for $extract\_outer\_des$ are used to add equations to the helpers set. Thus they always depend upon the presence of a helper function which has a fresh name (different from all names in $prg$) and therefore doesn't typecheck against $prg$.
+
+Each sequence step in the other part of the partition is always replaced by two one-step reductions. The first of those starts at a term containing a call to a helper function which has a fresh name (different from all in $prg$) and therefore doesn't typecheck against $prg$. The second reduction both starts and ends at a term containing a call to this helper functions and therefore doesn't typecheck against $prg$, either.
+
+\end{enumerate}
+
+TODO: the other cases
 
 \end{proof}
 
