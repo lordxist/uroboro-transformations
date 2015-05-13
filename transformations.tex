@@ -1444,4 +1444,129 @@ For the other cases ``Constructor", ``Function", ``Destructor arguments", and ``
 
 \end{proof}
 
+\subsection{Disentangle (refunc.)}
+
+For step $disentangle_r$, the described kind of weak bisimulation holds.
+
+\begin{proof}[Proof of (1)] By induction on the structure of $\mathcal{D}$.
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+It will be shown: there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract}$. Using Lemma 2 for $e = extract$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $disentangle_r = extract\_helpers(extract)$.
+
+By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the number of constructor patterns appearing in $q$.
+
+If there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also exists such a reduction sequence with respect to the equations within $\langle `` q = s' ", H \rangle^{extract}$.
+
+Proof by induction:
+
+\begin{itemize}
+
+\item \underline{Case 1:} 0 constructor patterns appear in $q$:
+
+Then the first two cases of the definition of $extract$ are not effective, since they depend upon the presence of at least one constructor pattern in $q$. It follows that the third case (``otherwise") of the definition is effective:
+
+$\langle `` q = s' ", H \rangle^{extract} = \big\langle `` q = s' ", H \big\rangle$
+
+Thus the resulting equations are the same as the original equations, for which we already know that the desired reduction sequence exists.
+
+\item \underline{Case 2:} $n+1$ constructor pattern appear in $q$, with $n \geq 0$:
+
+\begin{itemize}
+
+\item \underline{Case 2.1}: $q = fun(p^0_1, ..., p^0_n).des_1(p^1_1, ..., p^1_{n_1})...des_k(p^k_1, ..., p^k_{n_k})$, $k \geq 1$, $\exists p^j_i:$ $p^j_i$ is constructor pattern:
+
+$\langle `` q = s' ", H \rangle^{extract} = \langle `` q^{-con} = hname (q^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract}$
+
+with $hname, hsig, heqn$ as in the definition of $extract$.
+
+Compared to $q$, $q^{-con}$ has one less constructor pattern. Thus we can apply the induction hypothesis to $q^{-con}$, yielding a reduction sequence from $s$ to $t$ using only the equations within $\langle `` q = s' ", H \rangle^{extract}$ if there is one with respect to $\big\langle `` q^{-con} = hname (q^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle$.
+
+This last sequence can be constructed as in the following steps, somewhat analogous to the construction in Lemma 3. The construction starts from the known original sequence with respect to $\big\langle `` q = s' ", H \big\rangle$; let this sequence be:
+
+$t_1 \longrightarrow t_2 \longrightarrow ... \longrightarrow t_{n-1} \longrightarrow t$
+
+with $t_1 = s$, $t_n = t$. Also, let $r := (q, s')$.
+
+\begin{enumerate}
+
+\item Let $I \subseteq \{1, ..., n - 1\}$ be the set of indices $j$ where $t_j \longrightarrow t_{j+1}$ contains an application of the ``Subst" rule for $r$. For all indices $k \not\in I$, $t_k \longrightarrow t_{k+1}$ is with respect to the equations within $H$.
+
+\item For a $j \in I$, by inversion, we know the derivation of $t_j \longrightarrow t_{j+1}$ looks as follows:
+
+\begin{prooftree}
+\AxiomC{\vdots}
+\RightLabel{\scriptsize PM\textsubscript{Des}}
+\UnaryInfC{$t^0_j =^? q \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $(q, s')$}
+\UnaryInfC{$t^0_j \longrightarrow s'[\sigma]$}
+\UnaryInfC{$\mathcal{D'}$}
+\UnaryInfC{$t_j \longrightarrow t_{j+1}$}
+\end{prooftree}
+
+for some substitution $\sigma$, some intermediate derivation $\mathcal{D'}$ and a subterm $t^0_j$ of $t_j$.
+
+\item In the original sequence above, for every $j \in I$, replace $t_j \longrightarrow t_{j+1}$ with the two reduction steps $t_j \longrightarrow t'_j$, $t'_j \longrightarrow t_{j+1}$, in this order, with the following derivations:
+
+Derivation for $t_j \longrightarrow t'_j$:
+\begin{prooftree}
+\AxiomC{\vdots}
+\UnaryInfC{$t^0_j =^? q^{-con} \searrow \sigma'$}
+\RightLabel{\scriptsize Subst with $(q^{-con}, `` hname(q^{-con}_{vars^+}) ")$}
+\UnaryInfC{$t^0_j \longrightarrow t_h$}
+\UnaryInfC{$\mathcal{D'}_1$}
+\UnaryInfC{$t_j \longrightarrow t'_j$}
+\end{prooftree}
+
+The derivation for $t^0_j =^? q^{-con} \searrow \sigma'$, for some substitution $\sigma'$ has been omitted. We know from above that $t^0_j$ matches against $q$ returning $\sigma$. $q^{-con}$ is simply $q$ with one of its patterns replaced by a variable, thus it catches at least all terms which are caught by $q$. $\mathcal{D'}_1$ is $\mathcal{D'}$ where all the occurrences of $s'[\sigma]$ that stem from the reduction by substitution of $t^0_j$ to it are replaced by
+
+$t_h := `` hname(q^{-con}_{vars^+}) "[\sigma]$.
+
+$t'_j$ is defined accordingly.
+
+For the next derivation, let $q_h = `` hname(q^{-con}_{vars^-}) "$. Thus it is $heqn = `` q_h = s'  "$.
+
+Derivation for $t'_j \longrightarrow t_{j+1}$:
+\begin{prooftree}
+\AxiomC{\vdots}
+\UnaryInfC{$t_h =^? q_h \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $(q_h,  s')$}
+\UnaryInfC{$t_h \longrightarrow s'[\sigma]$}
+\UnaryInfC{$\mathcal{D'}_2$}
+\UnaryInfC{$t'_j \longrightarrow t_{j+1}$}
+\end{prooftree}
+
+where $\mathcal{D'}_2$ is $\mathcal{D'}$ where all the occurrences of $t^0_j$ that stem from its reduction by substitution to $s'[\sigma]$ are replaced by $t_h$.
+
+TODO: finish the proof for this case (especially with regards to $\sigma$)
+
+\end{enumerate}
+
+\item \underline{Case 2.2}: $q = fun(con(p^0_1, ..., p^0_n), p^1_1, ..., p^1_n)$, $\exists p^j_i:$ $p^j_i$ is constructor pattern:
+
+TODO
+
+\item \underline{Case 2.3}: otherwise:
+
+Since neither the first (as in Case 2.1) nor the second (as in Case 2.2) case of the definition of $extract$ is effective, it follows that the third case (``otherwise") is effective. Thus, proceed as in Case 1.
+
+\end{itemize}
+
+\end{itemize}
+
+\end{enumerate}
+
+For the other cases ``Constructor", ``Function", ``Destructor arguments", and ``Destructor applied expression", proceed as with $elim\_multi\_des$.
+
+\end{proof}
+
 \end{document}
