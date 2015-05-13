@@ -1289,4 +1289,103 @@ For the other cases ``Constructor", ``Function", ``Destructor arguments", and ``
 
 \end{proof}
 
+\subsection{Disentangle (defunc.)}
+
+For step $disentangle_d$, the described kind of weak bisimulation holds.
+
+\begin{proof}[Proof of (1)] ~
+
+\begin{enumerate}
+
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_patterns}$. Using Lemma 2, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $disentangle_d = extract\_helpers(extract\_patterns)$.
+
+\begin{itemize}
+
+\item \underline{Case 1}: $q$ is hole pattern:
+
+$\langle `` q = s' " \rangle^{extract\_patterns} = \big\langle `` q = s' ", \emptyset \big\rangle$
+
+Thus the only resulting equation is the same as the original equation, for which we already know (from the precondition of the ``Subst" case) that the desired (one-step) reduction sequence exists.
+
+\item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
+
+The argument is identical to that in Case 1.
+
+\item \underline{Case 3}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
+
+$\langle q \rangle^{extract\_patterns}$\\
+$= \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{ \big\langle hsig, heqn \big\rangle \} \big\rangle $
+
+with $hname, hsig, heqn$ as in the definition of $extract\_patterns$.
+
+By inversion we have the following form for $\mathcal{D}_{\textrm{PM}}$:
+\begin{prooftree}
+\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\RightLabel{\scriptsize PM\textsubscript{App}}
+\UnaryInfC{$fun(t_1, ..., t_n) =^? fun(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
+\AxiomC{$t'_i =^? p'_i \searrow \sigma'_i ~ \forall i \in \{1, ..., k\}$}
+\RightLabel{\scriptsize PM\textsubscript{Des}}
+\BinaryInfC{$fun(t_1, ..., t_n).des(t'_1, ..., t'_k) =^? fun(p_1, ..., p_n).des(p'_1, ..., p'_k) \searrow \sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k$}
+\end{prooftree}
+
+We also have that $s = `` fun(t_1, ..., t_n).des(t'_1, ..., t'_k) "$ and $t = s'[\sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k]$. The desired sequence from $s$ to $t$ can thus be given as follows:
+
+$s \longrightarrow hname(t_1, ..., t_n, t'_1, ..., t'_k) \longrightarrow t$
+
+The first reduction step can be derived as follows, using only
+
+$r := `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) "$:\\
+
+{\setlength{\parindent}{-\leftmargin}
+\AxiomC{}
+\RightLabel{\scriptsize PM\textsubscript{Var}}
+\UnaryInfC{$t_i =^? x_i \searrow t_i / x_i ~ \forall i \in \{1, ..., n\}$}
+\RightLabel{\scriptsize PM\textsubscript{App}}
+\UnaryInfC{$fun(t_1, ..., t_n) =^? fun(x_1, ..., x_n) \searrow t_1 / x_1, ..., t_n / x_n$}
+\AxiomC{}
+\RightLabel{\scriptsize PM\textsubscript{Var}}
+\UnaryInfC{$t'_i =^? x'_i \searrow t'_i / x'_i ~ \forall i \in \{1, ..., k\}$}
+\RightLabel{\scriptsize PM\textsubscript{Des}}
+\BinaryInfC{$s =^? fun(x_1, ..., x_n).des(x'_1, ..., x'_k) \searrow t_1 / x_1, ..., t_n / x_n, t'_1 / x'_1, ..., t'_k / t'_k$}
+\RightLabel{\scriptsize Subst with $r$}
+\UnaryInfC{$s \longrightarrow ``hname(x_1, ..., x_n, x'_1, ..., x'_k)"[t_1 / x_1, ..., t_n / x_n, t'_1 / x'_1, ..., t'_k / t'_k]$}
+\DisplayProof
+}
+
+It is clear that
+
+$`` hname(x_1, ..., x_n, x'_1, ..., x'_k) "[t_1 / x_1, ..., t_n / x_n, t'_1 / x'_1, ..., t'_k / t'_k] = `` hname(t_1, ..., t_n, t'_1, ..., t'_k) "$.
+
+The second reduction step can be derived as follows below, using only $heqn$. Remember that $heqn = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = s' "$.
+\begin{prooftree}
+\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\AxiomC{$t'_i =^? p'_i \searrow \sigma'_i ~ \forall i \in \{1, ..., k\}$}
+\RightLabel{\scriptsize PM\textsubscript{App}}
+\BinaryInfC{$hname(t_1, ..., t_n, t'_1, ..., t'_k) =^? hname(p_1, ..., p_n, p'_1, ..., p'_k) \searrow \sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k$}
+\RightLabel{\scriptsize Subst with $heqn$}
+\UnaryInfC{$hname(t_1, ..., t_n, t'_1, ..., t'_k) \longrightarrow s'[\sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k]$}
+\end{prooftree}
+
+As stated above, $t = s'[\sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k]$.
+
+\end{itemize}
+
+\end{enumerate}
+
+For the other cases ``Constructor", ``Function", ``Destructor arguments", and ``Destructor applied expression", proceed as with $elim\_multi\_des$.
+
+\end{proof}
+
+
+
 \end{document}
