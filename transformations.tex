@@ -1386,6 +1386,62 @@ For the other cases ``Constructor", ``Function", ``Destructor arguments", and ``
 
 \end{proof}
 
+\subsection{Unmix (refunc.)}
 
+For step $unmix_r$, the described kind of weak bisimulation holds.
+
+\begin{proof}[Proof of (1)] ~
+
+\begin{enumerate}
+
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+\begin{itemize}
+
+\item \underline{Case 1:} $`` q = s' "$ is from a not-mixed function definition.
+
+Then, since $unmix_r$ doesn't touch such function definitions, as can be seen directly in its definition, $(q, s') \in \textrm{Rules}(\langle prg \rangle)$ and thus $s \longrightarrow_{\langle prg \rangle} t$.
+
+\item \underline{Case 2:} $`` q = s' "$ is from a mixed function definition.
+
+It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_all\_des}$. Using Lemma 2, this gives us $s \longrightarrow^*_{prg'} t$ for $prg' = \langle \{ def \in prg | prg \textrm{ is (co)data def. or mixed function def.} \} \rangle^{extract\_helpers(extract\_all\_des)}$. Since $prg' \subseteq \langle prg \rangle$, as can be seen directly in the definition of $unmix_r$, it follows that $s \longrightarrow^*_{\langle prg \rangle} t$.
+
+What follows is the proof for the above statement. By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
+
+If there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also exists such a reduction sequence with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_all\_des}$.
+
+Note the similarity between the definitions of $extract\_outer\_des$ and $extract\_all\_des$: The only difference is the distinction between outer and single destructor calls in $extract\_outer\_des$. This similarity will be used in the proof below.
+
+Proof by induction:
+
+\begin{itemize}
+
+\item \underline{Case 1}: $q$ is hole pattern:
+
+$\langle `` q = s' ", H \rangle^{extract\_all\_des} = \big\langle `` q = s' ", H \big\rangle$
+
+Thus the resulting equations are the same as the original equations, for which we already know that the desired reduction sequence exists.
+
+\item \underline{Case 2}: $q = q'.des(p_1, ..., p_k)$:
+
+The argument here is identical to that of Case 3 in the induction concerning $extract\_outer\_des$, inside the ``Subst" case of the proof of (1) for $elim\_multi\_des$, with $extract\_all\_des$ substituted for $extract\_outer\_des$.
+
+\end{itemize}
+
+\end{itemize}
+
+\end{enumerate}
+
+For the other cases ``Constructor", ``Function", ``Destructor arguments", and ``Destructor applied expression", proceed as with $elim\_multi\_des$.
+
+\end{proof}
 
 \end{document}
