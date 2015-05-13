@@ -1223,6 +1223,8 @@ Proceed with $t_0$ and $t'_0$ as in the ``Constructor" case with $t_j$ and $t'_j
 
 \end{proof}
 
+Note that the ``Constructor" to ``Destructor applied expression" cases don't depend upon the concrete transformation. Thus they can be reused in proofs of (1) for other transformations such that only the proof for the ``Subst" case needs to be given individually for each proof.
+
 \begin{proof}[Proof of (2)] By inspecting the proof of (1).
 
 \begin{enumerate}
@@ -1246,6 +1248,44 @@ TODO: the other cases
 \end{proof}
 
 \begin{proof}[Proof of (3)] TODO
+
+\end{proof}
+
+\subsection{Unmix (defunc.)}
+
+For step $unmix_d$, the described kind of weak bisimulation holds.
+
+\begin{proof}[Proof of (1)] ~
+
+\begin{enumerate}
+
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+\begin{itemize}
+
+\item \underline{Case 1:} $`` q = s' "$ is from a not-mixed function definition.
+
+Then, since $unmix_d$ doesn't touch such function definitions, as can be seen directly in its definition, $(q, s') \in \textrm{Rules}(\langle prg \rangle)$ and thus $s \longrightarrow_{\langle prg \rangle} t$.
+
+\item \underline{Case 2:} $`` q = s' "$ is from a mixed function definition.
+
+It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_des}$. Using Lemma 2, this gives us $s \longrightarrow^*_{prg'} t$ for $prg' = \langle \{ def \in prg | prg \textrm{ is (co)data def. or mixed function def.} \} \rangle^{extract\_helpers(extract\_des)}$. Since $prg' \subseteq \langle prg \rangle$, as can be seen directly in the definition of $unmix_d$, it follows that $s \longrightarrow^*_{\langle prg \rangle} t$.
+
+What follows is the proof for the above statement. From the precondition of the ``Subst" case we have that $s$ reduces to $t$ using only $`` q = s' "$. Using Lemma 3 we have the desired sequence from $s$ to $t$ using only the rules from $\langle `` q = s' " \rangle^{extract\_des}$.
+
+\end{itemize}
+
+\end{enumerate}
+
+For the other cases ``Constructor", ``Function", ``Destructor arguments", and ``Destructor applied expression", proceed as with $elim\_multi\_des$.
 
 \end{proof}
 
