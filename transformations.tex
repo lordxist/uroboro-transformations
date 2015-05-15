@@ -1527,33 +1527,48 @@ Derivation for $t_j \longrightarrow t'_j$:
 \UnaryInfC{$t_j \longrightarrow t'_j$}
 \end{prooftree}
 
-The derivation for $t^0_j =^? q^{-con} \searrow \sigma'$, for some substitution $\sigma'$ has been omitted. We know from above that $t^0_j$ matches against $q$ returning $\sigma$. $q^{-con}$ is simply $q$ with one of its patterns replaced by a variable, thus it catches at least all terms which are caught by $q$. $\mathcal{D'}_1$ is $\mathcal{D'}$ where all the occurrences of $s'[\sigma]$ that stem from the reduction by substitution of $t^0_j$ to it are replaced by
+The derivation for $t^0_j =^? q^{-con} \searrow \sigma'$, for some substitution $\sigma'$ has been omitted. We know from above that $t^0_j$ matches against $q$ returning $\sigma$. $q^{-con}$ is simply $q$ with one of its patterns $p$ replaced by a variable $x_p$, thus it catches at least all terms which are caught by $q$. $\sigma'$ is $\sigma$ where the part $\sigma_p$ of the substitution returned by matching the relevant subterm $t_p$ against $p$ is replaced by $t_p / x_p$. Let $x_1, ..., x_n$ be the variables in $q^{-con}$. It is $\sigma = \sigma_p, \sigma'[\{ x_1, ..., x_n \} \setminus \{ x_p \}]$, where $\sigma'[S]$ for a set $S$ means the substitutions of $\sigma'$ limited to those for variables in $S$.
 
-$t_h := `` hname(q^{-con}_{vars^+}) "[\sigma]$.
+$\mathcal{D'}_1$ is $\mathcal{D'}$ where all the occurrences of $s'[\sigma]$ that stem from the reduction by substitution of $t^0_j$ to it are replaced by
+
+$t_h := `` hname(q^{-con}_{vars^+}) "[\sigma']$.
 
 $t'_j$ is defined accordingly.
 
-For the next derivation, let $q_h = `` hname(q^{-con}_{vars^-}) "$. Thus it is $heqn = `` q_h = s'  "$.
+For the next derivation, let $q_h = `` hname(q^{-con}_{vars^-}) "$. Thus it is $heqn = `` q_h = s'  "$. 
+
+Let $k$ be the index of $x_p$, that is $x_p = x_k$, and $(y_1, ..., y_m)$ be the list $(x_1, ..., x_{k-1}, x_{k+1}, ..., x_n)$ ($m = n-1$). The list $q^{-con}_{vars^+}$ is, by definition, $(x_p, y_1, ..., y_m)$. The list $q^{-con}_{vars^-}$ is $(p, y_1, ..., y_m)$. Note that for the $\sigma'$ described above, $x_p[\sigma'] = t_p$. In the derivation below, the derivation for $x_p[\sigma'] =^? p \searrow \sigma_p$, with $\sigma_p$ as described above, has thus been omitted.
 
 Derivation for $t'_j \longrightarrow t_{j+1}$:
-\begin{prooftree}
+
+{\setlength{\parindent}{-\leftmargin}
 \AxiomC{\vdots}
-\UnaryInfC{$t_h =^? q_h \searrow \sigma$}
+\UnaryInfC{$x_p[\sigma'] =^? p \searrow \sigma_p$}
+\AxiomC{}
+\RightLabel{\scriptsize PM\textsubscript{Var}}
+\UnaryInfC{$y_1[\sigma'] =^? y_1 \searrow \sigma'[y_1]$}
+\AxiomC{...}
+\AxiomC{}
+\RightLabel{\scriptsize PM\textsubscript{Var}}
+\UnaryInfC{$y_m[\sigma'] =^? y_m \searrow \sigma'[y_m]$}
+\RightLabel{\scriptsize PM\textsubscript{App}}
+\QuaternaryInfC{$t_h =^? q_h \searrow \sigma$}
 \RightLabel{\scriptsize Subst with $(q_h,  s')$}
 \UnaryInfC{$t_h \longrightarrow s'[\sigma]$}
 \UnaryInfC{$\mathcal{D'}_2$}
 \UnaryInfC{$t'_j \longrightarrow t_{j+1}$}
-\end{prooftree}
+\DisplayProof
+}
 
 where $\mathcal{D'}_2$ is $\mathcal{D'}$ where all the occurrences of $t^0_j$ that stem from its reduction by substitution to $s'[\sigma]$ are replaced by $t_h$.
 
-TODO: finish the proof for this case (especially with regards to $\sigma$)
+
 
 \end{enumerate}
 
 \item \underline{Case 2.2}: $q = fun(con(p^0_1, ..., p^0_n), p^1_1, ..., p^1_n)$, $\exists p^j_i:$ $p^j_i$ is constructor pattern:
 
-TODO
+This case proceeds completely analogous to Case 2.1, where a left-most outer constructor pattern is skipped over. This is possible since second case of the definition of $extract$, which is effective in this case, is only different in exactly this way: All relevant definitions are precisely analogous to the respective other definitions.
 
 \item \underline{Case 2.3}: otherwise:
 
