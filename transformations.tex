@@ -1584,4 +1584,77 @@ For the other cases ``Constructor", ``Function", ``Destructor arguments", and ``
 
 \end{proof}
 
+\subsection{Actual defunctionalization}
+
+For the actual defunctionalization, $d''$, strong bisimulation holds. The proof relies on properties of the automatic defunctionalization of Uroboro in the paper of Rendel, Trieflinger, and Ostermann. This defunctionalization is from now on referred to as $d^{core}$. The authors' notion of reducibility is the same than that of this work when restricted to the domain of $d^{core}$. The authors call this domain the Codata Fragment, they describe it in section 3.3 of their paper. Analogously, their notion of reducibility is identical to this work's notion when restricted to the domain of their refunctionalization.
+
+In section 3 of their paper, they prove Lemma 5, which in terms of this work can be stated as follows (possible since the reducibility notions are identical):
+
+$s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ for all input terms $s,t$ of $\langle \cdot \rangle$ (*)
+
+Here, the angular brackets can stand for either of their transformations, refunctionalization and defunctionalization; the second is from now on referred to as $d^{core}$. This statement is exactly the strong bisimulation statement above, thus strong bisimulation holds for $d^{core}$.
+
+\begin{proof}[Proof of strong bisimulation for $d''$] ~
+
+$`` \Rightarrow "$: By induction on the structure of $\mathcal{D}$.
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^d$, $\langle t \rangle = \langle t \rangle^d$. $d$ is the defunctionalization of terms defined at the end of section 2.
+
+\begin{itemize}
+
+\item \underline{Case 1}: $q$ is hole pattern:
+
+Then the function definition that contains $`` q = s' "$ contains only equations where the right-hand side is a hole pattern (other cases are excluded by the relevant input fragment for $d''$). Such equations (and indeed the function definitions) are left unchanged by $d''$ except for defunctionalizing the right-hand term, as can be seen directly in the definition of $d''$ (last set in the highest-level union). Thus Rules($\langle prg \rangle$) contains $(q, \langle s' \rangle)$. 
+
+By inversion, we have from $s =^? q \searrow \sigma$ that $s$ has the form $fun(v_1, ..., v_n)$ for some values $v_1, ..., v_n$, thus $\langle s \rangle = fun(\langle v_1 \rangle, ..., \langle v_n \rangle)$. By inversion for values, we have that each $v_i$ is either a constructor application or a value of codata type. If it is a value of codata type, by inversion on pattern matching, the relevant subpattern of $q$ can only be a variable, thus it is also matched by $\langle v_i \rangle$. If it is a constructor application, the relevant subpattern of $q$ is either a variable, and the same holds, or it is a constructor pattern, and by recursively descending into its subpatterns we still get that $\langle v_i \rangle = con(\langle v^1_i \rangle, ..., \langle v^m_n \rangle)$ matches against the subpattern of $q$.
+
+By carrying the substitutions returned from the matchings along in the above recursive argument, we get a substitution $\sigma'$ such that $\langle s \rangle =^? q \searrow \sigma'$ and, by distributing over $\langle s' \rangle$, $\langle s' \rangle [\sigma'] = \langle s'[\sigma] \rangle = \langle t \rangle$. It follows that $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
+
+\item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$:
+
+For any program $prg'$, when Rules($prg'$) contains only rules of the form $q$ has, no data types, and no constructor calls in right-hand sides, the result of applying $d''$ to $prg'$ is identical to that of applying $d^{core}$ to it. This can be seen by comparing the definitions of $d''$ and $d^{core}$. When only programs $prg'$ as limited as listed above are considered, the first two sets in the highest-level union in the definition of $d''$ are equal to the definition of $d^{core}$. (TODO: not entirely correct, since empty function defs are excluded -- perhaps best to change $d''$) And only these two sets are not empty under these conditions.
+
+Now, consider a program $prg'$ which contains only $q$. Since this is the only rule used in the precondition of the ``Subst" case, it follows that:
+
+$s \longrightarrow_{prg'} t$
+
+This even holds when well-typedness of $prg'$ is dropped, as long as the subterm value conditions of the ``Subst" rule are dropped as well. This is because pattern matching is purely syntactical and doesn't depend upon types, and, without the value conditions, thus neither does the ``Subst" rule. Dropping the value conditions only possibly leads to more reductions, but the reduction given above is in any case still possible.
+
+The dropping of well-typedness allows to drop the data type definitions from $prg'$, as well.
+
+Next, go one step further and subsume the constructor calls under the function calls. Since $prg'$ needn't be well-typed, it is not necessary that all called functions actually appear in the program.
+
+After these steps, $prg'$ has the above described form for which it holds that the application of $d''$ to it is identical to the application of $d^{core}$ to it. Especially, this means that
+
+$s \longrightarrow_{\langle prg' \rangle^{d''}} t \iff s \longrightarrow_{\langle prg' \rangle^{d^{core}}} t $
+
+Remember, that by (*) it is
+
+$s \longrightarrow_{\langle prg' \rangle^{d^{core}}} t \iff s \longrightarrow_{prg'} t $
+
+and thus, by going backwards through the equivalences,
+
+$s \longrightarrow_{\langle prg' \rangle^{d''}} t$.
+
+\end{itemize}
+
+\end{enumerate}
+
+TODO: the other cases
+
+$`` \Leftarrow "$: By induction on the structure of $\mathcal{D}$.
+
+TODO
+
+\end{proof}
+
 \end{document}
