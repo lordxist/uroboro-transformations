@@ -563,21 +563,83 @@ As is the case with the language of Abel et al., whether a term is a value depen
 
 $\vdash_v t$ means that the closed term $t$ is a value. This notation is borrowed from `Copatterns" (Abel et al.), section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
 
+%%-- under construction
+
+The value judgement makes use of a ``no-match" judgement. This judgement is complementary to the pattern matching judgement in the next section.
+
 \begin{prooftree}
-\AxiomC{$\vdash_v t_1$}
-\AxiomC{...}
-\AxiomC{$\vdash_v t_n$}
-\RightLabel{V\textsubscript{CodTFun}, if $fun(t_1, ..., t_n)$ has codata type}
-\TrinaryInfC{$\vdash_v fun(t_1, ..., t_n)$}
+\AxiomC{$t_i \neq^? p_i$}
+\RightLabel{NPM\textsubscript{Con/Mism}}
+\UnaryInfC{$con(t_1, , ..., t_i, ..., t_n) \neq^? con(p_1, ..., p_i, ..., p_n)$}
 \end{prooftree}
 
 \begin{prooftree}
+\AxiomC{$n \neq m$}
+\RightLabel{NPM\textsubscript{Con/Card}}
+\UnaryInfC{$con(t_1, , ..., t_n) \neq^? con(p_1, ..., p_m)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$n \neq m$}
+\RightLabel{NPM\textsubscript{App/Mism}}
+\UnaryInfC{$fun(t_1, ..., t_n) \neq^? fun(p_1, ..., p_m)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t_i \neq^? p_i$}
+\RightLabel{NPM\textsubscript{App/Card}}
+\UnaryInfC{$fun(t_1, ..., t_i, ..., t_n) \neq^? fun(p_1, ..., p_i, ..., p_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t \neq^? q$}
+\RightLabel{NPM\textsubscript{Des/Mism}}
+\UnaryInfC{$t.des(t_1, ..., t_n) \neq^? q.des(p_1, ..., p_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t_i \neq^? p_i$}
+\RightLabel{NPM\textsubscript{Des/MismArgs}}
+\UnaryInfC{$t.des(t_1, ..., t_i, ..., t_n) \neq^? q.des(p_1, ..., p_i, ..., p_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$n \neq m$}
+\RightLabel{NPM\textsubscript{Des/Card}}
+\UnaryInfC{$t.des(t_1, ..., t_n) \neq^? q.des(p_1, ..., p_m)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{NPM\textsubscript{Diff1}}
+\UnaryInfC{$fun(...) \neq^? q.des(...)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{NPM\textsubscript{Diff2}}
+\UnaryInfC{$t.des(...) \neq^? fun(...)$}
+\end{prooftree}
+
+%%--
+
+\begin{prooftree}
+\AxiomC{$fun(t_1, ..., t_n) \neq^? q ~ \forall (q, t) \in \textrm{Rules}(prg)$}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{CodTFun}}
+\QuaternaryInfC{$\vdash_v fun(t_1, ..., t_n)$, if $fun(t_1, ..., t_n)$ has codata type}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t_0.des(t_1, ..., t_n) \neq^? q ~ \forall (q, t) \in \textrm{Rules}(prg)$}
 \AxiomC{$\vdash_v t_0$}
 \AxiomC{$\vdash_v t_1$}
 \AxiomC{...}
 \AxiomC{$\vdash_v t_n$}
-\RightLabel{V\textsubscript{CodTDes}, if $t_0.des(t_1, ..., t_n)$ has codata type}
-\QuaternaryInfC{$\vdash_v t_0.des(t_1, ..., t_n)$}
+\RightLabel{V\textsubscript{CodTDes}}
+\QuinaryInfC{$\vdash_v t_0.des(t_1, ..., t_n)$, , if $t_0.des(t_1, ..., t_n)$ has codata type}
 \end{prooftree}
 
 \begin{prooftree}
@@ -648,13 +710,7 @@ Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrigh
 
 \subsection{As an extension of (Co)Data Fragment semantics}
 
-The properties of the reductions and the de- and refunctionalization transformations of the paper of Rendel, Trieflinger, and Ostermann are used for the proofs of the next section. The domain of their defunctionalization is what they call the Codata Fragment, and that of refunctionalization the Data Fragment. Their semantic properties can be used in the proofs because, for well-typed programs:
-
-\begin{itemize}
-\item This work's reducibility notion is a conservative extension of the Data Fragment's.
-
-\item This work's notion is an extension of the Codata Fragment's notion.
-\end{itemize}
+The properties of the reductions and the de- and refunctionalization transformations of the paper of Rendel, Trieflinger, and Ostermann are used for the proofs of the next section. The domain of their defunctionalization is what they call the Codata Fragment, and that of refunctionalization the Data Fragment. Their semantic properties can be used in the proofs because, for well-typed programs with copattern coverage, this work's reducibility notion is a conservative extension of either the Data Fragment's notion or the Codata Fragment's notion.
 
 \subsubsection{Data Fragment}
 
@@ -670,9 +726,13 @@ while the V\textsubscript{CodTFun} can never be applied. This is because, under 
 
 \subsubsection{Codata Fragment}
 
-The case is a bit different with the Codata Fragment, however, as their evaluation context notion for it isn't conservatively extended by this work's. This is because, in their value rule for the Codata Fragment, a term is a value if and only if it is a function application with argument values. In this work, a value can also be a destructor application if it has codata type, but on the other hand, it cannot be a function application if this function doesn't have codata type. 
+The Codata Fragment's evaluation context notion is conservatively extended by this work's, as well. And here again, this is why the notion of reduction for all of Uroboro conservatively extends that for the Codata Fragment.
 
-However, this second difference doesn't exist under the assumption of well-typedness, since, in the Codata Fragment, a type can only be added by a codata definition. Under this assumption, only the first difference remains, but this means that only more reductions are possible. As these are the only differences, this work's reduction notion is still an (albeit not conservative) extension of the Codata Fragment's notion for well-typed programs.
+As with the Data Fragment, this conservation for evaluation context notions follows from that of the value notions. In their value rule for the Codata Fragment, a term is a value if and only if it is a function application with argument values. It will be demonstrated why the two directions of the equivalence hold for this work's value judgement, restricted to terms in the Codata Fragment, as well.
+
+Consider first the ``if" direction. By the rules of the judgement, a function application with argument values is only a value if it has codata type and doesn't match any rule of the program. Assuming well-typedness, the first constraint is always fulfilled in the Codata Fragment, since there, a type can only be added by a codata definition. That the second constraint is always fulfilled because, in the Codata Fragment, there are no left-hand sides of rules which are hole patterns.
+
+Second, consider the ``only if" direction. By the rules of the judgement, a value can also be a destructor application if it has codata type and doesn't match any rule of the program. But this case can be excluded in the Codata Fragment for programs with copattern coverage.
 
 \section{Semantics preservation}
 
@@ -1648,29 +1708,7 @@ By carrying the substitutions returned from the matchings along in the above rec
 
 \item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$:
 
-For any program $prg'$, when Rules($prg'$) contains only rules of the form $q$ has, no data types, and no constructor calls in right-hand sides, the result of applying $d''$ to $prg'$ is identical to that of applying $d^{core}$ to it. This can be seen by comparing the definitions of $d''$ and $d^{core}$. When only programs $prg'$ as limited as listed above are considered, the first two sets in the highest-level union in the definition of $d''$ are equal to the definition of $d^{core}$. (TODO: not entirely correct, since empty function defs are excluded -- perhaps best to change $d''$) And only these two sets are not empty under these conditions.
-
-Now, consider a program $prg'$ which contains only $q$. Since this is the only rule used in the precondition of the ``Subst" case, it follows that:
-
-$s \longrightarrow_{prg'} t$
-
-This even holds when well-typedness of $prg'$ is dropped, as long as the subterm value conditions of the ``Subst" rule are dropped as well. This is because pattern matching is purely syntactical and doesn't depend upon types, and, without the value conditions, thus neither does the ``Subst" rule. Dropping the value conditions only possibly leads to more reductions, but the reduction given above is in any case still possible.
-
-The dropping of well-typedness allows to drop the data type definitions from $prg'$, as well.
-
-Next, go one step further and subsume the constructor calls under the function calls. Since $prg'$ needn't be well-typed, it is not necessary that all called functions actually appear in the program.
-
-After these steps, $prg'$ has the above described form for which it holds that the application of $d''$ to it is identical to the application of $d^{core}$ to it. Especially, this means that
-
-$\langle s \rangle^{d} \longrightarrow_{\langle prg' \rangle^{d''}} \langle t \rangle^{d} \iff \langle s \rangle^{d^{core}} \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle^{d^{core}} $
-
-Remember, that by (*) it is
-
-$\langle s \rangle^{d^{core}} \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle^{d^{core}} \iff s \longrightarrow_{prg'} t $
-
-and thus, by going backwards through the equivalences,
-
-$\langle s \rangle^d \longrightarrow_{\langle prg' \rangle^{d''}} \langle t \rangle^d$.
+Then the function definition that contains $`` q = s' "$ contains only equations where the right-hand side is a destructor pattern (other cases are excluded by the relevant input fragment for $d''$). Thus $s$ reduces to $t$ already with respect to the part of the program that is passed to $d^{core}$ (in the definition of $d''$). Let this part be $prg'$. By (*) we have $\langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle$. But (the definitions of) $\langle prg' \rangle^{d^{core}}$ is a subset of $\langle prg \rangle$, as can be seen in the definition of $d''$. Thus we have the desired $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
 
 \end{itemize}
 
