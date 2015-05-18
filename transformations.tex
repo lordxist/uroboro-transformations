@@ -274,16 +274,11 @@ function $\langle repeat, elemAt \rangle^{autogen}$(Nat, Nat): Nat
 \end{lstlisting}
 
 Actual defunctionalization (for programs without mixed function defs and without constructor applications in destructor patterns):
+
+This uses the automatic defunctionalization of Uroboro in the paper of Rendel, Trieflinger, and Ostermann, from now on referred to as $d^{core}$.
+
 \begin{alignat*}{3}
-\langle prg \rangle^{d''} & = ~&& \{ ~&& \textrm{\textbf{data }} \sigma \textrm{\textbf{ where }} \\
-& && && \{ \langle fun \rangle^d (\tau_1, ..., \tau_n): \sigma \\
-& && && | ~ `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } eqns \neq \emptyset \textrm{ and } \\
-& && &&\quad \forall e \in eqns: e \textrm{ has destructor pattern }  \} \\
-& && | && "\textrm{\textbf{codata }} \sigma ..." \in prg \} \\
-& \cup && \{ && \textrm{\textbf{function }} \langle des \rangle^d (\sigma, \tau_1, ..., \tau_n): \tau \textrm{\textbf{ where }} \\
-& && && \{ \langle des \rangle^d ( \langle fun \rangle^d (x_1, ..., x_n), y_1, ..., y_k) = \langle t \rangle^d \\
-& && && | ~ `` fun(x_1, ..., x_n).des(y_1, ..., y_k) = t " \in prg \} \\
-& && | && `` \sigma.des(\tau_1, ... \tau_n): \tau " \in prg \} \\
+\langle prg \rangle^{d''} & = ~&& \langle && \{ def \in prg ~ | ~ def \textrm{ is codata def. or} \\ & && &&\quad \textrm{ function def. with equations } eqns \neq \emptyset: \forall e \in eqns: e \textrm{ has destr. pattern } \} \rangle^{d^{core}} \\
 & \cup && \{ && \textrm{\textbf{data }} ... ~ | ~ `` \textrm{\textbf{data }} ... " \in prg \} \\
 & \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ p = \langle t \rangle^d ~ | ~ "p = t" \in eqns \} \\
 & && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } \forall e \in eqns: e \textrm{ has hole pattern}\} 
@@ -568,7 +563,22 @@ As is the case with the language of Abel et al., whether a term is a value depen
 
 $\vdash_v t$ means that the closed term $t$ is a value. This notation is borrowed from `Copatterns" (Abel et al.), section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
 
-$\vdash_v t$ if $t$ has codata type (V\textsubscript{CodT})
+\begin{prooftree}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{CodTFun}, if $fun(t_1, ..., t_n)$ has codata type}
+\TrinaryInfC{$\vdash_v fun(t_1, ..., t_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\vdash_v t_0$}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{CodTDes}, if $t_0.des(t_1, ..., t_n)$ has codata type}
+\QuaternaryInfC{$\vdash_v t_0.des(t_1, ..., t_n)$}
+\end{prooftree}
 
 \begin{prooftree}
 \AxiomC{$\vdash_v t_1$}
@@ -611,30 +621,17 @@ $t =^? q \searrow \sigma$ means that term $t$ matches copattern $q$ returning su
 \BinaryInfC{$t.des(t_1, ...t_n) =^? q.des(p_1, ..., p_n) \searrow \sigma, \sigma_1, ..., \sigma_n$}
 \end{prooftree}
 
-$\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule).
+$\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction uses the evaluation context $\mathcal{E}$ given below, which in turn requires the syntax of the complete Uroboro (TODO: Define this like its fragments in section 5). 
 
-\begin{prooftree}
-\AxiomC{$t_j \longrightarrow t'_j$}
-\RightLabel{$\longrightarrow$\textsubscript{Con}}
-\UnaryInfC{$con(t_1, ... t_j, ..., t_n) \longrightarrow con(t_1, ..., t'_j, ..., t_n)$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$t_j \longrightarrow t'_j$}
-\RightLabel{$\longrightarrow$\textsubscript{Fun}}
-\UnaryInfC{$fun(t_1, ... t_j, ..., t_n) \longrightarrow fun(t_1, ..., t'_j, ..., t_n)$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$t_j \longrightarrow t'_j$}
-\RightLabel{$\longrightarrow$\textsubscript{Des\textsubscript{P}}}
-\UnaryInfC{$t.des(t_1, ... t_j, ..., t_n) \longrightarrow t.des(t_1, ..., t'_j, ..., t_n)$}
-\end{prooftree}
+\begin{alignat*}{2}
+& v  = &&\textrm{value, that is } \vdash_v v \\
+& \mathcal{E} ::= ~&& [] ~ | ~ fun(v^*, \mathcal{E}, t^*) ~ | ~ con(v^*, \mathcal{E}, t^*) ~ | ~ \mathcal{E}.des(t^*) ~ | ~ v.des(v^*, \mathcal{E}, t^*)
+\end{alignat*}
 
 \begin{prooftree}
 \AxiomC{$t \longrightarrow t'$}
-\RightLabel{$\longrightarrow$\textsubscript{Des\textsubscript{Args}}}
-\UnaryInfC{$t.des(t_1, ..., t_n) \longrightarrow t'.des(t_1, ..., t_n)$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[t] \longrightarrow \mathcal{E}[t']$}
 \end{prooftree}
 
 \begin{prooftree}
@@ -645,7 +642,37 @@ $\longrightarrow$ is the one-step reduction relation for closed terms, which is 
 
 where the following holds: If $t = fun(t_1, ..., t_n)$ or $t = con(t_1, ..., t_n)$, then $\vdash_v t_i$ for $i = 1,...,n$. If $t = t_0.des(t_1, ..., t_n)$, then $\vdash_v t_i$ for $i = 0,1,...,n$.
 
+TODO: consolidate the cases in the proofs which correspond to the Cong case
+
 Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
+
+\subsection{As an extension of (Co)Data Fragment semantics}
+
+The properties of the reductions and the de- and refunctionalization transformations of the paper of Rendel, Trieflinger, and Ostermann are used for the proofs of the next section. The domain of their defunctionalization is what they call the Codata Fragment, and that of refunctionalization the Data Fragment. Their semantic properties can be used in the proofs because, for well-typed programs:
+
+\begin{itemize}
+\item This work's reducibility notion is a conservative extension of the Data Fragment's.
+
+\item This work's notion is an extension of the Codata Fragment's notion.
+\end{itemize}
+
+\subsubsection{Data Fragment}
+
+The evaluation context $\mathcal{E}$ conservatively extends the context for the Data Fragment (Figure 6b), as explained below. The common congruence rule for both of this and their Codata Fragment is used here, as well. As a result of this and of the pattern matching rules given above, the notion of reduction for Uroboro of this work is a conservative extension of their Data Fragment reduction.
+
+$\mathcal{E}$ uses a different notion of evaluation context than the usual, in that it is not syntactic. Determining whether something is an evaluation context is nonetheless unproblematic, as one can simply use the value judgement from last section.
+
+This work's evaluation context conservatively extends that for the Data Fragment, since the value judgement conservatively extends the syntactic notion of value for the Data Fragment: For this fragment, the Con rule is identical to the syntax rule (Figure 6b)
+\begin{equation*}
+u, v ::= con(v^*),
+\end{equation*}
+while the V\textsubscript{CodTFun} can never be applied. This is because, under the assumption of well-typedness, a function in the Data Fragment can only have data type, as types can only be added by data definitions.
+
+\subsubsection{Codata Fragment}
+
+The case is a bit different with the Codata Fragment, however, as their evaluation context notion for it isn't conservatively extended by this work's. This is because, in their value rule for the Codata Fragment, a term is a value if and only if it is a function application with argument values. In this work, a value can also be a destructor application if it has codata type, but on the other hand, it cannot be a function application if this function doesn't have codata type. 
+
+However, this second difference doesn't exist under the assumption of well-typedness, since, in the Codata Fragment, a type can only be added by a codata definition. Under this assumption, only the first difference remains, but this means that only more reductions are possible. As these are the only differences, this work's reduction notion is still an (albeit not conservative) extension of the Codata Fragment's notion for well-typed programs.
 
 \section{Semantics preservation}
 
@@ -1586,13 +1613,13 @@ For the other cases ``Constructor", ``Function", ``Destructor arguments", and ``
 
 \subsection{Actual defunctionalization}
 
-For the actual defunctionalization, $d''$, strong bisimulation holds. The proof relies on properties of the automatic defunctionalization of Uroboro in the paper of Rendel, Trieflinger, and Ostermann. This defunctionalization is from now on referred to as $d^{core}$. The authors' notion of reducibility is the same than that of this work when restricted to the domain of $d^{core}$. The authors call this domain the Codata Fragment, they describe it in section 3.3 of their paper. Analogously, their notion of reducibility is identical to this work's notion when restricted to the domain of their refunctionalization.
+For the actual defunctionalization, $d''$, strong bisimulation holds. The proof relies on properties of the automatic defunctionalization of Uroboro in the paper of Rendel, Trieflinger, and Ostermann, in here called $d^{core}$. As stated in section 7, the authors' notion of reducibility is the same than that of this work when restricted to the domain of $d^{core}$, the Codata Fragment, and, analogously, when restricted to the domain of their refunctionalization, the Data Fragment.
 
 In section 3 of their paper, they prove Lemma 5, which in terms of this work can be stated as follows (possible since the reducibility notions are identical):
 
 $s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ for all input terms $s,t$ of $\langle \cdot \rangle$ (*)
 
-Here, the angular brackets can stand for either of their transformations, refunctionalization and defunctionalization; the second is from now on referred to as $d^{core}$. This statement is exactly the strong bisimulation statement above, thus strong bisimulation holds for $d^{core}$.
+Here, the angular brackets can stand for either of their transformations, refunctionalization and defunctionalization. Statement (*) is exactly the strong bisimulation statement above, thus strong bisimulation holds for $d^{core}$.
 
 \begin{proof}[Proof of strong bisimulation for $d''$] ~
 
@@ -1635,15 +1662,15 @@ Next, go one step further and subsume the constructor calls under the function c
 
 After these steps, $prg'$ has the above described form for which it holds that the application of $d''$ to it is identical to the application of $d^{core}$ to it. Especially, this means that
 
-$s \longrightarrow_{\langle prg' \rangle^{d''}} t \iff s \longrightarrow_{\langle prg' \rangle^{d^{core}}} t $
+$\langle s \rangle^{d} \longrightarrow_{\langle prg' \rangle^{d''}} \langle t \rangle^{d} \iff \langle s \rangle^{d^{core}} \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle^{d^{core}} $
 
 Remember, that by (*) it is
 
-$s \longrightarrow_{\langle prg' \rangle^{d^{core}}} t \iff s \longrightarrow_{prg'} t $
+$\langle s \rangle^{d^{core}} \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle^{d^{core}} \iff s \longrightarrow_{prg'} t $
 
 and thus, by going backwards through the equivalences,
 
-$s \longrightarrow_{\langle prg' \rangle^{d''}} t$.
+$\langle s \rangle^d \longrightarrow_{\langle prg' \rangle^{d''}} \langle t \rangle^d$.
 
 \end{itemize}
 
