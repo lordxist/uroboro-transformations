@@ -284,6 +284,10 @@ This uses the automatic defunctionalization of Uroboro in the paper of Rendel, T
 & && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } \forall e \in eqns: e \textrm{ has hole pattern}\} 
 \end{alignat*}
 
+Technical note on constructor subsumption:
+
+The input of $d^{core}$ in the definition above is actually not in its domain. This is because it can contain constructor calls. The following technical trick allows to transform such inputs as well: For the sake of $d^{core}$, subsume constructor names under function names (as if they were from the same syntactic domain). After the transformation, since names aren't changed (or when name changes are desired, the original name can still be retrieved), the subsumed constructor names (or their equivalents after a name change) are once again considered constructor names (from the original syntactic domain).
+
 Example:
 
 \begin{lstlisting}
