@@ -1724,6 +1724,18 @@ But this program is a subset of $\langle prg \rangle$, as can be seen in the def
 
 \end{itemize}
 
+\item \textbf{``Cong" case}:
+
+\begin{prooftree}
+\AxiomC{$s' \longrightarrow t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[s'] \longrightarrow \mathcal{E}[t']$}
+\end{prooftree}
+
+with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
+
+By the induction hypothesis we have a derivation for $\langle s' \rangle \longrightarrow_{\langle prg \rangle} \langle t' \rangle$. Let $\langle \mathcal{E} \rangle$ denote the transformation of $\mathcal{E}$, defined analogously to the transformation of terms by transforming the terms in $\mathcal{E}$ and by setting $\langle [] \rangle = []$. By applying the congruence rule we get $\langle \mathcal{E} \rangle[\langle s' \rangle] \longrightarrow_{\langle prg \rangle} \langle \mathcal{E} \rangle[\langle t' \rangle]$. It is clear that $\langle \mathcal{E} \rangle[\langle s' \rangle] = \langle \mathcal{E}[s'] \rangle = \langle s \rangle$ and $\langle \mathcal{E} \rangle[\langle t' \rangle] = \langle \mathcal{E}[t'] \rangle = \langle t \rangle$.
+
 \end{enumerate}
 
 TODO: the other cases
