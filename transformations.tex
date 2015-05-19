@@ -714,7 +714,7 @@ Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrigh
 
 \subsection{As an extension of (Co)Data Fragment semantics}
 
-The properties of the reductions and the de- and refunctionalization transformations of the paper of Rendel, Trieflinger, and Ostermann are used for the proofs of the next section. The domain of their defunctionalization is what they call the Codata Fragment, and that of refunctionalization the Data Fragment. Their semantic properties can be used in the proofs because, for well-typed programs with copattern coverage, this work's reducibility notion is a conservative extension of either the Data Fragment's notion or the Codata Fragment's notion.
+The properties of the reductions and the de- and refunctionalization transformations of the paper of Rendel, Trieflinger, and Ostermann are used for the proofs of the next section. The domain of their defunctionalization is what they call the Codata Fragment, and that of refunctionalization the Data Fragment. Their semantic properties can be used in the proofs because, for well-typed programs and limited to terms which have copattern coverage for all of their subterms in the program (TODO: define this more precisely), this work's reducibility notion is a conservative extension of either the Data Fragment's notion or the Codata Fragment's notion.
 
 \subsubsection{Data Fragment}
 
@@ -736,7 +736,7 @@ As with the Data Fragment, this conservation for evaluation context notions foll
 
 Consider first the ``if" direction. By the rules of the judgement, a function application with argument values is only a value if it has codata type and doesn't match any rule of the program. Assuming well-typedness, the first constraint is always fulfilled in the Codata Fragment, since there, a type can only be added by a codata definition. That the second constraint is always fulfilled because, in the Codata Fragment, there are no left-hand sides of rules which are hole patterns.
 
-Second, consider the ``only if" direction. By the rules of the judgement, a value can also be a destructor application if it has codata type and doesn't match any rule of the program. But this case can be excluded in the Codata Fragment for programs with copattern coverage.
+Second, consider the ``only if" direction. By the rules of the judgement, a value can also be a destructor application if it has codata type and doesn't match any rule of the program. But this case can be excluded in the Codata Fragment for programs with copattern coverage for all subterms of the input term, since those are the only ones that can be relevant for the value judgement in the one-step reduction.
 
 \section{Semantics preservation}
 
@@ -1698,7 +1698,7 @@ $`` \Rightarrow "$: By induction on the structure of $\mathcal{D}$.
 \UnaryInfC{$s \longrightarrow s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^d$, $\langle t \rangle = \langle t \rangle^d$. $d$ is the defunctionalization of terms defined at the end of section 2.
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^d$, $\langle t \rangle = \langle t \rangle^d$. $d$ is the defunctionalization of terms defined at the end of section 2. This defunctionalization of terms is also, for all input terms from the fragment, identical to that of the Codata Fragment.
 
 \begin{itemize}
 
@@ -1712,7 +1712,15 @@ By carrying the substitutions returned from the matchings along in the above rec
 
 \item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$:
 
-Then the function definition that contains $`` q = s' "$ contains only equations where the right-hand side is a destructor pattern (other cases are excluded by the relevant input fragment for $d''$). Thus $s$ reduces to $t$ already with respect to the part of the program that is passed to $d^{core}$ (in the definition of $d''$). Let this part be $prg'$. By (*) we have $\langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle$. But (the definitions of) $\langle prg' \rangle^{d^{core}}$ is a subset of $\langle prg \rangle$, as can be seen in the definition of $d''$. Thus we have the desired $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
+Then the function definition that contains $`` q = s' "$ contains only equations where the right-hand side is a destructor pattern (other cases are excluded by the relevant input fragment for $d''$). Thus $s$ reduces to $t$ already with respect to the part of the program that is passed to $d^{core}$, as specified in the definition of $d''$. Let this part, amended by the ``constructor subsumption" noted for the definition of $d''$, be $prg'$.
+
+By (*) we would have $\langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle$, were $prg'$ a well-typed program with copattern coverage for all subterms of $s$. 
+
+For the coverage, bear in mind that the equation $`` q = s' "$ enabling the reduction of $s$ by the ``Subst" rule is part of $prg'$ by the precondition of Case 2. As $s$ matches against $q$, copattern coverage for $s$ is trivially fulfilled in $prg'$. The immediate subterms of $s$ are values with respect to $prg$ and, by inversion, their immediate subterms and so forth, which especially means that there is no rule in $prg$ against which they match. But $prg$ has copattern coverage for such a subterm (TODO: make this a general precondition) and there is already no rule for it in $prg$. It follows that $prg'$ still has copattern coverage for the subterm even though there is no rule for it in $prg'$. This is because, either (1) the subterm is a destructor call, then it can only be covered by destructor copatterns (as it matches against a destructor copattern) and those only occur within $prg'$, or (2) it is a constructor call, which doesn't need to be matched for coverage. It can't be a function call, since these can only be covered by directly matching the call, which isn't the case even in $prg$, for which coverage is assumed.
+
+Well-typedness doesn't hold since types defined by data definitions aren't part of $prg'$. This problem can be solved by temporarily adding ``dummy" empty codata definitions for the missing types, and by adding empty function definitions for (1) each function in $prg$ but not in $prg'$ and (2) each function that is a subsumed constructor. Call this changed program $prg''$.   Now, by (*) we have $\langle s \rangle \longrightarrow_{\langle prg'' \rangle^{d^{core}}} \langle t \rangle$. In the definition of $d^{core}$ it can be seen that empty codata definitions are converted to empty function definitions. A reduction cannot depend upon such an empty function definition. Also, the empty function definitions are converted to empty data definitions. A reduction cannot depend upon those either, as there are no constructors a pattern matching could make a case distinction upon. Thus those definitions can be replaced by the original data definitions for the same types from $prg$ without breaking the reduction from $s$ to $t$. The resulting program is the union of $\langle prg' \rangle^{d^{core}}$ and those original data definitions.
+
+But this program is a subset of $\langle prg \rangle$, as can be seen in the definition of $d''$. (The full $\langle prg \rangle$ is obtained by adding the original function definitions with hole pattern left-hand sides.) Thus we have the desired $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
 
 \end{itemize}
 
