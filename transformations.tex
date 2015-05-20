@@ -726,7 +726,7 @@ This work's evaluation context conservatively extends that for the Data Fragment
 \begin{equation*}
 u, v ::= con(v^*),
 \end{equation*}
-while the V\textsubscript{CodTFun} can never be applied. This is because, under the assumption of well-typedness, a function in the Data Fragment can only have data type, as types can only be added by data definitions.
+while the V\textsubscript{CodTFun} can never be applied. This is because a function in the Data Fragment can only have data type unless it doesn't have a type defined in the program at all, as types can only be added by data definitions.
 
 \subsubsection{Codata Fragment}
 
@@ -1685,7 +1685,9 @@ $s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg \
 
 Here, the angular brackets can stand for either of their transformations, refunctionalization and defunctionalization. Statement (*) is exactly the strong bisimulation statement above, thus strong bisimulation holds for $d^{core}$.
 
-\begin{proof}[Proof of strong bisimulation for $d''$] By induction on the structure of $\mathcal{D}$.
+\begin{proof}[Proof of strong bisimulation for $d''$] ~
+
+$`` \Rightarrow "$: By induction on the structure of $\mathcal{D}$.
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
@@ -1702,26 +1704,15 @@ with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\
 
 \item \underline{Case 1}: $q$ is hole pattern:
 
-Then the function definition (if any) that contains $`` q = s' "$ contains only equations where the right-hand side is a hole pattern (other cases are excluded by the relevant input fragment for $d''$). Such equations (and indeed the function definitions) are left unchanged by $d''$ except for defunctionalizing the right-hand term, as can be seen directly in the definition of $d''$ (last set in the highest-level union). Thus Rules($\langle prg \rangle$) contains $(q, \langle s' \rangle)$ when Rules($prg$) does.
-
-$`` \Rightarrow "$:
-
-By the condition and by the above, Rules($\langle prg \rangle$) contains $(q, \langle s' \rangle)$.
+Then the function definition that contains $`` q = s' "$ contains only equations where the right-hand side is a hole pattern (other cases are excluded by the relevant input fragment for $d''$). Such equations (and indeed the function definitions) are left unchanged by $d''$ except for defunctionalizing the right-hand term, as can be seen directly in the definition of $d''$ (last set in the highest-level union). Thus Rules($\langle prg \rangle$) contains $(q, \langle s' \rangle)$.
 
 By inversion, we have from $s =^? q \searrow \sigma$ that $s$ has the form $fun(v_1, ..., v_n)$ for some values $v_1, ..., v_n$, thus $\langle s \rangle = fun(\langle v_1 \rangle, ..., \langle v_n \rangle)$. By inversion for values, we have that each $v_i$ is either a constructor application or a value of codata type. If it is a value of codata type, by inversion on pattern matching, the relevant subpattern of $q$ can only be a variable, thus it is also matched by $\langle v_i \rangle$. If it is a constructor application, the relevant subpattern of $q$ is either a variable, and the same holds, or it is a constructor pattern, and by recursively descending into its subpatterns we still get that $\langle v_i \rangle = con(\langle v^1_i \rangle, ..., \langle v^m_n \rangle)$ matches against the subpattern of $q$.
 
 By carrying the substitutions returned from the matchings along in the above recursive argument, we get a substitution $\sigma'$ such that $\langle s \rangle =^? q \searrow \sigma'$ and, by distributing over $\langle s' \rangle$, $\langle s' \rangle [\sigma'] = \langle s'[\sigma] \rangle = \langle t \rangle$. It follows that $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
 
-$`` \Leftarrow "$:
-
-Let the equations of hole pattern right-hand sides function definitions don't contain $`` q = s' "$. $d''$ doesn't introduce new equations for those function definitions. Thus there is nothing in $\langle prg \rangle$ that $\langle s \rangle$ could match against to produce $t$, since $\langle s \rangle$ is a function application of the same function $s$ is an application of. (TODO: Cover all possibilities to prove that no match is possible.) But by the precondition of the ``Subst" case, $\langle s \rangle$ can only reduce by matching.
-
 \item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$:
 
-Then the function definition that contains $`` q = s' "$ contains only equations where the right-hand side is a destructor pattern (other cases are excluded by the relevant input fragment for $d''$). Thus $s$ reduces to $t$ already with respect to the part of the program that is passed to $d^{core}$, as specified in the definition of $d''$. Let this part, amended by the ``constructor subsumption" noted for the definition of $d''$, be $prg'$. $s$ also doesn't reduce to $t$ in $prg$ when it doesn't do so in $prg'$, as no other function definition contains $`` q = s' "$, and no other way of reducing $s$ is possible, per the subterm value condition of the ``Subst" case. All in all, it is:
-\begin{equation*}
-s \longrightarrow_{prg} t \iff s \longrightarrow_{prg'} t
-\end{equation*}
+Then the function definition that contains $`` q = s' "$ contains only equations where the right-hand side is a destructor pattern (other cases are excluded by the relevant input fragment for $d''$). Thus $s$ reduces to $t$ already with respect to the part of the program that is passed to $d^{core}$, as specified in the definition of $d''$. Let this part, amended by the ``constructor subsumption" noted for the definition of $d''$, be $prg'$; it is: $s \longrightarrow_{prg'} t$
 
 By (*) we would have
 
@@ -1731,30 +1722,14 @@ s \longrightarrow_{prg'} t \iff \langle s \rangle \longrightarrow_{\langle prg' 
 
 were $prg'$ a well-typed program with copattern coverage for all subterms of $s$. 
 
-For the coverage, bear in mind that the equation $`` q = s' "$ enabling the reduction of $s$ by the ``Subst" rule is part of $prg'$ by the precondition of Case 2. As $s$ matches against $q$, copattern coverage for $s$ is trivially fulfilled in $prg'$. The immediate subterms of $s$ are values with respect to $prg$ and, by inversion, their immediate subterms and so forth, which especially means that there is no rule in $prg$ against which they match. But $prg$ has copattern coverage for such a subterm (TODO: make this a general precondition) and there is already no rule for it in $prg$. It follows that $prg'$ still has copattern coverage for the subterm even though there is no rule for it in $prg'$. This is because, either (1) the subterm is a destructor call, then it can only be covered by destructor copatterns (as it matches against a destructor copattern) and those only occur within $prg'$, or (2) it is a constructor call, which doesn't need to be matched for coverage. It can't be a function call, since these can only be covered by directly matching the call, which isn't the case even in $prg$, for which coverage is assumed.
+For the coverage, bear in mind that the equation $`` q = s' "$ enabling the reduction of $s$ by the ``Subst" rule is part of $prg'$ by the precondition of Case 2. As $s$ matches against $q$, copattern coverage for $s$ is trivially fulfilled in $prg'$. The immediate subterms of $s$ are values with respect to $prg$ and, by inversion, their immediate subterms and so forth, which especially means that there is no rule in $prg$ against which they match. But $prg$ has copattern coverage for such a subterm (TODO: make this a general precondition) and there is already no rule for it in $prg$. It follows that $prg'$ still has copattern coverage for the subterm even though there is no rule for it in $prg'$. This is because, either (1) the subterm is a destructor call, then it can only be covered by destructor copatterns (as it matches against a destructor copattern) and those only occur within $prg'$, or (2) it is a constructor call, which doesn't need to be matched for coverage. It can't be a function call, since these can only be covered by directly matching the call, which isn't the case even in $prg$, for which coverage is assumed. Thus coverage holds for $prg'$.
 
-Well-typedness doesn't hold since types defined by data definitions aren't part of $prg'$. This problem can be solved by temporarily adding ``dummy" empty codata definitions for the missing types, and by adding empty function definitions for (1) each function in $prg$ but not in $prg'$ and (2) each function that is a subsumed constructor. Call this changed program $prg''$. It has not added any equations and thus it is
+For well-typedness, simply treat the missing types temporarily, that is, for the sake of (*), as codata types. This is no problem for the restriction to the domain of $d^{core}$, since such types could be introduced inside the Codata Fragment with codata definitions. To be more precise, empty function definitions can be added for missing ones and empty codata definitions for missing types, and removed again after using (*), without adding or removing possible reductions, respectively. All in all, we have by (*):
 \begin{equation*}
-s \longrightarrow_{prg'} t \iff s \longrightarrow_{prg''} t
+s \longrightarrow_{prg'} t \iff \langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle
 \end{equation*}
 
-Now, coverage and well-typedness hold for $prg''$ and by (*) we have:
-\begin{equation*}
-s \longrightarrow_{prg''} t \iff \langle s \rangle \longrightarrow_{\langle prg'' \rangle^{d^{core}}} \langle t \rangle
-\end{equation*}
-In the definition of $d^{core}$ it can be seen that empty codata definitions are converted to empty function definitions. A reduction cannot depend upon such an empty function definition. Also, the empty function definitions are converted to empty data definitions. A reduction cannot depend upon those either, as there are no constructors a pattern matching could make a case distinction upon. Thus those definitions can be replaced by the original data definitions for the same types from $prg$ without breaking or introducing the reduction from $\langle s \rangle$ to $\langle t \rangle$. The resulting program is the union of $\langle prg' \rangle^{d^{core}}$ and those original data definitions.
-
-But this program is a subset of $\langle prg \rangle$, as can be seen in the definition of $d''$. This implies the reduction from $\langle s \rangle$ to $\langle t \rangle$ with respect to $\langle prg \rangle$.
-
-The full $\langle prg \rangle$ is obtained by adding the original function definitions with hole pattern left-hand sides. Remember that $s$ doesn't reduce to $t$ with respect to those function definitions, per the conditions of this Case 2 and the ``Subst" case. In fact, per these conditions, $s$ doesn't reduce to anything with respect to those definitions. It is now either $\langle s \rangle = s$, then it trivially follows that adding those definitions doesn't introduce the reduction from $\langle s \rangle$ to $\langle t \rangle$. Or $s$ contains one or more destructor calls, which are defunctionalized to function calls, but these function are not among those defined in the original function definitions. But this is the only way $\langle s \rangle$ differs from $s$, thus there is still no reduction from $\langle s \rangle$ to $\langle t \rangle$ introduced. All in all, we have:
-\begin{equation*}
-\langle s \rangle \longrightarrow_{\langle prg'' \rangle^{d^{core}}} \langle t \rangle \iff \langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle
-\end{equation*}
-
-By combining the equivalences we have the desired
-\begin{equation*}
-s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle.
-\end{equation*}
+But this program $\langle prg' \rangle^{d^{core}}$ is a subset of $\langle prg \rangle$, as can be seen in the definition of $d''$. This implies the desired $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
 
 \end{itemize}
 
@@ -1770,16 +1745,48 @@ Other cases are excluded by the relevant input fragment.
 
 with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
 
-By the induction hypothesis we have
+By the induction hypothesis we have $\langle s' \rangle \longrightarrow_{\langle prg \rangle} \langle t' \rangle$. Let $\langle \mathcal{E} \rangle$ denote the transformation of $\mathcal{E}$, defined analogously to the transformation of terms by transforming the terms in $\mathcal{E}$ and by setting $\langle [] \rangle = []$. By applying the congruence rule we get $\langle \mathcal{E} \rangle[\langle s' \rangle] \longrightarrow_{\langle prg \rangle} \langle \mathcal{E} \rangle[\langle t' \rangle]$. It is clear that $\langle \mathcal{E} \rangle[\langle s' \rangle] = \langle \mathcal{E}[s'] \rangle = \langle s \rangle$ and $\langle \mathcal{E} \rangle[\langle t' \rangle] = \langle \mathcal{E}[t'] \rangle = \langle t \rangle$.
+
+\end{enumerate}
+
+$`` \Leftarrow "$: By induction on the structure of $\mathcal{D}$.
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$\langle s \rangle =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$\langle s \rangle \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^d$, $\langle t \rangle = \langle t \rangle^d$. $d$ is the defunctionalization of terms defined at the end of section 2. This defunctionalization of terms is also, for all input terms from the fragment, identical to that of the Codata Fragment.
+
+The equation $`` q = s' "$ can either be contained in that part of $\langle prg \rangle$ that results from the application of $d^{core}$ to the relevant part of $prg$, as specified in the definition of $d''$, or it can be in the other part of $\langle prg \rangle$. As can be seen in the definition of $d''$, this other part is taken over unchanged from $prg$. Thus an equation from this part is present in both $prg$ and $\langle prg \rangle$. For such an equation, $q$ has hole pattern. It can then be easily seen that $\langle s \rangle =^? q \searrow \sigma'$ for a $\sigma'$ with $s'[\sigma'] = \langle t \rangle$ by an argument analogous to that of $`` \Rightarrow "$, ``Subst" case, Case 1.
+
+Now, suppose that $`` q = s' "$ is contained in the part of $\langle prg \rangle$ that results from the application of $d^{core}$ to the relevant part $prg' \subseteq prg$. Thus $\langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle$.
+
+By (*) we would have
+
 \begin{equation*}
-s' \longrightarrow t' \iff \langle s' \rangle \longrightarrow_{\langle prg \rangle} \langle t' \rangle.
+\langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle \iff s \longrightarrow_{prg'} t,
 \end{equation*}
-Let $\langle \mathcal{E} \rangle$ denote the transformation of $\mathcal{E}$, defined analogously to the transformation of terms by transforming the terms in $\mathcal{E}$ and by setting $\langle [] \rangle = []$. By applying the congruence rule and by the unique decomposition of $\mathcal{E}$ (TODO: Proof lemma for this) we get
 
-$\mathcal{E}[s'] \longrightarrow \mathcal{E}[t'] \iff \langle \mathcal{E} \rangle[\langle s' \rangle] \longrightarrow_{\langle prg \rangle} \langle \mathcal{E} \rangle[\langle t' \rangle]$.
+were $prg'$ a well-typed program with copattern coverage for all subterms of $s$. Both of those properties can be shown or simulated similarly to the way they are in the $`` \Rightarrow "$ part.
 
-It is clear that $\langle \mathcal{E} \rangle[\langle s' \rangle] = \langle \mathcal{E}[s'] \rangle = \langle s \rangle$ and $\langle \mathcal{E} \rangle[\langle t' \rangle] = \langle \mathcal{E}[t'] \rangle = \langle t \rangle$.
+But it is $prg' \subseteq prg$, as can be seen in the definition of $d''$. This implies the desired $s \longrightarrow_{prg} t$.
 
+\item \textbf{``Cong" case}:
+
+\begin{prooftree}
+\AxiomC{$s' \longrightarrow_{\langle prg \rangle} t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[s'] \longrightarrow \mathcal{E}[t']$}
+\end{prooftree}
+
+with $\mathcal{E}[s'] = \langle s \rangle$ and $\mathcal{E}[t'] = \langle t \rangle$.
+
+By the induction hypothesis we have $s'' \longrightarrow_{prg} t''$ with $s' = \langle s'' \rangle$, $t' = \langle t'' \rangle$. Let $\langle \mathcal{E} \rangle$ denote the transformation of $\mathcal{E}$ (defined as in the $`` \Rightarrow "$ part). Apply the congruence rule to get $\mathcal{E}'[s''] \longrightarrow_{prg} \mathcal{E}'[t'']$ with $\mathcal{E} = \langle \mathcal{E}' \rangle$. That is, $\mathcal{E}'$ is the result of applying the inverse of $\langle \cdot \rangle$ to $\mathcal{E}$, which is possible, since, for instance, $\mathcal{E}[s'] = \langle s \rangle$. It is $\langle \mathcal{E}'[s''] \rangle = \langle \mathcal{E}' \rangle[\langle s'' \rangle] = \mathcal{E}[s'] = \langle s \rangle$ and $\langle \mathcal{E}'[t''] \rangle = \langle \mathcal{E}' \rangle[\langle t'' \rangle] = \mathcal{E}[t'] = \langle t \rangle$ and thus we have the desired $s \longrightarrow_{prg} t$.
 \end{enumerate}
 
 \end{proof}
