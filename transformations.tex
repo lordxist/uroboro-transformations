@@ -828,14 +828,6 @@ Let $\mathcal{D}$ be a derivation of $t =^? q \searrow \sigma$.
 
 \end{lemma}
 
-\begin{definition}[Pattern matching chain] A pattern matching chain from a closed term $s$ to a closed term $t$ with respect to a set $R$ of rules of the form $`` q_i = s_i "$ with $q_i$ copattern, $s_i$ term, is a series $`` q_1 = s_1 ", ..., `` q_n = s_n "$ of rules in $R$ such that:
-
-$s =^? q_1 \searrow \sigma_1$, $s_1[\sigma_1] =^? q_2 \searrow \sigma_2$, ..., $s_{n-1}[\sigma_{n-1}] =^? q_n \searrow \sigma_n$, $s_n[\sigma_n] = t$
-
-\end{definition}
-
-Note that it follows directly from the definitions of pattern matching chains and pattern matching that if there is a pattern matching chain from $s$ to $t$, then $s \longrightarrow^* t$ with respect to any program containing at least the rules of the chain.
-
 \begin{lemma} Let $e$ be a helper extraction function, i.e. a function that can be an argument of $extract\_helpers$ as defined in section 1. For any program $prg$ and any two closed terms $s,t$ with $s =^? q \searrow \sigma$, $s'[\sigma] = t$ for a rule $(q, s') \in \textrm{Rules}(prg)$ it holds that:
 
 If $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is a reduction sequence from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$,
