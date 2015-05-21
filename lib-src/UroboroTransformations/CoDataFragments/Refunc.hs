@@ -33,7 +33,9 @@ refuncFunSig (l, id, t':ts, t) = PTDes l t id ts t'
 refuncFunSig _ = undefined
 
 refuncDef :: [(Location, Identifier, [Type], Type)] -> PT -> Maybe PT
-refuncDef fs (PTPos l t _)    = Just $ PTNeg l t (map refuncFunSig fs)
+refuncDef fs (PTPos l t _)    = Just $ PTNeg l t (map refuncFunSig $ filter correctType fs)
+  where
+    correctType (_, _, (t':_), _) = t' == t
 refuncDef _ (PTNeg _ _ _)   = Nothing
 refuncDef _ (PTFun _ _ _ _ _) = undefined
 
