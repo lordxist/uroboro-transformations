@@ -50,6 +50,17 @@ extractWithFlag flag (PTFun l id ts t _) r@(PTRule l' pq e) = do
             newVs2 <- mapM convertToVar vs2
             return $ v:(newVs1 ++ newVs2)
 
+renameVars :: PP -> State Int PP
+renameVars v@(PPVar _ _) = convertToVar v
+renameVars (PPCon l id pps) = liftM (PPCon l id) $ mapM renameVars pps
+
+renameVarsPQ :: PQ -> State Int PQ
+renameVarsPQ (PQApp l id pps) = liftM (PQApp l id) $ mapM renameVars pps
+renameVarsPQ (PQDes l id pps pq) = do
+    newPQ <- renameVarsPQ pq
+    newPPs <- mapM renameVars pps
+    return $ PQDes l id newPPs newPQ
+
 removeLeftConPPs :: [PP] -> ExtractFlag -> State Int [PP]
 removeLeftConPPs ((v@(PPVar _ _)):pps) flag = do
     newV <- convertToVar v
@@ -67,18 +78,24 @@ removeLeftConPPs ((c@(PPCon l id pps)):pps') flag
         newPPs' <- if flag == NormalExtract
                    then mapM renameVars pps'
                    else removeLeftConPPs pps' NormalExtract
-        return $ newVOrOldC:newPPs'
-  where
-    renameVars v@(PPVar _ _) = convertToVar v
-    renameVars (PPCon l id pps) = liftM (PPCon l id) $ mapM renameVars pps
+        return $ newVOrOldC:newPPs'    
 removeLeftConPPs [] _ = return []
 
+removeLeftConWithState :: PQ -> ExtractFlag -> State Int PQ
+removeLeftConWithState (PQApp l id pps) flag = liftM (PQApp l id) (removeLeftConPPs pps flag)
+removeLeftConWithState (PQDes l id pps pq) NormalExtract
+    | conInPQ pq NormalExtract = do
+        newPQ <- removeLeftConWithState pq NormalExtract
+        newPPs <- mapM renameVars pps
+        return $ PQDes l id newPPs newPQ
+    | otherwise  = do
+        newPQ <- renameVarsPQ pq
+        newPPs <- removeLeftConPPs pps NormalExtract
+        return $ PQDes l id newPPs newPQ
+removeLeftConWithState _ _ = error "can't go here"
+
 removeLeftCon :: PQ -> ExtractFlag -> PQ
-removeLeftCon (PQApp l id pps) flag = PQApp l id (evalState (removeLeftConPPs pps flag) 0)
-removeLeftCon (PQDes l id pps pq) NormalExtract
-    | conInPQ pq NormalExtract = PQDes l id pps (removeLeftCon pq NormalExtract)
-    | otherwise  = PQDes l id (evalState (removeLeftConPPs pps NormalExtract) 0) pq
-removeLeftCon _ _ = error "can't go here"
+removeLeftCon pq flag = evalState (removeLeftConWithState pq flag) 0
 
 isolateLeftConPPs :: [PP] -> ExtractFlag -> (PP, ([PP], [PP]))
 isolateLeftConPPs ((v@(PPVar _ _)):pps) flag = second (first (v:)) (isolateLeftConPPs pps NormalExtract)
