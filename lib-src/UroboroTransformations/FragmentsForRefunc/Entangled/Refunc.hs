@@ -120,13 +120,15 @@ disentangle :: [PT] -> [PT]
 disentangle = extractHelperFuns extractPatternMatching
 
 splitRule :: [PT] -> Type -> PTRule -> [PTRule]
-splitRule pts t (PTRule l pq@(PQApp l' id ((PPVar _ id'):pps)) e) =
-    map makeRuleForCon $ consForType pts
+splitRule pts t r@(PTRule l pq@(PQApp l' id ((PPVar _ id'):pps)) e)
+    | null $ consForType pts  = [r]
+    | otherwise               = map makeRuleForCon $ head (consForType pts)
   where
     consForType ((PTPos _ _ cons@((PTCon _ t' _ _):_)):pts')
-        | t == t' = cons
+        | t == t' = [cons]
         | otherwise          = consForType pts'
     consForType (_:pts') = consForType pts'
+    consForType []       = []
 
     makeRuleForCon c =
         (PTRule l (PQApp l' id (convertPPs c))
