@@ -15,7 +15,7 @@ refuncExp (PApp l id es) fsigs
     | otherwise           = PApp l id (map (flip refuncExp fsigs) es)
   where
     hasSameId (_, id', _, _) = id' == id
-refuncExp pq _ = pq -- this makes it usable for CoDataDefsDisj.Refunc
+refuncExp (PDes l id es e) fsigs = PDes l id (map (flip refuncExp fsigs) es) (refuncExp e fsigs) -- this makes it usable for CoDataDefsDisj.Refunc
 
 illegalRule :: PTRule -> Bool
 illegalRule (PTRule _ (PQDes l _ _ _) _) = True
