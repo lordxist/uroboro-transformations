@@ -1253,8 +1253,44 @@ TODO
 
 \begin{proof}[Proof of (4)]
 
-TODO
+Let $S$ be a possibly infinite reduction sequence with respect to $\langle prg \rangle$ and containing only terms that don't typecheck in $prg$. The equations upon which $S$ can possibly depend will now be reduced step-by-step, in the end demonstrating that no infinite sequence is possible with the remaining equations.
 
+\begin{enumerate}
+
+\item $S$ depends only on equations where each results from applications of $extract\_outer\_des$ to some original equation $r$ with multiple destructors on the left-hand side.
+
+\underline{Proof:}
+
+$elim\_multi\_des$ is defined as the application of $extract\_helpers$ to $extract\_outer\_des$. Thus, as can be seen in the definition of $extract\_helpers$, for every equation in the original program, the transformed program contains a replacement equation and some helper equations. These are defined by $extract\_outer\_des$ applied to the original equation and an empty helpers set.
+
+For original equations with hole patterns or only one destructor on the left-hand side, these original equations appear unchanged in $\langle prg \rangle$, and no helpers are added. The right-hand side of those equations typecheck against $prg$. Q.E.D.
+
+\item Any equation that $S$ depends on is contained in some helpers set $H$ as defined below for such an equation $r$ with multiple destructors on the left-hand side.
+\begin{equation*}
+\big\langle r', H \big\rangle := \langle r \rangle^{extract\_outer\_des}
+\end{equation*}
+
+\underline{Proof:}
+
+The left-hand side of $r'$ is a hole pattern matching precisely function applications of functions already defined in $prg$. Thus any reduction using $r'$ must start with a term that typechecks against $prg$, and therefore $S$ can't depend upon it. Q.E.D.
+
+\end{enumerate}
+
+Now it can be shown that no infinite reduction is possible with respect to the equations in $H$. This is done by showing that all terms appearing in $S$ are different.
+
+The recursive expansion of $extract\_outer\_des$ works as given by its definition:
+\begin{equation*}
+\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des}
+\end{equation*}
+The helpers set $H$ is built up as follows. In one step of the expansion, as can be seen in the definition of $extract\_des$, it is only ever extended by adding one pair of signature and equation, as defined by $hsig$ and $heqn$, respectively. Therefore its equations are only ever defined in the way given by $heqn$.
+
+An equation added in the $i$-th expansion step, that is, an equation $h$, as defined via $heqn$, with
+\begin{equation*}
+\langle r_i, H_i \rangle^{extract\_des}  = \big\langle r_{i+1}, \{h\} \cup H_i \big\rangle
+\end{equation*}
+for some equations $r_i, r_{i+1}$ and some helpers set $H_i$, depends upon $r_i$. Specifically, the name of the function of helper function is defined via $hname$ to be dependent upon the left-hand side copattern of $r_i$ without the final destructor application. By induction on $i$ it can be seen that all the helper equation function names are dependent upon the number $m$ of destructor applications in the respective step. It can also be seen that the right-hand side of the equation either checks against $prg$ (when it is the original equation's right-hand side), or is itself a helper function application, where the number of the embedded destructor applications is less than $m$.
+
+In a term matching such helper equations, these destructor applications must be embedded. Thus, in any reduction step of $S$, the number of the destructor applications embedded into the term is decreased. It follows that all terms in $S$ must be different.
 
 \end{proof}
 
