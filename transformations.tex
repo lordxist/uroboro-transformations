@@ -841,10 +841,15 @@ If $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is
 
 then $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
 
-\begin{proof}
+%%-- under construction
 
-Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. Thus there is a reduction sequence from $s$ to $t$ with respect to the equations of the transformed program: $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
+If for a rule $(q, s') \in \textrm{Rules}(\langle prg \rangle^{extract\_helpers(e)})$ it holds that $s =^? q \searrow \sigma$, $s'[\sigma] = t$,
 
+then there is an equation $r$ in the equations of $prg$ such that $\langle r \rangle^e$ contains $`` q = s' "$.
+
+%%--
+
+\begin{proof} Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. Thus there is a reduction sequence from $s$ to $t$ with respect to the equations of the transformed program: $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
 \end{proof}
 
 \end{lemma}
@@ -1245,9 +1250,67 @@ TODO: the other cases
 
 \end{proof}
 
-\begin{proof}[Proof of (3)]
+\begin{proof}[Proof of (3)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ ($s, t$ typecheck against $prg$).
 
-TODO
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$\langle s \rangle =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$s \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+When $(q, s') \in \textrm{Rules}(prg)$, so, by the ``Subst" rule, $s \longrightarrow_{prg} t$. It remains to be shown that $(q, s') \in \textrm{Rules}(prg)$.
+
+Since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$, by Lemma 2b there is an equation $r$ of $prg$ such that $\langle r \rangle^{extract\_outer\_des}$ contains $`` q = s' "$.
+
+\begin{itemize}
+
+\item \underline{Case 1}: $r = `` q'.des(p_1, ..., p_k) = t' "$, $q'$ is destructor pattern:
+\begin{equation*}
+\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des}
+\end{equation*}
+It will be shown that this case contradicts the fact that $\langle r \rangle^{extract\_outer\_des}$ contains $`` q = s' "$. This is done by showing, by induction on the structure of $q''$, with $q' = q''.des'(...)$, for any $r$ that has the above form and any helpers set $H$ (including the empty one):
+
+$\langle r , H \rangle^{extract\_outer\_des}$ doesn't contain $`` q = s' "$ unless it is already within $H$
+
+\begin{enumerate}
+
+\item $q''$ is hole pattern:
+\begin{multline*}
+\langle \langle r, H \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
+= \langle \langle `` q''.des'(...).des(p_1, ..., p_k) = t' " \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
+= \langle `` q''.des'(...) = hname(\langle q''.des'(...) \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \rangle^{extract\_outer\_des} \\
+= \big\langle `` q''.des'(...) = hname(\langle q''.des'(...) \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \big\rangle
+\end{multline*}
+with $hname, hsig, heqn$ according to the definition of $extract\_des$. The two only equations within $\langle r \rangle^{extract\_outer\_des}$ can be seen in the last line. The right-hand side of the first is a function application of the helper function ($hname(...)$) that doesn't typecheck in $prg$ and neither can a result of substituting its variables. The helper function of the left-hand side copattern of the second, defined according to $heqn$, isn't matched by any term that typechecks in $prg$. But these two are the only equations that could have been $`` q = s' "$ outside of $H$, thus $\langle r, H \rangle^{extract\_outer\_des}$ doesn't contain $`` q = s' "$.
+
+\item $q''$ is destructor pattern:
+\begin{multline*}
+\langle \langle r, H \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
+= \langle \langle `` q''.des'(...).des(p_1, ..., p_k) = t' ", H \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
+= \langle `` q''.des'(...) = hname(\langle q''.des'(...) \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \rangle^{extract\_outer\_des}
+\end{multline*}
+with $hname, hsig, heqn$ according to the definition of $extract\_des$. $q''.des'(...)$ has the above form for $r$. Let $q'' = q'''.des''(...)$ Apply the induction hypothesis to $q'''$ to obtain that $\langle r, H \rangle^{extract\_outer\_des}$ doesn't contain $`` q = s' "$ unless it is contained in $\{ \big\langle hsig, heqn \big\rangle \} \cup H$. But the left-hand side copattern defined according to $heqn$ isn't matched by any term that typechecks in $prg$. Thus only the equations within $H$ remain as candidates for $`` q = s' "$.
+
+\end{enumerate}
+
+\item \underline{Case 2}: $r = `` q'.des(p_1, ..., p_k) = t' "$, $q'$ is hole pattern:
+\begin{equation*}
+\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle
+\end{equation*}
+It follows that $r = `` q' = s "$, thus $(q, s') \in \textrm{Rules}(prg)$.
+
+\item \underline{Case 3}: $r = `` q' = t'$, $q'$ is hole pattern:
+
+The argument here is identical to that in Case 2.
+
+\end{itemize}
+
+\end{enumerate}
 
 \end{proof}
 
