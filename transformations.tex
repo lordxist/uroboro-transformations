@@ -740,25 +740,24 @@ TODO: The bisimulation statement presupposes that the one-step reduction relatio
 
 In this section it is shown that the transformations above preserve the semantics of programs in a kind of weak bisimulation. Precisely, for all transformations indicated by angular brackets, it holds for all closed input terms $s, t$ and all programs $prg$ that:
 
-$s \longrightarrow_{prg} t \implies \langle s \rangle \longrightarrow_{\langle prg \rangle}^* \langle t \rangle$ (1)
+\begin{itemize}
+\item $s \longrightarrow_{prg} t \implies \langle s \rangle \longrightarrow_{\langle prg \rangle}^* \langle t \rangle$ (1)
 
-and
+\item the reduction sequence from $\langle s \rangle$ to $\langle t \rangle$ in (1), contains no terms, except possibly $\langle s \rangle$ and $\langle t \rangle$, that typecheck against $prg$ (2)
 
-the reduction sequence from $\langle s \rangle$ to $\langle t \rangle$ in (1), contains no terms, except possibly $\langle s \rangle$ and $\langle t \rangle$, that typecheck against $prg$ (2)
+\item when $s, t$ typecheck against $prg$: $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle \implies s \longrightarrow_{prg} t$ (3)
 
-and
+\item there is no infinite reduction sequence with respect to $\langle prg \rangle$ containing only terms that don't typecheck in $prg$ (4)
 
-when $s$ doesn't reduce to anything in $prg$, then there is no infinite reduction sequence starting with $\langle s \rangle$ in $prg$ (3)
-
-and
-
-when $s, t$ typecheck against $prg$: $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle \implies s \longrightarrow_{prg} t$ (4)
+\end{itemize}
 
 When one-step reduction is viewed as state transition, with $prg$ and $\langle prg \rangle$ standing for two different transition systems, the statements above describe the precise kind of their bisimilarity.
 
-Statements (1) to (3) stand for the direction from $prg$ to $\langle prg \rangle$. (1) means that every state of $prg$ has a corresponding state in $\langle prg \rangle$, but there can be internal states (intermediate in the transition). (2) guarantees that these internal states are in fact internal, that is, they have no corresponding states in $prg$. (3) accounts for the fact that internal actions might sometimes apply to a state that corresponds to one in $prg$ but not lead to another such corresponding state. This case cannot be altogether avoided by all of the transformations, but at least be made less problematic by not allowing an infinite progression of internal transitions only.
+Statements (1) and (2) stand for the direction from $prg$ to $\langle prg \rangle$. (1) means that every state of $prg$ has a corresponding state in $\langle prg \rangle$, but there can be internal states (intermediate in the transition). (2) guarantees that these internal states are in fact internal, that is, they have no corresponding states in $prg$.
 
-Statement (4) stands for the direction from $\langle prg \rangle$ to $prg$. It means that when a state in $\langle prg \rangle$ has a corresponding state in $prg$, it behaves like it, that is, when there is a transition from it to another state with a corresponding state, there also is a transition between the corresponding states.
+Statement (3) stands for the direction from $\langle prg \rangle$ to $prg$. It means that when a state in $\langle prg \rangle$ has a corresponding state in $prg$, it behaves like it, that is, when there is a transition from it to another state with a corresponding state, there also is a transition between the corresponding states.
+
+Statement (4) is about a special property of internal states: there cannot be an infinite sequence of transitions between only internal states. Especially, this accounts for the fact that internal actions might sometimes apply to a state that corresponds to one in $prg$ but not lead to another such corresponding state. This case cannot be altogether avoided by all of the transformations, but at least be made less problematic by not allowing an infinite progression of internal transitions only. This way, it can be determined in $\langle prg \rangle$, simply by going through the internal transitions and arriving at a final internal state, that the original starting state in $prg$ doesn't lead to any other state.
 
 (1) is always shown in the following way:
 
@@ -1246,7 +1245,16 @@ TODO: the other cases
 
 \end{proof}
 
-\begin{proof}[Proof of (3)] TODO
+\begin{proof}[Proof of (3)]
+
+TODO
+
+\end{proof}
+
+\begin{proof}[Proof of (4)]
+
+TODO
+
 
 \end{proof}
 
