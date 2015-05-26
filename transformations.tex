@@ -1181,7 +1181,7 @@ For step $elim\_multi\_des$, the described kind of weak bisimulation holds.
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-It will be shown: there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract\_outer\_des}$. Using Lemma 2 for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
+It will be shown: there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract\_outer\_des}$. Using Lemma 2.1 for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
 
 By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
 
@@ -1241,7 +1241,7 @@ Note that the ``Cong" case doesn't depend upon the concrete transformation. Thus
 
 \item \textbf{``Subst" case}:
 
-Lemma 2 returns the relevant sequence by leaving the sequence constructed in the rest of the proof unchanged.
+Lemma 2.1 returns the relevant sequence by leaving the sequence constructed in the rest of the proof unchanged.
 
 This sequence is constructed inductively, on the structure of $q$, starting with the original single-step sequence $s \longrightarrow_{prg} t$. In Case 1 and 2 of this induction, the sequence returned is the one from the induction hypothesis, unchanged.
 
@@ -1272,7 +1272,7 @@ with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \ran
 
 When $(q, s') \in \textrm{Rules}(prg)$, so, by the ``Subst" rule, $s \longrightarrow_{prg} t$. It remains to be shown that $(q, s') \in \textrm{Rules}(prg)$.
 
-Since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$, by Lemma 2b there is an equation $r$ of $prg$ such that $\langle r \rangle^{extract\_outer\_des}$ contains $`` q = s' "$.
+Since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$, by Lemma 2.2 there is an equation $r$ of $prg$ such that $\langle r \rangle^{extract\_outer\_des}$ contains $`` q = s' "$.
 
 \begin{itemize}
 
@@ -1316,6 +1316,18 @@ It follows that $r = `` q' = s "$, thus $(q, s') \in \textrm{Rules}(prg)$.
 The argument here is identical to that in Case 2.
 
 \end{itemize}
+
+\item \textbf{``Cong" case}:
+
+\begin{prooftree}
+\AxiomC{$s' \longrightarrow_{\langle prg \rangle} t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$}
+\end{prooftree}
+
+with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
+
+By the induction hypothesis we have $s' \longrightarrow_{prg} t'$. By applying the congruence rule we get $\mathcal{E}[s'] \longrightarrow_{prg} \mathcal{E}[t']$.
 
 \end{enumerate}
 
@@ -1390,7 +1402,7 @@ Then, since $unmix_d$ doesn't touch such function definitions, as can be seen di
 
 \item \underline{Case 2:} $`` q = s' "$ is from a mixed function definition.
 
-It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_des}$. Using Lemma 2, this gives us $s \longrightarrow^*_{prg'} t$ for $prg' = \langle \{ def \in prg | prg \textrm{ is (co)data def. or mixed function def.} \} \rangle^{extract\_helpers(extract\_des)}$. Since $prg' \subseteq \langle prg \rangle$, as can be seen directly in the definition of $unmix_d$, it follows that $s \longrightarrow^*_{\langle prg \rangle} t$.
+It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_des}$. Using Lemma 2.1, this gives us $s \longrightarrow^*_{prg'} t$ for $prg' = \langle \{ def \in prg | prg \textrm{ is (co)data def. or mixed function def.} \} \rangle^{extract\_helpers(extract\_des)}$. Since $prg' \subseteq \langle prg \rangle$, as can be seen directly in the definition of $unmix_d$, it follows that $s \longrightarrow^*_{\langle prg \rangle} t$.
 
 What follows is the proof for the above statement. From the precondition of the ``Subst" case we have that $s$ reduces to $t$ using only $`` q = s' "$. Using Lemma 3 we have the desired sequence from $s$ to $t$ using only the rules from $\langle `` q = s' " \rangle^{extract\_des}$.
 
@@ -1436,7 +1448,7 @@ For step $disentangle_d$, the described kind of weak bisimulation holds.
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_patterns}$. Using Lemma 2, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $disentangle_d = extract\_helpers(extract\_patterns)$.
+It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_patterns}$. Using Lemma 2.1, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $disentangle_d = extract\_helpers(extract\_patterns)$.
 
 \begin{itemize}
 
@@ -1515,6 +1527,56 @@ For the ``Cong" case, proceed as with $elim\_multi\_des$.
 
 \end{proof}
 
+\begin{proof}[Proof of (2)] By inspecting the proof of (1).
+
+TODO
+
+\end{proof}
+
+\begin{proof}[Proof of (3)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ ($s,t$ typecheck against $prg$)
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$\langle s \rangle =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$s \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+When $(q, s') \in \textrm{Rules}(prg)$, so, by the ``Subst" rule, $s \longrightarrow_{prg} t$. It remains to be shown that $(q, s') \in \textrm{Rules}(prg)$.
+
+Since $disentangle_d = extract\_helpers(extract\_patterns)$, by Lemma 2.2 there is an equation $r$ of $prg$ such that $\langle r \rangle^{extract\_patterns}$ contains $`` q = s' "$.
+
+\begin{itemize}
+
+\item \underline{Case 1}: $r = `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t' " $, $\exists p \in \{p_1, ..., p_n, p'_1, ..., p'_k\}: p \textrm{ is constructor application}$:
+\begin{alignat*}{3}
+&\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \rangle^{extract\_patterns} \\
+&\quad = \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{\big\langle hsig, heqn \big\rangle\} \big\rangle
+\end{alignat*}
+with $hname, hsig, heqn$ as in the definition of $extract\_patterns$. Neither of the two equations in $\langle r \rangle^{extract\_patterns}$ is $`` q = s' "$, thus this case contradicts the fact that $\langle r \rangle^{extract\_patterns}$ contains $`` q = s' "$.
+
+\item \underline{Case 2}: otherwise:
+
+It can then be seen directly in the definition of $extract\_patterns$ that $\langle r \rangle^{extract\_patterns}$ contains only $r$. Thus it must be $r = `` q = s' "$ and therefore $(q, s') \in \textrm{Rules}(prg)$.
+
+\end{itemize}
+
+\end{enumerate}
+
+For the ``Cong" case, proceed as with $elim\_multi\_des$.
+
+\end{proof}
+
+\begin{proof}[Proof of (4)]
+
+TODO
+
+\end{proof}
+
 \subsection{Unmix (refunc.)}
 
 For step $unmix_r$, the described kind of weak bisimulation holds.
@@ -1541,7 +1603,7 @@ Then, since $unmix_r$ doesn't touch such function definitions, as can be seen di
 
 \item \underline{Case 2:} $`` q = s' "$ is from a mixed function definition.
 
-It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_all\_des}$. Using Lemma 2, this gives us $s \longrightarrow^*_{prg'} t$ for $prg' = \langle \{ def \in prg | prg \textrm{ is (co)data def. or mixed function def.} \} \rangle^{extract\_helpers(extract\_all\_des)}$. Since $prg' \subseteq \langle prg \rangle$, as can be seen directly in the definition of $unmix_r$, it follows that $s \longrightarrow^*_{\langle prg \rangle} t$.
+It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_all\_des}$. Using Lemma 2.1, this gives us $s \longrightarrow^*_{prg'} t$ for $prg' = \langle \{ def \in prg | prg \textrm{ is (co)data def. or mixed function def.} \} \rangle^{extract\_helpers(extract\_all\_des)}$. Since $prg' \subseteq \langle prg \rangle$, as can be seen directly in the definition of $unmix_r$, it follows that $s \longrightarrow^*_{\langle prg \rangle} t$.
 
 What follows is the proof for the above statement. By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
 
@@ -1590,7 +1652,7 @@ For step $disentangle_r$, the described kind of weak bisimulation holds.
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-It will be shown: there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract}$. Using Lemma 2 for $e = extract$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $disentangle_r = extract\_helpers(extract)$.
+It will be shown: there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract}$. Using Lemma 2.1 for $e = extract$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $disentangle_r = extract\_helpers(extract)$.
 
 By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the number of constructor patterns appearing in $q$.
 
@@ -1710,6 +1772,81 @@ Since neither the first (as in Case 2.1) nor the second (as in Case 2.2) case of
 \end{enumerate}
 
 For the ``Cong" case, proceed as with $elim\_multi\_des$.
+
+\end{proof}
+
+\begin{proof}[Proof of (2)] By inspecting the proof of (1).
+
+TODO
+
+\end{proof}
+
+\begin{proof}[Proof of (3)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ ($s,t$ typecheck against $prg$)
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$\langle s \rangle =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$s \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+When $(q, s') \in \textrm{Rules}(prg)$, so, by the ``Subst" rule, $s \longrightarrow_{prg} t$. It remains to be shown that $(q, s') \in \textrm{Rules}(prg)$.
+
+Since $disentangle_r = extract\_helpers(extract)$, by Lemma 2.2 there is an equation $r$ of $prg$ such that $\langle r \rangle^{extract}$ contains $`` q = s' "$.
+
+\begin{itemize}
+
+\item \underline{Case 1}: $r = `` fun(p^0_1, ..., p^0_n).des_1(p'_1, ..., p'_{n_1})...des_k(p^k_1, ..., p^k_{n_k}) = t' " $, $k \geq 1$, $\exists p^j_i: p^j_i \textrm{ is constructor pattern}$:
+
+It will be shown that this case contradicts the fact that $\langle r \rangle^{extract}$ contains $`` q = s' "$. This is done by showing, by induction on the number $n_c$ of constructor patterns contained in $q'$, for any $r := `` q' = t' "$ that has the above form and any helpers set $H$ (including the empty one):
+
+$\langle r , H \rangle^{extract}$ doesn't contain $`` q = s' "$ unless it is already within $H$
+
+\begin{enumerate}
+
+\item $n_c = 1$:
+\begin{equation*}
+\langle `` q' = t' ", H \rangle^{extract} = \langle `` q'^{-con} = hname (q'^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract}
+\end{equation*}
+with $hname, hsig, heqn$ as in the definition of $extract$. Since $q'$ contains only one constructor pattern, $q'^{-con}$ contains no constructor pattern. It follows that:
+\begin{equation*}
+\langle `` q' = t' ", H \rangle^{extract} = \big\langle `` q'^{-con} = hname (q'^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle
+\end{equation*}
+ Neither of the two equations outside of $H$ in $\langle r, H \rangle^{extract}$ is $`` q = s' "$, since they both contain function names not present in $prg$.
+
+\item $n_c = n'_c + 1$, $n'_c \geq 0$:
+\begin{equation*}
+\langle `` q' = t' ", H \rangle^{extract} = \langle `` q'^{-con} = hname (q'^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract}
+\end{equation*}
+with $hname, hsig, heqn$ as in the definition of $extract$. Since $q'^{-con}$ contains one less constructor pattern than $q'$, it contains $n'_c$ such patterns. Applying the induction hypothesis we have that $\langle r, H \rangle^{extract}$ doesn't contain $`` q = s' "$ outside of $\{ \big\langle hsig, heqn \big\rangle \} \cup H$. The only remaining equation outside of $H$ that could be $`` q = s' "$ is defined by $heqn$ to contain a function name not present in $prg$. Thus this equation can't be $`` q = s' "$, either.
+
+\end{enumerate}
+
+\item \underline{Case 2}:  $r = `` fun(con(p^0_1, ..., p^0_k), p^1_1, ..., p^1_n) = t' " $, $\exists p^j_i: p^j_i \textrm{ is constructor pattern}$:
+
+This case can be shown analogously to Case 1, by using instead this other form of $r$ and the respective analogues $q^{-con'}, q^{-con'}_{vars^+}$ etc. in the places of $q^{-con}, q^{-con}_{vars^+}$ etc.
+
+\item \underline{Case 3}: otherwise:
+\begin{equation*}
+\langle r \rangle^{extract} = \big\langle r \big\rangle
+\end{equation*}
+Thus it must be $r = `` q = s' "$ and therefore $(q, s') \in \textrm{Rules}(prg)$.
+
+\end{itemize}
+
+\end{enumerate}
+
+For the ``Cong" case, proceed as with $elim\_multi\_des$.
+
+\end{proof}
+
+\begin{proof}[Proof of (4)]
+
+TODO
 
 \end{proof}
 
