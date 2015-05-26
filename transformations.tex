@@ -471,6 +471,12 @@ $s, t ::= x ~ | ~ fun(t^*) ~ | ~ con(t^*) ~ | ~ s.des(t^*)$\\
 
 A fragment will be defined by giving the respective EBNF rule for $fdef$, which stands for function definitions.
 
+The entire language Uroboro is defined by giving the following rule for $fdef$:\\
+$fdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } eqn^*$\\
+$eqn ::= q = t$\\
+$q ::= fun(p^*) ~ | ~ q.des(p^*)$\\
+$p ::= x ~ | ~ con(p^*) $\\
+
 \subsection{Fragments for defunc.}
 
 This subsection gives the relevant input fragments for the defunctionalization steps. The domain for the first step, $elim\_multi\_des$, is simply the set of all Uroboro programs. Thus the entire defunc. transformation is indeed applicable to any Uroboro program.
@@ -681,7 +687,7 @@ $t =^? q \searrow \sigma$ means that term $t$ matches copattern $q$ returning su
 \BinaryInfC{$t.des(t_1, ...t_n) =^? q.des(p_1, ..., p_n) \searrow \sigma, \sigma_1, ..., \sigma_n$}
 \end{prooftree}
 
-$\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction uses the evaluation context $\mathcal{E}$ given below, which in turn requires the syntax of the complete Uroboro (TODO: Define this like its fragments in section 5). 
+$\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction uses the evaluation context $\mathcal{E}$ given below, which in turn requires the syntax of the complete Uroboro. 
 
 \begin{alignat*}{2}
 & v  = &&\textrm{value, that is } \vdash_v v \\
