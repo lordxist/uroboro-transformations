@@ -875,7 +875,7 @@ then there is a reduction sequence from $s$ to $t$ with respect to $\langle r, H
 
 \item \underline{Case 1}: There exists a reduction sequence from $s$ to $t$ with respect to $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$.
 
-It is $\langle r, H \rangle^{extract\_des} = \big\langle r', H' \cup H \big\rangle$ for some (possibly empty) helpers set H' and some (possibly equal to r) equation r'. Thus the equations in this result are a superset of those within $H$. Since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the reduction sequence that exists with respect to the equations within H exists also with respect to this superset.
+It is $\langle r, H \rangle^{extract\_des} = \big\langle r', H' \cup H \big\rangle$ for some (possibly empty) helpers set H' and some (possibly equal to r) equation r'. Thus the equations in this result are a superset of those within $H$. Since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), there also exists a reduction sequence from $s$ to $t$ with respect to this superset.
 
 \item \underline{Case 2}: The reduction sequence from $s$ to $t$ depends upon the equation $r$. It therefore contains at least one reduction step where the derivation contains an application of the ``Subst" rule for $r$.
 
