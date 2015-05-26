@@ -834,21 +834,29 @@ Let $\mathcal{D}$ be a derivation of $t =^? q \searrow \sigma$.
 
 \end{lemma}
 
-\begin{lemma} Let $e$ be a helper extraction function, i.e. a function that can be an argument of $extract\_helpers$ as defined in section 1. For any program $prg$ and any two closed terms $s,t$ with $s =^? q \searrow \sigma$, $s'[\sigma] = t$ for a rule $(q, s') \in \textrm{Rules}(prg)$ it holds that:
+\begin{lemma}
 
-If $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is a reduction sequence from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$,
+Let $e$ be a helper extraction function, i.e., a function that can be an argument of $extract\_helpers$ as defined in section 1. For any program $prg$ and any two closed terms $s,t$ it holds that:
+
+\begin{enumerate}
+
+\item If $s =^? q \searrow \sigma$, $s'[\sigma] = t$ for a rule $(q, s') \in \textrm{Rules}(prg)$ and $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is a reduction sequence from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$,
 
 then $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
 
-%%-- under construction
-
-If for a rule $(q, s') \in \textrm{Rules}(\langle prg \rangle^{extract\_helpers(e)})$ it holds that $s =^? q \searrow \sigma$, $s'[\sigma] = t$,
+\item If for a rule $(q, s') \in \textrm{Rules}(\langle prg \rangle^{extract\_helpers(e)})$ it holds that $s =^? q \searrow \sigma$, $s'[\sigma] = t$,
 
 then there is an equation $r$ in the equations of $prg$ such that $\langle r \rangle^e$ contains $`` q = s' "$.
 
-%%--
+\end{enumerate}
 
-\begin{proof} Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. Thus there is a reduction sequence from $s$ to $t$ with respect to the equations of the transformed program: $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
+\begin{proof} ~
+\begin{enumerate}
+\item Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. Thus there is a reduction sequence from $s$ to $t$ with respect to the equations of the transformed program: $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
+
+\item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
+
+\end{enumerate}
 \end{proof}
 
 \end{lemma}
