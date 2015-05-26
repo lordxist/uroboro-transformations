@@ -698,13 +698,12 @@ $\longrightarrow$ is the one-step reduction relation for closed terms, which is 
 \UnaryInfC{$\mathcal{E}[t] \longrightarrow \mathcal{E}[t']$}
 \end{prooftree}
 
+if the immediate subterms of $t$ are values:
 \begin{prooftree}
 \AxiomC{$t =^? q \searrow \sigma$ with $(q, t') \in \textrm{Rules}(prg)$}
 \RightLabel{Subst}
 \UnaryInfC{$t \longrightarrow t'[\sigma]$}
 \end{prooftree}
-
-where the following holds: If $t = fun(t_1, ..., t_n)$ or $t = con(t_1, ..., t_n)$, then $\vdash_v t_i$ for $i = 1,...,n$. If $t = t_0.des(t_1, ..., t_n)$, then $\vdash_v t_i$ for $i = 0,1,...,n$.
 
 Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
 
