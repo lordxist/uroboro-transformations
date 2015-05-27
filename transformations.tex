@@ -863,19 +863,126 @@ then there is an equation $r$ in the equations of $prg$ such that $\langle r \ra
 
 \end{lemma}
 
+%%-- under construction
+
 \begin{lemma}
 
-If there is a reduction sequence from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$ for a pair $\big\langle r, H \big\rangle$,
+If there is a reduction $s \longrightarrow_{prg} t$, for a program $prg$ and $s,t$ well-typed with respect to $prg$, that, in its derivation, uses only an equation $r$ of $prg$,
 
-then there is a reduction sequence from $s$ to $t$ with respect to $\langle r, H \rangle^{extract\_des}$.
+then there is a reduction sequence $s \longrightarrow^*_{prg'} t$ for some $prg'$ that contains only the equations in $\langle r, H \rangle^{extract\_des}_{prg}$.
+
+\begin{proof} Let $r := `` q' = s' "$. If $q'$ is hole pattern, it is
+\begin{equation*}
+\langle r \rangle^{extract\_des} = \big\langle r, \emptyset \big\rangle
+\end{equation*}
+The only equation in the result is $r$; we already have a reduction $s \longrightarrow_{prg} t$ that uses only $r$. For a program $prg'$ that contains only $r$ it still holds that $s \longrightarrow_{prg'} t$. This is because all equations necessary for the ``Subst" step in the derivation are present in $prg'$, and the removal of equations doesn't affect positive value judgements.
+
+Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$. It is thus
+\begin{equation*}
+\langle r \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \big\rangle
+\end{equation*}
+with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. Especially it is $heqn = `` q_h = s' "$, with $q_h$ defined as $hname(\langle q \rangle^{vars}).des(p_1, ..., p_k)$. A sequence $s \longrightarrow^*_{prg'} t$, for a program $prg'$ that contains only the two equations in this result and the same data and codata definitions as $prg$, can be constructed for any reduction $s \longrightarrow_{prg} t$ by induction on the structure of its derivation.
+
+\begin{enumerate}
+
+\item \textbf{``Subst" case}:
+
+By inversion, we have a derivation of $s \longrightarrow_{prg} t$ that looks as follows:
+
+\begin{prooftree}
+\AxiomC{$s^{0} =^? q \searrow \sigma_0$}
+\AxiomC{$s^{1} =^? p_1 \searrow \sigma_1$}
+\AxiomC{...}
+\AxiomC{$s^{k} =^? p_k \searrow \sigma_k$}
+\RightLabel{\scriptsize PM\textsubscript{Des}}
+\QuaternaryInfC{$s =^? q' \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $(q', s')$}
+\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+Here it is $s = s^{0}.des(s^{1}, ..., s^{k})$, $\sigma = \sigma_0, ..., \sigma_k$ and $s'[\sigma] = t$.
+
+We also know that $s^{0}, s^1, ..., s^k$, as subterms of $s$, are values with respect to the equations of $prg$.
+
+Let $t_h := hname(\langle q \rangle^{vars})[\sigma_0]$. The desired sequence consists of the following steps:
+\begin{equation*}
+s \longrightarrow t_h.des(s^{1}, ..., s^{k}) \longrightarrow^* t_h.des(s^{1}_v, ..., s^{k}_v) \longrightarrow t
+\end{equation*}
+The derivations for the first and the last step are given below, in order. The intermediate steps are necessary to reduce every $s^i$ that is not a value with respect to $prg'$ to such a value $s^i_v$. The derivation for each such step will be given further below.
+
+\begin{prooftree}
+\AxiomC{$s^{0} =^? q \searrow \sigma_0$}
+\RightLabel{\scriptsize Subst with $(q, `` hname(\langle q \rangle^{vars}) ")$}
+\UnaryInfC{$s^0 \longrightarrow hname(\langle q \rangle^{vars})[\sigma_0]$}
+\RightLabel{\scriptsize Cong}
+\UnaryInfC{$s \longrightarrow hname(\langle q \rangle^{vars})[\sigma_0].des(s^1, ..., s^k)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$hname(\langle q \rangle^{vars})[\sigma_0] =^? hname(\langle q \rangle^{vars}) \searrow \sigma_0$}
+\AxiomC{$s^{1}_v =^? p_1 \searrow \sigma_1$}
+\AxiomC{...}
+\AxiomC{$s^{k}_v =^? p_k \searrow \sigma_k$}
+\RightLabel{\scriptsize PM\textsubscript{Des}}
+\QuaternaryInfC{$hname(\langle q \rangle^{vars})[\sigma_0].des(s^1_v, ..., s^k_v) =^? q_h \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $(q_h, s')$}
+\UnaryInfC{$hname(\langle q \rangle^{vars})[\sigma_0].des(s^1_v, ..., s^k_v) \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+It needs to be shown that $s^{i}_v =^? p_i \searrow \sigma_i$ for $i = 1, ..., k$, which will be done below when the intermediate steps are derived.
+
+For these two derivations, what also needs to be shown is the value judgement, with respect to $prg'$, for several terms used in derivation steps which require them to be values. For each such term, it suffices to show that it matches neither against $q$ nor against $q_h$, as those are the only two left-hand sides in $prg'$.
+
+\begin{itemize}
+
+\item immediate subterms of $s^0$: These terms cannot match against $q$ because $s^0$ already matches against $q$. They can also not match against $q_h$ because then they wouldn't typecheck against $prg$ (as subterms of $s$) in the first place, as $prg$ doesn't contain the function name of $q_h$.
+
+\item $hname(\langle q \rangle^{vars})[\sigma_0]$: This term cannot match against $q$ because its function name is different from any function name in $prg$. It also cannot match against $q_h$ because $q_h$ is a destructor pattern while the term is not a destructor call.
+
+\end{itemize}
+
+Finally, what remains are the derivations for the intermediate steps. Let $I \subseteq \{1, ..., k\}$ be the set of indices $i$ for which $s^i$ is not a value with respect to $prg'$. Also, set $s^j_v = s^j$ for every $j \in I$. For each $j \in I$, the intermediate step
+\begin{equation*}
+t_h.des(s^{1}_v, ..., s^{j-1}_v, s^j, s^{j+1}, ...,  s^{k}) \longrightarrow t_h.des(s^{1}_v, ..., s^{j-1}_v, s^j_v, s^{j+1}, ...,  s^{k})
+\end{equation*}
+can be derived as follows:
+
+\begin{prooftree}
+\AxiomC{$s^j =^? q \searrow \sigma'$}
+\RightLabel{\scriptsize Subst with $(q, `` hname(\langle q \rangle^{vars}) ")$}
+\UnaryInfC{$t_h.des(s^{1}_v, ..., s^{j-1}_v, s^j, s^{j+1}, ...,  s^{k}) \longrightarrow t_h.des(s^{1}_v, ..., s^{j-1}_v, s^j_v, s^{j+1}, ...,  s^{k})$}
+\end{prooftree}
+
+$s^j =^? q \searrow \sigma'$ holds because if $s^j$ is not a value with respect to $prg'$, it has to match one of its left-hand sides. It can't match $q_h$ because then it wouldn't typecheck against $prg$, as $prg$ doesn't contain the function name of $q_h$.
+
+As seen in the derivation, $s^j_v = `` hname(\langle q \rangle^{vars})  "[\sigma']$. As is the case with $hname(\langle q \rangle^{vars})[\sigma_0]$, this term is a value with respect to $prg'$.
+
+TODO: $s^j_v$ and $s^j$, albeit being different represent the same object. This ``sameness" has to be formalized.
+
+
+\end{enumerate}
+
+\end{proof}
+
+\end{lemma}
+
+%%--
+
+\begin{lemma}
+
+If there is a reduction sequence $s \longrightarrow^*_{prg} t$, for a program $prg$ and $s,t$ well-typed with respect to $prg$, that, in its derivation, uses only the equations in $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$ for a pair $\big\langle r, H \big\rangle$ with the equations within this pair appearing in $prg$,
+
+then there is a reduction sequence $s \longrightarrow^*_{prg'} t$ for some $prg'$ that contains only the equations in $\langle r, H \rangle^{extract\_des}_{prg}$. (TODO: explain this notation along with the first bullet point of section 1)
 
 \begin{proof}
 
 \begin{itemize}
 
-\item \underline{Case 1}: There exists a reduction sequence from $s$ to $t$ with respect to $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$.
+\item \underline{Case 1}: The given reduction sequence $s \longrightarrow_{prg} t$ uses, in its derivation, only the equations in $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$.
 
-It is $\langle r, H \rangle^{extract\_des} = \big\langle r', H' \cup H \big\rangle$ for some (possibly empty) helpers set H' and some (possibly equal to r) equation r'. Thus the equations in this result are a superset of those within $H$. Since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), there also exists a reduction sequence from $s$ to $t$ with respect to this superset.
+It is $\langle r, H \rangle^{extract\_des} = \big\langle r', H' \cup H \big\rangle$ for some (possibly empty) helpers set $H'$ and some (possibly equal to $r$) equation $r'$. It will be shown that every reduction step in the sequence is still possible after adding the equations in $H' \cup \{ r' \}$.
+
+ Thus the equations in this result are a superset of those within $H$. Since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), there also exists a reduction sequence from $s$ to $t$ with respect to this superset.
 
 \item \underline{Case 2}: The reduction sequence from $s$ to $t$ depends upon the equation $r$. It therefore contains at least one reduction step where the derivation contains an application of the ``Subst" rule for $r$.
 
@@ -885,13 +992,15 @@ $t_1 \longrightarrow t_2 \longrightarrow ... \longrightarrow t_{n-1} \longrighta
 
 with $t_1 = s$, $t_n = t$.
 
-In the case where $\langle r, H \rangle^{extract\_des} = \big\langle r, H \big\rangle$, that is, $q'$ is hole pattern, the resulting equations have not changed and thus a reduction sequence trivially exists with respect to them: It is the same sequence as given above.
+In the case where $\langle r, H \rangle^{extract\_des} = \big\langle r, H \big\rangle$, that is, $q'$ is hole pattern, the resulting equations have not changed and thus a reduction sequence  exists with respect to $prg$ that uses only them in its derivation: It is the same sequence as given above. For a program $prg'$ that contains only these actually used equations it still holds that $s \longrightarrow_{prg'} t$. This is because all equations necessary for ``Subst" steps in the derivation are present in $prg'$, and the removal of equations doesn't affect positive value judgements.
 
-Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$, and thus $\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle$, with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. Especially it is $heqn = `` q_h = s' "$, with $q_h$ defined as $hname(\langle q \rangle^{vars}).des(p_1, ..., p_k)$. The sequence with respect to the equations in this result can be constructed as follows:
+Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$, and thus $\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle$, with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. Especially it is $heqn = `` q_h = s' "$, with $q_h$ defined as $hname(\langle q \rangle^{vars}).des(p_1, ..., p_k)$. The sequence with respect to a program $prg'$ that contains only the equations in this result can be constructed as follows:
 
 \begin{enumerate}
 
-\item Let $I \subseteq \{1, ..., n - 1\}$ be the set of indices $j$ where $t_j \longrightarrow t_{j+1}$ contains an application of the ``Subst" rule for $r$. For all indices $k \not\in I$, $t_k \longrightarrow t_{k+1}$ is with respect to the equations within $H$.
+\item Let $I \subseteq \{1, ..., n - 1\}$ be the set of indices $j$ where $t_j \longrightarrow t_{j+1}$ contains an application of the ``Subst" rule for $r$.
+
+For all indices $k \not\in I$, $t_k \longrightarrow t_{k+1}$ uses only an equation within $H$. These reduction steps can be taken over unchanged, because positive value judgements for subterms of $t_k$ aren't affected by the two other equations in $\langle r, H \rangle^{extract\_des}$. This is because (a) the left-hand side $q_h$ of $heqn$ has a fresh (in $prg$) function name that is not contained in these subterms, which typecheck against $prg$, and (b) the left-hand side $q$ of the other equation has the same function name as the left-hand side $q'$ of $r$: If such a subterm matched $q'$, then $t_k$ wouldn't match any left-hand side of $H$.
 
 \item Without loss of generality, let there be only one application of the ``Subst" rule for $r$ in the derivation. When there is more than one such application, simply repeat this construction until they are all dealt with. For a $j \in I$, by inversion, we know the derivation of $t_j \longrightarrow t_{j+1}$ looks as follows:
 
@@ -908,7 +1017,7 @@ Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$, and thus $\langle 
 \UnaryInfC{$t_j \longrightarrow t_{j+1}$}
 \end{prooftree}
 
-with $\sigma = \sigma_0, \sigma_1, ..., \sigma_k$, for some intermediate derivation $\mathcal{D'}$ and a subterm $t^0_j$ of $t_j$. By inversion, we know that $t^0_j = t'^0_j.des(t^{1,1}_j, ..., t^{1,k}_j)$.
+with $\sigma = \sigma_0, \sigma_1, ..., \sigma_k$, for some intermediate derivation $\mathcal{D'}$ and a subterm $t^0_j$ of $t_j$. By inversion, we know that $t^0_j = t'^0_j.des(t^{1,1}_j, ..., t^{1,k}_j)$, where $t'^0_j$ is a value with respect to $prg$. Again, by inversion (TODO: prove inversion for values) we have that every immediate subterm of $t'^0_j$ is a value as well. The removal of equations doesn't change a positive value judgement, thus it is also a value with respect to a program that contains just the equations within $H$. The positive value judgement for any immediate subterm of $t'^0_j$ still holds when adding the other two equations in $\langle r, H \rangle^{extract\_des}$ to get $prg'$. This is because (a) the left-hand side of the first, $q$, is already matched by $t'^0_j$ and therefore can't be matched by any of its proper subterms, and (b) the left-hand side of the second, $q_h$, can't be matched by any subterm of $t'^0_j$, since the function name of $q_h$ doesn't appear in $prg$ (is a fresh name) and $t'^0_j$ is well-typed with respect to $prg$.
 
 \item In the original sequence above, for every $j \in I$, replace $t_j \longrightarrow t_{j+1}$ with the two reduction steps $t_j \longrightarrow t'_j$, $t'_j \longrightarrow t_{j+1}$, in this order, with the following derivations:
 
@@ -917,7 +1026,7 @@ Derivation for $t_j \longrightarrow t'_j$:
 \AxiomC{$t'^0_j =^? q \searrow \sigma_0$}
 \RightLabel{\scriptsize Subst with $(q, `` hname(\langle q \rangle^{vars}) ")$}
 \UnaryInfC{$t'^0_j \longrightarrow `` hname(\langle q \rangle^{vars}) "[\sigma_0]$}
-\RightLabel{\scriptsize $\longrightarrow$\textsubscript{Des\textsubscript{P}}}
+\RightLabel{\scriptsize Cong}
 \UnaryInfC{$t^0_j \longrightarrow t_h$}
 \UnaryInfC{$\mathcal{D'}_1$}
 \UnaryInfC{$t_j \longrightarrow t'_j$}
@@ -946,6 +1055,52 @@ Derivation for $t'_j \longrightarrow t_{j+1}$:
 where $\mathcal{D'}_2$ is $\mathcal{D'}$ where all the occurrences of $t^0_j$ that stem from its reduction by substitution to $s'[\sigma]$ are replaced by $t_h$.
 
 \end{enumerate}
+
+\end{itemize}
+
+\end{proof}
+
+\end{lemma}
+
+\begin{lemma}
+
+For any set of rules $R$ and any rule $r$:
+
+If there is a reduction sequence from $s$ to $t$ with respect to the rules in $R$,
+
+there also exists a reduction sequence from $s$ to $t$ with respect to the rules $R \cup \{ r \}$.
+
+\begin{proof}
+
+Let
+\begin{equation*}
+s_0 \longrightarrow s_1 \longrightarrow ... \longrightarrow s_n
+\end{equation*}
+with $s_0 = s, s_n = t$ be the given reduction sequence from $s$ to $t$ with respect to $R$. 
+The sequence from $s$ to $t$ with respect to $R \cup \{ r \}$ will be constructed by constructing a sequence from $s_i$ to $s_{i+1}$ with respect to $R \cup \{ r \}$, for $i = 0, ..., n-1$. The following cases for the original one-step reduction from $s_i$ to $s_{i+1}$ with respect to $R$ can be distinguished:
+
+\begin{itemize}
+
+\item \underline{Case 1}: $s_i \longrightarrow s_{i+1}$ is the result of applying the ``Subst" rule:
+
+This means that the immediate subterms of $s_i$ are values with respect to the rules in $R$.
+
+\begin{itemize}
+
+\item \underline{Case 1.1}: The immediate subterms of $s_i$ are still values with respect to the rules in $R \cup \{ r \}$:
+
+Then the ``Subst" rule can be applied to $s_i$ with respect to the rules in $R \cup \{ r \}$ as well, yielding the same reduction $s_i \longrightarrow s_{i+1}$.
+
+\item \underline{Case 1.2}: There are immediate subterms of $s_i$ that aren't values with respect to the rules in $R \cup \{ r \}$:
+
+Without loss of generality, let there be only one such subterm $s'_i$. For the others, the following construction can be repeated.
+
+Replace the reduction sequence from $s_i$ to $s_{i+1}$ with a sequence constructed as follows: Reduce $s'_i$ as far as possible, to the result $s''_i$, after each reduction step applying the ``Cong" rule to obtain the corresponding reduction step for the reduction starting with $s_i$. Call the result of this last reduction $s_{i'}$.
+
+Now, suppose that $s'_i$ neither has codata type nor is a constructor call. Then, by the rules of the value judgement, it cannot be a value, even with respect to $R$. Thus $s'_i$ is either a constructor call or has codata type.
+
+When it has codata type, so has $s''_i$, and, since this can't be reduced further by the rules in $R \cup \{ r \}$, it is a value with respect to this set. But, since $s'_i$ was the only non-value immediate subterm of $s_i$ and it has been reduced to $s''_i$ within $s_i$ with result $s_{i'}$, $s_{i'}$ has no immediate non-value subterm. It follows that it can be reduced by the ``Subst" rule when it matches a rule. It can be shown by induction on the length of the reduction sequence from $s_i$ to $s_{i'}$ that $s_{i'}$ matches the same rule that 
+\end{itemize}
 
 \end{itemize}
 
@@ -1183,9 +1338,9 @@ For step $elim\_multi\_des$, the described kind of weak bisimulation holds.
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-It will be shown: there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract\_outer\_des}$. Using Lemma 2.1 for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
+It will be shown: there exists a reduction sequence $s \longrightarrow_{prg'} t$ for some $prg'$ that contains only the equations within $\langle `` q = s' " \rangle^{extract\_outer\_des}$. Using Lemma 2.1 for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
 
-By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
+By the condition of the ``Subst" case, we have a one-step reduction sequence $s \longrightarrow_{prg} t$ that uses only $`` q = s' "$. Therefore, and by setting $H = \emptyset$, the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
 
 If there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also exists such a reduction sequence with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_outer\_des}$.
 
@@ -1607,7 +1762,7 @@ Then, since $unmix_r$ doesn't touch such function definitions, as can be seen di
 
 It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_all\_des}$. Using Lemma 2.1, this gives us $s \longrightarrow^*_{prg'} t$ for $prg' = \langle \{ def \in prg | prg \textrm{ is (co)data def. or mixed function def.} \} \rangle^{extract\_helpers(extract\_all\_des)}$. Since $prg' \subseteq \langle prg \rangle$, as can be seen directly in the definition of $unmix_r$, it follows that $s \longrightarrow^*_{\langle prg \rangle} t$.
 
-What follows is the proof for the above statement. By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
+What follows is the proof for the above statement. By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and by setting $H = \emptyset$, the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the structure of $q$:
 
 If there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also exists such a reduction sequence with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_all\_des}$.
 
@@ -1656,7 +1811,7 @@ with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\
 
 It will be shown: there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\langle `` q = s' " \rangle^{extract}$. Using Lemma 2.1 for $e = extract$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $disentangle_r = extract\_helpers(extract)$.
 
-By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and since the addition of rules preserves the existence of a reduction sequence (TODO: prove lemma for this), the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the number of constructor patterns appearing in $q$.
+By the condition of the ``Subst" case, we have a one-step reduction sequence from $s$ to $t$ with respect to $`` q = s' "$. Therefore, and by setting $H = \emptyset$, the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and helpers sets $H$, which will be proved by induction on the number of constructor patterns appearing in $q$.
 
 If there exists a reduction sequence from $s$ to $t$ with respect to the equations within $\big\langle `` q = s' ", H \big\rangle$, there also exists such a reduction sequence with respect to the equations within $\langle `` q = s' ", H \rangle^{extract}$.
 
