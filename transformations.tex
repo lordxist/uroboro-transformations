@@ -33,6 +33,7 @@
 
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage{amssymb}
 \usepackage{listings}
 \usepackage{bussproofs}
 \usepackage{fixltx2e}
@@ -836,34 +837,71 @@ Let $\mathcal{D}$ be a derivation of $t =^? q \searrow \sigma$.
 
 \end{lemma}
 
+%%-- old version of lemma 2
+%\begin{lemma}
+%
+%Let $e$ be a helper extraction function, i.e., a function that can be an argument of $extract\_helpers$ as defined in section 1. For any program $prg$ and any two closed terms $s,t$ it holds that:
+%
+%\begin{enumerate}
+%
+%\item If $s =^? q \searrow \sigma$, $s'[\sigma] = t$ for a rule $(q, s') \in \textrm{Rules}(prg)$ and $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is a reduction sequence from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$,
+%
+%then $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
+%
+%\item If for a rule $(q, s') \in \textrm{Rules}(\langle prg \rangle^{extract\_helpers(e)})$ it holds that $s =^? q \searrow \sigma$, $s'[\sigma] = t$,
+%
+%then there is an equation $r$ in the equations of $prg$ such that $\langle r \rangle^e$ contains $`` q = s' "$.
+%
+%\end{enumerate}
+%
+%\begin{proof} ~
+%\begin{enumerate}
+%\item Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. Thus there is a reduction sequence from $s$ to $t$ with respect to the equations of the transformed program: $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
+%
+%\item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
+%
+%\end{enumerate}
+%\end{proof}
+%
+%\end{lemma}
+%%--
+
+%%-- under construction
+
 \begin{lemma}
 
-Let $e$ be a helper extraction function, i.e., a function that can be an argument of $extract\_helpers$ as defined in section 1. For any program $prg$ and any two closed terms $s,t$ it holds that:
+Let $e$ be a helper extraction function, i.e., a function that can be an argument of $extract\_helpers$ as defined in section 1, and let $prg$ be a deterministic program (TODO: define this as not containing any two rules which both match the same term). Let this $e$ satisfy the following conditions for every equation $r := `` q_r = t_r "$ of $prg$, with $\langle r \rangle^e = \big\langle r', H \big\rangle$ and $r' := `` q_{r'} = t_{r'} "$:
 
-\begin{enumerate}
+TODO: move these properties into a definition (for extraction functions)
 
-\item If $s =^? q \searrow \sigma$, $s'[\sigma] = t$ for a rule $(q, s') \in \textrm{Rules}(prg)$ and $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is a reduction sequence from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$,
+\begin{itemize}
+\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$) (Note/TODO: terms and copatterns are conflated for some $\sim$ properties, note this somewhere)
 
-then $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
+\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
 
-\item If for a rule $(q, s') \in \textrm{Rules}(\langle prg \rangle^{extract\_helpers(e)})$ it holds that $s =^? q \searrow \sigma$, $s'[\sigma] = t$,
+\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
 
-then there is an equation $r$ in the equations of $prg$ such that $\langle r \rangle^e$ contains $`` q = s' "$.
+\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
 
-\end{enumerate}
+\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+\end{itemize}
+For any two closed terms $s,t$ it holds that:
 
-\begin{proof} ~
-\begin{enumerate}
-\item Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. Thus there is a reduction sequence from $s$ to $t$ with respect to the equations of the transformed program: $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
+If $s =^? q_r \searrow \sigma$, $t_r[\sigma] = t$ for some equation $r := `` q_r = t_r "$ of $prg$, and the (immediate) subterms of $s$ are values in $prg$,
 
-\item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
+then $s \longrightarrow^*_{\langle prg \rangle^{extract\_helpers(e)}} t'$ for a $t'$ with $t' \sim t$.
 
-\end{enumerate}
+\begin{proof}
+
+As we can see in the definition of $extract\_helpers$, the transformed program contains the equations within $\langle r \rangle^e = \big\langle r', H \big\rangle$, because $prg$ contains $r$. The desired sequence can be constructed as follows.
+
+First the (immediate) subterms of $s$ need to be reduced to values in $\langle prg \rangle^{extract\_helpers(e)}$; let the result of the reduction be $s'$. This has to happen in such a way that $s \sim s'$ holds. In fact, the result of each step of the reduction is equivalent to $s$.
+
+After that, $s'$ is reduced in one step to a result $t'$ with $t' \sim t$. This step is derived by applying the ``Subst" rule for the equation $`` q_h = t_h "$ for which $q_r \sim q_h$ and $t_r \sim t_h$ holds.
+
 \end{proof}
 
 \end{lemma}
-
-%%-- under construction
 
 \begin{lemma}
 
@@ -1310,41 +1348,81 @@ For step $elim\_multi\_des$, the described kind of weak bisimulation holds.
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-It will be shown: there exists a reduction sequence $s \longrightarrow^*_{prg'} t$ for some $prg'$ that contains only the equations within $\langle `` q = s' " \rangle^{extract\_outer\_des}$. Using Lemma 2.1 for $e = extract\_outer\_des$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
+It will be shown that $extract\_outer\_des$ fulfils the extraction function properties as given in Lemma 2. Using Lemma 2 for $e = extract\_outer\_des$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t'$ for a $t' \sim t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
 
-By the condition of the ``Subst" case, we have a one-step reduction sequence $s \longrightarrow_{prg} t$ that uses only $`` q = s' "$. Therefore, by setting $H = \emptyset$ and since the removal of rules doesn't change a positive value judgement, the existence of the reduction sequence follows from the following statement for arbitrary copatterns $q$, terms $s'$, closed terms $s,t$, and some helpers set $H$, which will be proved by induction on the structure of $q$:
-
-If there exists a reduction sequence $s \longrightarrow^*_{prg'} t$ that in its derivation uses only $`` q = s' "$ and $H$, with $prg'$ a program with these as the only equations, there also exists such a reduction sequence with respect to the equations within $\langle `` q = s' ", H \rangle^{extract\_outer\_des}$.
-
-Proof by induction:
+It is now proved that, for each equation $`` q_r = t_r "$ with $\langle `` q_r = t_r " \rangle^{extract\_outer\_des} = \big\langle `` q_{r'} = t_{r'} ", H \big\rangle$, the extraction function properties hold. This is done by induction on the structure of $q_r$.
 
 \begin{itemize}
 
-\item \underline{Case 1}: $q$ is hole pattern:
-
-$\langle `` q = s' ", H \rangle^{extract\_outer\_des} = \big\langle `` q = s' ", H \big\rangle$
-
-Thus the only resulting equations are the same as the original, for which we already know that the desired reduction sequence exists.
-
-\item \underline{Case 2}: $q = q'.des(p_1, ..., p_k)$, $q'$ is hole pattern:
-
-The argument is identical to that in Case 1.
-
-\item \underline{Case 3}: $q = q'.des(p_1, ..., p_k)$, $q'$ is destructor pattern:
-
-$\langle `` q = s' " \rangle^{extract\_outer\_des} = \langle \langle `` q = s' " \rangle^{extract\_des} \rangle^{extract\_outer\_des}$
-
-There is a reduction sequence that uses only $`` q = s' "$ and $H$, let this sequence be:
+\item \underline{Case 1}: $q_r$ is hole pattern, or: $q_r = q'_r.des(p_1, ..., p_k)$, $q'_r$ is hole pattern.
 \begin{equation*}
-s_0 \longrightarrow_{prg'} s_1 \longrightarrow_{prg'} ... \longrightarrow_{prg'} s_{n-1} \longrightarrow_{prg'} s_n
+\langle `` q_r = t_r " \rangle^{extract\_outer\_des} = \big\langle `` q_r = t_r ", \emptyset \big\rangle
 \end{equation*}
-with $s = s_0, s_n = t$. It is clear that each of these reduction steps can only use $`` q = s' "$ and $H$. By Lemma 3, for each of these steps there is a reduction sequence $s_i \longrightarrow^*_{prg''} s_{i+1}$ that uses only the equations $\langle `` q = s' ", H \rangle^{extract\_des}$, with $prg''$ a program with only these equations. It follows that there is also such a sequence $s \longrightarrow^*_{prg''} t$.
+Each extraction function property is now listed along with a proof for it in this case.
 
-From the definition of $extract\_des$ we have that:
+\begin{enumerate}
+\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$) (Note/TODO: terms and copatterns are conflated for some $\sim$ properties, note this somewhere)
 
-$\langle `` q = s' ", H \rangle^{extract\_des} = \langle `` q'.des(p_1, ..., p_k) = s' " \rangle^{extract\_des} = \big\langle `` q' = t_h ", H' \big\rangle$ for some term $t_h$ and some helpers set $H' \supset H$. 
+Proof: It is $H = \emptyset$ and thus the property is trivially fulfilled.
 
-We thus have a reduction sequence from $s$ to $t$ with respect to the equations within $\big\langle `` q' = t_h ", H' \big\rangle$. By the induction hypothesis, applied to $q'$, we have the desired reduction sequence.
+\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
+
+Proof: Trivially true, since $H = \emptyset$.
+
+\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
+
+Proof: By the definition of $extract\_outer\_des$ (as given above) it is $r = r'$ and $H = \emptyset$.
+
+\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
+
+Proof: Clear since there is only one equation.
+
+\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+
+Proof: Trivially true, because $H = \emptyset$.
+
+\end{enumerate}
+
+\item \underline{Case 2}: $q_r = q'_r.des(p_1, ..., p_k)$, $q'_r$ is destructor pattern.
+\begin{equation*}
+\langle `` q_r = t_r " \rangle^{extract\_outer\_des} = \langle \langle `` q_r = t_r " \rangle^{extract\_des} \rangle^{extract\_outer\_des}
+\end{equation*}
+First, note that
+\begin{equation*}
+\langle `` q_r = t_r " \rangle^{extract\_des} = \big\langle r'^0, \{h_0\} \big\rangle.
+\end{equation*}
+The left-hand side of $r'^0$ is $q'_r$. Also, for any equation $r_0$, it can be easily seen by induction on its structure that $h_0$ is part of the helper equations in $\big\langle r_0, \{h_0\} \big\rangle^{extract\_outer\_des}$. Especially, $h_0$ is part of $H$.
+
+Again, each extraction function property is now listed along with a proof for it in this case.
+
+\begin{enumerate}
+
+\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$) (Note/TODO: terms and copatterns are conflated for some $\sim$ properties, note this somewhere)
+
+Proof: From Lemma 3 we have this property for $extract\_des$, especially for $`` q_r = t_r "$. This means that the property for $extract\_outer\_des$ is at least fulfilled with respect to $\{h_0\}$. Let $\big\langle r_0, H_0 \big\rangle \boxplus H_1 := \big\langle r_0, H_0 \cup H_1 \big\rangle$. Because $h_0$ is part of the helper equations in $\langle r_0, \{h_0\} \rangle^{extract\_outer\_des}$, it follows that
+\begin{multline*}
+\langle r'^0, \{h_0\} \rangle^{extract\_outer\_des} = \big\langle r', H \big\rangle = \big\langle r', H' \cup \{h_0\} \big\rangle \\
+= \big\langle r', H' \big\rangle \boxplus \{h_0\} = \langle r'^0 \rangle^{extract\_outer\_des} \boxplus \{h_0\}
+\end{multline*}
+By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, for every equation $`` q_h = t_h "$ in $H'$ it is either either $q_h \sim t_h$ or ($q_{r'^0} \sim q_h$ and $t_{r'^0} \sim t_h$). For equations of the first case we thus have the desired property. For equations of the second case we have $q_h \sim t_h$ by the third property of the induction hypothesis (since $H \neq \emptyset$) and transitivity.
+
+\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
+
+Proof: $h_0$ is such an equation, by the definition of $extract\_des$.
+
+\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
+
+Proof: We have $q_{r'} \sim t_{r'}$ from this property of the induction hypothesis applied to $q'_r$.
+
+\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
+
+Proof: TODO
+
+\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+
+Proof:
+
+\end{enumerate}
 
 \end{itemize}
 
@@ -1353,14 +1431,18 @@ This concludes the proof for the ``Subst" case.
 \item \textbf{``Cong" case}:
 
 \begin{prooftree}
-\AxiomC{$s' \longrightarrow t'$}
+\AxiomC{$s^0 \longrightarrow t^0$}
 \RightLabel{Cong}
-\UnaryInfC{$\mathcal{E}[s'] \longrightarrow \mathcal{E}[t']$}
+\UnaryInfC{$\mathcal{E}[s^0] \longrightarrow \mathcal{E}[t^0]$}
 \end{prooftree}
 
-with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
+with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$.
 
-By the induction hypothesis we have $s' \longrightarrow_{\langle prg \rangle} t'$. By applying the congruence rule we get $\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$.
+The desired sequence can be constructed as follows.
+
+Terms immediately under $\mathcal{E}$ in its structure that are values in $prg$ but aren't values in $\langle prg \rangle$ need to be reduced to equivalent values first. Apply the ``Cong" rule after each step of such a reduction to obtain an initial reduction $s \longrightarrow^*_{\langle prg \rangle} \mathcal{E'}[s]$ with $\mathcal{E'}[s] \sim \mathcal{E}[s]$.
+
+By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} t'^0$, for a $t'^0 \sim t^0$. By applying the congruence rule we get $\mathcal{E'}[s^0] \longrightarrow_{\langle prg \rangle} \mathcal{E'}[t'^0] \sim \mathcal{E}[t'^0] \sim \mathcal{E}[t^0]$.
 
 \end{enumerate}
 
