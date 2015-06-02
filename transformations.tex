@@ -895,7 +895,7 @@ then $s \longrightarrow^*_{\langle prg \rangle^{extract\_helpers(e)}} t'$ for a 
 
 As we can see in the definition of $extract\_helpers$, the transformed program contains the equations within $\langle r \rangle^e = \big\langle r', H \big\rangle$, because $prg$ contains $r$. The desired sequence can be constructed as follows.
 
-First the (immediate) subterms of $s$ need to be reduced to values in $\langle prg \rangle^{extract\_helpers(e)}$; let the result of the reduction be $s'$. This has to happen in such a way that $s \sim s'$ holds. In fact, the result of each step of the reduction is equivalent to $s$.
+First the (immediate) subterms of $s$ need to be reduced to values in $\langle prg \rangle^{extract\_helpers(e)}$; let the result of the reduction be $s'$. This has to happen in such a way that $s \sim s'$ holds. We have such a reduction sequence by Lemma 4. In fact, the result of each step of the reduction is equivalent to $s$, which can easily be seen by inspecting the proof of the lemma.
 
 After that, $s'$ is reduced in one step to a result $t'$ with $t' \sim t$. This step is derived by applying the ``Subst" rule for the equation $`` q_h = t_h "$ for which $q_r \sim q_h$ and $t_r \sim t_h$ holds.
 
@@ -903,218 +903,285 @@ After that, $s'$ is reduced in one step to a result $t'$ with $t' \sim t$. This 
 
 \end{lemma}
 
+%%- old version of Lemma 3
+%\begin{lemma}
+%
+%If there is a reduction $s \longrightarrow_{prg} t$, for a program $prg$ and $s,t$ well-typed with respect to $prg$, that, in its derivation, uses only an equation $r$ and equations within a helpers set $H$,
+%
+%then there is a reduction sequence $s \longrightarrow^*_{prg'} t$ for some $prg'$ that contains only the equations in $\langle r, H \rangle^{extract\_des}_{prg}$.
+%
+%\begin{proof} Let $r := `` q' = s' "$. If $q'$ is hole pattern, it is
+%\begin{equation*}
+%\langle r, H \rangle^{extract\_des} = \big\langle r, H \big\rangle
+%\end{equation*}
+%The resulting equations are the same as the original. By setting $prg' = prg$ we have the desired $s \longrightarrow^*_{prg'} t$ (which has only one step $s \longrightarrow_{prg'} t$).
+%
+%Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$. It is thus
+%\begin{equation*}
+%\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle
+%\end{equation*}
+%with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. Especially it is $heqn = `` q_h = s' "$, with $q_h$ defined as $hname(\langle q \rangle^{vars}).des(p_1, ..., p_k)$. A sequence $s \longrightarrow^*_{prg'} t$, for a program $prg'$ that contains only the equations in $\langle r, H \rangle^{extract\_des}$ and the same data and codata definitions as $prg$, can be constructed for any reduction $s \longrightarrow_{prg} t$ by induction on the structure of its derivation.
+%
+%\begin{enumerate}
+%
+%\item \textbf{``Subst" case}:
+%
+%The derivation of $s \longrightarrow_{prg} t$ can either use $r$ or one of the equations within $H$.
+%
+%\underline{It uses an equation $`` q_H = t_H "$ within $H$.} By inversion we have the following form for the derivation:
+%
+%\begin{prooftree}
+%\AxiomC{$s =^? q_H \searrow \sigma_H$}
+%\RightLabel{\scriptsize Subst with $(q_H, t_H)$}
+%\UnaryInfC{$s \longrightarrow t_H[\sigma_H]$}
+%\end{prooftree}
+%
+%with $t_H[\sigma_H] =t$; the immediate subterms of $s$ values in $prg$. They need not be values in $prg'$, which is why the key part of the construction below is concerned with their reduction to values.
+%
+%Since the subterms of $s$ are values in $prg$, we already know they don't match any left-hand side of $H$. Of the two other equations' left-hand sides, only $q$ can possibly be matched by such a subterm. This is because the left-hand side of the other, $q_h$, has a function name that is different from any in $prg$. Thus the subterm wouldn't typecheck in $prg$ if it were to match against $q_h$.
+%
+%By Lemma 4 we have a reduction sequence
+%\begin{equation*}
+%s(s^1, ..., s^n) \longrightarrow^*_{prg} s(s^1_v, ..., s^n_v)
+%\end{equation*}
+%where all subterms of $s(s^1_v, ..., s^n_v)$ are values in $prg$, and with $s \sim s(s^1_v, ..., s^n_v)$.
+%
+%This reduction sequence is the initial part of the desired sequence. After it, only one final step follows, derived as given below.
+%\begin{prooftree}
+%\AxiomC{$s(s^1_v, ..., s^n_v) =^? q_H \searrow \sigma'_H$}
+%\RightLabel{\scriptsize Subst with $(q_H, t_H)$}
+%\UnaryInfC{$s(s^1_v, ..., s^n_v) \longrightarrow t_H[\sigma'_H]$}
+%\end{prooftree}
+%From $s \sim s(s^1_v, ..., s^n_v)$ and $s =^? q_H \searrow \sigma_H$ it follows that $t_H[\sigma'_H] \sim t_H[\sigma_H]$.
+%
+%\underline{The derivation uses $r$.} By inversion, we have a derivation of $s \longrightarrow_{prg} t$ that looks as follows:
+%
+%\begin{prooftree}
+%\AxiomC{$s^{0} =^? q \searrow \sigma_0$}
+%\AxiomC{$s^{1} =^? p_1 \searrow \sigma_1$}
+%\AxiomC{...}
+%\AxiomC{$s^{k} =^? p_k \searrow \sigma_k$}
+%\RightLabel{\scriptsize PM\textsubscript{Des}}
+%\QuaternaryInfC{$s =^? q' \searrow \sigma$}
+%\RightLabel{\scriptsize Subst with $(q', s')$}
+%\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+%\end{prooftree}
+%
+%Here it is $s = s^{0}.des(s^{1}, ..., s^{k})$, $\sigma = \sigma_0, ..., \sigma_k$ and $s'[\sigma] = t$.
+%
+%We also know that $s^{0}, s^1, ..., s^k$, as subterms of $s$, are values with respect to the equations of $prg$.
+%
+%Let $t_h := hname(\langle q \rangle^{vars})[\sigma_0]$. The desired sequence consists of the following steps:
+%\begin{equation*}
+%s \longrightarrow t_h.des(s^{1}, ..., s^{k}) \longrightarrow^* t_h(...).des(s^{1}_v, ..., s^{k}_v) \longrightarrow s'[\sigma']
+%\end{equation*}
+%The derivations for the first and the last step are given below. The intermediate sequence, which we have by Lemma 4, is necessary to reduce every $s^i$ that is not a value with respect to $prg'$ to such a value $s^i_v$. From Lemma 4 we also have
+%\begin{equation*}
+%t_h.des(s^{1}, ..., s^{k}) \sim t_h(...).des(s^{1}_v, ..., s^{k}_v)
+%\end{equation*}
+%$t_h(...)$ stands for $t_h$ with some of its subterms substituted with an equivalent subterm (especially it is $t_h(...) \sim t_h$).
+%
+%What follows are the derivations of the first and last step, in order.
+%
+%\begin{prooftree}
+%\AxiomC{$s^{0} =^? q \searrow \sigma_0$}
+%\RightLabel{\scriptsize Subst with $(q, `` hname(\langle q \rangle^{vars}) ")$}
+%\UnaryInfC{$s^0 \longrightarrow hname(\langle q \rangle^{vars})[\sigma_0]$}
+%\RightLabel{\scriptsize Cong}
+%\UnaryInfC{$s \longrightarrow hname(\langle q \rangle^{vars})[\sigma_0].des(s^1, ..., s^k)$}
+%\end{prooftree}
+%
+%\begin{prooftree}
+%\AxiomC{$t_h(...) =^? hname(\langle q \rangle^{vars}) \searrow \sigma'_0$}
+%\AxiomC{$s^{1}_v =^? p_1 \searrow \sigma'_1$}
+%\AxiomC{...}
+%\AxiomC{$s^{k}_v =^? p_k \searrow \sigma'_k$}
+%\RightLabel{\scriptsize PM\textsubscript{Des}}
+%\QuaternaryInfC{$t_h(...).des(s^1_v, ..., s^k_v) =^? q_h \searrow \sigma'$}
+%\RightLabel{\scriptsize Subst with $(q_h, s')$}
+%\UnaryInfC{$t_h(...).des(s^1_v, ..., s^k_v) \longrightarrow s'[\sigma']$}
+%\end{prooftree}
+%
+%It is $s \sim t_h.des(s^1, ..., s^k) \sim t_h(...).des(s^1_v, ..., s^k_v)$ and thus $s'[\sigma'] \sim s'[sigma] = t$.
+%
+%For these two derivations, what also needs to be shown is the value judgement, with respect to $prg'$, for several terms used in derivation steps which require them to be values. For each such term, it suffices to show that it matches neither against $q$ nor against $q_h$, as those are the only two left-hand sides in $prg'$.
+%
+%\begin{itemize}
+%
+%\item immediate subterms of $s^0$: These terms cannot match against $q$ because $s^0$ already matches against $q$. They can also not match against $q_h$ because then they wouldn't typecheck against $prg$ (as subterms of $s$) in the first place, as $prg$ doesn't contain the function name of $q_h$.
+%
+%\item $hname(\langle q \rangle^{vars})[\sigma_0]$: This term cannot match against $q$ because its function name is different from any function name in $prg$. It also cannot match against $q_h$ because $q_h$ is a destructor pattern while the term is not a destructor call.
+%
+%\end{itemize}
+%
+%\item \textbf{``Cong" case}:
+%
+%By inversion we have the following form for the derivation:
+%\begin{prooftree}
+%\AxiomC{$s_0 \longrightarrow t_0$}
+%\RightLabel{\scriptsize Cong}
+%\UnaryInfC{$\mathcal{E}[s_0] \longrightarrow \mathcal{E}[t_0]$}
+%\end{prooftree}
+%with $\mathcal{E}[s_0] = s, \mathcal{E}[t_0] = t$. By the induction hypothesis, we have
+%\begin{equation*}
+%s_0 \longrightarrow_{prg'} t_0
+%\end{equation*}
+%The following sequence will be constructed:
+%\begin{equation*}
+%\mathcal{E}[s_0] \longrightarrow^* \mathcal{E'}[s_0] \longrightarrow \mathcal{E'}[t_0]
+%\end{equation*}
+%The final step is derived by using the ``Cong" rule on the step we have from the induction hypothesis. The initial sequence is necessary to turn all terms in $\mathcal{E}$ that are values in $prg$ into values in $prg'$ ($\mathcal{E'}$ is defined by this change).
+%
+%We already know that a value term (with respect to $prg$) appearing in $\mathcal{E}$ doesn't match against any left-hand side in $H$. It also cannot match against $q_h$ because that copattern has a function name not in $prg$, and the term is well-typed in $prg$. The only left-hand side that the term could possibly match against is $q$.
+%
+%Lemma 4 can now be used in a limited form to obtain
+%\begin{equation*}
+%\mathcal{E}[s_0] \longrightarrow^* \mathcal{E'}[s_0]
+%\end{equation*}
+%For this, the reduction sequence construction in Lemma 4 is only carried out up to (and not including) $s_0$. This turns all values with respect to $prg$ in $\mathcal{E}$ into values in $\mathcal{E'}$ with respect to $prg'$. Just as with the complete construction of Lemma 4, it is $\mathcal{E}[s_0] \sim \mathcal{E'}[s_0]$. Replacing $s_0$ with $t_0$, it follows that $\mathcal{E'}[t_0] \sim \mathcal{E}[t_0] = t$.
+%
+%\end{enumerate}
+%
+%\end{proof}
+%
+%\end{lemma}
+%%-
+
 \begin{lemma}
 
-If there is a reduction $s \longrightarrow_{prg} t$, for a program $prg$ and $s,t$ well-typed with respect to $prg$, that, in its derivation, uses only an equation $r$ and equations within a helpers set $H$,
+$extract\_des$ fulfils the extraction function properties.
 
-then there is a reduction sequence $s \longrightarrow^*_{prg'} t$ for some $prg'$ that contains only the equations in $\langle r, H \rangle^{extract\_des}_{prg}$.
+\begin{proof}
 
-\begin{proof} Let $r := `` q' = s' "$. If $q'$ is hole pattern, it is
-\begin{equation*}
-\langle r, H \rangle^{extract\_des} = \big\langle r, H \big\rangle
-\end{equation*}
-The resulting equations are the same as the original. By setting $prg' = prg$ we have the desired $s \longrightarrow^*_{prg'} t$ (which has only one step $s \longrightarrow_{prg'} t$).
+TODO
 
-Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$. It is thus
-\begin{equation*}
-\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle
-\end{equation*}
-with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. Especially it is $heqn = `` q_h = s' "$, with $q_h$ defined as $hname(\langle q \rangle^{vars}).des(p_1, ..., p_k)$. A sequence $s \longrightarrow^*_{prg'} t$, for a program $prg'$ that contains only the equations in $\langle r, H \rangle^{extract\_des}$ and the same data and codata definitions as $prg$, can be constructed for any reduction $s \longrightarrow_{prg} t$ by induction on the structure of its derivation.
+\end{proof}
 
-\begin{enumerate}
+\end{lemma}
 
-\item \textbf{``Subst" case}:
+\begin{lemma}
 
-The derivation of $s \longrightarrow_{prg} t$ can either use $r$ or one of the equations within $H$.
+Let $e$ be an helper extraction function that fulfils the extraction function properties. Write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. Let $s^0$ be a closed term. Further, let $s$ be a closed term which has only value immediate subterms in $prg$, but has a non-value immediate subterm in $\langle prg \rangle$, and where $s^0$ is the left-most such subterm. Denote $s$ as $s(s^0)$ in order to use it for contextual substitution of $s^0$ with some other term.
 
-\underline{It uses an equation $`` q_H = t_H "$ within $H$.} By inversion we have the following form for the derivation:
+Then there is a reduction sequence $s^0 \longrightarrow^*_{\langle prg \rangle} s^0_v$, where $s^0_v \sim s^0$ is a value in $\langle prg \rangle$. Especially this means $s \sim s(s^0_v)$, and that there is a reduction sequence (by applying the ``Cong" rule) $s(s^0) \longrightarrow^*_{\langle prg \rangle} s(s^0_v)$.
 
-\begin{prooftree}
-\AxiomC{$s =^? q_H \searrow \sigma_H$}
-\RightLabel{\scriptsize Subst with $(q_H, t_H)$}
-\UnaryInfC{$s \longrightarrow t_H[\sigma_H]$}
-\end{prooftree}
+\begin{proof}
 
-with $t_H[\sigma_H] =t$; the immediate subterms of $s$ values in $prg$. They need not be values in $prg'$, which is why the key part of the construction below is concerned with their reduction to values.
+First, note that by the definition of $extract\_helper$, each equation in $\langle prg \rangle$ results from the application of $e$ to an equation $r$ in $prg$. Thus this equation in $\langle prg \rangle$ has some properties that follow from the extraction function properties that the original equation in $prg$ fulfils. Specifically, the resulting equation is contained in $\langle r \rangle^e = \big\langle r', H \big\rangle$. For the properties of the equation it must be distinguished between those in $r'$ and those in the helper set $H$.
 
-Since the subterms of $s$ are values in $prg$, we already know they don't match any left-hand side of $H$. Of the two other equations' left-hand sides, only $q$ can possibly be matched by such a subterm. This is because the left-hand side of the other, $q_h$, has a function name that is different from any in $prg$. Thus the subterm wouldn't typecheck in $prg$ if it were to match against $q_h$.
-
-By Lemma 4 we have a reduction sequence
-\begin{equation*}
-s(s^1, ..., s^n) \longrightarrow^*_{prg} s(s^1_v, ..., s^n_v)
-\end{equation*}
-where all subterms of $s(s^1_v, ..., s^n_v)$ are values in $prg$, and with $s \sim s(s^1_v, ..., s^n_v)$.
-
-This reduction sequence is the initial part of the desired sequence. After it, only one final step follows, derived as given below.
-\begin{prooftree}
-\AxiomC{$s(s^1_v, ..., s^n_v) =^? q_H \searrow \sigma'_H$}
-\RightLabel{\scriptsize Subst with $(q_H, t_H)$}
-\UnaryInfC{$s(s^1_v, ..., s^n_v) \longrightarrow t_H[\sigma'_H]$}
-\end{prooftree}
-From $s \sim s(s^1_v, ..., s^n_v)$ and $s =^? q_H \searrow \sigma_H$ it follows that $t_H[\sigma'_H] \sim t_H[\sigma_H]$.
-
-\underline{The derivation uses $r$.} By inversion, we have a derivation of $s \longrightarrow_{prg} t$ that looks as follows:
-
-\begin{prooftree}
-\AxiomC{$s^{0} =^? q \searrow \sigma_0$}
-\AxiomC{$s^{1} =^? p_1 \searrow \sigma_1$}
-\AxiomC{...}
-\AxiomC{$s^{k} =^? p_k \searrow \sigma_k$}
-\RightLabel{\scriptsize PM\textsubscript{Des}}
-\QuaternaryInfC{$s =^? q' \searrow \sigma$}
-\RightLabel{\scriptsize Subst with $(q', s')$}
-\UnaryInfC{$s \longrightarrow s'[\sigma]$}
-\end{prooftree}
-
-Here it is $s = s^{0}.des(s^{1}, ..., s^{k})$, $\sigma = \sigma_0, ..., \sigma_k$ and $s'[\sigma] = t$.
-
-We also know that $s^{0}, s^1, ..., s^k$, as subterms of $s$, are values with respect to the equations of $prg$.
-
-Let $t_h := hname(\langle q \rangle^{vars})[\sigma_0]$. The desired sequence consists of the following steps:
-\begin{equation*}
-s \longrightarrow t_h.des(s^{1}, ..., s^{k}) \longrightarrow^* t_h(...).des(s^{1}_v, ..., s^{k}_v) \longrightarrow s'[\sigma']
-\end{equation*}
-The derivations for the first and the last step are given below. The intermediate sequence, which we have by Lemma 4, is necessary to reduce every $s^i$ that is not a value with respect to $prg'$ to such a value $s^i_v$. From Lemma 4 we also have
-\begin{equation*}
-t_h.des(s^{1}, ..., s^{k}) \sim t_h(...).des(s^{1}_v, ..., s^{k}_v)
-\end{equation*}
-$t_h(...)$ stands for $t_h$ with some of its subterms substituted with an equivalent subterm (especially it is $t_h(...) \sim t_h$).
-
-What follows are the derivations of the first and last step, in order.
-
-\begin{prooftree}
-\AxiomC{$s^{0} =^? q \searrow \sigma_0$}
-\RightLabel{\scriptsize Subst with $(q, `` hname(\langle q \rangle^{vars}) ")$}
-\UnaryInfC{$s^0 \longrightarrow hname(\langle q \rangle^{vars})[\sigma_0]$}
-\RightLabel{\scriptsize Cong}
-\UnaryInfC{$s \longrightarrow hname(\langle q \rangle^{vars})[\sigma_0].des(s^1, ..., s^k)$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$t_h(...) =^? hname(\langle q \rangle^{vars}) \searrow \sigma'_0$}
-\AxiomC{$s^{1}_v =^? p_1 \searrow \sigma'_1$}
-\AxiomC{...}
-\AxiomC{$s^{k}_v =^? p_k \searrow \sigma'_k$}
-\RightLabel{\scriptsize PM\textsubscript{Des}}
-\QuaternaryInfC{$t_h(...).des(s^1_v, ..., s^k_v) =^? q_h \searrow \sigma'$}
-\RightLabel{\scriptsize Subst with $(q_h, s')$}
-\UnaryInfC{$t_h(...).des(s^1_v, ..., s^k_v) \longrightarrow s'[\sigma']$}
-\end{prooftree}
-
-It is $s \sim t_h.des(s^1, ..., s^k) \sim t_h(...).des(s^1_v, ..., s^k_v)$ and thus $s'[\sigma'] \sim s'[sigma] = t$.
-
-For these two derivations, what also needs to be shown is the value judgement, with respect to $prg'$, for several terms used in derivation steps which require them to be values. For each such term, it suffices to show that it matches neither against $q$ nor against $q_h$, as those are the only two left-hand sides in $prg'$.
+Now, the proof proceeds by induction on the structure of $s^0$.
 
 \begin{itemize}
 
-\item immediate subterms of $s^0$: These terms cannot match against $q$ because $s^0$ already matches against $q$. They can also not match against $q_h$ because then they wouldn't typecheck against $prg$ (as subterms of $s$) in the first place, as $prg$ doesn't contain the function name of $q_h$.
+\item \underline{Case 1}: $s^0 = con(t^1, ..., t^n)$.
 
-\item $hname(\langle q \rangle^{vars})[\sigma_0]$: This term cannot match against $q$ because its function name is different from any function name in $prg$. It also cannot match against $q_h$ because $q_h$ is a destructor pattern while the term is not a destructor call.
+The desired sequence can be given as follows:
+\begin{equation*}
+con(t^1, ..., t^n) \longrightarrow^* con(t^1_v, ..., t^n_v)
+\end{equation*}
+Let $I \subseteq \{1, ..., n\}$ be the set of indices $i$ for which $t^i$ is not a value in $\langle prg \rangle$, and $t^j_v := t^j$ for all $j \not\in I$. The above sequence consists of sequences for each $i \in I$, in order of the $i$, where each sequence can be given as follows.
+\begin{equation*}
+con(t^1_v, ..., t^{i-1}_v, t^i, t^{i+1}, ..., t^n) \longrightarrow^* con(t^1_v, ..., t^{i-1}_v, t^i_v, t^{i+1}, ..., t^n)
+\end{equation*}
+We have such a sequence with $t^i \sim t^i_v$ by the induction hypothesis, applied to $t^i$.
+
+\item \underline{Case 2}: $s^0 = fun(t^1, ..., t^n)$.
+
+First, construct an initial sequence
+\begin{equation*}
+fun(t^1, ..., t^n) \longrightarrow^* fun(t^1_v, ..., t^n_v)
+\end{equation*}
+analogously to Case 1. If the result matches an equation $`` q = t "$ of $\langle prg \rangle$, add a step derived by applying the ``Subst" rule for this equation, with some $\sigma$ with $fun(t^1_v, ..., t^n_v) =^? q \searrow \sigma$.
+\begin{equation*}
+fun(t^1_v, ..., t^n_v) \longrightarrow t[\sigma]
+\end{equation*}
+It is $fun(t^1_v, ..., t^n_v) \sim t[\sigma]$, because $q \sim t$. This, in turn, can be shown as follows. For some equation $r$ of $prg$, $`` q = t "$ is contained in $\langle r \rangle^e = \big\langle r', H \big\rangle$. Suppose $`` q = t "$ is in $H$. Then, by the first extraction function property, it is either $q \sim t$, or ($q_r \sim q$ and $t_r \sim t$). But, in the second case, $s^0 \sim fun(t^1_v, ..., t^n_v)$ would already match $q_r$, which contradicts the fact that $s^0$ is a value in $prg$. Now, suppose $r' = `` q = t "$. Then, by the third extraction function property, it is either $q \sim t$, or ($r = `` q = t "$ and $H = \emptyset$). But, in the second case, $s^0 \sim fun(t^1_v, ..., t^n_v)$ would already match $q_r$, which contradicts the fact that $s^0$ is a value in $prg$.
+
+\item \underline{Case 3}: $s^0 = t^0.des(t^1, ..., t^n)$.
+
+First, construct an initial sequence
+\begin{equation*}
+ t^0.des(t^1, ..., t^n) \longrightarrow^*  t^0_v.des(t^1_v, ..., t^n_v)
+\end{equation*}
+analogously to Case 1 (regard $t^0$ simply as an initial argument). This result then has to be reduced similarly to Case 2, with the only difference being that a rule with destructor pattern is used instead of one with hole pattern.
 
 \end{itemize}
 
-\item \textbf{``Cong" case}:
-
-By inversion we have the following form for the derivation:
-\begin{prooftree}
-\AxiomC{$s_0 \longrightarrow t_0$}
-\RightLabel{\scriptsize Cong}
-\UnaryInfC{$\mathcal{E}[s_0] \longrightarrow \mathcal{E}[t_0]$}
-\end{prooftree}
-with $\mathcal{E}[s_0] = s, \mathcal{E}[t_0] = t$. By the induction hypothesis, we have
-\begin{equation*}
-s_0 \longrightarrow_{prg'} t_0
-\end{equation*}
-The following sequence will be constructed:
-\begin{equation*}
-\mathcal{E}[s_0] \longrightarrow^* \mathcal{E'}[s_0] \longrightarrow \mathcal{E'}[t_0]
-\end{equation*}
-The final step is derived by using the ``Cong" rule on the step we have from the induction hypothesis. The initial sequence is necessary to turn all terms in $\mathcal{E}$ that are values in $prg$ into values in $prg'$ ($\mathcal{E'}$ is defined by this change).
-
-We already know that a value term (with respect to $prg$) appearing in $\mathcal{E}$ doesn't match against any left-hand side in $H$. It also cannot match against $q_h$ because that copattern has a function name not in $prg$, and the term is well-typed in $prg$. The only left-hand side that the term could possibly match against is $q$.
-
-Lemma 4 can now be used in a limited form to obtain
-\begin{equation*}
-\mathcal{E}[s_0] \longrightarrow^* \mathcal{E'}[s_0]
-\end{equation*}
-For this, the reduction sequence construction in Lemma 4 is only carried out up to (and not including) $s_0$. This turns all values with respect to $prg$ in $\mathcal{E}$ into values in $\mathcal{E'}$ with respect to $prg'$. Just as with the complete construction of Lemma 4, it is $\mathcal{E}[s_0] \sim \mathcal{E'}[s_0]$. Replacing $s_0$ with $t_0$, it follows that $\mathcal{E'}[t_0] \sim \mathcal{E}[t_0] = t$.
-
-\end{enumerate}
-
 \end{proof}
 
 \end{lemma}
 
-\begin{lemma}
-
-Let $s(s^1, ..., s^n)$ be any closed term $s$ with its proper outer-most subterms $s^i$, from left to right, that match against $q$, for some copattern $q$. This notation for $s$ will be used for contextual substitution. Also, let there be a rule $(q, s')$ with $s^i =^? q \searrow \sigma$ and $s'[\sigma] \sim s^i$. Finally, let $prg$ be a program that contains no rule other than $(q, s')$ that any subterm of $s$ matches against, and with respect to which $s'[\sigma_v]$ is a value, for any substitution $\sigma_v$ that substitutes only with values.
-
-Then there is a reduction sequence $s \longrightarrow^*_{prg} s(s^1_v, ..., s^n_v)$ that uses only $(q, s')$ in its derivation, with all $s^i_v$ values in $prg$ and $s^i_v \sim s^i$. Especially, these last properties are equivalent with the properties that all proper subterms of $s(s^1_v, ..., s^n_v)$ are values in $prg$, and that $s \sim s(s^1_v, ..., s^n_v)$.
-
-\begin{proof} By induction on the structure of $s$.
-
-\begin{enumerate}
-
-\item $s = con(t^1, ..., t^k)$.
-
-Let $I \subseteq \{1, ..., k\}$ be the set of indices $i$ for which either $t^i$ or one of its subterms matches $q$. Set $t^i_v := t^i$ for $i \not\in I$. The desired sequence can be given as follows:
-\begin{equation*}
-con(t^1, ..., t^k) \longrightarrow^* con(t^1_v, ..., t^k_v)
-\end{equation*}
-It consists of the sequences
-\begin{equation*}
-con(t^1_v, ..., t^{i-1}_v, t^i, t^{i+1}, ..., t^k) \longrightarrow^* con(t^1_v, ..., t^{i-1}_v, t^i_v, t^{i+1}, ..., t^k)
-\end{equation*}
-for each $i \in I$, in ascending order. It will be shown that $t^i_v \sim t^i$ for each $i \in I$, from which $con(t^1, ..., t^k) \sim con(t^1_v, ..., t^k_v)$ follows (since $t^i_v = t^i$ for $i \not\in I$).
-Three cases for $i \in I$ must be distinguished.
-
-Case 1: $t^i$ matches $q$, but not any of its proper subterms. Then the above sequence consists only of one step, which can be derived as follows.
-\begin{prooftree}
-\AxiomC{$t^i =^? q \searrow \sigma^i$}
-\RightLabel{\scriptsize Subst with $(q, s')$}
-\UnaryInfC{$t^i \longrightarrow s'[\sigma^i]$}
-\RightLabel{\scriptsize Cong}
-\UnaryInfC{$con(..., t^i, ...) \longrightarrow con(..., t^i_v, ...)$}
-\end{prooftree}
-Set $t^i_v := s'[\sigma^i]$. It is a value because $\sigma^i$ can only substitute with values since the proper subterms of $t^i$ are values. Clearly $t^i$ is a proper outer-most subterm of $s$ matching $q$, thus $t^i \sim s'[\sigma^i] = t^i_v$.
-
-Case 2: $t^i$ doesn't match $q$, but at least one of its proper subterms does. Then, by the induction hypothesis, we have the following sequence that uses only $(q, s')$:
-\begin{equation*}
-t^i \longrightarrow^* t'^i
-\end{equation*}
-The subterms of $t'^i$ are values in $prg$, set $t^i_v := t'^i$. We get the above sequence for $i$ by applying the ``Cong" rule at each step. We also know from the induction hypothesis that $t^i \sim t'^i = t^i_v$.
-
-Case 3: $t^i$ and at least one of its proper subterms matches $q$. Then first retrieve a sequence like in Case 2 and add to that a step as in Case 1 (use this lemma with the result of the Case 2 sequence for this). $t^i \sim t^i_v$ follows from the equivalences shown in Case 2 and Case 1 by transitivity.
-
-\item $s = fun(t^1, ..., t^k)$.
-
-This case can be shown analogously to $s = con(t^1, ..., t^k)$.
-
-\item $s = t^0.des(t^1, ..., t^k)$.
-
-The following sequence will be constructed:
-\begin{equation*}
-t^0.des(t^1, ..., t^k) \longrightarrow^* t'^0_v.des(t'^1_v, ..., t'^k_v)
-\end{equation*}
-By the induction hypothesis, we have sequences from $t^i$ to a $t'^i$ with $t^i \sim t'^i$ and with only values as proper subterms of $t'^i$, for every $i \in \{0, ..., k\}$. Apply the ``Cong" rule at each step and add the sequences behind one another (in ascending order of $i$) to retrieve the following sequence, which is the initial part of the constructed sequence.
-\begin{equation*}
-t^0.des(t^1, ..., t^k) \longrightarrow^* t'^0.des(t'^1, ..., t'^k)
-\end{equation*}
-Set $t'^i_v := t'^i$ for each $i \in \{0, ..., k\}$ where $t'^i$ doesn't match against $q$. Add a step
-\begin{equation*}
-t'^0.des(t'^1, ..., t'^k) \longrightarrow t'^0_v.des(t'^1, ..., t'^k)
-\end{equation*}
-if $t'^0$ matches against $q$. Add further steps, in ascending order of $i$, for every $i \in \{1, ..., k\}$ where $t'^i$ matches against $q$:
-\begin{equation*}
-t'^0_v.des(t'^1_v, ..., t'^{i-1}_v, t'^i, t'^{i+1} ..., t^k) \longrightarrow t'^0_v.des(t'^1_v, ..., t'^{i-1}_v, t'^i_v, t'^{i+1} ..., t^k)
-\end{equation*}
-Those steps can all be derived analogously to 1., Case 1, and the desired properties of $t'^i_v$ can also be shown analogously to there.
-
-\end{enumerate}
-
-\end{proof}
-
-\end{lemma}
+%%- old version of Lemma 4
+%\begin{lemma}
+%
+%Let $s(s^1, ..., s^n)$ be any closed term $s$ with its proper outer-most subterms $s^i$, from left to right, that match against $q$, for some copattern $q$. This notation for $s$ will be used for contextual substitution. Also, let there be a rule $(q, s')$ with $s^i =^? q \searrow \sigma$ and $s'[\sigma] \sim s^i$. Finally, let $prg$ be a program that contains no rule other than $(q, s')$ that any subterm of $s$ matches against, and with respect to which $s'[\sigma_v]$ is a value, for any substitution $\sigma_v$ that substitutes only with values.
+%
+%Then there is a reduction sequence $s \longrightarrow^*_{prg} s(s^1_v, ..., s^n_v)$ that uses only $(q, s')$ in its derivation, with all $s^i_v$ values in $prg$ and $s^i_v \sim s^i$. Especially, these last properties are equivalent with the properties that all proper subterms of $s(s^1_v, ..., s^n_v)$ are values in $prg$, and that $s \sim s(s^1_v, ..., s^n_v)$.
+%
+%\begin{proof} By induction on the structure of $s$.
+%
+%\begin{enumerate}
+%
+%\item $s = con(t^1, ..., t^k)$.
+%
+%Let $I \subseteq \{1, ..., k\}$ be the set of indices $i$ for which either $t^i$ or one of its subterms matches $q$. Set $t^i_v := t^i$ for $i \not\in I$. The desired sequence can be given as follows:
+%\begin{equation*}
+%con(t^1, ..., t^k) \longrightarrow^* con(t^1_v, ..., t^k_v)
+%\end{equation*}
+%It consists of the sequences
+%\begin{equation*}
+%con(t^1_v, ..., t^{i-1}_v, t^i, t^{i+1}, ..., t^k) \longrightarrow^* con(t^1_v, ..., t^{i-1}_v, t^i_v, t^{i+1}, ..., t^k)
+%\end{equation*}
+%for each $i \in I$, in ascending order. It will be shown that $t^i_v \sim t^i$ for each $i \in I$, from which $con(t^1, ..., t^k) \sim con(t^1_v, ..., t^k_v)$ follows (since $t^i_v = t^i$ for $i \not\in I$).
+%Three cases for $i \in I$ must be distinguished.
+%
+%Case 1: $t^i$ matches $q$, but not any of its proper subterms. Then the above sequence consists only of one step, which can be derived as follows.
+%\begin{prooftree}
+%\AxiomC{$t^i =^? q \searrow \sigma^i$}
+%\RightLabel{\scriptsize Subst with $(q, s')$}
+%\UnaryInfC{$t^i \longrightarrow s'[\sigma^i]$}
+%\RightLabel{\scriptsize Cong}
+%\UnaryInfC{$con(..., t^i, ...) \longrightarrow con(..., t^i_v, ...)$}
+%\end{prooftree}
+%Set $t^i_v := s'[\sigma^i]$. It is a value because $\sigma^i$ can only substitute with values since the proper subterms of $t^i$ are values. Clearly $t^i$ is a proper outer-most subterm of $s$ matching $q$, thus $t^i \sim s'[\sigma^i] = t^i_v$.
+%
+%Case 2: $t^i$ doesn't match $q$, but at least one of its proper subterms does. Then, by the induction hypothesis, we have the following sequence that uses only $(q, s')$:
+%\begin{equation*}
+%t^i \longrightarrow^* t'^i
+%\end{equation*}
+%The subterms of $t'^i$ are values in $prg$, set $t^i_v := t'^i$. We get the above sequence for $i$ by applying the ``Cong" rule at each step. We also know from the induction hypothesis that $t^i \sim t'^i = t^i_v$.
+%
+%Case 3: $t^i$ and at least one of its proper subterms matches $q$. Then first retrieve a sequence like in Case 2 and add to that a step as in Case 1 (use this lemma with the result of the Case 2 sequence for this). $t^i \sim t^i_v$ follows from the equivalences shown in Case 2 and Case 1 by transitivity.
+%
+%\item $s = fun(t^1, ..., t^k)$.
+%
+%This case can be shown analogously to $s = con(t^1, ..., t^k)$.
+%
+%\item $s = t^0.des(t^1, ..., t^k)$.
+%
+%The following sequence will be constructed:
+%\begin{equation*}
+%t^0.des(t^1, ..., t^k) \longrightarrow^* t'^0_v.des(t'^1_v, ..., t'^k_v)
+%\end{equation*}
+%By the induction hypothesis, we have sequences from $t^i$ to a $t'^i$ with $t^i \sim t'^i$ and with only values as proper subterms of $t'^i$, for every $i \in \{0, ..., k\}$. Apply the ``Cong" rule at each step and add the sequences behind one another (in ascending order of $i$) to retrieve the following sequence, which is the initial part of the constructed sequence.
+%\begin{equation*}
+%t^0.des(t^1, ..., t^k) \longrightarrow^* t'^0.des(t'^1, ..., t'^k)
+%\end{equation*}
+%Set $t'^i_v := t'^i$ for each $i \in \{0, ..., k\}$ where $t'^i$ doesn't match against $q$. Add a step
+%\begin{equation*}
+%t'^0.des(t'^1, ..., t'^k) \longrightarrow t'^0_v.des(t'^1, ..., t'^k)
+%\end{equation*}
+%if $t'^0$ matches against $q$. Add further steps, in ascending order of $i$, for every $i \in \{1, ..., k\}$ where $t'^i$ matches against $q$:
+%\begin{equation*}
+%t'^0_v.des(t'^1_v, ..., t'^{i-1}_v, t'^i, t'^{i+1} ..., t^k) \longrightarrow t'^0_v.des(t'^1_v, ..., t'^{i-1}_v, t'^i_v, t'^{i+1} ..., t^k)
+%\end{equation*}
+%Those steps can all be derived analogously to 1., Case 1, and the desired properties of $t'^i_v$ can also be shown analogously to there.
+%
+%\end{enumerate}
+%
+%\end{proof}
+%
+%\end{lemma}
 
 %%--
 
@@ -1393,18 +1460,21 @@ First, note that
 \end{equation*}
 The left-hand side of $r'^0$ is $q'_r$. Also, for any equation $r_0$, it can be easily seen by induction on its structure that $h_0$ is part of the helper equations in $\big\langle r_0, \{h_0\} \big\rangle^{extract\_outer\_des}$. Especially, $h_0$ is part of $H$.
 
+Let $\big\langle r_0, H_0 \big\rangle \boxplus H_1 := \big\langle r_0, H_0 \cup H_1 \big\rangle$. Because $h_0$ is part of the helper equations in $\langle r_0, \{h_0\} \rangle^{extract\_outer\_des}$, it follows that
+\begin{multline*}
+\langle r'^0, \{h_0\} \rangle^{extract\_outer\_des} = \big\langle r', H \big\rangle = \big\langle r', H' \cup \{h_0\} \big\rangle \\
+= \big\langle r', H' \big\rangle \boxplus \{h_0\} = \langle r'^0 \rangle^{extract\_outer\_des} \boxplus \{h_0\}
+\end{multline*}
+
 Again, each extraction function property is now listed along with a proof for it in this case.
 
 \begin{enumerate}
 
 \item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$) (Note/TODO: terms and copatterns are conflated for some $\sim$ properties, note this somewhere)
 
-Proof: From Lemma 3 we have this property for $extract\_des$, especially for $`` q_r = t_r "$. This means that the property for $extract\_outer\_des$ is at least fulfilled with respect to $\{h_0\}$. Let $\big\langle r_0, H_0 \big\rangle \boxplus H_1 := \big\langle r_0, H_0 \cup H_1 \big\rangle$. Because $h_0$ is part of the helper equations in $\langle r_0, \{h_0\} \rangle^{extract\_outer\_des}$, it follows that
-\begin{multline*}
-\langle r'^0, \{h_0\} \rangle^{extract\_outer\_des} = \big\langle r', H \big\rangle = \big\langle r', H' \cup \{h_0\} \big\rangle \\
-= \big\langle r', H' \big\rangle \boxplus \{h_0\} = \langle r'^0 \rangle^{extract\_outer\_des} \boxplus \{h_0\}
-\end{multline*}
-By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, for every equation $`` q_h = t_h "$ in $H'$ it is either either $q_h \sim t_h$ or ($q_{r'^0} \sim q_h$ and $t_{r'^0} \sim t_h$). For equations of the first case we thus have the desired property. For equations of the second case we have $q_h \sim t_h$ by the third property of the induction hypothesis (since $H \neq \emptyset$) and transitivity.
+Proof: From Lemma 3 we have this property for $extract\_des$, especially for $`` q_r = t_r "$. This means that the property for $extract\_outer\_des$ is at least fulfilled with respect to $\{h_0\}$.
+
+By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, for every equation $`` q_h = t_h "$ in $H'$ it is either $q_h \sim t_h$ or ($q_{r'^0} \sim q_h$ and $t_{r'^0} \sim t_h$). For equations of the first case we thus have the desired property. For equations of the second case we have $q_h \sim t_h$ by the third property of the induction hypothesis (since $H \neq \emptyset$) and transitivity.
 
 \item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
 
@@ -1416,11 +1486,15 @@ Proof: We have $q_{r'} \sim t_{r'}$ from this property of the induction hypothes
 
 \item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
 
-Proof: TODO
+Proof: By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, the set of equations in $\big\langle r', H' \big\rangle$ is deterministic.
+
+TODO
 
 \item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
 
-Proof:
+Proof: From Lemma 3 we have this property for $extract\_des$, especially for $`` q_r = t_r "$. This means that the property for $extract\_outer\_des$ is at least fulfilled with respect to $\{h_0\}$.
+
+By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, for every equation $`` q_h = t_h "$ in $H'$, $q_h$ is equivalent to a sub-copattern of the left-hand side $q'_r$ of $r'^0$. But $q'_r$ is in turn a sub-copattern of $q_r$.
 
 \end{enumerate}
 
