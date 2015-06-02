@@ -1097,13 +1097,17 @@ fun(t^1_v, ..., t^n_v) \longrightarrow t[\sigma]
 \end{equation*}
 It is $fun(t^1_v, ..., t^n_v) \sim t[\sigma]$, because $q \sim t$. This, in turn, can be shown as follows. For some equation $r$ of $prg$, $`` q = t "$ is contained in $\langle r \rangle^e = \big\langle r', H \big\rangle$. Suppose $`` q = t "$ is in $H$. Then, by the first extraction function property, it is either $q \sim t$, or ($q_r \sim q$ and $t_r \sim t$). But, in the second case, $s^0 \sim fun(t^1_v, ..., t^n_v)$ would already match $q_r$, which contradicts the fact that $s^0$ is a value in $prg$. Now, suppose $r' = `` q = t "$. Then, by the third extraction function property, it is either $q \sim t$, or ($r = `` q = t "$ and $H = \emptyset$). But, in the second case, $s^0 \sim fun(t^1_v, ..., t^n_v)$ would already match $q_r$, which contradicts the fact that $s^0$ is a value in $prg$.
 
+Use the induction hypothesis to reduce the immediate subterms of $t[\sigma]$ to values. By the same argument as in the last paragraph, it can be seen that, if $t[\sigma]$ reduces to something at all, this is equivalent to it.
+
+This process can be repeated until a value obtains; it is equivalent to $s^0$.
+
 \item \underline{Case 3}: $s^0 = t^0.des(t^1, ..., t^n)$.
 
 First, construct an initial sequence
 \begin{equation*}
  t^0.des(t^1, ..., t^n) \longrightarrow^*  t^0_v.des(t^1_v, ..., t^n_v)
 \end{equation*}
-analogously to Case 1 (regard $t^0$ simply as an initial argument). This result then has to be reduced similarly to Case 2, with the only difference being that a rule with destructor pattern is used instead of one with hole pattern.
+analogously to Case 1 (regard $t^0$ simply as an initial argument). This result then has to be reduced similarly to Case 2, with the only difference being that a rule with destructor pattern is used initially, instead of one with hole pattern.
 
 \end{itemize}
 
