@@ -1,0 +1,14 @@
+data A where
+  a(): A
+
+codata B where
+  B.des1(): B
+  B.des2(): B
+
+function b(): B where
+
+function b2(): B where
+
+function fun(A): B where
+  fun(x) = b()
+  fun(x).des1().des2() = b2() -- this is a "dead" rule, i.e., it cannot be matched by any term
