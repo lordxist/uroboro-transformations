@@ -922,17 +922,31 @@ TODO: move these properties into a definition (for extraction functions)
 \end{itemize}
 For any two closed terms $s,t$ it holds that:
 
-If $s =^? q_r \searrow \sigma$, $t_r[\sigma] = t$ for some equation $r := `` q_r = t_r "$ of $prg$, and the (immediate) subterms of $s$ are values in $prg$,
+\begin{enumerate}
+
+\item If $s =^? q_r \searrow \sigma$, $t_r[\sigma] = t$ for some equation $r := `` q_r = t_r "$ of $prg$, and the (immediate) subterms of $s$ are values in $prg$,
 
 then $s \longrightarrow^*_{\langle prg \rangle^{extract\_helpers(e)}} t'$ for a $t'$ with $t' \sim t$.
 
+\item If for a rule $(q, s') \in \textrm{Rules}(\langle prg \rangle^{extract\_helpers(e)})$ it holds that $s =^? q \searrow \sigma$, $s'[\sigma] = t$,
+
+then there is an equation $r$ in the equations of $prg$ such that $\langle r \rangle^e$ contains $`` q = s' "$.
+
+\end{enumerate}
+
 \begin{proof}
 
-As we can see in the definition of $extract\_helpers$, the transformed program contains the equations within $\langle r \rangle^e = \big\langle r', H \big\rangle$, because $prg$ contains $r$. The desired sequence can be constructed as follows.
+\begin{enumerate}
+
+\item As we can see in the definition of $extract\_helpers$, the transformed program contains the equations within $\langle r \rangle^e = \big\langle r', H \big\rangle$, because $prg$ contains $r$. The desired sequence can be constructed as follows.
 
 First the (immediate) subterms of $s$ need to be reduced to values in $\langle prg \rangle^{extract\_helpers(e)}$; let the result of the reduction be $s'$. This has to happen in such a way that $s \sim s'$ holds. We have such a reduction sequence by Lemma 4. In fact, the result of each step of the reduction is equivalent to $s$, which can easily be seen by inspecting the proof of the lemma.
 
 After that, $s'$ is reduced in one step to a result $t'$ with $t' \sim t$. This step is derived by applying the ``Subst" rule for the equation $`` q_h = t_h "$ for which $q_r \sim q_h$ and $t_r \sim t_h$ holds.
+
+\item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
+
+\end{enumerate}
 
 \end{proof}
 
