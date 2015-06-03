@@ -1461,7 +1461,7 @@ By the induction hypothesis we have $s' \longrightarrow_{prg} t'$. By applying t
 
 For step $elim\_multi\_des$, the described kind of weak bisimulation holds.
 
-\begin{proof}[Proof of (1)] By induction on the structure of $\mathcal{D}$.
+\begin{proof}[Proof of (1a)] By induction on the structure of $\mathcal{D}$.
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
@@ -1571,41 +1571,41 @@ This concludes the proof for the ``Subst" case.
 
 with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$.
 
+First note that Lemma 4 is applicable for $\langle prg \rangle$, because
+\begin{equation*}
+elim\_multi\_des = extract\_helpers(extract\_outer\_des),
+\end{equation*}
+and $extract\_outer\_des$ fulfils the extraction function properties, as shown in the ``Subst" case.
+
 The desired sequence can be constructed as follows.
 
-Terms immediately under $\mathcal{E}$ in its structure that are values in $prg$ but aren't values in $\langle prg \rangle$ need to be reduced to equivalent values first. Apply the ``Cong" rule after each step of such a reduction to obtain an initial reduction $s \longrightarrow^*_{\langle prg \rangle} \mathcal{E'}[s]$ with $\mathcal{E'}[s] \sim \mathcal{E}[s]$.
+Terms immediately under $\mathcal{E}$ in its structure that are values in $prg$ but aren't values in $\langle prg \rangle$ need to be reduced to equivalent values first. For this, Lemma 4 can be applied multiple times to produce sequences that, starting with $\mathcal{E}[s^0]$ and always reducing the left-most such subterm, achieve exactly that. Thus we obtain an initial reduction $s \longrightarrow^*_{\langle prg \rangle} \widetilde{\mathcal{E}}[s^0]$ with $\widetilde{\mathcal{E}}[s^0] \sim \mathcal{E}[s^0]$.
 
-By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} t'^0$, for a $t'^0 \sim t^0$. By applying the congruence rule we get $\mathcal{E'}[s^0] \longrightarrow_{\langle prg \rangle} \mathcal{E'}[t'^0] \sim \mathcal{E}[t'^0] \sim \mathcal{E}[t^0]$.
+By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0}$, for a $\widetilde{t^0} \sim t^0$. By applying the congruence rule we get $\widetilde{\mathcal{E}}[s^0] \longrightarrow_{\langle prg \rangle} \widetilde{\mathcal{E}}[\widetilde{t^0}] \sim \mathcal{E}[\widetilde{t^0}] \sim \mathcal{E}[t^0]$.
 
 \end{enumerate}
 
 \end{proof}
 
-Note that the ``Cong" case doesn't depend upon the concrete transformation. Thus it can be reused in proofs of (1) for other transformations such that only the proof for the ``Subst" case needs to be given individually for each proof.
+Note that the ``Cong" case doesn't depend upon the concrete transformation, only on the property that the transformation is $extract\_helpers(e)$ for some helper extraction function $e$ that fulfils the extraction function properties. Thus it can be reused in proofs of (1a) for other transformations such that only the proof for the ``Subst" case needs to be given individually for each proof.
 
-\begin{proof}[Proof of (2)] By inspecting the proof of (1).
+\begin{proof}[Proof of (1b)] By inspecting the proof of (1a).
 
 \begin{enumerate}
 
 \item \textbf{``Subst" case}:
 
-Lemma 2.1 returns the relevant sequence by leaving the sequence constructed in the rest of the proof unchanged.
+The relevant sequence is constructed by Lemma 2. As stated in its proof, all the steps before the last are constructed using Lemma 4. It is also stated there that each step is equivalent to the start term, which can be seen by inspecting the proof of Lemma 4. Going through this proof, one can see that any step is constructed in such a way that it is equivalent to the previous.
 
-This sequence is constructed inductively, on the structure of $q$, starting with the original single-step sequence $s \longrightarrow_{prg} t$. In Case 1 and 2 of this induction, the sequence returned is the one from the induction hypothesis, unchanged.
+\item \textbf{``Cong" case}:
 
-The interesting case is Case 3, where the sequence is constructed by Lemma 3 from the one from the induction hypothesis. Lemma 3 itself is only interesting when $extract\_des$ changes the equations, otherwise, it returns the sequence it is given. The relevant construction is described in the lemma in three steps.
-
-The first partitions the given sequence steps. The ones that don't contain an application of the relevant ``Subst" rule are left unchanged. But they only use equations within $H$, the given helpers set. Again, by inspecting this proof, one can see that only the equations for $extract\_outer\_des$ are used to add equations to the helpers set. Thus they always depend upon the presence of a helper function which has a fresh name (different from all names in $prg$) and therefore doesn't typecheck against $prg$.
-
-Each sequence step in the other part of the partition is always replaced by two one-step reductions. The first of those starts at a term containing a call to a helper function which has a fresh name (different from all in $prg$) and therefore doesn't typecheck against $prg$. The second reduction both starts and ends at a term containing a call to this helper functions and therefore doesn't typecheck against $prg$, either.
+The relevant initial part of the sequence is constructed by Lemma 4. Again, by inspecting its proof, it can be seen that each step is equivalent to the start term.
 
 \end{enumerate}
 
-TODO: the other cases
-
 \end{proof}
 
-\begin{proof}[Proof of (3)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ ($s, t$ typecheck against $prg$).
+\begin{proof}[Proof of (2)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$, with $s \not\sim t$.
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
@@ -1618,52 +1618,21 @@ TODO: the other cases
 
 with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-When $(q, s') \in \textrm{Rules}(prg)$, so, by the ``Subst" rule, $s \longrightarrow_{prg} t$. It remains to be shown that $(q, s') \in \textrm{Rules}(prg)$.
-
 Since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$, by Lemma 2.2 there is an equation $r$ of $prg$ such that $\langle r \rangle^{extract\_outer\_des}$ contains $`` q = s' "$.
 
-\begin{itemize}
+$extract\_outer\_des$ fulfils the extraction function properties, as shown in the proof of (1a). By the first property it is either $q \sim s'$ or ($q_r \sim q$ and $t_r \sim s'$). In the first case, it follows that $s \sim s'[\sigma] = t$, contrary to the assumption.
 
-\item \underline{Case 1}: $r = `` q'.des(p_1, ..., p_k) = t' "$, $q'$ is destructor pattern:
-\begin{equation*}
-\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des}
-\end{equation*}
-It will be shown that this case contradicts the fact that $\langle r \rangle^{extract\_outer\_des}$ contains $`` q = s' "$. This is done by showing, by induction on the structure of $q''$, with $q' = q''.des'(...)$, for any $r$ that has the above form and any helpers set $H$ (including the empty one):
+Now, consider the second case. The desired reduction step can be derived as follows:
+\begin{prooftree}
+\AxiomC{$q_r[\sigma] =^? q_r \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $(q_r, t_r)$}
+\UnaryInfC{$q_r[\sigma] \longrightarrow_{prg} t_r[\sigma]$}
+\end{prooftree}
+It is clear that $\widetilde{t} := t_r[\sigma] \sim s'[\sigma] = t$. It is $\widetilde{s} := q_r[\sigma] \sim q[\sigma] = s$.
 
-$\langle r , H \rangle^{extract\_outer\_des}$ doesn't contain $`` q = s' "$ unless it is already within $H$
+It remains to be shown that the immediate subterms of $q_r[\sigma]$ are values in $prg$. Suppose that such a subterm $s^0$ reduces to some term in $prg$; this term cannot be equivalent to $s^0$. $s^0$ can either reduce by the ``Cong" rule, or by the ``Subst" rule. If it reduces by the ``Subst" rule, by Lemma 2, $s^0$ reduces to a non-equivalent term in $\langle prg \rangle$, as well. If it reduces by the ``Cong" rule, there is some subterm of $s^0$ that reduces by the ``Subst" rule in $prg$ to a non-equivalent term, and by Lemma 2 it also reduces to some non-equivalent term in $\langle prg \rangle$. As a consequence, $s^0$ reduces to some non-equivalent term in $\langle prg \rangle$, as well. It will be shown that this cannot be true.
 
-\begin{enumerate}
-
-\item $q''$ is hole pattern:
-\begin{multline*}
-\langle \langle r, H \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
-= \langle \langle `` q''.des'(...).des(p_1, ..., p_k) = t' " \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
-= \langle `` q''.des'(...) = hname(\langle q''.des'(...) \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \rangle^{extract\_outer\_des} \\
-= \big\langle `` q''.des'(...) = hname(\langle q''.des'(...) \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \big\rangle
-\end{multline*}
-with $hname, hsig, heqn$ according to the definition of $extract\_des$. The two only equations within $\langle r \rangle^{extract\_outer\_des}$ can be seen in the last line. The right-hand side of the first is a function application of the helper function ($hname(...)$) that doesn't typecheck in $prg$ and neither can a result of substituting its variables. The helper function of the left-hand side copattern of the second, defined according to $heqn$, isn't matched by any term that typechecks in $prg$. But these two are the only equations that could have been $`` q = s' "$ outside of $H$, thus $\langle r, H \rangle^{extract\_outer\_des}$ doesn't contain $`` q = s' "$.
-
-\item $q''$ is destructor pattern:
-\begin{multline*}
-\langle \langle r, H \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
-= \langle \langle `` q''.des'(...).des(p_1, ..., p_k) = t' ", H \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
-= \langle `` q''.des'(...) = hname(\langle q''.des'(...) \rangle^{vars}) ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \rangle^{extract\_outer\_des}
-\end{multline*}
-with $hname, hsig, heqn$ according to the definition of $extract\_des$. $q''.des'(...)$ has the above form for $r$. Let $q'' = q'''.des''(...)$ Apply the induction hypothesis to $q'''$ to obtain that $\langle r, H \rangle^{extract\_outer\_des}$ doesn't contain $`` q = s' "$ unless it is contained in $\{ \big\langle hsig, heqn \big\rangle \} \cup H$. But the left-hand side copattern defined according to $heqn$ isn't matched by any term that typechecks in $prg$. Thus only the equations within $H$ remain as candidates for $`` q = s' "$.
-
-\end{enumerate}
-
-\item \underline{Case 2}: $r = `` q'.des(p_1, ..., p_k) = t' "$, $q'$ is hole pattern:
-\begin{equation*}
-\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle
-\end{equation*}
-It follows that $r = `` q' = s "$, thus $(q, s') \in \textrm{Rules}(prg)$.
-
-\item \underline{Case 3}: $r = `` q' = t'$, $q'$ is hole pattern:
-
-The argument here is identical to that in Case 2.
-
-\end{itemize}
+If $s^0$ reduced to a non-equivalent term in $\langle prg \rangle$, then there would be a reduction from a subterm of $q[\sigma] \sim q_r[\sigma]$ to a non-equivalent term, as well. It follows that not all immediate subterms of $q[\sigma]$ are values. But it is $q[\sigma] = s$, and thus $s$ wouldn't reduce by the ``Subst" rule for $(q, s')$, contrary to the assumption.
 
 \item \textbf{``Cong" case}:
 
@@ -1675,7 +1644,11 @@ The argument here is identical to that in Case 2.
 
 with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
 
-By the induction hypothesis we have $s' \longrightarrow_{prg} t'$. By applying the congruence rule we get $\mathcal{E}[s'] \longrightarrow_{prg} \mathcal{E}[t']$.
+By the induction hypothesis we have $\widetilde{s'} \longrightarrow_{prg} \widetilde{t'}$, for some $\widetilde{s'} \sim s'$ and $\widetilde{t'} \sim t'$. By applying the congruence rule we get the desired
+\begin{equation*}
+s = \mathcal{E}[s'] \sim \mathcal{E}[\widetilde{s'}] \longrightarrow_{prg} \mathcal{E}[\widetilde{t'}] \sim \mathcal{E}[t'] = t,
+\end{equation*}
+because the subterms of $\mathcal{E}$ that are values in $\langle prg \rangle$ are values in $prg$, as well. Too see this, suppose that such a subterm $s^0$ reduces to some term in $prg$. It can either do so by the ``Cong" rule, or by the ``Subst" rule. If it reduces by the ``Subst" rule, then, by Lemma 2, $s^0$ reduces to a term in $\langle prg \rangle$, as well. But this contradicts the fact that $s^0$ is a value in $\langle prg \rangle$. If it reduces by the ``Cong" rule, there is some subterm of $s^0$ that reduces by the ``Subst" rule in $prg$, and by Lemma 2 it also reduces to some term in $\langle prg \rangle$. Thus this subterm of $s^0$ is not a value in $\langle prg \rangle$. It follows that neither is $s^0$, contrary to fact.
 
 \end{enumerate}
 
