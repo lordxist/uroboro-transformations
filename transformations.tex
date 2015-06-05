@@ -39,6 +39,7 @@
 \usepackage{fixltx2e}
 
 \newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
 \newtheorem{definition}{Definition}
 
 %%% HEADERS & FOOTERS
@@ -1270,239 +1271,88 @@ analogously to Case 1 (regard $t^0$ simply as an initial argument). This result 
 
 %%--
 
-Exemplary, the proof of strong bisimulation for the transformation $split$ is given below.
+%%-- under construction
 
-\subsection{Split}
+\subsection{Proofs of (1a) and (1b)}
 
-\begin{proof}[Proof of strong bisimulation, ``$\Rightarrow$"] ~
+The bisimulation statements (1a) and (1b) hold for $unmix_r$ (TODO: redefine, see TODO in its proof of (1a)), $elim\_outer\_des$ and $disentangle_d$ by virtue of Proposition 1 below. This is because they are all defined as $extract\_helpers(e)$ for some helper extraction function $e$ with the extraction function properties, and don't affect input terms. The relevant helper extraction functions are $extract\_outer\_des$, $extract\_all\_des$, and $extract\_patterns$, and their extraction function properties are proved in the subsection that follows Proposition 1.
+
+\begin{proposition}
+
+Let $e$ be any helper extraction function with the extraction function properties. Then let $trans$ be a transformation which doesn't affect input terms, and for programs, is defined as $extract\_helpers(e)$.
+
+\begin{enumerate}
+
+\item Statement (1a) holds for $trans$.
+
+\item Statement (1b) holds for $trans$.
+
+\end{enumerate}
+
+\begin{proof} ~
+
+\begin{enumerate}
+
+\item By induction on the structure of $\mathcal{D}$.
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
 
 \begin{prooftree}
-\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
-\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+\AxiomC{$s =^? q \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $(q, s') \in \textrm{Rules}(prg)$}
 \UnaryInfC{$s \longrightarrow s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-It will be shown: there exists a derivation $\mathcal{D}_1$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$; it is $\langle s \rangle = s$ and $\langle t \rangle = t$ ($split$ doesn't change input terms).
-
-For this, define $\mathcal{D}_1$ as follows:
-
-\begin{prooftree}
-\AxiomC{$s =^? q_2 \searrow \sigma_2$ with $(q_2, s'_2) \in \textrm{Rules}(\langle prg \rangle)$}
-\UnaryInfC{$s \longrightarrow s'_2[\sigma_2]$}
-\end{prooftree}
-
-with the rule $(q_2, s'_2) \in \textrm{Rules}(\langle prg \rangle)$ such that $s'_2[\sigma_2] = t$. Next, it will be shown that such a rule exists in $\textrm{Rules}(\langle prg \rangle)$.
-
-\begin{itemize}
-\item \underline{Case 1}: $q = q'.des(x_1, ..., x_k)$:
-
-Then there is a $(q, s')$ in Rules$(\langle prg \rangle)$ as well as in Rules$(prg)$, since $split$ doesn't change rules where the copattern has this form. This can be seen directly in the definition of $split$.
-
-Thus, set $q_2 := q$. It follows that $s'_2 = s', \sigma_2 = \sigma$ and finally $s'_2[\sigma_2] = s'[\sigma] = t$.
-
-\item \underline{Case 2}: $q = fun(con(x_1, ..., x_k), y_1, ..., y_n)$:
-
-The argument here is identical to that in Case 1.
-
-\item \underline{Case 3}: $q = fun(x_1, x_2, ..., x_n)$, where $x_1$ has codata type or $n = 0$:
-
-The argument here is identical to that in Case 1.
-
-\item \underline{Case 4}: $q = fun(x_1, x_2, ..., x_n)$, where $n > 0$, $x_1$ has data type:
-
-Since $(q, s') \in \textrm{Rules}(prg)$ there exists a $(q_2, s_2') \in \textrm{Rules}(\langle prg \rangle)$ with $q_2 = fun(con(y_1, ..., y_k), x_2, ..., x_n)$ and $s'_2 = s'[con(y_1, ..., y_k) / x_1]$ for every constructor $con$ with the correct type (i.e. with return type equal to the type of the first argument of $fun$). This can also be seen directly in the definition of $split$. The concrete choice of $q_2$ depends upon the choice of $con$ -- below, $con$ will be chosen as needed.
-
-It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 1}$ such that:
-
-\begin{prooftree}
-\AxiomC{$\mathcal{D}_{\textrm{PM}, 1}$}
-\UnaryInfC{$s =^? q_2 \searrow \sigma_2$}
-\end{prooftree}
-
-Remember that $s'_2[\sigma_2] = t$ has to hold.
-
-We know there exists a derivation $\mathcal{D}_{\textrm{PM}}$ for $s =^? q \searrow \sigma$.
-
-By inversion (Lemma 1) we have the following form for $\mathcal{D}_{\textrm{PM}}$:
-
-\begin{prooftree}
-\AxiomC{$t_1 =^? x_1 \searrow t_1 / x_1$}
-\AxiomC{...}
-\AxiomC{$t_n =^? x_n \searrow t_n / x_n$}
-\TrinaryInfC{$fun(t_1, ..., t_n) =^? q \searrow t_1 / x_1, ..., t_n / x_n$}
-\end{prooftree}
-
-With that, we also know the form of $s$: $s = fun(t_1, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}, 1}$ as follows:\\
-
-{\setlength{\parindent}{-\leftmargin}
-\AxiomC{$t_1^1 =^? y_1 \searrow t_1^1 / y_1$}
-\AxiomC{...}
-\AxiomC{$t_k^1 =^? y_k \searrow t_k^1 / y_k$}
-\TrinaryInfC{$t_1 =^? con(y_1, ..., y_k) \searrow t_1^1 / y_1, ..., t_k^1 / y_k$}
-\AxiomC{$t_2 =^? x_2 \searrow t_2 / x_2$}
-\AxiomC{...}
-\AxiomC{$t_n =^? x_2 \searrow t_n / x_n$}
-\QuaternaryInfC{$fun(t_1, ..., t_n) =^? q_2 \searrow t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  
-t_n / x_n$}
-\DisplayProof
-}
-
-Remember that the choice of $con$ and, depending upon that, $q_2$, was left open until needed. This is now the place where $con$ needs to be chosen such that $t_1 = con(t^1_1, ..., t^1_k)$, with the result that the derivation $\mathcal{D}_{\textrm{PM}, 1}$ given above is correct.
-
-It is still open why $t_1$ can be chosen that way at all. To see this, consider the following cases: If $t_1$ is a variable, $s$ isn't a closed term, which is excluded by definition. If $t_1$ isn't a variable but also not a value, then the ``Subst" rule wouldn't even apply. The only case that remains is that $t_1$ is a value that has data type. By inversion (TODO: prove lemma of inversion for values) we know that $t_1$ is a constructor application of a constructor $con$. Since $t_1$ has the correct type, this same constructor $con$ can simply be chosen, as stated above.
-
-In the derivation above, $\sigma_2 = t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  t_n / x_n$ and thus:
-
-$s'_2[\sigma_2] = s'[con(y_1, ..., y_k) / x_1][\sigma_2] \\
-= s'[con(t_1^1, ... t_k^1) / x_1, t_2 / x_2, ..., t_n / x_n] = s'[t_1 / x_1, t_2 / x_2, ..., t_n / x_n] = s'[\sigma] = t$
-
-There is no conflict between the substitutions for, e.g., $x_2$ and $y_1$, since all variables that are substituted are distinct, as can be seen in the definition of $split$.
-
-\end{itemize}
-
-Other cases for $q$ are outside the relevant input fragment for $split$. This concludes the proof for the ``Subst" case.
+We know that $e$ fulfils the extraction function properties. Using Lemma 2.1 for $e$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t'$ for a $t' \sim t$, since $trans = extract\_helpers(e)$.
 
 \item \textbf{``Cong" case}:
 
 \begin{prooftree}
-\AxiomC{$s' \longrightarrow t'$}
+\AxiomC{$s^0 \longrightarrow t^0$}
 \RightLabel{Cong}
-\UnaryInfC{$\mathcal{E}[s'] \longrightarrow \mathcal{E}[t']$}
+\UnaryInfC{$\mathcal{E}[s^0] \longrightarrow \mathcal{E}[t^0]$}
 \end{prooftree}
 
-with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
+with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$.
 
-By the induction hypothesis we have $s' \longrightarrow_{\langle prg \rangle} t'$. By applying the congruence rule we get $\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$.
+First note that Lemma 4 is applicable for $\langle prg \rangle$, because $trans = extract\_helpers(e)$ and $e$ fulfils the extraction function properties.
+
+The desired sequence can be constructed as follows.
+
+Terms immediately under $\mathcal{E}$ in its structure that are values in $prg$ but aren't values in $\langle prg \rangle$ need to be reduced to equivalent values first. For this, Lemma 4 can be applied multiple times to produce sequences that, starting with $\mathcal{E}[s^0]$ and always reducing the left-most such subterm, achieve exactly that. Thus we obtain an initial reduction $s \longrightarrow^*_{\langle prg \rangle} \widetilde{\mathcal{E}}[s^0]$ with $\widetilde{\mathcal{E}}[s^0] \sim \mathcal{E}[s^0]$.
+
+By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0}$, for a $\widetilde{t^0} \sim t^0$. By applying the congruence rule we get $\widetilde{\mathcal{E}}[s^0] \longrightarrow_{\langle prg \rangle} \widetilde{\mathcal{E}}[\widetilde{t^0}] \sim \mathcal{E}[\widetilde{t^0}] \sim \mathcal{E}[t^0]$.
+
+\end{enumerate}
+
+\item By inspecting the proof of 1.
+
+\begin{enumerate}
+
+\item \textbf{``Subst" case}:
+
+The relevant sequence is constructed by Lemma 2.1. As stated in its proof, all the steps before the last are constructed using Lemma 4. It is also stated there that each step is equivalent to the start term, which can be seen by inspecting the proof of Lemma 4. Going through this proof, one can see that any step is constructed in such a way that it is equivalent to the previous.
+
+\item \textbf{``Cong" case}:
+
+The relevant initial part of the sequence is constructed by Lemma 4. Again, by inspecting its proof, it can be seen that each step is equivalent to the start term.
+
+\end{enumerate}
 
 \end{enumerate}
 
 \end{proof}
 
-\begin{proof}[Proof of strong bisimulation, ``$\Leftarrow$"] ~
+\end{proposition}
 
-\begin{enumerate}
-\item \textbf{``Subst" case}:
+\subsubsection{Proofs for extraction function properties}
 
-\begin{prooftree}
-\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
-\UnaryInfC{$\langle s \rangle =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
-\UnaryInfC{$\langle s \rangle \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
-\end{prooftree}
+\begin{proof}[Proof for $extract\_outer\_des$]
 
-with $s'[\sigma] = \langle t \rangle$ ($\langle s \rangle = s, \langle t \rangle = t$); the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
-
-It will be shown: there exists a derivation $\mathcal{D}_1$ for $s \longrightarrow_{prg} t$.
-
-For this, define $\mathcal{D}_1$ as follows:
-
-\begin{prooftree}
-\AxiomC{$s =^? q_2 \searrow \sigma_2$ with $(q_2, s'_2) \in \textrm{Rules}(prg)$}
-\UnaryInfC{$s \longrightarrow_{prg} s'_2[\sigma_2]$}
-\end{prooftree}
-
-with the rule $(q_2, s'_2) \in \textrm{Rules}(prg)$ such that $s'_2[\sigma_2] = t$. Next, it will be shown that such a rule exists in $\textrm{Rules}(prg)$.
-
-\begin{itemize}
-\item \underline{Case 1}: $q = q'.des(x_1, ..., x_k)$:
-
-Then there is a $(q, s')$ in Rules$(prg)$ as well as in Rules$(\langle prg \rangle)$, since the result of $split$ doesn't contain a rule where the left-hand side copattern has this form unless the input of $split$ already contains this rule. This can be seen directly in the definition of $split$.
-
-Thus, set $q_2 := q$. It follows that $s'_2 = s', \sigma_2 = \sigma$ and finally $s'_2[\sigma_2] = s'[\sigma] = t$.
-
-\item \underline{Case 2}: $q = fun(x_1, ..., x_n)$:
-
-The argument is identical to that in Case 1.
-
-\item \underline{Case 3}: $q = fun(con(x_1, ..., x_k), y_2, ..., y_n)$:
-
-Then there either exists $(q, s')$ in Rules($prg$) as well, in this case proceed as in Case 1, or there exists $q_2 := fun(y_1, y_2, ..., y_n)$, ($q_2, s'_2) \in \textrm{Rules}(prg)$, $s' = s'_2[con(x_1, ..., x_k) / y_1]$. This is because these are the only cases in which a rule with left-hand side copattern $q$ of this form is present in Rules($\langle prg \rangle$), as can be seen directly in the definition of $split$.
-
-It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 1}$ such that:
-
-\begin{prooftree}
-\AxiomC{$\mathcal{D}_{\textrm{PM}, 1}$}
-\UnaryInfC{$s =^? q_2 \searrow \sigma_2$}
-\end{prooftree}
-
-Remember that $s'_2[\sigma_2] = t$ has to hold.
-
-We know there exists a derivation $\mathcal{D}_{\textrm{PM}}$ for $s =^? q \searrow \sigma$.
-
-By inversion (Lemma 1) we have the following form for $\mathcal{D}_{\textrm{PM}}$:\\
-
-{\setlength{\parindent}{-\leftmargin}
-\AxiomC{$t^1_1 =^? x_1 \searrow t^1_1 / x_1$}
-\AxiomC{...}
-\AxiomC{$t^1_k =^? x_k \searrow t^1_k / x_k$}
-\TrinaryInfC{$con(t^1_1, ..., t^1_k) =^? con(x_1, ..., x_k) \searrow t^1_1 / x_1, ..., t^1_k / x_k$}
-\AxiomC{$t_2 =^? y_2 \searrow t_2 / y_2$}
-\AxiomC{...}
-\AxiomC{$t_n =^? y_n \searrow t_n / y_n$}
-\QuaternaryInfC{$fun(con(t^1_1, ..., t^1_k), t_2 ..., t_n) =^? q \searrow t^1_1 / x_1, ..., t^1_k / x_k, t_2 / y_2, ..., t_n / y_n$}
-\DisplayProof
-}
-
-With that, $\sigma = t^1_1 / x_1, ..., t^1_k / x_k, t_2 / y_2, ..., t_n / y_n$ and we also know the form of $s$: $s = fun(con(t^1_1, ..., t^1_k), t_2, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}, 1}$ as follows:
-
-\begin{prooftree}
-\AxiomC{$con(t^1_1, ..., t^1_k) =^? y_1 \searrow con(t^1_1, ..., t^1_k) / y_1$}
-\AxiomC{$t_2 =^? y_2 \searrow t_2 / y_2$}
-\AxiomC{...}
-\AxiomC{$t_n =^? y_n \searrow t_n / y_n$}
-\QuaternaryInfC{$fun(con(t^1_1, ..., t^1_k), t_2, ..., t_n) =^? q_2 \searrow \sigma_2$}
-\end{prooftree}
-
-In the derivation above, $\sigma_2 = con(t_1^1 ..., t_k^1) / y_1,  t_2 / y_2, ...,  t_n / y_n$ and thus:
-
-$t = s'[\sigma] = s'_2[con(x_1, ..., x_k) / y_1][\sigma] = s'_2[con(t^1_1, ..., t^1_k) / y_1, t_2 / y_2, ..., t_n / y_n] = s'_2[\sigma_2]$
-
-There is no conflict between the substitutions for, e.g., $x_1$ and $y_2$, since all variables that are substituted are distinct, as can be seen in the definition of $split$.
-
-\end{itemize}
-
-This concludes the proof for the ``Subst" case.
-
-\item \textbf{``Cong" case}:
-
-\begin{prooftree}
-\AxiomC{$s' \longrightarrow_{\langle prg \rangle} t'$}
-\RightLabel{Cong}
-\UnaryInfC{$\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$}
-\end{prooftree}
-
-with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
-
-By the induction hypothesis we have $s' \longrightarrow_{prg} t'$. By applying the congruence rule we get $\mathcal{E}[s'] \longrightarrow_{prg} \mathcal{E}[t']$.
-
-\end{enumerate}
-
-\end{proof}
-
-\subsection{Eliminate multiple destructors}
-
-For step $elim\_multi\_des$, the described kind of weak bisimulation holds.
-
-\begin{proof}[Proof of (1a)] By induction on the structure of $\mathcal{D}$.
-
-\begin{enumerate}
-\item \textbf{``Subst" case}:
-
-\begin{prooftree}
-\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
-\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
-\UnaryInfC{$s \longrightarrow s'[\sigma]$}
-\end{prooftree}
-
-with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
-
-It will be shown that $extract\_outer\_des$ fulfils the extraction function properties as given in Lemma 2. Using Lemma 2 for $e = extract\_outer\_des$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t'$ for a $t' \sim t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
-
-It is now proved that, for each equation $`` q_r = t_r "$ with $\langle `` q_r = t_r " \rangle^{extract\_outer\_des} = \big\langle `` q_{r'} = t_{r'} ", H \big\rangle$, the extraction function properties hold. This is done by induction on the structure of $q_r$.
+By induction on the structure of $q_r$.
 
 \begin{itemize}
 
@@ -1585,51 +1435,235 @@ By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, 
 
 \end{itemize}
 
-This concludes the proof for the ``Subst" case.
+\end{proof}
 
-\item \textbf{``Cong" case}:
+\begin{proof}[Proof for $extract\_all\_des$]
 
-\begin{prooftree}
-\AxiomC{$s^0 \longrightarrow t^0$}
-\RightLabel{Cong}
-\UnaryInfC{$\mathcal{E}[s^0] \longrightarrow \mathcal{E}[t^0]$}
-\end{prooftree}
-
-with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$.
-
-First note that Lemma 4 is applicable for $\langle prg \rangle$, because
-\begin{equation*}
-elim\_multi\_des = extract\_helpers(extract\_outer\_des),
-\end{equation*}
-and $extract\_outer\_des$ fulfils the extraction function properties, as shown in the ``Subst" case.
-
-The desired sequence can be constructed as follows.
-
-Terms immediately under $\mathcal{E}$ in its structure that are values in $prg$ but aren't values in $\langle prg \rangle$ need to be reduced to equivalent values first. For this, Lemma 4 can be applied multiple times to produce sequences that, starting with $\mathcal{E}[s^0]$ and always reducing the left-most such subterm, achieve exactly that. Thus we obtain an initial reduction $s \longrightarrow^*_{\langle prg \rangle} \widetilde{\mathcal{E}}[s^0]$ with $\widetilde{\mathcal{E}}[s^0] \sim \mathcal{E}[s^0]$.
-
-By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0}$, for a $\widetilde{t^0} \sim t^0$. By applying the congruence rule we get $\widetilde{\mathcal{E}}[s^0] \longrightarrow_{\langle prg \rangle} \widetilde{\mathcal{E}}[\widetilde{t^0}] \sim \mathcal{E}[\widetilde{t^0}] \sim \mathcal{E}[t^0]$.
-
-\end{enumerate}
+TODO (very similar to $extract\_outer\_des$)
 
 \end{proof}
 
-Note that the ``Cong" case doesn't depend upon the concrete transformation, only on the property that the transformation is $extract\_helpers(e)$ for some helper extraction function $e$ that fulfils the extraction function properties. Thus it can be reused in proofs of (1a) for other transformations such that only the proof for the ``Subst" case needs to be given individually for each proof.
+\begin{proof}[Proof for $extract\_patterns$] The following cases need to be distinguished.
 
-\begin{proof}[Proof of (1b)] By inspecting the proof of (1a).
+\begin{itemize}
+
+\item \underline{Case 1}: $q_r$ is hole pattern:
+
+$\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_r = t_r ", \emptyset \big\rangle$
 
 \begin{enumerate}
+\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
 
-\item \textbf{``Subst" case}:
+Proof: It is $H = \emptyset$ and thus the property is trivially fulfilled.
 
-The relevant sequence is constructed by Lemma 2. As stated in its proof, all the steps before the last are constructed using Lemma 4. It is also stated there that each step is equivalent to the start term, which can be seen by inspecting the proof of Lemma 4. Going through this proof, one can see that any step is constructed in such a way that it is equivalent to the previous.
+\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
 
-\item \textbf{``Cong" case}:
+Proof: Trivially true, since $H = \emptyset$.
 
-The relevant initial part of the sequence is constructed by Lemma 4. Again, by inspecting its proof, it can be seen that each step is equivalent to the start term.
+\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
+
+Proof: By the definition of $extract\_patterns$ (as given above) it is $r = r'$ and $H = \emptyset$.
+
+\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
+
+Proof: Clear since there is only one equation.
+
+\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+
+Proof: Trivially true, because $H = \emptyset$.
 
 \end{enumerate}
 
+\item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
+
+The argument is identical to that in Case 1.
+
+\item \underline{Case 3}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
+
+$\langle q \rangle^{extract\_patterns}$\\
+$= \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{ \big\langle hsig, heqn \big\rangle \} \big\rangle $
+
+with $hname, hsig, heqn$ as in the definition of $extract\_patterns$.
+
+\begin{enumerate}
+\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
+
+Proof: For the only equation $`` q_h = t_h "$ in $H$, it is $q_h = hname(p_1, ..., p_n, p'_1, ..., p'_k) = \langle fun, des, prg \rangle^{autogen}(p_1, ..., p_n, p'_1, ..., p'_k)$ and $t_h = t_r$, by the definition of $heqn$. It follows that $q_r \sim q_h$ and $t_r \sim t_h$.
+
+\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
+
+Proof: This equation is the only equation in $H$, as shown in the proof of the first property.
+
+\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
+
+Proof: It is $q_{r'} = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$ and $t_{r'} = hname(x_1, ..., x_n, x'_1, ..., x'_k) = \langle fun, des, prg \rangle^{autogen}(x_1, ..., x_n, x'_1, ..., x'_k)$ and thus $q_{r'} \sim t_{r'}$.
+
+\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
+
+Proof: TODO
+
+\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+
+Proof: TODO
+
+\end{enumerate}
+
+\end{itemize}
+
 \end{proof}
+
+\subsection{Proofs of (2)}
+
+TODO: momentarily contains the old versions of some proofs of (1a), (1b) and other old versions that all still need to be reworked
+
+\subsubsection{Eliminate multiple destructors}
+
+%- old version of (1a), (1b)
+%For step $elim\_multi\_des$, the described kind of weak bisimulation holds.
+%
+%\begin{proof}[Proof of (1a)] By induction on the structure of $\mathcal{D}$.
+%
+%\begin{enumerate}
+%\item \textbf{``Subst" case}:
+%
+%\begin{prooftree}
+%\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+%\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+%\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+%\end{prooftree}
+%
+%with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+%
+%It will be shown that $extract\_outer\_des$ fulfils the extraction function properties as given in Lemma 2. Using Lemma 2 for $e = extract\_outer\_des$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t'$ for a $t' \sim t$, since $elim\_multi\_des = extract\_helpers(extract\_outer\_des)$.
+%
+%It is now proved that, for each equation $`` q_r = t_r "$ with $\langle `` q_r = t_r " \rangle^{extract\_outer\_des} = \big\langle `` q_{r'} = t_{r'} ", H \big\rangle$, the extraction function properties hold. This is done by induction on the structure of $q_r$.
+%
+%\begin{itemize}
+%
+%\item \underline{Case 1}: $q_r$ is hole pattern, or: $q_r = q'_r.des(p_1, ..., p_k)$, $q'_r$ is hole pattern.
+%\begin{equation*}
+%\langle `` q_r = t_r " \rangle^{extract\_outer\_des} = \big\langle `` q_r = t_r ", \emptyset \big\rangle
+%\end{equation*}
+%Each extraction function property is now listed along with a proof for it in this case.
+%
+%\begin{enumerate}
+%\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$) (Note/TODO: terms and copatterns are conflated for some $\sim$ properties, note this somewhere)
+%
+%Proof: It is $H = \emptyset$ and thus the property is trivially fulfilled.
+%
+%\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
+%
+%Proof: Trivially true, since $H = \emptyset$.
+%
+%\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
+%
+%Proof: By the definition of $extract\_outer\_des$ (as given above) it is $r = r'$ and $H = \emptyset$.
+%
+%\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
+%
+%Proof: Clear since there is only one equation.
+%
+%\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+%
+%Proof: Trivially true, because $H = \emptyset$.
+%
+%\end{enumerate}
+%
+%\item \underline{Case 2}: $q_r = q'_r.des(p_1, ..., p_k)$, $q'_r$ is destructor pattern.
+%\begin{equation*}
+%\langle `` q_r = t_r " \rangle^{extract\_outer\_des} = \langle \langle `` q_r = t_r " \rangle^{extract\_des} \rangle^{extract\_outer\_des}
+%\end{equation*}
+%First, note that
+%\begin{equation*}
+%\langle `` q_r = t_r " \rangle^{extract\_des} = \big\langle r'^0, \{h_0\} \big\rangle.
+%\end{equation*}
+%The left-hand side of $r'^0$ is $q'_r$. Also, for any equation $r_0$, it can be easily seen by induction on its structure that $h_0$ is part of the helper equations in $\big\langle r_0, \{h_0\} \big\rangle^{extract\_outer\_des}$. Especially, $h_0$ is part of $H$.
+%
+%Let $\big\langle r_0, H_0 \big\rangle \boxplus H_1 := \big\langle r_0, H_0 \cup H_1 \big\rangle$. Because $h_0$ is part of the helper equations in $\langle r_0, \{h_0\} \rangle^{extract\_outer\_des}$, it follows that
+%\begin{multline*}
+%\langle r'^0, \{h_0\} \rangle^{extract\_outer\_des} = \big\langle r', H \big\rangle = \big\langle r', H' \cup \{h_0\} \big\rangle \\
+%= \big\langle r', H' \big\rangle \boxplus \{h_0\} = \langle r'^0 \rangle^{extract\_outer\_des} \boxplus \{h_0\}
+%\end{multline*}
+%
+%Again, each extraction function property is now listed along with a proof for it in this case.
+%
+%\begin{enumerate}
+%
+%\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$) (Note/TODO: terms and copatterns are conflated for some $\sim$ properties, note this somewhere)
+%
+%Proof: From Lemma 3 we have this property for $extract\_des$, especially for $`` q_r = t_r "$. This means that the property for $extract\_outer\_des$ is at least fulfilled with respect to $\{h_0\}$.
+%
+%By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, for every equation $`` q_h = t_h "$ in $H'$ it is either $q_h \sim t_h$ or ($q_{r'^0} \sim q_h$ and $t_{r'^0} \sim t_h$). For equations of the first case we thus have the desired property. For equations of the second case we have $q_h \sim t_h$ by the third property of the induction hypothesis (since $H \neq \emptyset$) and transitivity.
+%
+%\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
+%
+%Proof: $h_0$ is such an equation, by the definition of $extract\_des$.
+%
+%\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
+%
+%Proof: We have $q_{r'} \sim t_{r'}$ from this property of the induction hypothesis applied to $q'_r$.
+%
+%\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
+%
+%Proof: By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, the set of equations in $\big\langle r', H' \big\rangle$ is deterministic.
+%
+%TODO
+%
+%\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+%
+%Proof: From Lemma 3 we have this property for $extract\_des$, especially for $`` q_r = t_r "$. This means that the property for $extract\_outer\_des$ is at least fulfilled with respect to $\{h_0\}$.
+%
+%By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, for every equation $`` q_h = t_h "$ in $H'$, $q_h$ is equivalent to a sub-copattern of the left-hand side $q'_r$ of $r'^0$. But $q'_r$ is in turn a sub-copattern of $q_r$.
+%
+%\end{enumerate}
+%
+%\end{itemize}
+%
+%This concludes the proof for the ``Subst" case.
+%
+%\item \textbf{``Cong" case}:
+%
+%\begin{prooftree}
+%\AxiomC{$s^0 \longrightarrow t^0$}
+%\RightLabel{Cong}
+%\UnaryInfC{$\mathcal{E}[s^0] \longrightarrow \mathcal{E}[t^0]$}
+%\end{prooftree}
+%
+%with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$.
+%
+%First note that Lemma 4 is applicable for $\langle prg \rangle$, because
+%\begin{equation*}
+%elim\_multi\_des = extract\_helpers(extract\_outer\_des),
+%\end{equation*}
+%and $extract\_outer\_des$ fulfils the extraction function properties, as shown in the ``Subst" case.
+%
+%The desired sequence can be constructed as follows.
+%
+%Terms immediately under $\mathcal{E}$ in its structure that are values in $prg$ but aren't values in $\langle prg \rangle$ need to be reduced to equivalent values first. For this, Lemma 4 can be applied multiple times to produce sequences that, starting with $\mathcal{E}[s^0]$ and always reducing the left-most such subterm, achieve exactly that. Thus we obtain an initial reduction $s \longrightarrow^*_{\langle prg \rangle} \widetilde{\mathcal{E}}[s^0]$ with $\widetilde{\mathcal{E}}[s^0] \sim \mathcal{E}[s^0]$.
+%
+%By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0}$, for a $\widetilde{t^0} \sim t^0$. By applying the congruence rule we get $\widetilde{\mathcal{E}}[s^0] \longrightarrow_{\langle prg \rangle} \widetilde{\mathcal{E}}[\widetilde{t^0}] \sim \mathcal{E}[\widetilde{t^0}] \sim \mathcal{E}[t^0]$.
+%
+%\end{enumerate}
+%
+%\end{proof}
+%
+%Note that the ``Cong" case doesn't depend upon the concrete transformation, only on the property that the transformation is $extract\_helpers(e)$ for some helper extraction function $e$ that fulfils the extraction function properties. Thus it can be reused in proofs of (1a) for other transformations such that only the proof for the ``Subst" case needs to be given individually for each proof.
+%
+%\begin{proof}[Proof of (1b)] By inspecting the proof of (1a).
+%
+%\begin{enumerate}
+%
+%\item \textbf{``Subst" case}:
+%
+%The relevant sequence is constructed by Lemma 2. As stated in its proof, all the steps before the last are constructed using Lemma 4. It is also stated there that each step is equivalent to the start term, which can be seen by inspecting the proof of Lemma 4. Going through this proof, one can see that any step is constructed in such a way that it is equivalent to the previous.
+%
+%\item \textbf{``Cong" case}:
+%
+%The relevant initial part of the sequence is constructed by Lemma 4. Again, by inspecting its proof, it can be seen that each step is equivalent to the start term.
+%
+%\end{enumerate}
+%
+%\end{proof}
 
 \begin{proof}[Proof of (2)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$, with $s \not\sim t$.
 
@@ -1723,7 +1757,7 @@ because the subterms of $\mathcal{E}$ that are values in $\langle prg \rangle$ a
 
 \end{proof}
 
-\subsection{Unmix (defunc.)}
+\subsubsection{Unmix (defunc.)}
 
 For step $unmix_d$, the described kind of weak bisimulation holds.
 
@@ -1777,104 +1811,105 @@ TODO
 
 \end{proof}
 
-\subsection{Disentangle (defunc.)}
+\subsubsection{Disentangle (defunc.)}
 
-For step $disentangle_d$, the described kind of weak bisimulation holds.
-
-\begin{proof}[Proof of (1a)] By induction on the structure of $\mathcal{D}$.
-
-\begin{enumerate}
-
-\item \textbf{``Subst" case}:
-
-\begin{prooftree}
-\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
-\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
-\UnaryInfC{$s \longrightarrow s'[\sigma]$}
-\end{prooftree}
-
-with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
-
-It will be shown that $extract\_patterns$ fulfils the extraction function properties as given in Lemma 2. Using Lemma 2.1 for $e = extract\_patterns$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ for a $\widetilde{t} \sim t$, since $disentangle_d = extract\_helpers(extract\_patterns)$.
-
-It is now proved that, for each equation $`` q_r = t_r "$ with $\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_{r'} = t_{r'} ", H \big\rangle$, the extraction function properties hold.
-
-\begin{itemize}
-
-\item \underline{Case 1}: $q_r$ is hole pattern:
-
-$\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_r = t_r ", \emptyset \big\rangle$
-
-\begin{enumerate}
-\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
-
-Proof: It is $H = \emptyset$ and thus the property is trivially fulfilled.
-
-\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
-
-Proof: Trivially true, since $H = \emptyset$.
-
-\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
-
-Proof: By the definition of $extract\_patterns$ (as given above) it is $r = r'$ and $H = \emptyset$.
-
-\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
-
-Proof: Clear since there is only one equation.
-
-\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
-
-Proof: Trivially true, because $H = \emptyset$.
-
-\end{enumerate}
-
-\item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
-
-The argument is identical to that in Case 1.
-
-\item \underline{Case 3}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
-
-$\langle q \rangle^{extract\_patterns}$\\
-$= \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{ \big\langle hsig, heqn \big\rangle \} \big\rangle $
-
-with $hname, hsig, heqn$ as in the definition of $extract\_patterns$.
-
-\begin{enumerate}
-\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
-
-Proof: For the only equation $`` q_h = t_h "$ in $H$, it is $q_h = hname(p_1, ..., p_n, p'_1, ..., p'_k) = \langle fun, des, prg \rangle^{autogen}(p_1, ..., p_n, p'_1, ..., p'_k)$ and $t_h = t_r$, by the definition of $heqn$. It follows that $q_r \sim q_h$ and $t_r \sim t_h$.
-
-\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
-
-Proof: This equation is the only equation in $H$, as shown in the proof of the first property.
-
-\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
-
-Proof: It is $q_{r'} = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$ and $t_{r'} = hname(x_1, ..., x_n, x'_1, ..., x'_k) = \langle fun, des, prg \rangle^{autogen}(x_1, ..., x_n, x'_1, ..., x'_k)$ and thus $q_{r'} \sim t_{r'}$.
-
-\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
-
-Proof: TODO
-
-\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
-
-Proof: TODO
-
-\end{enumerate}
-
-\end{itemize}
-
-\end{enumerate}
-
-For the ``Cong" case, proceed as with $elim\_multi\_des$.
-
-\end{proof}
-
-\begin{proof}[Proof of (1b)] By inspecting the proof of (1a).
-
-TODO
-
-\end{proof}
+% old version for (1a), (1b)
+%For step $disentangle_d$, the described kind of weak bisimulation holds.
+%
+%\begin{proof}[Proof of (1a)] By induction on the structure of $\mathcal{D}$.
+%
+%\begin{enumerate}
+%
+%\item \textbf{``Subst" case}:
+%
+%\begin{prooftree}
+%\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+%\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+%\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+%\end{prooftree}
+%
+%with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+%
+%It will be shown that $extract\_patterns$ fulfils the extraction function properties as given in Lemma 2. Using Lemma 2.1 for $e = extract\_patterns$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ for a $\widetilde{t} \sim t$, since $disentangle_d = extract\_helpers(extract\_patterns)$.
+%
+%It is now proved that, for each equation $`` q_r = t_r "$ with $\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_{r'} = t_{r'} ", H \big\rangle$, the extraction function properties hold.
+%
+%\begin{itemize}
+%
+%\item \underline{Case 1}: $q_r$ is hole pattern:
+%
+%$\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_r = t_r ", \emptyset \big\rangle$
+%
+%\begin{enumerate}
+%\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
+%
+%Proof: It is $H = \emptyset$ and thus the property is trivially fulfilled.
+%
+%\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
+%
+%Proof: Trivially true, since $H = \emptyset$.
+%
+%\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
+%
+%Proof: By the definition of $extract\_patterns$ (as given above) it is $r = r'$ and $H = \emptyset$.
+%
+%\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
+%
+%Proof: Clear since there is only one equation.
+%
+%\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+%
+%Proof: Trivially true, because $H = \emptyset$.
+%
+%\end{enumerate}
+%
+%\item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
+%
+%The argument is identical to that in Case 1.
+%
+%\item \underline{Case 3}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
+%
+%$\langle q \rangle^{extract\_patterns}$\\
+%$= \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{ \big\langle hsig, heqn \big\rangle \} \big\rangle $
+%
+%with $hname, hsig, heqn$ as in the definition of $extract\_patterns$.
+%
+%\begin{enumerate}
+%\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
+%
+%Proof: For the only equation $`` q_h = t_h "$ in $H$, it is $q_h = hname(p_1, ..., p_n, p'_1, ..., p'_k) = \langle fun, des, prg \rangle^{autogen}(p_1, ..., p_n, p'_1, ..., p'_k)$ and $t_h = t_r$, by the definition of $heqn$. It follows that $q_r \sim q_h$ and $t_r \sim t_h$.
+%
+%\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
+%
+%Proof: This equation is the only equation in $H$, as shown in the proof of the first property.
+%
+%\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
+%
+%Proof: It is $q_{r'} = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$ and $t_{r'} = hname(x_1, ..., x_n, x'_1, ..., x'_k) = \langle fun, des, prg \rangle^{autogen}(x_1, ..., x_n, x'_1, ..., x'_k)$ and thus $q_{r'} \sim t_{r'}$.
+%
+%\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
+%
+%Proof: TODO
+%
+%\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+%
+%Proof: TODO
+%
+%\end{enumerate}
+%
+%\end{itemize}
+%
+%\end{enumerate}
+%
+%For the ``Cong" case, proceed as with $elim\_multi\_des$.
+%
+%\end{proof}
+%
+%\begin{proof}[Proof of (1b)] By inspecting the proof of (1a).
+%
+%TODO
+%
+%\end{proof}
 
 \begin{proof}[Proof of (2)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$, with $s \not\sim t$.
 
@@ -1927,7 +1962,7 @@ For the ``Cong" case, proceed as with $elim\_multi\_des$.
 
 \end{proof}
 
-\subsection{Unmix (refunc.)}
+\subsubsection{Unmix (refunc.)}
 
 For step $unmix_r$, the described kind of weak bisimulation holds.
 
@@ -1987,7 +2022,7 @@ For the ``Cong" case, proceed as with $elim\_multi\_des$.
 
 \end{proof}
 
-\subsection{Disentangle (refunc.)}
+\subsubsection{Disentangle (refunc.)}
 
 For step $disentangle_r$, the described kind of weak bisimulation holds.
 
@@ -2202,7 +2237,222 @@ TODO
 
 \end{proof}
 
-\subsection{Actual defunctionalization}
+\subsection{Proofs of strong bisimulation}
+
+Strong bisimulation holds for $split$, actual defunctionalization, and actual refunctionalization.
+
+\subsubsection{Split}
+
+\begin{proof}[Proof of strong bisimulation, ``$\Rightarrow$"] ~
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$s =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
+
+It will be shown: there exists a derivation $\mathcal{D}_1$ for $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$; it is $\langle s \rangle = s$ and $\langle t \rangle = t$ ($split$ doesn't change input terms).
+
+For this, define $\mathcal{D}_1$ as follows:
+
+\begin{prooftree}
+\AxiomC{$s =^? q_2 \searrow \sigma_2$ with $(q_2, s'_2) \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$s \longrightarrow s'_2[\sigma_2]$}
+\end{prooftree}
+
+with the rule $(q_2, s'_2) \in \textrm{Rules}(\langle prg \rangle)$ such that $s'_2[\sigma_2] = t$. Next, it will be shown that such a rule exists in $\textrm{Rules}(\langle prg \rangle)$.
+
+\begin{itemize}
+\item \underline{Case 1}: $q = q'.des(x_1, ..., x_k)$:
+
+Then there is a $(q, s')$ in Rules$(\langle prg \rangle)$ as well as in Rules$(prg)$, since $split$ doesn't change rules where the copattern has this form. This can be seen directly in the definition of $split$.
+
+Thus, set $q_2 := q$. It follows that $s'_2 = s', \sigma_2 = \sigma$ and finally $s'_2[\sigma_2] = s'[\sigma] = t$.
+
+\item \underline{Case 2}: $q = fun(con(x_1, ..., x_k), y_1, ..., y_n)$:
+
+The argument here is identical to that in Case 1.
+
+\item \underline{Case 3}: $q = fun(x_1, x_2, ..., x_n)$, where $x_1$ has codata type or $n = 0$:
+
+The argument here is identical to that in Case 1.
+
+\item \underline{Case 4}: $q = fun(x_1, x_2, ..., x_n)$, where $n > 0$, $x_1$ has data type:
+
+Since $(q, s') \in \textrm{Rules}(prg)$ there exists a $(q_2, s_2') \in \textrm{Rules}(\langle prg \rangle)$ with $q_2 = fun(con(y_1, ..., y_k), x_2, ..., x_n)$ and $s'_2 = s'[con(y_1, ..., y_k) / x_1]$ for every constructor $con$ with the correct type (i.e. with return type equal to the type of the first argument of $fun$). This can also be seen directly in the definition of $split$. The concrete choice of $q_2$ depends upon the choice of $con$ -- below, $con$ will be chosen as needed.
+
+It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 1}$ such that:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}, 1}$}
+\UnaryInfC{$s =^? q_2 \searrow \sigma_2$}
+\end{prooftree}
+
+Remember that $s'_2[\sigma_2] = t$ has to hold.
+
+We know there exists a derivation $\mathcal{D}_{\textrm{PM}}$ for $s =^? q \searrow \sigma$.
+
+By inversion (Lemma 1) we have the following form for $\mathcal{D}_{\textrm{PM}}$:
+
+\begin{prooftree}
+\AxiomC{$t_1 =^? x_1 \searrow t_1 / x_1$}
+\AxiomC{...}
+\AxiomC{$t_n =^? x_n \searrow t_n / x_n$}
+\TrinaryInfC{$fun(t_1, ..., t_n) =^? q \searrow t_1 / x_1, ..., t_n / x_n$}
+\end{prooftree}
+
+With that, we also know the form of $s$: $s = fun(t_1, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}, 1}$ as follows:\\
+
+{\setlength{\parindent}{-\leftmargin}
+\AxiomC{$t_1^1 =^? y_1 \searrow t_1^1 / y_1$}
+\AxiomC{...}
+\AxiomC{$t_k^1 =^? y_k \searrow t_k^1 / y_k$}
+\TrinaryInfC{$t_1 =^? con(y_1, ..., y_k) \searrow t_1^1 / y_1, ..., t_k^1 / y_k$}
+\AxiomC{$t_2 =^? x_2 \searrow t_2 / x_2$}
+\AxiomC{...}
+\AxiomC{$t_n =^? x_2 \searrow t_n / x_n$}
+\QuaternaryInfC{$fun(t_1, ..., t_n) =^? q_2 \searrow t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  
+t_n / x_n$}
+\DisplayProof
+}
+
+Remember that the choice of $con$ and, depending upon that, $q_2$, was left open until needed. This is now the place where $con$ needs to be chosen such that $t_1 = con(t^1_1, ..., t^1_k)$, with the result that the derivation $\mathcal{D}_{\textrm{PM}, 1}$ given above is correct.
+
+It is still open why $t_1$ can be chosen that way at all. To see this, consider the following cases: If $t_1$ is a variable, $s$ isn't a closed term, which is excluded by definition. If $t_1$ isn't a variable but also not a value, then the ``Subst" rule wouldn't even apply. The only case that remains is that $t_1$ is a value that has data type. By inversion (TODO: prove lemma of inversion for values) we know that $t_1$ is a constructor application of a constructor $con$. Since $t_1$ has the correct type, this same constructor $con$ can simply be chosen, as stated above.
+
+In the derivation above, $\sigma_2 = t_1^1 / y_1, ..., t_k^1 / y_k,  t_2 / x_2, ...,  t_n / x_n$ and thus:
+
+$s'_2[\sigma_2] = s'[con(y_1, ..., y_k) / x_1][\sigma_2] \\
+= s'[con(t_1^1, ... t_k^1) / x_1, t_2 / x_2, ..., t_n / x_n] = s'[t_1 / x_1, t_2 / x_2, ..., t_n / x_n] = s'[\sigma] = t$
+
+There is no conflict between the substitutions for, e.g., $x_2$ and $y_1$, since all variables that are substituted are distinct, as can be seen in the definition of $split$.
+
+\end{itemize}
+
+Other cases for $q$ are outside the relevant input fragment for $split$. This concludes the proof for the ``Subst" case.
+
+\item \textbf{``Cong" case}:
+
+\begin{prooftree}
+\AxiomC{$s' \longrightarrow t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[s'] \longrightarrow \mathcal{E}[t']$}
+\end{prooftree}
+
+with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
+
+By the induction hypothesis we have $s' \longrightarrow_{\langle prg \rangle} t'$. By applying the congruence rule we get $\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$.
+
+\end{enumerate}
+
+\end{proof}
+
+\begin{proof}[Proof of strong bisimulation, ``$\Leftarrow$"] ~
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$\langle s \rangle =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$\langle s \rangle \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = \langle t \rangle$ ($\langle s \rangle = s, \langle t \rangle = t$); the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching.
+
+It will be shown: there exists a derivation $\mathcal{D}_1$ for $s \longrightarrow_{prg} t$.
+
+For this, define $\mathcal{D}_1$ as follows:
+
+\begin{prooftree}
+\AxiomC{$s =^? q_2 \searrow \sigma_2$ with $(q_2, s'_2) \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow_{prg} s'_2[\sigma_2]$}
+\end{prooftree}
+
+with the rule $(q_2, s'_2) \in \textrm{Rules}(prg)$ such that $s'_2[\sigma_2] = t$. Next, it will be shown that such a rule exists in $\textrm{Rules}(prg)$.
+
+\begin{itemize}
+\item \underline{Case 1}: $q = q'.des(x_1, ..., x_k)$:
+
+Then there is a $(q, s')$ in Rules$(prg)$ as well as in Rules$(\langle prg \rangle)$, since the result of $split$ doesn't contain a rule where the left-hand side copattern has this form unless the input of $split$ already contains this rule. This can be seen directly in the definition of $split$.
+
+Thus, set $q_2 := q$. It follows that $s'_2 = s', \sigma_2 = \sigma$ and finally $s'_2[\sigma_2] = s'[\sigma] = t$.
+
+\item \underline{Case 2}: $q = fun(x_1, ..., x_n)$:
+
+The argument is identical to that in Case 1.
+
+\item \underline{Case 3}: $q = fun(con(x_1, ..., x_k), y_2, ..., y_n)$:
+
+Then there either exists $(q, s')$ in Rules($prg$) as well, in this case proceed as in Case 1, or there exists $q_2 := fun(y_1, y_2, ..., y_n)$, ($q_2, s'_2) \in \textrm{Rules}(prg)$, $s' = s'_2[con(x_1, ..., x_k) / y_1]$. This is because these are the only cases in which a rule with left-hand side copattern $q$ of this form is present in Rules($\langle prg \rangle$), as can be seen directly in the definition of $split$.
+
+It is to be shown that there exists $\mathcal{D}_{\textrm{PM}, 1}$ such that:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}, 1}$}
+\UnaryInfC{$s =^? q_2 \searrow \sigma_2$}
+\end{prooftree}
+
+Remember that $s'_2[\sigma_2] = t$ has to hold.
+
+We know there exists a derivation $\mathcal{D}_{\textrm{PM}}$ for $s =^? q \searrow \sigma$.
+
+By inversion (Lemma 1) we have the following form for $\mathcal{D}_{\textrm{PM}}$:\\
+
+{\setlength{\parindent}{-\leftmargin}
+\AxiomC{$t^1_1 =^? x_1 \searrow t^1_1 / x_1$}
+\AxiomC{...}
+\AxiomC{$t^1_k =^? x_k \searrow t^1_k / x_k$}
+\TrinaryInfC{$con(t^1_1, ..., t^1_k) =^? con(x_1, ..., x_k) \searrow t^1_1 / x_1, ..., t^1_k / x_k$}
+\AxiomC{$t_2 =^? y_2 \searrow t_2 / y_2$}
+\AxiomC{...}
+\AxiomC{$t_n =^? y_n \searrow t_n / y_n$}
+\QuaternaryInfC{$fun(con(t^1_1, ..., t^1_k), t_2 ..., t_n) =^? q \searrow t^1_1 / x_1, ..., t^1_k / x_k, t_2 / y_2, ..., t_n / y_n$}
+\DisplayProof
+}
+
+With that, $\sigma = t^1_1 / x_1, ..., t^1_k / x_k, t_2 / y_2, ..., t_n / y_n$ and we also know the form of $s$: $s = fun(con(t^1_1, ..., t^1_k), t_2, ..., t_n)$. Now, set $\mathcal{D}_{\textrm{PM}, 1}$ as follows:
+
+\begin{prooftree}
+\AxiomC{$con(t^1_1, ..., t^1_k) =^? y_1 \searrow con(t^1_1, ..., t^1_k) / y_1$}
+\AxiomC{$t_2 =^? y_2 \searrow t_2 / y_2$}
+\AxiomC{...}
+\AxiomC{$t_n =^? y_n \searrow t_n / y_n$}
+\QuaternaryInfC{$fun(con(t^1_1, ..., t^1_k), t_2, ..., t_n) =^? q_2 \searrow \sigma_2$}
+\end{prooftree}
+
+In the derivation above, $\sigma_2 = con(t_1^1 ..., t_k^1) / y_1,  t_2 / y_2, ...,  t_n / y_n$ and thus:
+
+$t = s'[\sigma] = s'_2[con(x_1, ..., x_k) / y_1][\sigma] = s'_2[con(t^1_1, ..., t^1_k) / y_1, t_2 / y_2, ..., t_n / y_n] = s'_2[\sigma_2]$
+
+There is no conflict between the substitutions for, e.g., $x_1$ and $y_2$, since all variables that are substituted are distinct, as can be seen in the definition of $split$.
+
+\end{itemize}
+
+This concludes the proof for the ``Subst" case.
+
+\item \textbf{``Cong" case}:
+
+\begin{prooftree}
+\AxiomC{$s' \longrightarrow_{\langle prg \rangle} t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$}
+\end{prooftree}
+
+with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
+
+By the induction hypothesis we have $s' \longrightarrow_{prg} t'$. By applying the congruence rule we get $\mathcal{E}[s'] \longrightarrow_{prg} \mathcal{E}[t']$.
+
+\end{enumerate}
+
+\end{proof}
+
+\subsubsection{Actual defunctionalization}
 
 For the actual defunctionalization, $d''$, strong bisimulation holds. The proof relies on properties of the automatic defunctionalization of Uroboro in the paper of Rendel, Trieflinger, and Ostermann, in here called $d^{core}$. As stated in section 7, the authors' notion of reducibility is the same than that of this work when restricted to the domain of $d^{core}$, the Codata Fragment, and, analogously, when restricted to the domain of their refunctionalization, the Data Fragment.
 
@@ -2318,7 +2568,7 @@ By the induction hypothesis we have $s'' \longrightarrow_{prg} t''$ with $s' = \
 
 \end{proof}
 
-\subsection{Actual refunctionalization}
+\subsubsection{Actual refunctionalization}
 
 For the actual refunctionalization, $r''$, strong bisimulation holds. The proof relies on properties of the automatic refunctionalization of Uroboro in the paper of Rendel, Trieflinger, and Ostermann, in here called $r^{core}$. As stated in section 7, the authors' notion of reducibility is the same than that of this work when restricted to the domain of $r^{core}$, the Data Fragment, and, analogously, when restricted to the domain of their defunctionalization, the Codata Fragment.
 
