@@ -755,11 +755,21 @@ The equivalence relation $\sim$ for terms is different for each transformation, 
 
 TODO: extract from the proofs (see the TODOs there)
 
-For $elim\_multi\_des$, the equivalence relation is defined as the smallest equivalence relation for which the following holds:
-
 \begin{itemize}
 
-\item $q[\sigma] \sim \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars})[\sigma]$
+\item Let $q$ be a copattern with its function name $fun$ different from $fun'$, and both of those names declared in $prg$. If $q' \sim q$ for a copattern $q'$, the function name of $q'$ is different from $fun'$, as well.
+
+\item Let two terms $s,t$ have the following forms: $s = fun(...).des_1(...)...des_k()$ and $t = fun'(...).des'_1(...)...des'_l(...)$, with $k \neq l$, and with $fun$ and $fun'$ declared in $prg$. For any $\widetilde{s} \sim s$ and $\widetilde{t} \sim t$ it is $\widetilde{s} \not\sim \widetilde{t}$.
+
+TODO: demonstrate that these intended consequences actually hold for each transformation
+
+\end{itemize}
+
+For a transformation, the corresponding equivalence relation is defined as the smallest equivalence relation for which some general and some specific properties hold. The general properties are shared by all equivalence relations.
+
+The general properties are the following:
+
+\begin{itemize}
 
 \item If $t_i \sim \widetilde{t_i}$ for $i \in \{1, ..., n\}$: $con(t_1, ..., t_n) \sim con(\widetilde{t_1}, ..., \widetilde{t_n})$
 
@@ -769,7 +779,23 @@ For $elim\_multi\_des$, the equivalence relation is defined as the smallest equi
 
 \end{itemize}
 
-Especially, this means that, for an equation $`` q = t "$ of $prg$, it is $q \not\sim t$.
+There is only one specific property for $elim\_multi\_des$, as follows:
+
+\begin{itemize}
+
+\item If $\sigma$ and $\widetilde{\sigma}$ substitute the same variables, and for every term $t$ that $\sigma$ substitutes for a variable $x$, it is $t \sim \widetilde{t}$ for the term that $\widetilde{\sigma}$ subtitutes for $x$: $q[\sigma] \sim \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars})[\widetilde{\sigma}]$
+
+\end{itemize}
+
+There is only one specific property for $disentangle_d$, as follows:
+
+\begin{itemize}
+
+\item If $t_i \sim \widetilde{t_i}$ for $i \in \{1, ..., n\}$ and $t'_j \sim \widetilde{t'_j}$ for $j \in \{1, ..., k\}$: $fun(t_1, ..., t_n).des(t'_1, ..., t'_k) \sim \langle fun, des, prg \rangle^{autogen}(\widetilde{t_1}, ..., \widetilde{t_n}, \widetilde{t'_1}, ..., \widetilde{t'_k})$
+
+\end{itemize}
+
+All of these equivalence relations are defined such that, for an equation $`` q = t "$ of $prg$, unless $q = t$, it is $q \not\sim t$.
 
 %%- old bisim. statements
 %\begin{itemize}
