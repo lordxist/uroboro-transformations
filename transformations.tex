@@ -1656,9 +1656,52 @@ Now, consider the second case. The desired reduction step can be derived as foll
 \end{prooftree}
 It is clear that $\widetilde{t} := t_r[\sigma] \sim s'[\sigma] = t$. It is $\widetilde{s} := q_r[\sigma] \sim q[\sigma] = s$.
 
-It remains to be shown that the immediate subterms of $q_r[\sigma]$ are values in $prg$. Suppose that such a subterm $s^0$ reduces to some term in $prg$; this term cannot be equivalent to $s^0$. $s^0$ can either reduce by the ``Cong" rule, or by the ``Subst" rule. If it reduces by the ``Subst" rule, by Lemma 2, $s^0$ reduces to a non-equivalent term in $\langle prg \rangle$, as well. If it reduces by the ``Cong" rule, there is some subterm of $s^0$ that reduces by the ``Subst" rule in $prg$ to a non-equivalent term, and by Lemma 2 it also reduces to some non-equivalent term in $\langle prg \rangle$. As a consequence, $s^0$ reduces to some non-equivalent term in $\langle prg \rangle$, as well. It will be shown that this cannot be true.
+It remains to be shown that the immediate subterms of $q_r[\sigma]$ are values in $prg$. Suppose that such a subterm $s^0$ reduces to some term in $prg$; this resulting term cannot be equivalent to $s^0$ unless it is identical to $s^0$. It will be shown that this leads to a contradiction.
 
-If $s^0$ reduced to a non-equivalent term in $\langle prg \rangle$, then there would be a reduction from a subterm of $q[\sigma] \sim q_r[\sigma]$ to a non-equivalent term, as well. It follows that not all immediate subterms of $q[\sigma]$ are values. But it is $q[\sigma] = s$, and thus $s$ wouldn't reduce by the ``Subst" rule for $(q, s')$, contrary to the assumption.
+First, note that if $s^0$ reduces in $prg$, it does so in $\langle prg \rangle$, as well.
+$s^0$ can either reduce by the ``Cong" rule, or by the ``Subst" rule. If it reduces by the ``Subst" rule, then, by Lemma 2.1, it also reduces to some term in $\langle prg \rangle$. If it reduces by the ``Cong" rule, a subterm of $s^0$ reduces by the ``Subst" rule in $prg$ and by Lemma 2.1 it does so in $\langle prg \rangle$, as well. But then either (a) the ``Cong" rule can be applied, and $s^0$ reduces by this rule in $\langle prg \rangle$, or (b) there is some non-value term left of the subterm of $s^0$ which reduces in $\langle prg \rangle$, and the ``Cong" rule can be applied, to the reduction of the left-most such subterm, to reduce $s^0$.
+
+The contradiction can be shown as follows. If $s^0$ reduces to some term in $prg$, then there is a non-value immediate subterm of $s = q[\sigma]$, contrary to the assumption. In turn, this follows from the more general statement for any copatterns $q_r, q$ with $q_r \sim q$, substitutions $\sigma$, and immediate subterms $s^0$ of $q_r[\sigma]$:
+
+If $s^0$ reduces to some term in $prg$, then there is a non-value immediate subterm of $q[\sigma]$ in $\langle prg \rangle$.
+
+This is now shown by induction on the structure of $q_r$.
+
+\begin{itemize}
+
+\item $q_r = fun(p_1, ..., p_n)$. There are two possible cases in which $q \sim q_r$ holds:
+
+\begin{itemize}
+
+\item $q = fun(\widetilde{p_1}, ..., \widetilde{p_n})$ with $p_i \sim \widetilde{p_i}$ for $i = 1, ..., n$.
+
+Since the patterns $p_i$ are made up only of constructor calls and variables, it follows that $p_i = \widetilde{p_i}$. Thus it is $q_r = q$ and $q_r[\sigma] = q[\sigma]$ and thus $s^0$ is also an immediate subterm of $q[\sigma]$. By the above, since $s^0$ reduces to some term in $prg$, it also reduces to some term in $\langle prg \rangle$. But then $s = q[\sigma]$ contains a non-value immediate subterm.
+
+\item $q = \langle \textrm{extract}, \langle q_r \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q_r \rangle^{vars})$.
+
+The patterns $p_i$ of $q_r$ are made up only of constructor calls and variables. It follows that a reduction of $s^0$ needs to contain a step in its derivation that starts with a term that $\sigma$ substitutes one of its variables with. But this term is also a subterm of $s = q[\sigma]$, since $q$ contains (by definition) all variables of $q_r$. By the above it follows that this subterm of $s$ reduces to some term in $\langle prg \rangle$. Thus $s$ contains a non-value subterm and consequently a non-value immediate subterm.
+
+\end{itemize}
+
+\item $q_r = q'.des(p_1, ..., p_k)$. There are two possible cases in which $q \sim q_r$ holds:
+
+\begin{itemize}
+
+\item $q = \widetilde{q'}.des(\widetilde{p_1}, ..., \widetilde{p_k})$ with $q' \sim \widetilde{q'}$ and $p_i \sim \widetilde{p_i}$ for $i \in \{1, ... k\}$.
+
+First, suppose that $s^0 = q'[\sigma]$. By the induction hypothesis, we have a non-value immediate subterm of $\widetilde{q'}[\sigma]$ in $\langle prg \rangle$. It follows that $\widetilde{q'}[\sigma]$ also is not a value in $\langle prg \rangle$. Thus we have $\widetilde{q'}[\sigma]$ as the desired non-value immediate subterm of $q[\sigma] = \widetilde{q'}[\sigma].des(\widetilde{p_1}[\sigma], ..., \widetilde{p_k}[\sigma])$.
+
+On the other hand, suppose that $s^0$ is $p_i[\sigma]$ for an $i \in \{1, ..., k\}$. Since the $p_i$ are made up only of constructor calls and variables, it follows that $p_i = \widetilde{p_i}$. Thus $s^0$ is also an immediate subterm of $q[\sigma]$. By the above, since $s^0$ reduces to some term in $prg$, it also reduces to some term in $\langle prg \rangle$. But then $q[\sigma]$ contains a non-value immediate subterm.
+
+\item $q = \langle \textrm{extract}, \langle q_r \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q_r \rangle^{vars})$.
+
+First, suppose that $s^0 = q'[\sigma]$. But this would mean that the rule of which $q_r$ is the left-hand side can never be used. This is because any term that matches it has to contain a subterm (the term the destructor is called upon) that reduces by the rule by which $s^0$ reduces. The rule of which $q_r$ is the left-hand side thus is a ``dead" rule, and these were disallowed in the preconditions for $prg$.
+
+On the other hand, suppose that $s^0$ is $p_i[\sigma]$ for an $i \in \{1, ..., k\}$. The argument proceeds like in this case for $q_r = fun(p_1, ..., p_n)$.
+
+\end{itemize}
+
+\end{itemize}
 
 \item \textbf{``Cong" case}:
 
@@ -1677,49 +1720,6 @@ s = \mathcal{E}[s'] \sim \mathcal{E}[\widetilde{s'}] \longrightarrow_{prg} \math
 because the subterms of $\mathcal{E}$ that are values in $\langle prg \rangle$ are values in $prg$, as well. Too see this, suppose that such a subterm $s^0$ reduces to some term in $prg$. It can either do so by the ``Cong" rule, or by the ``Subst" rule. If it reduces by the ``Subst" rule, then, by Lemma 2, $s^0$ reduces to a term in $\langle prg \rangle$, as well. But this contradicts the fact that $s^0$ is a value in $\langle prg \rangle$. If it reduces by the ``Cong" rule, there is some subterm of $s^0$ that reduces by the ``Subst" rule in $prg$, and by Lemma 2 it also reduces to some term in $\langle prg \rangle$. Thus this subterm of $s^0$ is not a value in $\langle prg \rangle$. It follows that neither is $s^0$, contrary to fact.
 
 \end{enumerate}
-
-\end{proof}
-
-\begin{proof}[Proof of (4)]
-
-Let $S$ be a possibly infinite reduction sequence with respect to $\langle prg \rangle$ and containing only terms that don't typecheck in $prg$. The equations upon which $S$ can possibly depend will now be reduced step-by-step, in the end demonstrating that no infinite sequence is possible with the remaining equations.
-
-\begin{enumerate}
-
-\item $S$ depends only on equations where each results from applications of $extract\_outer\_des$ to some original equation $r$ with multiple destructors on the left-hand side.
-
-\underline{Proof:}
-
-$elim\_multi\_des$ is defined as the application of $extract\_helpers$ to $extract\_outer\_des$. Thus, as can be seen in the definition of $extract\_helpers$, for every equation in the original program, the transformed program contains a replacement equation and some helper equations. These are defined by $extract\_outer\_des$ applied to the original equation and an empty helpers set.
-
-For original equations with hole patterns or only one destructor on the left-hand side, these original equations appear unchanged in $\langle prg \rangle$, and no helpers are added. The right-hand side of those equations typecheck against $prg$. Q.E.D.
-
-\item Any equation that $S$ depends on is contained in some helpers set $H$ as defined below for such an equation $r$ with multiple destructors on the left-hand side.
-\begin{equation*}
-\big\langle r', H \big\rangle := \langle r \rangle^{extract\_outer\_des}
-\end{equation*}
-
-\underline{Proof:}
-
-The left-hand side of $r'$ is a hole pattern matching precisely function applications of functions already defined in $prg$. Thus any reduction using $r'$ must start with a term that typechecks against $prg$, and therefore $S$ can't depend upon it. Q.E.D.
-
-\end{enumerate}
-
-Now it can be shown that no infinite reduction is possible with respect to the equations in $H$. This is done by showing that all terms appearing in $S$ are different.
-
-The recursive expansion of $extract\_outer\_des$ works as given by its definition:
-\begin{equation*}
-\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des}
-\end{equation*}
-The helpers set $H$ is built up as follows. In one step of the expansion, as can be seen in the definition of $extract\_des$, it is only ever extended by adding one pair of signature and equation, as defined by $hsig$ and $heqn$, respectively. Therefore its equations are only ever defined in the way given by $heqn$.
-
-An equation added in the $i$-th expansion step, that is, an equation $h$, as defined via $heqn$, with
-\begin{equation*}
-\langle r_i, H_i \rangle^{extract\_des}  = \big\langle r_{i+1}, \{h\} \cup H_i \big\rangle
-\end{equation*}
-for some equations $r_i, r_{i+1}$ and some helpers set $H_i$, depends upon $r_i$. Specifically, the name of the function of helper function is defined via $hname$ to be dependent upon the left-hand side copattern of $r_i$ without the final destructor application. By induction on $i$ it can be seen that all the helper equation function names are dependent upon the number $m$ of destructor applications in the respective step. It can also be seen that the right-hand side of the equation either checks against $prg$ (when it is the original equation's right-hand side), or is itself a helper function application, where the number of the embedded destructor applications is less than $m$.
-
-In a term matching such helper equations, these destructor applications must be embedded. Thus, in any reduction step of $S$, the number of the destructor applications embedded into the term is decreased. It follows that all terms in $S$ must be different.
 
 \end{proof}
 
@@ -1781,7 +1781,7 @@ TODO
 
 For step $disentangle_d$, the described kind of weak bisimulation holds.
 
-\begin{proof}[Proof of (1)] By induction on the structure of $\mathcal{D}$.
+\begin{proof}[Proof of (1a)] By induction on the structure of $\mathcal{D}$.
 
 \begin{enumerate}
 
@@ -1795,15 +1795,38 @@ For step $disentangle_d$, the described kind of weak bisimulation holds.
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-It will be shown: There exists a reduction sequence from $s$ to $t$ which uses only the rules from $\langle `` q = s' " \rangle^{extract\_patterns}$. Using Lemma 2.1, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t$, since $disentangle_d = extract\_helpers(extract\_patterns)$.
+It will be shown that $extract\_patterns$ fulfils the extraction function properties as given in Lemma 2. Using Lemma 2.1 for $e = extract\_patterns$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ for a $\widetilde{t} \sim t$, since $disentangle_d = extract\_helpers(extract\_patterns)$.
+
+It is now proved that, for each equation $`` q_r = t_r "$ with $\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_{r'} = t_{r'} ", H \big\rangle$, the extraction function properties hold.
 
 \begin{itemize}
 
-\item \underline{Case 1}: $q$ is hole pattern:
+\item \underline{Case 1}: $q_r$ is hole pattern:
 
-$\langle `` q = s' " \rangle^{extract\_patterns} = \big\langle `` q = s' ", \emptyset \big\rangle$
+$\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_r = t_r ", \emptyset \big\rangle$
 
-Thus the only resulting equation is the same as the original equation, for which we already know (from the precondition of the ``Subst" case) that the desired (one-step) reduction sequence exists.
+\begin{enumerate}
+\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
+
+Proof: It is $H = \emptyset$ and thus the property is trivially fulfilled.
+
+\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
+
+Proof: Trivially true, since $H = \emptyset$.
+
+\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
+
+Proof: By the definition of $extract\_patterns$ (as given above) it is $r = r'$ and $H = \emptyset$.
+
+\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
+
+Proof: Clear since there is only one equation.
+
+\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
+
+Proof: Trivially true, because $H = \emptyset$.
+
+\end{enumerate}
 
 \item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
 
@@ -1816,55 +1839,28 @@ $= \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n,
 
 with $hname, hsig, heqn$ as in the definition of $extract\_patterns$.
 
-By inversion we have the following form for $\mathcal{D}_{\textrm{PM}}$:
-\begin{prooftree}
-\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
-\RightLabel{\scriptsize PM\textsubscript{App}}
-\UnaryInfC{$fun(t_1, ..., t_n) =^? fun(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
-\AxiomC{$t'_i =^? p'_i \searrow \sigma'_i ~ \forall i \in \{1, ..., k\}$}
-\RightLabel{\scriptsize PM\textsubscript{Des}}
-\BinaryInfC{$fun(t_1, ..., t_n).des(t'_1, ..., t'_k) =^? fun(p_1, ..., p_n).des(p'_1, ..., p'_k) \searrow \sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k$}
-\end{prooftree}
+\begin{enumerate}
+\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
 
-We also have that $s = `` fun(t_1, ..., t_n).des(t'_1, ..., t'_k) "$ and $t = s'[\sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k]$. The desired sequence from $s$ to $t$ can thus be given as follows:
+Proof: For the only equation $`` q_h = t_h "$ in $H$, it is $q_h = hname(p_1, ..., p_n, p'_1, ..., p'_k) = \langle fun, des, prg \rangle^{autogen}(p_1, ..., p_n, p'_1, ..., p'_k)$ and $t_h = t_r$, by the definition of $heqn$. It follows that $q_r \sim q_h$ and $t_r \sim t_h$.
 
-$s \longrightarrow hname(t_1, ..., t_n, t'_1, ..., t'_k) \longrightarrow t$
+\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
 
-The first reduction step can be derived as follows, using only
+Proof: This equation is the only equation in $H$, as shown in the proof of the first property.
 
-$r := `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) "$:\\
+\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
 
-{\setlength{\parindent}{-\leftmargin}
-\AxiomC{}
-\RightLabel{\scriptsize PM\textsubscript{Var}}
-\UnaryInfC{$t_i =^? x_i \searrow t_i / x_i ~ \forall i \in \{1, ..., n\}$}
-\RightLabel{\scriptsize PM\textsubscript{App}}
-\UnaryInfC{$fun(t_1, ..., t_n) =^? fun(x_1, ..., x_n) \searrow t_1 / x_1, ..., t_n / x_n$}
-\AxiomC{}
-\RightLabel{\scriptsize PM\textsubscript{Var}}
-\UnaryInfC{$t'_i =^? x'_i \searrow t'_i / x'_i ~ \forall i \in \{1, ..., k\}$}
-\RightLabel{\scriptsize PM\textsubscript{Des}}
-\BinaryInfC{$s =^? fun(x_1, ..., x_n).des(x'_1, ..., x'_k) \searrow t_1 / x_1, ..., t_n / x_n, t'_1 / x'_1, ..., t'_k / t'_k$}
-\RightLabel{\scriptsize Subst with $r$}
-\UnaryInfC{$s \longrightarrow ``hname(x_1, ..., x_n, x'_1, ..., x'_k)"[t_1 / x_1, ..., t_n / x_n, t'_1 / x'_1, ..., t'_k / t'_k]$}
-\DisplayProof
-}
+Proof: It is $q_{r'} = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$ and $t_{r'} = hname(x_1, ..., x_n, x'_1, ..., x'_k) = \langle fun, des, prg \rangle^{autogen}(x_1, ..., x_n, x'_1, ..., x'_k)$ and thus $q_{r'} \sim t_{r'}$.
 
-It is clear that
+\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
 
-$`` hname(x_1, ..., x_n, x'_1, ..., x'_k) "[t_1 / x_1, ..., t_n / x_n, t'_1 / x'_1, ..., t'_k / t'_k] = `` hname(t_1, ..., t_n, t'_1, ..., t'_k) "$.
+Proof: TODO
 
-The second reduction step can be derived as follows below, using only $heqn$. Remember that $heqn = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = s' "$.
-\begin{prooftree}
-\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
-\AxiomC{$t'_i =^? p'_i \searrow \sigma'_i ~ \forall i \in \{1, ..., k\}$}
-\RightLabel{\scriptsize PM\textsubscript{App}}
-\BinaryInfC{$hname(t_1, ..., t_n, t'_1, ..., t'_k) =^? hname(p_1, ..., p_n, p'_1, ..., p'_k) \searrow \sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k$}
-\RightLabel{\scriptsize Subst with $heqn$}
-\UnaryInfC{$hname(t_1, ..., t_n, t'_1, ..., t'_k) \longrightarrow s'[\sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k]$}
-\end{prooftree}
+\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
 
-As stated above, $t = s'[\sigma_1, ..., \sigma_n, \sigma'_1, ..., \sigma'_k]$.
+Proof: TODO
+
+\end{enumerate}
 
 \end{itemize}
 
@@ -1874,13 +1870,13 @@ For the ``Cong" case, proceed as with $elim\_multi\_des$.
 
 \end{proof}
 
-\begin{proof}[Proof of (2)] By inspecting the proof of (1).
+\begin{proof}[Proof of (1b)] By inspecting the proof of (1a).
 
 TODO
 
 \end{proof}
 
-\begin{proof}[Proof of (3)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ ($s,t$ typecheck against $prg$)
+\begin{proof}[Proof of (2)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$, with $s \not\sim t$.
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
@@ -1893,22 +1889,35 @@ TODO
 
 with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-When $(q, s') \in \textrm{Rules}(prg)$, so, by the ``Subst" rule, $s \longrightarrow_{prg} t$. It remains to be shown that $(q, s') \in \textrm{Rules}(prg)$.
-
 Since $disentangle_d = extract\_helpers(extract\_patterns)$, by Lemma 2.2 there is an equation $r$ of $prg$ such that $\langle r \rangle^{extract\_patterns}$ contains $`` q = s' "$.
+
+$extract\_patterns$ fulfils the extraction function properties, as shown in the proof of (1a). By the first property it is either $q \sim s'$ or ($q_r \sim q$ and $t_r \sim s'$). In the first case, it follows that $s \sim s'[\sigma] = t$, contrary to the assumption.
+
+Now, consider the second case. From this point, the proof proceeds like that for $elim\_multi\_des$, with the following exceptions in the proof by induction on the structure of $q_r$ (identical parts are denoted by ellipses [...]):
 
 \begin{itemize}
 
-\item \underline{Case 1}: $r = `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t' " $, $\exists p \in \{p_1, ..., p_n, p'_1, ..., p'_k\}: p \textrm{ is constructor application}$:
-\begin{alignat*}{3}
-&\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t " \rangle^{extract\_patterns} \\
-&\quad = \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{\big\langle hsig, heqn \big\rangle\} \big\rangle
-\end{alignat*}
-with $hname, hsig, heqn$ as in the definition of $extract\_patterns$. Neither of the two equations in $\langle r \rangle^{extract\_patterns}$ is $`` q = s' "$, thus this case contradicts the fact that $\langle r \rangle^{extract\_patterns}$ contains $`` q = s' "$.
+\item $q_r = fun(p_1, ..., p_n)$. $q \sim q_r$ holds only when:
 
-\item \underline{Case 2}: otherwise:
+$q = fun(\widetilde{p_1}, ..., \widetilde{p_n})$ with $p_i \sim \widetilde{p_i}$ for $i = 1, ..., n$.
 
-It can then be seen directly in the definition of $extract\_patterns$ that $\langle r \rangle^{extract\_patterns}$ contains only $r$. Thus it must be $r = `` q = s' "$ and therefore $(q, s') \in \textrm{Rules}(prg)$.
+[...]
+
+\item $q_r = q'.des(p_1, ..., p_k)$. There are two possible cases in which $q \sim q_r$ holds:
+
+\begin{itemize}
+
+\item $q = \widetilde{q'}.des(\widetilde{p_1}, ..., \widetilde{p_k})$ with $q' \sim \widetilde{q'}$ and $p_i \sim \widetilde{p_i}$ for $i \in \{1, ... k\}$.
+
+[...]
+
+\item $q = \langle fun, des, prg \rangle^{autogen}(p'_1, ..., p'_n, p_1, ..., p_k)$, where $\widetilde{p'_i} \sim p'_i$ for $i \in \{1, ..., n\}$, $\widetilde{p_j} \sim p_j$ for $j \in \{1, ..., k\}$, and with $q' = fun(p'_1, ..., p'_n)$. ($q'$ has this form because it is the only form possible in the relevant input fragment for $disentangle_d$.)
+
+First, suppose that $s^0 = q'[\sigma]$. But this would mean that the rule of which $q_r$ is the left-hand side can never be used. This is because any term that matches it has to contain a subterm (the term the destructor is called upon) that reduces by the rule by which $s^0$ reduces. The rule of which $q_r$ is the left-hand side thus is a ``dead" rule, and these were disallowed in the preconditions for $prg$.
+
+On the other hand, suppose that $s^0$ is $p_i[\sigma]$ for an $i \in \{1, ..., k\}$. Since the $p_i$ are made up only of constructor calls and variables, it follows that $p_i = \widetilde{p_i}$. Thus $s^0$ is also an immediate subterm of $q[\sigma]$. By the above, since $s^0$ reduces to some term in $prg$, it also reduces to some term in $\langle prg \rangle$. But then $q[\sigma]$ contains a non-value immediate subterm.
+
+\end{itemize}
 
 \end{itemize}
 
@@ -1918,17 +1927,11 @@ For the ``Cong" case, proceed as with $elim\_multi\_des$.
 
 \end{proof}
 
-\begin{proof}[Proof of (4)]
-
-TODO
-
-\end{proof}
-
 \subsection{Unmix (refunc.)}
 
 For step $unmix_r$, the described kind of weak bisimulation holds.
 
-\begin{proof}[Proof of (1)] By induction on the structure of $\mathcal{D}$.
+\begin{proof}[Proof of (1a)] By induction on the structure of $\mathcal{D}$.
 
 \begin{enumerate}
 
@@ -1941,6 +1944,8 @@ For step $unmix_r$, the described kind of weak bisimulation holds.
 \end{prooftree}
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+TODO: Change $unmix_r$ such that this case distinction becomes unnecessary. Result should be: $unmix_r = extract\_helpers(extract\_all\_des)$, and this makes it necessary to change $extract\_all\_des$ to distinguish between rule from mixed and such from not-mixed function definitions. It can access the entire program and with this determine which of the two is the case.
 
 \begin{itemize}
 
