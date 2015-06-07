@@ -944,6 +944,8 @@ TODO: move these properties into a definition (for extraction functions)
 
 \item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
 
+-- TODO: the second property needs another statement, to make the last step of the proof of Lemma 2.1 work, possibly (see TODO below) this is: for this $q_h$ and any substitution $\sigma_v$ that subtitutes only with values it hold that each subterm of $q_h[\sigma_v]$ is a value
+
 \item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
 
 \item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
@@ -973,6 +975,8 @@ then there is an equation $r$ in the equations of $prg$ such that $\langle r \ra
 First the (immediate) subterms of $s$ need to be reduced to values in $\langle prg \rangle^{extract\_helpers(e)}$; let the result of the reduction be $s'$. This has to happen in such a way that $s \sim s'$ holds. We have such a reduction sequence by Lemma 4. In fact, the result of each step of the reduction is equivalent to $s$, which can easily be seen by inspecting the proof of the lemma.
 
 After that, $s'$ is reduced in one step to a result $t'$ with $t' \sim t$. This step is derived by applying the ``Subst" rule for the equation $`` q_h = t_h "$ for which $q_r \sim q_h$ and $t_r \sim t_h$ holds.
+
+TODO: It still needs to be shown that $s'$ matches this $q_h$. Proposal: The program is deterministic, thus a term can only reduce to one value (if a term has a corresponding value, this is unique), and by the proposed added statement to property 2 we have that each subterm of $q_h[\sigma_v]$ is a value whenever $\sigma_v$ substitutes only with values. We can then find a $\sigma_v$ such that $q_h[\sigma_v] \sim q_r[\sigma_v] \sim q_r[\sigma] = s$. But, for each subterm of $s$, there is only one \textit{value} that is equivalent to it, and an $s$ with all subterms reduced to values is already $s'$ by the above construction. Thus $s' = q_h[\sigma_v]$, which means $s'$ matches $q_h$.
 
 \item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
 
