@@ -974,9 +974,25 @@ then there is an equation $r$ in the equations of $prg$ such that $\langle r \ra
 
 First the (immediate) subterms of $s$ need to be reduced to values in $\langle prg \rangle^{extract\_helpers(e)}$; let the result of the reduction be $s'$. This has to happen in such a way that $s \sim s'$ holds. We have such a reduction sequence by Lemma 4. In fact, the result of each step of the reduction is equivalent to $s$, which can easily be seen by inspecting the proof of the lemma.
 
-After that, $s'$ is reduced in one step to a result $t'$ with $t' \sim t$. This step is derived by applying the ``Subst" rule for the equation $`` q_h = t_h "$ for which $q_r \sim q_h$ and $t_r \sim t_h$ holds.
+After that, consider the equation $`` q_h = t_h "$ for which $q_r \sim q_h$ and $t_r \sim t_h$ holds. There are two ways in which $q_r \sim q_h$ can hold:
 
-TODO: It still needs to be shown that $s'$ matches this $q_h$. Proposal: The program is deterministic, thus a term can only reduce to one value (if a term has a corresponding value, this is unique), and by the proposed added statement to property 2 we have that each subterm of $q_h[\sigma_v]$ is a value whenever $\sigma_v$ substitutes only with values. We can then find a $\sigma_v$ such that $q_h[\sigma_v] \sim q_r[\sigma_v] \sim q_r[\sigma] = s$. But, for each subterm of $s$, there is only one \textit{value} that is equivalent to it, and an $s$ with all subterms reduced to values is already $s'$ by the above construction. Thus $s' = q_h[\sigma_v]$, which means $s'$ matches $q_h$.
+\begin{itemize}
+
+\item \underline{Case 1:} The highest-level structures of $q_h$ and $q_r$ are identical\footnote{I.e., $q_h$ and $q_r$ are applications of the same function or of the same destructor.}, and the immediate subterms of $q_h$ are equivalent to the respective (from left to right) immediate subterms of $q_r$.
+
+Then $s'$ is reduced in one step to a result $t'$ with $t' \sim t$. This step is derived by applying the ``Subst" rule for the equation $`` q_h = t_h "$. For that, it still needs to be shown that $s'$ matches this $q_h$. This is done by showing that $s' = q_h[\sigma_v]$, where $\sigma_v$ is defined by replacing each term which $\sigma$ substitutes with its corresponding value.\footnote{A term can only reduce to one value because $\langle prg \rangle^{extract\_helpers(e)}$ is deterministic. To put it another way, for each term there is exactly one corresponding value.}
+
+From $q_h \sim q_r$ it follows that $q_h[\sigma_v] \sim q_r[\sigma_v]$. Because $\sigma$ substitutes only with what are values in $prg$, each term that $\sigma_v$ substitutes with is equivalent to the term of $\sigma$ it replaces. Thus it is $q_h[\sigma_v] \sim q_r[\sigma_v] \sim q_r[\sigma] = s$. Especially, this means that each immediate subterm of $s$ is equivalent to the respective (from left to right) immediate subterm of $q_h[\sigma_v]$. But, for each immediate subterm of $s$, there is only one \textit{value} that is equivalent to it\footnote{This is because of the intended consequence of the equivalence relation which says that, for closed terms $s,t$ with $s \sim t$, one of them reduces to the other.}, and an $s$ with all immediate subterms reduced to values is already $s'$ by the above construction. Thus $s' = q_h[\sigma_v]$.
+
+\item \underline{Case 2:} Either $q_r[\sigma_v]$ reduces to $q_h[\sigma_v]$, for any $\sigma_v$, or the other way round. Let $\sigma_v$ substitute only with values, and let the terms that $\sigma_v$ substitutes with be equivalent to those of $\sigma$.
+
+Then $s'$ is first reduced to $q_h[\sigma_v]$. Afterwards, $q_h[\sigma_v]$ is reduced in one step to $t' := t_h[\sigma_v]$ with $t' \sim t_r[\sigma_v] \sim t_r[\sigma] = t$. This step is derived by applying the ``Subst" rule for the equation $`` q_h = t_h "$. It still needs to be shown that the reduction from $s'$ to $q_h[\sigma_v]$ is possible.
+
+Because the transformed program is deterministic, $q_r[\sigma_v]$ reduces to $q_h[\sigma_v]$, not the other way round. If $s' = q_r[\sigma_v]$, we thus have the desired reduction.
+
+Now, suppose $s' \neq q_r[\sigma_v]$. As in Case 1 above, it still is $q_r[\sigma_v] \sim q_r[\sigma] = s$, and also $s \sim s'$, and thus $s' \sim q_r[\sigma_v]$. It follows that either $s'$ reduces to $q_r[\sigma_v]$, or the other way round. In the first case, put the reductions from $s'$ to $q_r[\sigma_v]$ and from $q_r[\sigma_v]$ to $q_h[\sigma_v]$ behind one another to obtain the desired reduction. In the second case, $q_r[\sigma_v]$ would reduce both to $s'$ and to $q_h[\sigma_v]$. Since the transformed program is deterministic, it follows that either (a) $s'$ is an intermediate result in the reduction from $q_r[\sigma_v]$ to $q_h[\sigma_v]$, or (b) $q_h[\sigma_v]$ is an intermediate result in the reduction from $q_r[\sigma_v]$ to $s'$. If (a) is true, we have the final part of this sequence as the desired sequence. 
+
+\end{itemize}
 
 \item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
 
