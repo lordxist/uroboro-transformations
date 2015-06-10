@@ -944,7 +944,7 @@ TODO: move these properties into a definition (for extraction functions)
 
 \item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
 
--- TODO: the second property needs another statement, to make the last step of the proof of Lemma 2.1 work, possibly (see TODO below) this is: for this $q_h$ and any substitution $\sigma_v$ that subtitutes only with values it hold that each subterm of $q_h[\sigma_v]$ is a value
+-- TODO: the second property needs to be changed: instead of such an equation in $H$, there needs to be an equation (either $r'$ or in $H$) such that the ??? property below in the proof holds
 
 \item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
 
@@ -976,30 +976,33 @@ First the (immediate) subterms of $s$ need to be reduced to values in $\langle p
 
 %%- under construction
 
-By the ??? extraction function property, there is an equation $`` q_{r'} = t_{r'} "$ such that:
-\begin{itemize}
-\item the highest-level structure of $q_{r'}$ is identical to that of $q_r$.
+By the ??? extraction function property, there is an equation $`` q_{r'} = t_{r'} "$ such that the following holds:
 
-\item for any substitution $\sigma_v$ that substitutes only with values, the immediate subterms of $q_{r'}[\sigma_v]$ are values
-\end{itemize}
-There is such a $\sigma_v$ with $s' = q_{r'}[\sigma_v]$. $\sigma_v$ can be constructed as follows for every variable $x$ in $q_{r'}(q^0_{r'}, p^1_{r'}, ..., p^n_{r'})$. If $x$ is contained in a $p^i_{r'}$, write $p_x$ for this pattern and define:
-\begin{equation*}
-    \sigma_v[x] =
-    \begin{cases}
-      v, & \text{if}\ p \ \text{contains or is}\ x \ \text{with}\ p_x = p^i_r[p / y] \ \text{and}\ p[v / x] = (\sigma[y])_v \\
-      (p[\sigma])_v, & \text{if}\ p_x[p / x] = p^i_r \ \text{and}\ p_x = p^i_{r'}
-    \end{cases}
-\end{equation*}
-On the other hand, if $x$ is contained in $q^0_{r'}$, define:
-\begin{equation*}
-    \sigma_v[x] =
-    \begin{cases}
-      (\sigma[y])_v, & \text{if}\ q^0_r = fun(p_1, ..., p_k) \\
-      (p[\sigma])_v, & \text{if}\ p_x[p / x] = p^i_r \ \text{and}\ p_x = p^i_{r'}
-    \end{cases}
-\end{equation*}
+Let $\sigma$ be a substitution that covers the variables in $q_r$, and let $s^1, ..., s^n$ be the immediate subterms (from left to right) of $q_r[\sigma]$. In order to use it for contextual substitution, write $q_r[\sigma](s^1, ..., s^n)$ for $q_r[\sigma]$ and its subterms (from left to right). There is a substitution $\sigma_v$ such that $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v)$.
 
-It will now be shown that $s' = q_{r'}[\sigma_v]$. Let $s^0, ..., s^n$ be the immediate subterms of $s = s(s^0, ..., s^n)$. It is $s' = s(s^0_v, ..., s^n_v) = q_{r'}(s^0_v, s^1_v, ..., s^n_v) = q_{r'}(q^0_{r'}[\sigma_v], p^1_{r'}[\sigma_v], ..., p^n_{r'}[\sigma_v]) = q_{r'}[\sigma]$, because $s^0_v = q^0_{r'}[\sigma_v]$ and $s^i_v = p^i_{r'}[\sigma_v]$ for $i = 1, ..., n$, which will be shown next. For $i = 1, ..., n$, it is $s^i_v = (p^i_r[\sigma])_v$. If $p^i_{r'}$ is a variable, say $x$, it is $p^i_{r'}[\sigma_v] = x[\sigma_v] = \sigma_v[x] = (\sigma[x])_v = (x[\sigma])_v = (p^i_r[\sigma])_v$. 
+%%- experimental, meant to be reused in proofs of the above property for concrete extraction functions
+%There is such a $\sigma_v$ with $s' = q_{r'}[\sigma_v]$. $\sigma_v$ can be constructed as follows for every variable $x$ in $q_{r'}(q^0_{r'}, p^1_{r'}, ..., p^n_{r'})$. If $x$ is contained in a $p^i_{r'}$, write $p_x$ for this pattern and define:
+%\begin{equation*}
+%    \sigma_v[x] =
+%    \begin{cases}
+%      v, & \text{if}\ p \ \text{contains or is}\ x \ \text{with}\ p_x = p^i_r[p / y] \ \text{and}\ p[v / x] = (\sigma[y])_v \\
+%      (p[\sigma])_v, & \text{if}\ p_x[p / x] = p^i_r \ \text{and}\ p_x = p^i_{r'}
+%    \end{cases}
+%\end{equation*}
+%On the other hand, if $x$ is contained in $q^0_{r'}$, distinguish two cases for $q^0_{r'}$. If $q^0_{r'} = fun(p'_1, ..., p'_k)$, two cases for $q^0_r$ will be distinguished. If $q^0_r = fun(p_1, ..., p_k)$, write $p_x$ for the pattern $p'_i$ that contains $x$ and define:
+%\begin{equation*}
+%    \sigma_v[x] =
+%    \begin{cases}
+%      v, & \text{if}\ p \ \text{contains or is}\ x \ \text{with}\ p_x = p_i[p / y] \ \text{and}\ p[v / x] = (\sigma[y])_v \\
+%      (p[\sigma])_v, & \text{if}\ p_x[p / x] = p_i \ \text{and}\ p_x = p'_i
+%    \end{cases}
+%\end{equation*}
+%
+%It will now be shown that $s' = q_{r'}[\sigma_v]$. Let $s^0, ..., s^n$ be the immediate subterms of $s = s(s^0, ..., s^n)$. It is $s' = s(s^0_v, ..., s^n_v) = q_{r'}(s^0_v, s^1_v, ..., s^n_v) = q_{r'}(q^0_{r'}[\sigma_v], p^1_{r'}[\sigma_v], ..., p^n_{r'}[\sigma_v]) = q_{r'}[\sigma]$, because $s^0_v = q^0_{r'}[\sigma_v]$ and $s^i_v = p^i_{r'}[\sigma_v]$ for $i = 1, ..., n$.
+%
+%First, it is shown that $s^i_v = p^i_{r'}[\sigma_v]$. For $i = 1, ..., n$, it is $s^i_v = (p^i_r[\sigma])_v$. If $p^i_{r'}$ is a variable, say $x$, it is $p^i_{r'}[\sigma_v] = x[\sigma_v] = \sigma_v[x] = (\sigma[x])_v = (x[\sigma])_v = (p^i_r[\sigma])_v$. If $p^i_{r'} = con(p_1, ..., p_k)$, it is $p^i_{r'}[\sigma_v] = con(p'_1, ..., p'_k)[\sigma_v] = con(p'_1[\sigma_v], ..., p'_k[\sigma_v]) = con((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = (p^i_r[\sigma])_v$.
+%
+%Second, it is shown that $s^0_v = q^0_{r'}[\sigma_v]$.
 
 By the ??? extraction function property, for the equation $`` q_{r'} = t_{r'} "$ (the same as above) it holds that $t_{r'} = q_1, t_1 = q_2, ..., t_{n-1} = q_n$ for some equations $`` q_i = t_i "$ for $i = 1, ..., n-1$ and an equation $`` q_n = t_r "$.
 
