@@ -978,7 +978,7 @@ First the (immediate) subterms of $s$ need to be reduced to values in $\langle p
 
 By the ??? extraction function property, there is an equation $`` q_{r'} = t_{r'} "$ such that the following holds:
 
-Let $\sigma$ be a substitution that covers the variables in $q_r$, and let $s^1, ..., s^n$ be the immediate subterms (from left to right) of $q_r[\sigma]$. In order to use it for contextual substitution, write $q_r[\sigma](s^1, ..., s^n)$ for $q_r[\sigma]$ and its subterms (from left to right). There is a substitution $\sigma_v$ such that $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v)$.
+Let $\sigma$ be a substitution that covers the variables in $q_r$, and let $s^1, ..., s^n$ be the immediate subterms (from left to right) of $q_r[\sigma]$. In order to use it for contextual substitution, write $q_r[\sigma](s^1, ..., s^n)$ for $q_r[\sigma]$ and its subterms (from left to right). There is a substitution $\sigma_v$, which substitutes only with values, such that $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v)$.
 
 %%- experimental, meant to be reused in proofs of the above property for concrete extraction functions
 %There is such a $\sigma_v$ with $s' = q_{r'}[\sigma_v]$. $\sigma_v$ can be constructed as follows for every variable $x$ in $q_{r'}(q^0_{r'}, p^1_{r'}, ..., p^n_{r'})$. If $x$ is contained in a $p^i_{r'}$, write $p_x$ for this pattern and define:
@@ -1004,7 +1004,11 @@ Let $\sigma$ be a substitution that covers the variables in $q_r$, and let $s^1,
 %
 %Second, it is shown that $s^0_v = q^0_{r'}[\sigma_v]$.
 
-By the ??? extraction function property, for the equation $`` q_{r'} = t_{r'} "$ (the same as above) it holds that $t_{r'} = q_1, t_1 = q_2, ..., t_{n-1} = q_n$ for some equations $`` q_i = t_i "$ for $i = 1, ..., n-1$ and an equation $`` q_n = t_r "$.
+For the $\sigma$ in our case, we thus have a $\sigma_v$ with $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v) = s(s^1_v, ..., s^n_v) = s'$. By the ``Subst" rule, a reduction from $s'$ to $t_{r'}[\sigma_v]$ follows.
+
+By the ??? extraction function property, for the equation $`` q_{r'} = t_{r'} "$ (the same as above) it holds that $t_{r'} = q_1, t_1 = q_2, ..., t_{n-1} = q_n$ for some equations $`` q_i = t_i "$ for $i = 1, ..., n-1$ and an equation $`` q_n = t_r "$. Further it holds that the immediate subterms of $q_i[\sigma_v]$ are values for any substitution $\sigma_v$ that substitutes only with values.
+
+As a consequence, and by using the $\sigma_v$ we have from the above, applying the ``Subst" rule for each of these equations gives us a reduction sequence from $t_{r'}[\sigma_v]$ to $t_r[\sigma_v] \sim t_r[\sigma]$.
 
 %After that, consider the equation $`` q_h = t_h "$ for which $q_r \sim q_h$ and $t_r \sim t_h$ holds. There are two ways in which $q_r \sim q_h$ can hold:
 %
