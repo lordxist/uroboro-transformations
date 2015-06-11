@@ -1411,8 +1411,9 @@ The relevant initial part of the sequence is constructed by Lemma 4. Again, by i
 
 \begin{proof}[Proof for $extract\_outer\_des$]
 
-By induction on the structure of $q_r$.
+Properties 1-5 are proved by induction on the structure of $q_r$, property 6 separately.
 
+\underline{Properties 1-5}
 \begin{itemize}
 
 \item \underline{Case 1}: $q_r$ is hole pattern, or: $q_r = q'_r.des(p_1, ..., p_k)$, $q'_r$ is hole pattern.
@@ -1491,6 +1492,109 @@ Proof: From Lemma 3 we have this property for $extract\_des$, especially for $``
 By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, for every equation $`` q_h = t_h "$ in $H'$, $q_h$ is equivalent to a sub-copattern of the left-hand side $q'_r$ of $r'^0$. But $q'_r$ is in turn a sub-copattern of $q_r$.
 
 \end{enumerate}
+
+\end{itemize}
+
+\underline{Property 6} (momentarily the first part of the ??? property)
+
+For each equation $r = `` q_r = t_r "$ there is an equation $r' = `` q_{r'} = t_{r'} "$ in $\langle `` q_r = t_r " \rangle^{extract\_outer\_des}$ such that the following holds:
+
+Let $\sigma$ be a substitution that covers the variables in $q_r$, and let $s^1, ..., s^n$ be the immediate subterms (from left to right) of $q_r[\sigma]$. In order to use it for contextual substitution, write $q_r[\sigma](s^1, ..., s^n)$ for $q_r[\sigma]$ and its subterms (from left to right). There is a substitution $\sigma_v$, which substitutes only with values, such that $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v)$.
+
+Proof:
+
+$\sigma_v$ is always constructed as follows, for each of its variables $x$:
+\begin{equation*}
+\sigma_v(x) = (\sigma(x))_v
+\end{equation*}
+
+\begin{itemize}
+
+\item \underline{Case 1:} $q_r$ is hole pattern or has only one destructor.
+
+Then it is $\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle$. Choose $r' = r$.
+
+\begin{itemize}
+
+\item \underline{Case 1.1:} $q_r$ is hole pattern, i.e., $q_r = fun(p_1, ..., p_k)$.
+
+It is
+\begin{multline*}
+q_{r'}[\sigma_v] = q_r[\sigma_v] = fun(p_1, ..., p_k)[\sigma_v] = fun(p_1[\sigma_v], ..., p_k[\sigma_v]) \\
+= fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = fun(s^1_v, ..., s^k_v) = q_r[\sigma](s^1_v, ..., s^k_v)
+\end{multline*}
+because $p_i[\sigma_v] = (p_i[\sigma])_v$, as can be easily shown by induction on the structure of the pattern and using $\sigma_v(x) = (\sigma(x))_v$.
+
+\item \underline{Case 1.2:} $q_r = fun(p_1, ..., p_k).des(p'_1, ..., p'_l)$.
+
+It is
+\begin{multline*}
+q_{r'}[\sigma_v] = q_r[\sigma_v] = (fun(p_1, ..., p_k).des(p'_1, ..., p'_l))[\sigma_v] \\
+= fun(p_1[\sigma_v], ..., p_k[\sigma_v]).des(p'_1[\sigma_v], ..., p'_l[\sigma_v]) \\
+= fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v).des((p'_1[\sigma])_v, ..., (p'_l[\sigma])_v) \\
+= (fun(p_1[\sigma], ..., p_k[\sigma]))_v.des((p'_1[\sigma])_v, ..., (p'_l[\sigma])_v) = s^1_v.des(s^2_v, ..., s^{l+1}_v)
+\end{multline*}
+because $(fun(p_1[\sigma], ..., p_k[\sigma]))_v = fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$. This will be shown next.
+
+Suppose that $fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$ could further reduce in $\langle prg \rangle$, which would only be possible by the ``Subst" rule using a left-hand side of the form $fun(...)$. By induction on the structure of the copattern $q$, it can be easily shown that $\langle `` q = t " \rangle^{extract\_outer\_des}$ (for arbitrary $t$) can only contain a left-hand side of the form $fun(...)$ (a hole pattern) if $q = fun(...)$. It follows that there already is a left-hand side of the form $fun(...)$ in $prg$. But then $fun(p_1[\sigma], ..., p_k[\sigma])$ would not be a value in $prg$, contrary to the assumption. Thus $fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$ cannot reduce further in $\langle prg \rangle$ and is a value.\footnote{It has codata type because otherwise $fun(p_1[\sigma], ..., p_k[\sigma])$ would not be a value in $prg$.}
+
+\end{itemize}
+
+\item \underline{Case 2:} $q_r = q'.des(p_1, ..., p_k)$ with $q'$ a destructor pattern.
+
+Then it is
+\begin{multline*}
+\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
+= \langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract\_outer\_des}
+\end{multline*}
+with $hsig, heqn$ as in the definition of $extract\_des$, especially 
+\begin{equation*}
+heqn = ``  \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}.des(p_1, ..., p_k) = t_r "
+\end{equation*}
+This equation $heqn$ is also in $\langle r \rangle^{extract\_outer\_des}$. (TODO: This is immediately clear when extraction is reformulated (with same meaning) to Writer monad style. See also the idea with the boxed plus in the proofs above for this.) Choose $r' = heqn$. It is
+\begin{multline*}
+q_{r'}[\sigma_v] = (\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}.des(p_1, ..., p_k))[\sigma_v] \\
+= (\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]).des(p_1[\sigma_v], ..., p_k[\sigma_v]) \\
+= (q'[\sigma])_v.des((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = q_r[\sigma](s^1_v, ..., s^{k+1}_v)
+\end{multline*}
+because
+\begin{equation*}
+\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v] = (q'[\sigma])_v,
+\end{equation*}
+which will be shown next. For this, let $q' = q''.des'(p_1, ..., p_l)$. It is now proved by induction on the structure of $q''$ that $q'[\sigma]$ reduces to $\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]$.
+
+\begin{itemize}
+
+\item $q'' = fun(p'_1, ..., p'_m)$:
+\begin{multline*}
+(q'[\sigma])_v = (fun(p'_1[\sigma], ..., p'_m[\sigma]).des(p_1[\sigma], ..., p_l[\sigma]))_v\\
+= (fun((p'_1[\sigma])_v, ..., (p'_m[\sigma])_v)_v.des((p_1[\sigma])_v, ..., (p_l[\sigma])_v))_v \\
+= ((fun(p'_1[\sigma_v], ..., p'_m[\sigma_v]))_v.des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
+= (((fun(p'_1, ..., p'_m))[\sigma_v])_v.des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v \\
+= (q'[\sigma_v])_v = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]
+\end{multline*}
+The last equation is derived by using the equation
+\begin{equation*}
+`` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} "
+\end{equation*}
+for the reduction of $q'[\sigma_v]$ by the ``Subst" rule. This equation is contained in $\langle r \rangle^{extract\_outer\_des}$ because
+\begin{multline*}
+\langle r \rangle^{extract\_outer\_des} \\
+= \langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract\_outer\_des}\\
+= \big\langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \big\rangle
+\end{multline*}
+
+\item $q'' = q^0.des(p'_1, ..., p'_m)$:
+\begin{multline*}
+(q'[\sigma])_v = ... =  ((q^0[\sigma])_v.des(p'_1[\sigma_v], ..., p'_m[\sigma_v]).des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
+= (\langle \textrm{extract}, \langle q^0 \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v].des(p'_1[\sigma_v], ..., p'_m[\sigma_v]).des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
+= (\langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v].des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v \\
+= (\langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m).des(p_1, ..., p_l) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v])_v\\
+= \langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m).des(p_1, ..., p_l) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]\\
+= \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]
+\end{multline*}
+
+\end{itemize}
 
 \end{itemize}
 
