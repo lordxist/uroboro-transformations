@@ -972,63 +972,45 @@ then there is an equation $r$ in the equations of $prg$ such that $\langle r \ra
 
 \item As we can see in the definition of $extract\_helpers$, the transformed program contains the equations within $\langle r \rangle^e = \big\langle r', H \big\rangle$, because $prg$ contains $r$. The desired sequence can be constructed as follows.
 
-First the (immediate) subterms of $s$ need to be reduced to values in $\langle prg \rangle^{extract\_helpers(e)}$; let the result of the reduction be $s'$. This has to happen in such a way that $s \sim s'$ holds. We have such a reduction sequence by Lemma 4. In fact, the result of each step of the reduction is equivalent to $s$, which can easily be seen by inspecting the proof of the lemma.
-
 %%- under construction
+\begin{enumerate}
 
-By the ??? extraction function property, there is an equation $`` q_{r'} = t_{r'} "$ such that the following holds:
+\item First, the prefixes of $s = q_r[\sigma]$ are converted. Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$.
+By property 6, we have equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_r, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$. 
+From this we have the sequence
+\begin{equation*}
+s = q_r[\sigma^0_v] \longrightarrow^* q_1[\sigma^1_v] \longrightarrow^* ... \longrightarrow^* q_n[\sigma^n_v]
+\end{equation*}
+with $\sigma^0_v := \sigma$; the other $\sigma^i_v$ are constructed iteratively, as follows below. This sequence consists of the sequences
+\begin{equation*}
+q_i[\sigma^i_v] \longrightarrow^* q_i[\sigma^{i+1}_v] \longrightarrow q_{i+1}[\sigma^{i+1}_v]
+\end{equation*}
+for each $i \in \{0, ..., n-1\}$ (it is $q_0 = q_r$). The initial part is responsible for reducing the immediate subterms of the prefix $q_{r_{i+1}}[\sigma^i_v] \leq q_i[\sigma^i_v]$ to values, resulting in $q_i[\sigma^{i+1}_v]$.
 
-Let $\sigma$ be a substitution that covers the variables in $q_r$, and let $s^1, ..., s^n$ be the immediate subterms (from left to right) of $q_r[\sigma]$. In order to use it for contextual substitution, write $q_r[\sigma](s^1, ..., s^n)$ for $q_r[\sigma]$ and its subterms (from left to right). There is a substitution $\sigma_v$, which substitutes only with values, such that $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v)$.
+This initial part is constructed first. It suffices to reduce the patterns within $q_{r_{i+1}}[\sigma^i_v]$ from left to right, as will be shown next. The form of $q_{r_{i+1}}$ is $fun(p^0_1, ..., p^0_k).des_1(p^1_1, ..., p^1_{k_1}...des_l(p^l_1, ..., p^l_{k_l})$. By property 6, $q_{r_{i+1}}$ is the smallest prefix of $q_i$ that is a left-hand side in $\langle r \rangle^e$. The other equations that need to be considered are those within $\langle r^* \rangle^e$ for an $r^* \neq r$ of $prg$. By induction on the structure of $q_{r^*}$ it can be shown that, if such an equation is a strict prefix of $q_{r_{i+1}}$, then either $r$ or $r^*$ is a ``dead" rule in $prg$. It follows that there is no left-hand side that a strict prefix of $q_{r_{i+1}}[\sigma^i_v]$ matches. Thus it suffices to reduce the patterns from left to right.
 
-%%- experimental, meant to be reused in proofs of the above property for concrete extraction functions
-%There is such a $\sigma_v$ with $s' = q_{r'}[\sigma_v]$. $\sigma_v$ can be constructed as follows for every variable $x$ in $q_{r'}(q^0_{r'}, p^1_{r'}, ..., p^n_{r'})$. If $x$ is contained in a $p^i_{r'}$, write $p_x$ for this pattern and define:
-%\begin{equation*}
-%    \sigma_v[x] =
-%    \begin{cases}
-%      v, & \text{if}\ p \ \text{contains or is}\ x \ \text{with}\ p_x = p^i_r[p / y] \ \text{and}\ p[v / x] = (\sigma[y])_v \\
-%      (p[\sigma])_v, & \text{if}\ p_x[p / x] = p^i_r \ \text{and}\ p_x = p^i_{r'}
-%    \end{cases}
-%\end{equation*}
-%On the other hand, if $x$ is contained in $q^0_{r'}$, distinguish two cases for $q^0_{r'}$. If $q^0_{r'} = fun(p'_1, ..., p'_k)$, two cases for $q^0_r$ will be distinguished. If $q^0_r = fun(p_1, ..., p_k)$, write $p_x$ for the pattern $p'_i$ that contains $x$ and define:
-%\begin{equation*}
-%    \sigma_v[x] =
-%    \begin{cases}
-%      v, & \text{if}\ p \ \text{contains or is}\ x \ \text{with}\ p_x = p_i[p / y] \ \text{and}\ p[v / x] = (\sigma[y])_v \\
-%      (p[\sigma])_v, & \text{if}\ p_x[p / x] = p_i \ \text{and}\ p_x = p'_i
-%    \end{cases}
-%\end{equation*}
-%
-%It will now be shown that $s' = q_{r'}[\sigma_v]$. Let $s^0, ..., s^n$ be the immediate subterms of $s = s(s^0, ..., s^n)$. It is $s' = s(s^0_v, ..., s^n_v) = q_{r'}(s^0_v, s^1_v, ..., s^n_v) = q_{r'}(q^0_{r'}[\sigma_v], p^1_{r'}[\sigma_v], ..., p^n_{r'}[\sigma_v]) = q_{r'}[\sigma]$, because $s^0_v = q^0_{r'}[\sigma_v]$ and $s^i_v = p^i_{r'}[\sigma_v]$ for $i = 1, ..., n$.
-%
-%First, it is shown that $s^i_v = p^i_{r'}[\sigma_v]$. For $i = 1, ..., n$, it is $s^i_v = (p^i_r[\sigma])_v$. If $p^i_{r'}$ is a variable, say $x$, it is $p^i_{r'}[\sigma_v] = x[\sigma_v] = \sigma_v[x] = (\sigma[x])_v = (x[\sigma])_v = (p^i_r[\sigma])_v$. If $p^i_{r'} = con(p_1, ..., p_k)$, it is $p^i_{r'}[\sigma_v] = con(p'_1, ..., p'_k)[\sigma_v] = con(p'_1[\sigma_v], ..., p'_k[\sigma_v]) = con((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = (p^i_r[\sigma])_v$.
-%
-%Second, it is shown that $s^0_v = q^0_{r'}[\sigma_v]$.
+We have such a reduction for each pattern from Lemma 4 with a result equivalent to the start. This is because the subterm that is meant to be reduced is, by precondition, already a value in $prg$. It is clear that, in the result of reducing these subterms, within the subterms, the terms that $\sigma^i_v$ substituted for variables are now replaced with their corresponding values. Thus $\sigma^{i+1}_v$ can be defined by replacing exactly those terms with their corresponding values and keeping the others from $\sigma^i_v$.
 
-For the $\sigma$ in our case, we thus have a $\sigma_v$ with $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v) = s(s^1_v, ..., s^n_v) = s'$. By the ``Subst" rule, a reduction from $s'$ to $t_{r'}[\sigma_v]$ follows.
+The final step is derived by first using the ``Subst" rule for the equation $r_{i+1}$, reducing the prefix $q_{r_{i+1}}[\sigma^{i+1}_v] \leq q_i[\sigma^{i+1}_v]$ to $t_{r_{i+1}}[\sigma^{i+1}_v]$, and then applying the ``Cong" rule to reduce $q_i[\sigma^{i+1}_v]$ to $q_i[q_{r_{i+1}} \leftarrow t_{r_{i+1}}[\sigma^{i+1}_v]] =  q_i[q_{r_{i+1}} \leftarrow t_{r_{i+1}}][\sigma^{i+1}_v]= q_{i+1}[\sigma^{i+1}_v]$. That the ``Cong" rule can be applied is clear since the term reduced in the ``Subst" rule is a prefix of $q_i[\sigma^{i+1}_v]$ and thus there is no term to the left of it. By property 6, the left- and right-hand sides of $r_{i+1}$ are equivalent, thus also the result of the final step to its start term. As a consequence of this and of the equivalences for the previous steps, the entire prefix conversion sequence preserves the equivalence.
 
-By the ??? extraction function property, for the equation $`` q_{r'} = t_{r'} "$ (the same as above) it holds that $t_{r'} = q_1, t_1 = q_2, ..., t_{n-1} = q_n$ for some equations $`` q_i = t_i "$ for $i = 1, ..., n-1$ and an equation $`` q_n = t_r "$. Further it holds that the immediate subterms of $q_i[\sigma_v]$ are values for any substitution $\sigma_v$ that substitutes only with values.
+\item The second part of the sequence is concerned with the conversion of function calls until the final equation that leads to $\widetilde{t}$ can be used. By property 6, we have equations $r_{n+1}, ..., r_{n+m}$ in $\langle r \rangle^e$ with $t_n = q_{r_{n+1}}, t_{r_{n+1}} = q_{r_{n+2}}, ..., t_{r_{n+m}} = q_{r_{n+m+1}}$.\footnote{It can also be the case that $m=0$, then $t_n = q_{r_{n+1}}$ and the sequence constructed below is empty.}
+From this we have the sequence
+\begin{equation*}
+t_n[\sigma^n_v] \longrightarrow^* t_{r_{n+1}}[\sigma^{n+1}_v] \longrightarrow^* ... \longrightarrow^* t_{r_{n+m}}[\sigma^n_v] = q_{r_{n+m+1}}[\sigma^n_v],
+\end{equation*}
+which consists of the sequences
+\begin{equation*}
+...
+\end{equation*}
 
-As a consequence, and by using the $\sigma_v$ we have from the above, applying the ``Subst" rule for each of these equations gives us a reduction sequence from $t_{r'}[\sigma_v]$ to $t_r[\sigma_v] \sim t_r[\sigma]$.
 
-%After that, consider the equation $`` q_h = t_h "$ for which $q_r \sim q_h$ and $t_r \sim t_h$ holds. There are two ways in which $q_r \sim q_h$ can hold:
-%
-%\begin{itemize}
-%
-%\item \underline{Case 1:} The highest-level structures of $q_h$ and $q_r$ are identical\footnote{I.e., $q_h$ and $q_r$ are applications of the same function or of the same destructor.}, and the immediate subterms of $q_h$ are equivalent to the respective (from left to right) immediate subterms of $q_r$.
-%
-%Then $s'$ is reduced in one step to a result $t'$ with $t' \sim t$. This step is derived by applying the ``Subst" rule for the equation $`` q_h = t_h "$. For that, it still needs to be shown that $s'$ matches this $q_h$. This is done by showing that $s' = q_h[\sigma_v]$, where $\sigma_v$ is defined by replacing each term which $\sigma$ substitutes with its corresponding value.\footnote{A term can only reduce to one value because $\langle prg \rangle^{extract\_helpers(e)}$ is deterministic. To put it another way, for each term there is exactly one corresponding value.}
-%
-%From $q_h \sim q_r$ it follows that $q_h[\sigma_v] \sim q_r[\sigma_v]$. Because $\sigma$ substitutes only with what are values in $prg$, each term that $\sigma_v$ substitutes with is equivalent to the term of $\sigma$ it replaces. Thus it is $q_h[\sigma_v] \sim q_r[\sigma_v] \sim q_r[\sigma] = s$. Especially, this means that each immediate subterm of $s$ is equivalent to the respective (from left to right) immediate subterm of $q_h[\sigma_v]$. But, for each immediate subterm of $s$, there is only one \textit{value} that is equivalent to it\footnote{This is because of the intended consequence of the equivalence relation which says that, for closed terms $s,t$ with $s \sim t$, one of them reduces to the other.}, and an $s$ with all immediate subterms reduced to values is already $s'$ by the above construction. Thus $s' = q_h[\sigma_v]$.
-%
-%\item \underline{Case 2:} Either $q_r[\sigma_v]$ reduces to $q_h[\sigma_v]$, for any $\sigma_v$, or the other way round. Let $\sigma_v$ substitute only with values, and let the terms that $\sigma_v$ substitutes with be equivalent to those of $\sigma$.
-%
-%Then $s'$ is first reduced to $q_h[\sigma_v]$. Afterwards, $q_h[\sigma_v]$ is reduced in one step to $t' := t_h[\sigma_v]$ with $t' \sim t_r[\sigma_v] \sim t_r[\sigma] = t$. This step is derived by applying the ``Subst" rule for the equation $`` q_h = t_h "$. It still needs to be shown that the reduction from $s'$ to $q_h[\sigma_v]$ is possible.
-%
-%Because the transformed program is deterministic, $q_r[\sigma_v]$ reduces to $q_h[\sigma_v]$, not the other way round. If $s' = q_r[\sigma_v]$, we thus have the desired reduction.
-%
-%Now, suppose $s' \neq q_r[\sigma_v]$. As in Case 1 above, it still is $q_r[\sigma_v] \sim q_r[\sigma] = s$, and also $s \sim s'$, and thus $s' \sim q_r[\sigma_v]$. It follows that either $s'$ reduces to $q_r[\sigma_v]$, or the other way round. In the first case, put the reductions from $s'$ to $q_r[\sigma_v]$ and from $q_r[\sigma_v]$ to $q_h[\sigma_v]$ behind one another to obtain the desired reduction. In the second case, $q_r[\sigma_v]$ would reduce both to $s'$ and to $q_h[\sigma_v]$. Since the transformed program is deterministic, it follows that either (a) $s'$ is an intermediate result in the reduction from $q_r[\sigma_v]$ to $q_h[\sigma_v]$, or (b) $q_h[\sigma_v]$ is an intermediate result in the reduction from $q_r[\sigma_v]$ to $s'$. If (a) is true, we have the final part of this sequence as the desired sequence. 
-%
-%\end{itemize}
+\item After this, the final equation that leads to $\widetilde{t}$ can be used, as follows.
+\begin{equation*}
+q_{r_{n+m+1}}[\sigma] \longrightarrow \widetilde{t_r}[\sigma]
+\end{equation*}
+
+\end{enumerate}
+%%-
 
 \item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
 
@@ -1495,108 +1477,145 @@ By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, 
 
 \end{itemize}
 
-\underline{Property 6} (momentarily the first part of the ??? property)
+\underline{Property 6}
 
-For each equation $r = `` q_r = t_r "$ there is an equation $r' = `` q_{r'} = t_{r'} "$ in $\langle `` q_r = t_r " \rangle^{extract\_outer\_des}$ such that the following holds:
-
-Let $\sigma$ be a substitution that covers the variables in $q_r$, and let $s^1, ..., s^n$ be the immediate subterms (from left to right) of $q_r[\sigma]$. In order to use it for contextual substitution, write $q_r[\sigma](s^1, ..., s^n)$ for $q_r[\sigma]$ and its subterms (from left to right). There is a substitution $\sigma_v$, which substitutes only with values, such that $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v)$.
+Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$.
+There are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_r, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
 
 Proof:
 
-$\sigma_v$ is always constructed as follows, for each of its variables $x$:
-\begin{equation*}
-\sigma_v(x) = (\sigma(x))_v
-\end{equation*}
+By induction on the structure of $q_r$.
 
 \begin{itemize}
 
-\item \underline{Case 1:} $q_r$ is hole pattern or has only one destructor.
+\item \underline{Case 1:} $q_r$ is hole pattern.
 
-Then it is $\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle$. Choose $r' = r$.
+\begin{equation*}
+\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle
+\end{equation*}
+Choose $n = 1$ and $r_1 = r$.
 
-\begin{itemize}
+\item \underline{Case 2:} $q_r = q'.des(p_1, ..., p_k)$.
 
-\item \underline{Case 1.1:} $q_r$ is hole pattern, i.e., $q_r = fun(p_1, ..., p_k)$.
-
-It is
+When $q'$ is hole pattern, it is
+\begin{equation*}
+\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle,
+\end{equation*}
+and the argument is identical to Case 1. Otherwise, it is
 \begin{multline*}
-q_{r'}[\sigma_v] = q_r[\sigma_v] = fun(p_1, ..., p_k)[\sigma_v] = fun(p_1[\sigma_v], ..., p_k[\sigma_v]) \\
-= fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = fun(s^1_v, ..., s^k_v) = q_r[\sigma](s^1_v, ..., s^k_v)
+\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des}\\
+= \langle `` q' = hname(\langle q' \rangle^{vars}) ", \{\big\langle hsig, `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r " \big\rangle \} \rangle^{extract\_outer\_des},
 \end{multline*}
-because $p_i[\sigma_v] = (p_i[\sigma])_v$, as can be easily shown by induction on the structure of the pattern and using $\sigma_v(x) = (\sigma(x))_v$.
-
-\item \underline{Case 1.2:} $q_r = fun(p_1, ..., p_k).des(p'_1, ..., p'_l)$.
-
-It is
-\begin{multline*}
-q_{r'}[\sigma_v] = q_r[\sigma_v] = (fun(p_1, ..., p_k).des(p'_1, ..., p'_l))[\sigma_v] \\
-= fun(p_1[\sigma_v], ..., p_k[\sigma_v]).des(p'_1[\sigma_v], ..., p'_l[\sigma_v]) \\
-= fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v).des((p'_1[\sigma])_v, ..., (p'_l[\sigma])_v) \\
-= (fun(p_1[\sigma], ..., p_k[\sigma]))_v.des((p'_1[\sigma])_v, ..., (p'_l[\sigma])_v) = s^1_v.des(s^2_v, ..., s^{l+1}_v)
-\end{multline*}
-because $(fun(p_1[\sigma], ..., p_k[\sigma]))_v = fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$. This will be shown next.
-
-Suppose that $fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$ could further reduce in $\langle prg \rangle$, which would only be possible by the ``Subst" rule using a left-hand side of the form $fun(...)$. By induction on the structure of the copattern $q$, it can be easily shown that $\langle `` q = t " \rangle^{extract\_outer\_des}$ (for arbitrary $t$) can only contain a left-hand side of the form $fun(...)$ (a hole pattern) if $q = fun(...)$. It follows that there already is a left-hand side of the form $fun(...)$ in $prg$. But then $fun(p_1[\sigma], ..., p_k[\sigma])$ would not be a value in $prg$, contrary to the assumption. Thus $fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$ cannot reduce further in $\langle prg \rangle$ and is a value.\footnote{It has codata type because otherwise $fun(p_1[\sigma], ..., p_k[\sigma])$ would not be a value in $prg$.}
+with $hname$, $hsig$ as in the definition of $extract\_des$. (TODO: What follows is immediately clear when extraction is reformulated (with same meaning) to Writer monad style. See also the idea with the boxed plus in the proofs above for this.) Choose
+\begin{equation*}
+r_n = `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r ".
+\end{equation*}
+The induction hypothesis, applied to $q'$, yields $r_1, ..., r_m$ in $\langle r \rangle^e$ with $q_{r_1} \leq q', q_{r_2} \leq q'_1, ..., q_{r_m} \leq q'_{n-1}$, with $q'_i := q'[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. It is clear that $q' \leq q_r$ and $q'_i \leq q_i$ for $i \in \{1, ..., m\}$. Choose $n = m+1$ to obtain the property.
 
 \end{itemize}
 
-\item \underline{Case 2:} $q_r = q'.des(p_1, ..., p_k)$ with $q'$ a destructor pattern.
-
-Then it is
-\begin{multline*}
-\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
-= \langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract\_outer\_des}
-\end{multline*}
-with $hsig, heqn$ as in the definition of $extract\_des$, especially 
-\begin{equation*}
-heqn = ``  \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}.des(p_1, ..., p_k) = t_r "
-\end{equation*}
-This equation $heqn$ is also in $\langle r \rangle^{extract\_outer\_des}$. (TODO: This is immediately clear when extraction is reformulated (with same meaning) to Writer monad style. See also the idea with the boxed plus in the proofs above for this.) Choose $r' = heqn$. It is
-\begin{multline*}
-q_{r'}[\sigma_v] = (\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}.des(p_1, ..., p_k))[\sigma_v] \\
-= (\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]).des(p_1[\sigma_v], ..., p_k[\sigma_v]) \\
-= (q'[\sigma])_v.des((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = q_r[\sigma](s^1_v, ..., s^{k+1}_v)
-\end{multline*}
-because
-\begin{equation*}
-\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v] = (q'[\sigma])_v,
-\end{equation*}
-which will be shown next. For this, let $q' = q''.des'(p_1, ..., p_l)$. It is now proved by induction on the structure of $q''$ that $q'[\sigma]$ reduces to $\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]$.
-
-\begin{itemize}
-
-\item $q'' = fun(p'_1, ..., p'_m)$:
-\begin{multline*}
-(q'[\sigma])_v = (fun(p'_1[\sigma], ..., p'_m[\sigma]).des(p_1[\sigma], ..., p_l[\sigma]))_v\\
-= (fun((p'_1[\sigma])_v, ..., (p'_m[\sigma])_v)_v.des((p_1[\sigma])_v, ..., (p_l[\sigma])_v))_v \\
-= ((fun(p'_1[\sigma_v], ..., p'_m[\sigma_v]))_v.des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
-= (((fun(p'_1, ..., p'_m))[\sigma_v])_v.des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v \\
-= (q'[\sigma_v])_v = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]
-\end{multline*}
-The last equation is derived by using the equation
-\begin{equation*}
-`` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} "
-\end{equation*}
-for the reduction of $q'[\sigma_v]$ by the ``Subst" rule. This equation is contained in $\langle r \rangle^{extract\_outer\_des}$ because
-\begin{multline*}
-\langle r \rangle^{extract\_outer\_des} \\
-= \langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract\_outer\_des}\\
-= \big\langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \big\rangle
-\end{multline*}
-
-\item $q'' = q^0.des(p'_1, ..., p'_m)$:
-\begin{multline*}
-(q'[\sigma])_v = ... =  ((q^0[\sigma])_v.des(p'_1[\sigma_v], ..., p'_m[\sigma_v]).des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
-= (\langle \textrm{extract}, \langle q^0 \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v].des(p'_1[\sigma_v], ..., p'_m[\sigma_v]).des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
-= (\langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v].des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v \\
-= (\langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m).des(p_1, ..., p_l) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v])_v\\
-= \langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m).des(p_1, ..., p_l) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]\\
-= \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]
-\end{multline*}
-
-\end{itemize}
-
-\end{itemize}
+%(momentarily the first part of the ??? property)
+%
+%For each equation $r = `` q_r = t_r "$ there is an equation $r' = `` q_{r'} = t_{r'} "$ in $\langle `` q_r = t_r " \rangle^{extract\_outer\_des}$ such that the following holds:
+%
+%Let $\sigma$ be a substitution that covers the variables in $q_r$, and let $s^1, ..., s^n$ be the immediate subterms (from left to right) of $q_r[\sigma]$. In order to use it for contextual substitution, write $q_r[\sigma](s^1, ..., s^n)$ for $q_r[\sigma]$ and its subterms (from left to right). There is a substitution $\sigma_v$, which substitutes only with values, such that $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v)$.
+%
+%Proof:
+%
+%$\sigma_v$ is always constructed as follows, for each of its variables $x$:
+%\begin{equation*}
+%\sigma_v(x) = (\sigma(x))_v
+%\end{equation*}
+%
+%\begin{itemize}
+%
+%\item \underline{Case 1:} $q_r$ is hole pattern or has only one destructor.
+%
+%Then it is $\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle$. Choose $r' = r$.
+%
+%\begin{itemize}
+%
+%\item \underline{Case 1.1:} $q_r$ is hole pattern, i.e., $q_r = fun(p_1, ..., p_k)$.
+%
+%It is
+%\begin{multline*}
+%q_{r'}[\sigma_v] = q_r[\sigma_v] = fun(p_1, ..., p_k)[\sigma_v] = fun(p_1[\sigma_v], ..., p_k[\sigma_v]) \\
+%= fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = fun(s^1_v, ..., s^k_v) = q_r[\sigma](s^1_v, ..., s^k_v)
+%\end{multline*}
+%because $p_i[\sigma_v] = (p_i[\sigma])_v$, as can be easily shown by induction on the structure of the pattern and using $\sigma_v(x) = (\sigma(x))_v$.
+%
+%\item \underline{Case 1.2:} $q_r = fun(p_1, ..., p_k).des(p'_1, ..., p'_l)$.
+%
+%It is
+%\begin{multline*}
+%q_{r'}[\sigma_v] = q_r[\sigma_v] = (fun(p_1, ..., p_k).des(p'_1, ..., p'_l))[\sigma_v] \\
+%= fun(p_1[\sigma_v], ..., p_k[\sigma_v]).des(p'_1[\sigma_v], ..., p'_l[\sigma_v]) \\
+%= fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v).des((p'_1[\sigma])_v, ..., (p'_l[\sigma])_v) \\
+%= (fun(p_1[\sigma], ..., p_k[\sigma]))_v.des((p'_1[\sigma])_v, ..., (p'_l[\sigma])_v) = s^1_v.des(s^2_v, ..., s^{l+1}_v)
+%\end{multline*}
+%because $(fun(p_1[\sigma], ..., p_k[\sigma]))_v = fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$. This will be shown next.
+%
+%Suppose that $fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$ could further reduce in $\langle prg \rangle$, which would only be possible by the ``Subst" rule using a left-hand side of the form $fun(...)$. By induction on the structure of the copattern $q$, it can be easily shown that $\langle `` q = t " \rangle^{extract\_outer\_des}$ (for arbitrary $t$) can only contain a left-hand side of the form $fun(...)$ (a hole pattern) if $q = fun(...)$. It follows that there already is a left-hand side of the form $fun(...)$ in $prg$. But then $fun(p_1[\sigma], ..., p_k[\sigma])$ would not be a value in $prg$, contrary to the assumption. Thus $fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$ cannot reduce further in $\langle prg \rangle$ and is a value.\footnote{It has codata type because otherwise $fun(p_1[\sigma], ..., p_k[\sigma])$ would not be a value in $prg$.}
+%
+%\end{itemize}
+%
+%\item \underline{Case 2:} $q_r = q'.des(p_1, ..., p_k)$ with $q'$ a destructor pattern.
+%
+%Then it is
+%\begin{multline*}
+%\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
+%= \langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract\_outer\_des}
+%\end{multline*}
+%with $hsig, heqn$ as in the definition of $extract\_des$, especially 
+%\begin{equation*}
+%heqn = ``  \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}.des(p_1, ..., p_k) = t_r "
+%\end{equation*}
+%This equation $heqn$ is also in $\langle r \rangle^{extract\_outer\_des}$. (TODO: This is immediately clear when extraction is reformulated (with same meaning) to Writer monad style. See also the idea with the boxed plus in the proofs above for this.) Choose $r' = heqn$. It is
+%\begin{multline*}
+%q_{r'}[\sigma_v] = (\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}.des(p_1, ..., p_k))[\sigma_v] \\
+%= (\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]).des(p_1[\sigma_v], ..., p_k[\sigma_v]) \\
+%= (q'[\sigma])_v.des((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = q_r[\sigma](s^1_v, ..., s^{k+1}_v)
+%\end{multline*}
+%because
+%\begin{equation*}
+%\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v] = (q'[\sigma])_v,
+%\end{equation*}
+%which will be shown next. For this, let $q' = q''.des'(p_1, ..., p_l)$. It is now proved by induction on the structure of $q''$ that $q'[\sigma]$ reduces to $\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]$.
+%
+%\begin{itemize}
+%
+%\item $q'' = fun(p'_1, ..., p'_m)$:
+%\begin{multline*}
+%(q'[\sigma])_v = (fun(p'_1[\sigma], ..., p'_m[\sigma]).des(p_1[\sigma], ..., p_l[\sigma]))_v\\
+%= (fun((p'_1[\sigma])_v, ..., (p'_m[\sigma])_v)_v.des((p_1[\sigma])_v, ..., (p_l[\sigma])_v))_v \\
+%= ((fun(p'_1[\sigma_v], ..., p'_m[\sigma_v]))_v.des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
+%= (((fun(p'_1, ..., p'_m))[\sigma_v])_v.des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v \\
+%= (q'[\sigma_v])_v = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]
+%\end{multline*}
+%The last equation is derived by using the equation
+%\begin{equation*}
+%`` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} "
+%\end{equation*}
+%for the reduction of $q'[\sigma_v]$ by the ``Subst" rule. This equation is contained in $\langle r \rangle^{extract\_outer\_des}$ because
+%\begin{multline*}
+%\langle r \rangle^{extract\_outer\_des} \\
+%= \langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract\_outer\_des}\\
+%= \big\langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \big\rangle
+%\end{multline*}
+%
+%\item $q'' = q^0.des(p'_1, ..., p'_m)$:
+%\begin{multline*}
+%(q'[\sigma])_v = ... =  ((q^0[\sigma])_v.des(p'_1[\sigma_v], ..., p'_m[\sigma_v]).des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
+%= (\langle \textrm{extract}, \langle q^0 \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v].des(p'_1[\sigma_v], ..., p'_m[\sigma_v]).des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
+%= (\langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v].des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v \\
+%= (\langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m).des(p_1, ..., p_l) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v])_v\\
+%= \langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m).des(p_1, ..., p_l) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]\\
+%= \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]
+%\end{multline*}
+%
+%\end{itemize}
+%
+%\end{itemize}
 
 \end{proof}
 
