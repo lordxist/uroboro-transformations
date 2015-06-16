@@ -933,25 +933,27 @@ Let $\mathcal{D}$ be a derivation of $t =^? q \searrow \sigma$.
 
 %%-- under construction
 
+\begin{definition}[Extraction function properties]
+Let $e$ be an argument of $extract\_helpers$. $e$ is said to satisfy the extraction function properties iff, for any equation $r$, the equations within $\langle r \rangle^e$ are
+\begin{equation*}
+r_1, ..., r_n, r_{n+1}, ..., r_{n+m}, r_{n+m+1}
+\end{equation*}
+for $n, m \geq 0$ with properties following below.
+\begin{enumerate} 
+\item There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
+\item Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. It is $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
+\item It is $t_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$, $t_{r_{n+1}}[\sigma^{n+1}_v] = q_{r_{n+2}}$, ..., $t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}$.
+\item For $i \in \{1, ..., m\}$, $q_{r_{n+i}}$ is hole pattern. Further, if $m \neq 0$, $q_{r_{n+m+1}}$ is hole pattern.
+\item It is $t_{r_{n+m+1}} = t_r$ and there exists a $\sigma'$ with $t_{r_{n+m}}[\sigma] = q_{r_{n+m+1}}[\sigma']$ for any $\sigma$. Further, if $\sigma$ substitutes only with values, so does $\sigma'$.
+\item For $i \in \{1, ..., n+m\}$ it is $q_{r_i} \sim t_{r_i}$.
+\end{enumerate}
+
+\end{definition}
+
 \begin{lemma}
 
-Let $e$ be a helper extraction function, i.e., a function that can be an argument of $extract\_helpers$ as defined in section 1, and let $prg$ be a deterministic program (TODO: define this as not containing any two rules which both match the same term). Let this $e$ satisfy the following conditions for every equation $r := `` q_r = t_r "$ of $prg$, with $\langle r \rangle^e = \big\langle r', H \big\rangle$ and $r' := `` q_{r'} = t_{r'} "$:
+Let $e$ be an argument of $extract\_helpers$ that satisfies the extraction function properties, and let $prg$ be a deterministic program (TODO: define this as not containing any two rules which both match the same term).
 
-TODO: move these properties into a definition (for extraction functions)
-
-\begin{itemize}
-\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
-
-\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
-
--- TODO: the second property needs to be changed: instead of such an equation in $H$, there needs to be an equation (either $r'$ or in $H$) such that the ??? property below in the proof holds
-
-\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
-
-\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
-
-\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
-\end{itemize}
 For any two closed terms $s,t$ it holds that:
 
 \begin{enumerate}
@@ -1004,10 +1006,13 @@ t_{r_{n+i}}[\sigma^{n+i}_v] \longrightarrow t_{r_{n+i+1}}[\sigma^{n+i+1}_v]
 \end{equation*}
 can be derived using the ``Subst" rule for the equation $q_{r_{n+i+1}} = t_{r_{n+i+1}}$. This is possible since, as stated above, by property 6 it is $q_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$ and $t_{r_{n+i}}[\sigma^{n+i}_v] = q_{r_{n+i+1}}[\sigma^{n+i+1}_v]$, respectively, and the immediate subterms of $q_{r_{n+i+1}}[\sigma^{n+i+1}_v]$ are values. This is because, by property 6, $q_{r_{n+i+1}}$ is hole pattern, and $\sigma^{n+i+1}_v$ substitutes only with values.
 
+The function call conversion sequence preserves the equivalence because, by property 6, it is $q_{r_{n+i+1}} \sim t_{r_{n+i+1}}$ for each $i \in \{0, ..., m-1\}$.
+
 \item After this, the final equation that leads to $\widetilde{t}$ can be used, as follows.
 \begin{equation*}
-q_{r_{n+m+1}}[\sigma^{n+m+1}_v] \longrightarrow \widetilde{t_r}[\sigma^{n+m+1}_v] =: \widetilde{t}
+t_{r_{n+m+1}}[\sigma^{n+m+1}_v] = q_{r_{n+m+1}}[\sigma'] \longrightarrow t_r[\sigma'] =: \widetilde{t}
 \end{equation*}
+Such a $\sigma'$ exists by property 6. This step is derived using the ``Subst" rule for the final equation $r_{n+m+1}$. This is possible because either (a) $m = 0$ and then $q_{r_{n+m+1}}[\sigma'] = q_{r_{n+1}}[\sigma^{n+1}_v] = q_n[\sigma^n_v]$, which only has immediate value subterms by construction, or (b) $q_{r_{n+m+1}}$ is hole pattern and $\sigma'$ substitutes only with values.
 
 \end{enumerate}
 %%-
@@ -1393,98 +1398,6 @@ The relevant initial part of the sequence is constructed by Lemma 4. Again, by i
 
 \begin{proof}[Proof for $extract\_outer\_des$]
 
-Properties 1-5 are proved by induction on the structure of $q_r$, property 6 separately.
-
-\underline{Properties 1-5}
-\begin{itemize}
-
-\item \underline{Case 1}: $q_r$ is hole pattern, or: $q_r = q'_r.des(p_1, ..., p_k)$, $q'_r$ is hole pattern.
-\begin{equation*}
-\langle `` q_r = t_r " \rangle^{extract\_outer\_des} = \big\langle `` q_r = t_r ", \emptyset \big\rangle
-\end{equation*}
-Each extraction function property is now listed along with a proof for it in this case.
-
-\begin{enumerate}
-\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$) (Note/TODO: terms and copatterns are conflated for some $\sim$ properties, note this somewhere)
-
-Proof: It is $H = \emptyset$ and thus the property is trivially fulfilled.
-
-\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
-
-Proof: Trivially true, since $H = \emptyset$.
-
-\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
-
-Proof: By the definition of $extract\_outer\_des$ (as given above) it is $r = r'$ and $H = \emptyset$.
-
-\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
-
-Proof: Clear since there is only one equation.
-
-\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
-
-Proof: Trivially true, because $H = \emptyset$.
-
-\end{enumerate}
-
-\item \underline{Case 2}: $q_r = q'_r.des(p_1, ..., p_k)$, $q'_r$ is destructor pattern.
-\begin{equation*}
-\langle `` q_r = t_r " \rangle^{extract\_outer\_des} = \langle \langle `` q_r = t_r " \rangle^{extract\_des} \rangle^{extract\_outer\_des}
-\end{equation*}
-First, note that
-\begin{equation*}
-\langle `` q_r = t_r " \rangle^{extract\_des} = \big\langle r'^0, \{h_0\} \big\rangle.
-\end{equation*}
-The left-hand side of $r'^0$ is $q'_r$. Also, for any equation $r_0$, it can be easily seen by induction on its structure that $h_0$ is part of the helper equations in $\big\langle r_0, \{h_0\} \big\rangle^{extract\_outer\_des}$. Especially, $h_0$ is part of $H$.
-
-Let $\big\langle r_0, H_0 \big\rangle \boxplus H_1 := \big\langle r_0, H_0 \cup H_1 \big\rangle$. Because $h_0$ is part of the helper equations in $\langle r_0, \{h_0\} \rangle^{extract\_outer\_des}$, it follows that
-\begin{multline*}
-\langle r'^0, \{h_0\} \rangle^{extract\_outer\_des} = \big\langle r', H \big\rangle = \big\langle r', H' \cup \{h_0\} \big\rangle \\
-= \big\langle r', H' \big\rangle \boxplus \{h_0\} = \langle r'^0 \rangle^{extract\_outer\_des} \boxplus \{h_0\}
-\end{multline*}
-
-Again, each extraction function property is now listed along with a proof for it in this case.
-
-\begin{enumerate}
-
-\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$) (Note/TODO: terms and copatterns are conflated for some $\sim$ properties, note this somewhere)
-
-Proof: From Lemma 3 we have this property for $extract\_des$, especially for $`` q_r = t_r "$. This means that the property for $extract\_outer\_des$ is at least fulfilled with respect to $\{h_0\}$.
-
-By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, for every equation $`` q_h = t_h "$ in $H'$ it is either $q_h \sim t_h$ or ($q_{r'^0} \sim q_h$ and $t_{r'^0} \sim t_h$). For equations of the first case we thus have the desired property. For equations of the second case we have $q_h \sim t_h$ by the third property of the induction hypothesis (since $H \neq \emptyset$) and transitivity.
-
-\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
-
-Proof: $h_0$ is such an equation, by the definition of $extract\_des$.
-
-\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
-
-Proof: We have $q_{r'} \sim t_{r'}$ from this property of the induction hypothesis applied to $q'_r$.
-
-\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
-
-Proof: By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, the set of equations in $\big\langle r', H' \big\rangle$ is deterministic.
-
-TODO
-
-\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
-
-Proof: From Lemma 3 we have this property for $extract\_des$, especially for $`` q_r = t_r "$. This means that the property for $extract\_outer\_des$ is at least fulfilled with respect to $\{h_0\}$.
-
-By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, that is, for every equation $`` q_h = t_h "$ in $H'$, $q_h$ is equivalent to a sub-copattern of the left-hand side $q'_r$ of $r'^0$. But $q'_r$ is in turn a sub-copattern of $q_r$.
-
-\end{enumerate}
-
-\end{itemize}
-
-\underline{Property 6}
-
-Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$.
-There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
-Further, there are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
-
-Proof:
-
 By induction on the structure of $q_r$; in any case, choose $q_0 := q_r$ and $\sigma^0_v = \sigma$.
 
 \begin{itemize}
@@ -1494,7 +1407,7 @@ By induction on the structure of $q_r$; in any case, choose $q_0 := q_r$ and $\s
 \begin{equation*}
 \langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle
 \end{equation*}
-Choose $n = 1$ and $r_1 = r$.
+Choose $n = 0$, $m = 0$ and $r_1 = r$.\footnote{Note that the fifth property is vacuously true because there is no $t_{r_{n+m}}$.}
 
 \item \underline{Case 2:} $q_r = q'.des(p_1, ..., p_k)$.
 
@@ -1511,7 +1424,7 @@ with $hname$, $hsig$ as in the definition of $extract\_des$. (TODO: What follows
 \begin{equation*}
 r_n = `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r ".
 \end{equation*}
-The induction hypothesis, applied to $q'$, yields $r_1, ..., r_m$ in $\langle r \rangle^e$ with $q_{r_1} \leq q', q_{r_2} \leq q'_1, ..., q_{r_m} \leq q'_{n-1}$, with $q'_i := q'[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. It is clear that $q' \leq q_r$ and $q'_i \leq q_i$ for $i \in \{1, ..., m\}$. Choose $n = m+1$ to obtain the property.
+The second property of the induction hypothesis, applied to $q'$, yields $r_1, ..., r_{n'}$ in $\langle r \rangle^e$ with $q_{r_1} \leq q', q_{r_2} \leq q'_1, ..., q_{r_{n'}} \leq q'_{n'-1}$, with $q'_i := q'[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. It is clear that $q' \leq q_r$ and $q'_i \leq q_i$ for $i \in \{1, ..., m\}$. Choose $n = n'+1$ and $m = 0$ to obtain the properties.
 
 \end{itemize}
 
@@ -1634,36 +1547,7 @@ TODO (very similar to $extract\_outer\_des$)
 
 $\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_r = t_r ", \emptyset \big\rangle$
 
-\begin{enumerate}
-\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
-
-Proof: It is $H = \emptyset$ and thus the property is trivially fulfilled.
-
-\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
-
-Proof: Trivially true, since $H = \emptyset$.
-
-\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
-
-Proof: By the definition of $extract\_patterns$ (as given above) it is $r = r'$ and $H = \emptyset$.
-
-\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
-
-Proof: Clear since there is only one equation.
-
-\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
-
-Proof: Trivially true, because $H = \emptyset$.
-
-\item \underline{Property 6:}
-
-Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$.
-There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
-Further, there are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
-
-Proof: Choose $r_1 = r$.
-
-\end{enumerate}
+Choose $n = 0$, $m = 0$, $r_1 = r$.\footnote{Note again that the fifth property is vacuously true because there is no $t_{r_{n+m}}$.}
 
 \item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
 
@@ -1677,48 +1561,18 @@ $= \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n,
 with $hname, hsig, heqn$ as in the definition of $extract\_patterns$.
 
 \begin{enumerate}
-\item for every equation $`` q_h = t_h "$ in $H$: either $q_h \sim t_h$ or ($q_r \sim q_h$ and $t_r \sim t_h$)
-
-Proof: For the only equation $`` q_h = t_h "$ in $H$, it is $q_h = hname(p_1, ..., p_n, p'_1, ..., p'_k) = \langle fun, des, prg \rangle^{autogen}(p_1, ..., p_n, p'_1, ..., p'_k)$ and $t_h = t_r$, by the definition of $heqn$. It follows that $q_r \sim q_h$ and $t_r \sim t_h$.
-
-\item unless $H = \emptyset$, there is an equation $`` q_h = t_h "$ in $H$ with $q_r \sim q_h$ and $t_r \sim t_h$
-
-Proof: This equation is the only equation in $H$, as shown in the proof of the first property.
-
-\item $q_{r'} \sim t_{r'}$ or ($r = r'$ and $H = \emptyset$)
-
-Proof: It is $q_{r'} = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$ and $t_{r'} = hname(x_1, ..., x_n, x'_1, ..., x'_k) = \langle fun, des, prg \rangle^{autogen}(x_1, ..., x_n, x'_1, ..., x'_k)$ and thus $q_{r'} \sim t_{r'}$.
-
-\item the set of rules in $\big\langle r', H \big\rangle$ is deterministic (TODO: define analogously to programs)
-
-Proof: TODO
-
-\item for every equation $`` q_h = t_h "$ in $H$: $q_h \sim q^0_r$ for some sub-copattern $q^0_r$ of $q_r$
-
-Proof: TODO
-
-\item \underline{Property 6:}
-\begin{itemize}
-\item There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
-\item Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. There are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
-\item There are equations $r_{n+1}, ..., r_{n+m}$ in $\langle r \rangle^e$ with $t_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$, $t_{r_{n+1}}[\sigma^{n+1}_v] = q_{r_{n+2}}$, ..., $t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}$.
-\item There is an equation $r_{n+m+1}$ in $\langle r \rangle^e$ and a $\sigma'$ with $t_{r_{n+m}}[\sigma] = q_{r_{n+m+1}}[\sigma']$ for any $\sigma$.
-\end{itemize}
-
-Proof:
-\begin{itemize}
 \item Choose $q_0 = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$, $\sigma^0_v(x_i) = p_i[\sigma]$, $\sigma^0_v(x'_i) = p'_i[\sigma]$.
-\item Choose
+\item Choose $n = 1$ and
 \begin{equation*}
 r_1 = `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ".
 \end{equation*}
 \item Choose $m = 0$.
+\item Irrelevant because $m = 0$.
 \item Choose $\sigma'$ such that $x_i[\sigma] = p_i[\sigma']$, and
 \begin{equation*}
 r_2 = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = t_r ".
 \end{equation*}
-\end{itemize}
-
+\item The only relevant equation is $r_1$ as chosen above, for which the equivalence holds by definition.
 \end{enumerate}
 
 \end{itemize}
@@ -1727,29 +1581,13 @@ r_2 = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = t_r ".
 
 \begin{proof}[Proof for $extract$]
 
-\begin{enumerate}
+By induction on the number $n_c$ of constructor patterns within the copattern that is the left-hand side of the argument of $extract$, the following strengthened statement will be proved:
 
-\item ...
-
-\item ...
-
-\item ...
-
-\item ...
-
-\item ...
-
-\item \underline{Property 6:}
+Let $\langle r \rangle^{extract} = \big\langle r', H \big\rangle$. Property 6 holds, and
 \begin{itemize}
-\item There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
-\item Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. There are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
-\item There are equations $r_{n+1}, ..., r_{n+m}$ in $\langle r \rangle^e$ with $t_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$, $t_{r_{n+1}}[\sigma^{n+1}_v] = q_{r_{n+2}}$, ..., $t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}$.
-\item There is an equation $r_{n+m+1}$ in $\langle r \rangle^e$ and a $\sigma'$ with $t_{r_{n+m}}[\sigma] = q_{r_{n+m+1}}[\sigma']$ for any $\sigma$.
+\item $r_{n+m+1} = r$ if $H = \emptyset$, and $r_{n+m+1} = heqn$ with $\langle r \rangle^{extract} = \langle r'', \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}$, otherwise
+\item The left-hand side of $r_{n+m+1}$ is hole pattern.
 \end{itemize}
-
-Proof: By induction on the number $n_c$ of constructor patterns within the copattern that is the left-hand side of the argument of $extract$, the following strengthened statement will be proved:
-
-Let $\langle r \rangle^{extract} = \big\langle r', H \big\rangle$. Property 6 holds, and $r_{n+m+1} = r$ if $H = \emptyset$, and $r_{n+m+1} = heqn$ with $\langle r \rangle^{extract} = \langle r'', \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}$, otherwise.
 
 Proof by induction:
 
@@ -1765,10 +1603,10 @@ Trivial.
 \item $n_c = n'_c + 1$.
 It is
 \begin{equation*}
-\langle r \rangle^{extract} = \langle `` (q_r)^{-con} = hname((q_r)^{-con}_{vars^+} ", \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}.
+\langle r \rangle^{extract} = \langle `` (q_r)^{-con} = hname((q_r)^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}.
 \end{equation*}
 By the induction hypothesis, we have the property for $(q_r)^{-con}$.
-\begin{itemize}
+\begin{enumerate}
 \item Set $\sigma'(x) = p_{con}[\sigma]$ for the variable $x$ replacing the left-most inner- most constructor pattern, and $\sigma'(x) = \sigma(x)$ for other variables $x$. By the induction hypothesis, there is a $q'_0$ and $\sigma'^0_v$ with $(q_r)^{-con}[\sigma'] = q'_0[\sigma'^0_v]$. Choose $q_0 = q'_0$ and $\sigma^0_v = \sigma'^0_v$. It is clear that $q_r[\sigma] = (q_r)^{-con}[\sigma'] = q_0[\sigma^0_v]$.
 \item By the induction hypothesis we have $r_1, ..., r_{n'}$ with
 \begin{equation*}
@@ -1784,12 +1622,12 @@ and an $r'_{n + m' + 1}$ and $\sigma'$ with
 t_{r_{n+m'}}[\sigma] = q_{r_{n+m'+1}}[\sigma'].
 \end{equation*}
 Choose $m = m' + 1$, $r_i = r'_i$ for $i \in \{n+1, ..., n+m\}$, and $\sigma^{n+m}_v = \sigma'$.
+\item As chosen, it is $r_i = r'_i$ for $i \in \{n+1, ..., n+m'\}$, and the left-hand sides of these equations are hole patterns by the induction hypothesis (unless $m' = 0$, but then there are no such equations). It also is, as chosen, $r_{n+m} = r'_{n+m'+1}$, which is a hole pattern by the induction hypothesis (of the strengthened statement).
 \item Choose $r_{n+m+1} = heqn$. By the induction hypothesis, it is $t_{r_{n+m'+1}} = t_{r_{n+m}} = hname((q_r)^{-con}_{vars^+})$. Further, as chosen, it is $q_{r_{n+m+1}} = hname((q_r)^{-con}_{vars^-})$. Thus, choose $\sigma'$ as follows: Let $x^0$ be the variable at the front of $(q_r)^{-con}_{vars^+}$, and $p^0$ be the pattern at the front of $(q_r)^{-con}_{vars}$. Set $\sigma'(x^0) = p^0[\sigma]$, and $\sigma'(x) = \sigma(x)$ for $x \neq x^0$.
-\end{itemize}
-
-\end{itemize}
-
+\item First, note again that $m = m'+1$, as chosen above. By the induction hypothesis, it is $q_{r_i} \sim t_{r_i}$ for $i \in \{1, ..., n+m'\}$ by the sixth property, and $t_{r_{n+m'+1}} = hname((q_r)^{-con}_{vars^+}$ by the fifth property. By the first strengthening property of the induction hypothesis, the left-hand side of $r_{n+m'+1}$ is either $hname(((q_r)^{-con})^{-con}_{vars^-})$ or $hname((q_r)^{-con}_{vars^+})$. In both cases it is equivalent to $hname((q_r)^{-con}_{vars^+}$.
 \end{enumerate}
+
+\end{itemize}
 
 \end{proof}
 
