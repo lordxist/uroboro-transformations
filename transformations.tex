@@ -987,26 +987,26 @@ q_i[\sigma^i_v] \longrightarrow^* q_i[\sigma^{i+1}_v] \longrightarrow q_{i+1}[\s
 \end{equation*}
 for each $i \in \{0, ..., n-1\}$. The initial part is responsible for reducing the immediate subterms of the prefix $q_{r_{i+1}}[\sigma^i_v] \leq q_i[\sigma^i_v]$ to values, resulting in $q_i[\sigma^{i+1}_v]$.
 
-This initial part is constructed first. It suffices to reduce the patterns within $q_{r_{i+1}}[\sigma^i_v]$ from left to right, as will be shown next. The form of $q_{r_{i+1}}$ is $fun(p^0_1, ..., p^0_k).des_1(p^1_1, ..., p^1_{k_1}...des_l(p^l_1, ..., p^l_{k_l})$. By property 6, $q_{r_{i+1}}$ is the smallest prefix of $q_i$ that is a left-hand side in $\langle r \rangle^e$. The other equations that need to be considered are those within $\langle r^* \rangle^e$ for an $r^* \neq r$ of $prg$. By induction on the structure of $q_{r^*}$ it can be shown that, if such an equation is a strict prefix of $q_{r_{i+1}}$, then either $r$ or $r^*$ is a ``dead" rule in $prg$. It follows that there is no left-hand side that a strict prefix of $q_{r_{i+1}}[\sigma^i_v]$ matches. Thus it suffices to reduce the patterns from left to right.
+This initial part is constructed first. It suffices to reduce the patterns within $q_{r_{i+1}}[\sigma^i_v]$ from left to right, as will be shown next. The form of $q_{r_{i+1}}$ is $fun(p^0_1, ..., p^0_k).des_1(p^1_1, ..., p^1_{k_1})...des_l(p^l_1, ..., p^l_{k_l})$. By property 6, $q_{r_{i+1}}$ is the smallest prefix of $q_i$ that is a left-hand side in $\langle r \rangle^e$. The other equations that need to be considered are those within $\langle r^* \rangle^e$ for an $r^* \neq r$ of $prg$. By induction on the structure of $q_{r^*}$ it can be shown that, if such an equation is a strict prefix of $q_{r_{i+1}}$, then either $r$ or $r^*$ is a ``dead" rule in $prg$. It follows that there is no left-hand side that a strict prefix of $q_{r_{i+1}}[\sigma^i_v]$ matches. Thus it suffices to reduce the patterns from left to right.
 
 We have such a reduction for each pattern from Lemma 4 with a result equivalent to the start. This is because the subterm that is meant to be reduced is, by precondition, already a value in $prg$. It is clear that, in the result of reducing these subterms, within the subterms, the terms that $\sigma^i_v$ substituted for variables are now replaced with their corresponding values. Thus $\sigma^{i+1}_v$ can be defined by replacing exactly those terms with their corresponding values and keeping the others from $\sigma^i_v$.
 
 The final step is derived by first using the ``Subst" rule for the equation $r_{i+1}$, reducing the prefix $q_{r_{i+1}}[\sigma^{i+1}_v] \leq q_i[\sigma^{i+1}_v]$ to $t_{r_{i+1}}[\sigma^{i+1}_v]$, and then applying the ``Cong" rule to reduce $q_i[\sigma^{i+1}_v]$ to $q_i[q_{r_{i+1}} \leftarrow t_{r_{i+1}}[\sigma^{i+1}_v]] =  q_i[q_{r_{i+1}} \leftarrow t_{r_{i+1}}][\sigma^{i+1}_v]= q_{i+1}[\sigma^{i+1}_v]$. That the ``Cong" rule can be applied is clear since the term reduced in the ``Subst" rule is a prefix of $q_i[\sigma^{i+1}_v]$ and thus there is no term to the left of it. By property 6, the left- and right-hand sides of $r_{i+1}$ are equivalent, thus also the result of the final step to its start term. As a consequence of this and of the equivalences for the previous steps, the entire prefix conversion sequence preserves the equivalence.
 
-\item The second part of the sequence is concerned with the conversion of function calls until the final equation that leads to $\widetilde{t}$ can be used. By property 6, we have equations $r_{n+1}, ..., r_{n+m}$ in $\langle r \rangle^e$ with $t_n = q_{r_{n+1}}, t_{r_{n+1}} = q_{r_{n+2}}, ..., t_{r_{n+m}} = q_{r_{n+m+1}}$.\footnote{It can also be the case that $m=0$, then $t_n = q_{r_{n+1}}$ and the sequence constructed below is empty.}
+\item The second part of the sequence is concerned with the conversion of function calls until the final equation that leads to $\widetilde{t}$ can be used. By property 6, we have equations $r_{n+1}, ..., r_{n+m}$ in $\langle r \rangle^e$ with $q_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v], t_{r_{n+1}}[\sigma^{n+1}_v] = q_{r_{n+2}}[\sigma^{n+2}_v], ..., t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}[\sigma^{n+m+1}_v]$.\footnote{It can also be the case that $m=0$, then $t_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$ and the sequence constructed below is empty.}
 From this we have the sequence
 \begin{equation*}
-t_n[\sigma^n_v] \longrightarrow^* t_{r_{n+1}}[\sigma^{n+1}_v] \longrightarrow^* ... \longrightarrow^* t_{r_{n+m}}[\sigma^n_v] = q_{r_{n+m+1}}[\sigma^n_v],
+q_n[\sigma^n_v] \longrightarrow t_{r_{n+1}}[\sigma^{n+1}_v] \longrightarrow ... \longrightarrow t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}[\sigma^{n+m+1}_v].
 \end{equation*}
-which consists of the sequences
+Its first step and each of its following steps
 \begin{equation*}
-...
+t_{r_{n+i}}[\sigma^{n+i}_v] \longrightarrow t_{r_{n+i+1}}[\sigma^{n+i+1}_v]
 \end{equation*}
-
+can be derived using the ``Subst" rule for the equation $q_{r_{n+i+1}} = t_{r_{n+i+1}}$. This is possible since, as stated above, by property 6 it is $q_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$ and $t_{r_{n+i}}[\sigma^{n+i}_v] = q_{r_{n+i+1}}[\sigma^{n+i+1}_v]$, respectively, and the immediate subterms of $q_{r_{n+i+1}}[\sigma^{n+i+1}_v]$ are values. This is because, by property 6, $q_{r_{n+i+1}}$ is hole pattern, and $\sigma^{n+i+1}_v$ substitutes only with values.
 
 \item After this, the final equation that leads to $\widetilde{t}$ can be used, as follows.
 \begin{equation*}
-q_{r_{n+m+1}}[\sigma] \longrightarrow \widetilde{t_r}[\sigma]
+q_{r_{n+m+1}}[\sigma^{n+m+1}_v] \longrightarrow \widetilde{t_r}[\sigma^{n+m+1}_v] =: \widetilde{t}
 \end{equation*}
 
 \end{enumerate}
@@ -1480,7 +1480,8 @@ By the induction hypothesis applied to $q'_r$, we have the property for $r'^0$, 
 \underline{Property 6}
 
 Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$.
-There are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_r, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
+There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
+Further, there are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
 
 Proof:
 
@@ -1654,6 +1655,14 @@ Proof: Clear since there is only one equation.
 
 Proof: Trivially true, because $H = \emptyset$.
 
+\item \underline{Property 6:}
+
+Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$.
+There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
+Further, there are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
+
+Proof: Choose $r_1 = r$.
+
 \end{enumerate}
 
 \item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
@@ -1688,9 +1697,99 @@ Proof: TODO
 
 Proof: TODO
 
+\item \underline{Property 6:}
+\begin{itemize}
+\item There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
+\item Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. There are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
+\item There are equations $r_{n+1}, ..., r_{n+m}$ in $\langle r \rangle^e$ with $t_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$, $t_{r_{n+1}}[\sigma^{n+1}_v] = q_{r_{n+2}}$, ..., $t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}$.
+\item There is an equation $r_{n+m+1}$ in $\langle r \rangle^e$ and a $\sigma'$ with $t_{r_{n+m}}[\sigma] = q_{r_{n+m+1}}[\sigma']$ for any $\sigma$.
+\end{itemize}
+
+Proof:
+\begin{itemize}
+\item Choose $q_0 = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$, $\sigma^0_v(x_i) = p_i[\sigma]$, $\sigma^0_v(x'_i) = p'_i[\sigma]$.
+\item Choose
+\begin{equation*}
+r_1 = `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ".
+\end{equation*}
+\item Choose $m = 0$.
+\item Choose $\sigma'$ such that $x_i[\sigma] = p_i[\sigma']$, and
+\begin{equation*}
+r_2 = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = t_r ".
+\end{equation*}
+\end{itemize}
+
 \end{enumerate}
 
 \end{itemize}
+
+\end{proof}
+
+\begin{proof}[Proof for $extract$]
+
+\begin{enumerate}
+
+\item ...
+
+\item ...
+
+\item ...
+
+\item ...
+
+\item ...
+
+\item \underline{Property 6:}
+\begin{itemize}
+\item There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
+\item Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. There are equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
+\item There are equations $r_{n+1}, ..., r_{n+m}$ in $\langle r \rangle^e$ with $t_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$, $t_{r_{n+1}}[\sigma^{n+1}_v] = q_{r_{n+2}}$, ..., $t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}$.
+\item There is an equation $r_{n+m+1}$ in $\langle r \rangle^e$ and a $\sigma'$ with $t_{r_{n+m}}[\sigma] = q_{r_{n+m+1}}[\sigma']$ for any $\sigma$.
+\end{itemize}
+
+Proof: By induction on the number $n_c$ of constructor patterns within the copattern that is the left-hand side of the argument of $extract$, the following strengthened statement will be proved:
+
+Let $\langle r \rangle^{extract} = \big\langle r', H \big\rangle$. Property 6 holds, and $r_{n+m+1} = r$ if $H = \emptyset$, and $r_{n+m+1} = heqn$ with $\langle r \rangle^{extract} = \langle r'', \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}$, otherwise.
+
+Proof by induction:
+
+\begin{itemize}
+
+\item $n_c = 0$.
+Then it is
+\begin{equation*}
+\langle r \rangle^{extract} = \big\langle r, \emptyset \big\rangle.
+\end{equation*}
+Trivial.
+
+\item $n_c = n'_c + 1$.
+It is
+\begin{equation*}
+\langle r \rangle^{extract} = \langle `` (q_r)^{-con} = hname((q_r)^{-con}_{vars^+} ", \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}.
+\end{equation*}
+By the induction hypothesis, we have the property for $(q_r)^{-con}$.
+\begin{itemize}
+\item Set $\sigma'(x) = p_{con}[\sigma]$ for the variable $x$ replacing the left-most inner- most constructor pattern, and $\sigma'(x) = \sigma(x)$ for other variables $x$. By the induction hypothesis, there is a $q'_0$ and $\sigma'^0_v$ with $(q_r)^{-con}[\sigma'] = q'_0[\sigma'^0_v]$. Choose $q_0 = q'_0$ and $\sigma^0_v = \sigma'^0_v$. It is clear that $q_r[\sigma] = (q_r)^{-con}[\sigma'] = q_0[\sigma^0_v]$.
+\item By the induction hypothesis we have $r_1, ..., r_{n'}$ with
+\begin{equation*}
+q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_{n'}} \leq q_{n-1}.
+\end{equation*}
+(Remember that $q_0$ was chosen as $q'_0$.) Choose $n = n'$.
+\item By the induction hypothesis we have $r'_{n + 1}, ..., r'_{n + m'}$ (since $n = n'$) with
+\begin{equation*}
+t_n[\sigma^n_v] = q_{r'_{n+1}}[\sigma^{n+1}_v], t_{r'_{n+1}}[\sigma^{n+1}_v] = q_{r'_{n+2}}, ..., t_{r'_{n+m'}}[\sigma^{n+m'}_v] = q_{r'_{n+m'+1}}
+\end{equation*}
+and an $r'_{n + m' + 1}$ and $\sigma'$ with
+\begin{equation*}
+t_{r_{n+m'}}[\sigma] = q_{r_{n+m'+1}}[\sigma'].
+\end{equation*}
+Choose $m = m' + 1$, $r_i = r'_i$ for $i \in \{n+1, ..., n+m\}$, and $\sigma^{n+m}_v = \sigma'$.
+\item Choose $r_{n+m+1} = heqn$. By the induction hypothesis, it is $t_{r_{n+m'+1}} = t_{r_{n+m}} = hname((q_r)^{-con}_{vars^+})$. Further, as chosen, it is $q_{r_{n+m+1}} = hname((q_r)^{-con}_{vars^-})$. Thus, choose $\sigma'$ as follows: Let $x^0$ be the variable at the front of $(q_r)^{-con}_{vars^+}$, and $p^0$ be the pattern at the front of $(q_r)^{-con}_{vars}$. Set $\sigma'(x^0) = p^0[\sigma]$, and $\sigma'(x) = \sigma(x)$ for $x \neq x^0$.
+\end{itemize}
+
+\end{itemize}
+
+\end{enumerate}
 
 \end{proof}
 
