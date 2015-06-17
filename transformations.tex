@@ -953,6 +953,7 @@ for $n, m \geq 0$ with properties following below.
 \end{definition}
 
 \begin{lemma}
+\label{lemma2}
 
 Let $e$ be an argument of $extract\_helpers$ that satisfies the extraction function properties, and let $prg$ be a deterministic program (TODO: define this as not containing any two rules which both match the same term).
 
@@ -1172,6 +1173,7 @@ Such a $\sigma'$ exists by property 5. This step is derived using the ``Subst" r
 %%-
 
 \begin{lemma}
+\label{lemma3}
 
 Let $e$ be an helper extraction function that fulfils the extraction function properties. Write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. Let $s^0$ be a closed term. Further, let $s$ be a closed term which has only value immediate subterms in $prg$, but has a non-value immediate subterm in $\langle prg \rangle$, and where $s^0$ is the left-most such subterm. Denote $s$ as $s(s^0)$ in order to use it for contextual substitution of $s^0$ with some other term.
 
@@ -1342,7 +1344,7 @@ Let $e$ be any helper extraction function with the extraction function propertie
 
 with $s'[\sigma] = t$; the immediate subterms of $s$ are values. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-We know that $e$ fulfils the extraction function properties. Using Lemma 2.1 for $e$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t'$ for a $t' \sim t$, since $trans = extract\_helpers(e)$.
+We know that $e$ fulfils the extraction function properties. Using \hyperref[lemma2]{ Lemma 2.1 } for $e$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t'$ for a $t' \sim t$, since $trans = extract\_helpers(e)$.
 
 \item \textbf{``Cong" case}:
 
@@ -1370,7 +1372,7 @@ By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} \
 
 \item \textbf{``Subst" case}:
 
-The relevant sequence is constructed by Lemma 2.1. As stated in its proof, all the steps before the last are constructed using Lemma 3. It is also stated there that each step is equivalent to the start term, which can be seen by inspecting the proof of Lemma 3. Going through this proof, one can see that any step is constructed in such a way that it is equivalent to the previous.
+The relevant sequence is constructed by \hyperref[lemma2]{ Lemma 2.1 }. As stated in its proof, all the steps before the last are constructed using \hyperref[lemma3]{ Lemma 3 }. It is also stated there that each step is equivalent to the start term, which can be seen by inspecting the proof of \hyperref[lemma3]{ Lemma 3 }. Going through this proof, one can see that any step is constructed in such a way that it is equivalent to the previous.
 
 \item \textbf{``Cong" case}:
 
