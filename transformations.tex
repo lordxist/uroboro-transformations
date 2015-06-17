@@ -765,6 +765,8 @@ TODO: extract from the proofs (see the TODOs there)
 
 \item Let two terms $s,t$ have the following forms: $s = fun(...).des_1(...)...des_k()$ and $t = fun'(...).des'_1(...)...des'_l(...)$, with $k \neq l$, and with $fun$ and $fun'$ declared in $prg$. For any $\widetilde{s} \sim s$ and $\widetilde{t} \sim t$ it is $\widetilde{s} \not\sim \widetilde{t}$.
 
+The second intended consequence is easy to show, because each equivalence relation ``mirrors" the number of destructor calls in the helper function name. This means that the result of adding the number of actual calls of a well-typed term of $\langle prg \rangle$ to the number of calls embedded in its helper function name is equal to the number of calls of the equivalent term well-typed in $prg$.
+
 TODO: demonstrate that these intended consequences actually hold for each transformation
 
 \end{itemize}
@@ -1221,9 +1223,9 @@ It is $fun(t^1_v, ..., t^n_v) \sim t[\sigma]$, because $q \sim t$. This, in turn
 
 Suppose that $s^0$ ($= fun(t^1_v, ..., t^n_v)$) didn't match $q_r$. That is, $q_r$ has the form $fun_2(...).des_1(...)...des_k(...)$ with either (a) the name $fun_2$ different from $fun$, or (b) $k > 0$, or both.
 
-If at least (a) is true, the function name of $q$ is different from $fun$, as well, because $q \sim q_r$. (TODO: This is an important property of the equivalence relation. Such intended properties need to be noted before defining the equivalence relation.) But then $s^0$ wouldn't match $q$, contrary to the assumption.
+If at least (a) is true, the function name of $q$ is different from $fun$, as well, because $q \sim q_r$. This is the first intended consequence of the equivalence relations. But then $s^0$ wouldn't match $q$, contrary to the assumption.
 
-If only (b) is true, $fun(t^1_v, ..., t^n_v)$ wouldn't match $q$, either. This is because the number of destructor calls in $q_r$ is mirrored in $q$,\footnote{It is the result of adding the number of actual calls to the number of calls embedded in the function name of $q$.} because $q \sim q_r$. (TODO: Again, an intended property) Since $k > 0$, this number is certainly larger than the number mirrored in just the name $fun$.
+If only (b) is true, $fun(t^1_v, ..., t^n_v)$ wouldn't match $q$, either. This is because the number of destructor calls in $q_r$ is mirrored in $q$. \footnote{It is the result of adding the number of actual calls to the number of calls embedded in the function name of $q$.} because $q \sim q_r$. This is the second intended consequence of the equivalence relations. Since $k > 0$, this number is certainly larger than the number mirrored in just the name $fun$.
 
 Use the induction hypothesis to reduce the immediate subterms of $t[\sigma]$ to values. By the same argument as in the previous paragraphs, it can be seen that, if $t[\sigma]$ reduces to something at all, this is equivalent to it.
 
