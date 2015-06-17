@@ -993,7 +993,7 @@ for each $i \in \{0, ..., n-1\}$. The initial part is responsible for reducing t
 
 This initial part is constructed first. It suffices to reduce the patterns within $q_{r_{i+1}}[\sigma^i_v]$ from left to right, as will be shown next. The form of $q_{r_{i+1}}$ is $fun(p^0_1, ..., p^0_k).des_1(p^1_1, ..., p^1_{k_1})...des_l(p^l_1, ..., p^l_{k_l})$. By property 2, $q_{r_{i+1}}$ is the smallest prefix of $q_i$ that is a left-hand side in $\langle r \rangle^e$. The other equations that need to be considered are those within $\langle r^* \rangle^e$ for an $r^* \neq r$ of $prg$. By induction on the structure of $q_{r^*}$ it can be shown that, if such an equation is a strict prefix of $q_{r_{i+1}}$, then either $r$ or $r^*$ is a ``dead" rule in $prg$. It follows that there is no left-hand side that a strict prefix of $q_{r_{i+1}}[\sigma^i_v]$ matches. Thus it suffices to reduce the patterns from left to right.
 
-We have such a reduction for each pattern from Lemma 4 with a result equivalent to the start. This is because the subterm that is meant to be reduced is, by precondition, already a value in $prg$. It is clear that, in the result of reducing these subterms, within the subterms, the terms that $\sigma^i_v$ substituted for variables are now replaced with their corresponding values. Thus $\sigma^{i+1}_v$ can be defined by replacing exactly those terms with their corresponding values and keeping the others from $\sigma^i_v$.
+We have such a reduction for each pattern from Lemma 3 with a result equivalent to the start. This is because the subterm that is meant to be reduced is, by precondition, already a value in $prg$. It is clear that, in the result of reducing these subterms, within the subterms, the terms that $\sigma^i_v$ substituted for variables are now replaced with their corresponding values. Thus $\sigma^{i+1}_v$ can be defined by replacing exactly those terms with their corresponding values and keeping the others from $\sigma^i_v$.
 
 The final step is derived by first using the ``Subst" rule for the equation $r_{i+1}$, reducing the prefix $q_{r_{i+1}}[\sigma^{i+1}_v] \leq q_i[\sigma^{i+1}_v]$ to $t_{r_{i+1}}[\sigma^{i+1}_v]$, and then applying the ``Cong" rule to reduce $q_i[\sigma^{i+1}_v]$ to $q_i[q_{r_{i+1}} \leftarrow t_{r_{i+1}}[\sigma^{i+1}_v]] =  q_i[q_{r_{i+1}} \leftarrow t_{r_{i+1}}][\sigma^{i+1}_v]= q_{i+1}[\sigma^{i+1}_v]$. That the ``Cong" rule can be applied is clear since the term reduced in the ``Subst" rule is a prefix of $q_i[\sigma^{i+1}_v]$ and thus there is no term to the left of it. By property 6, the left- and right-hand sides of $r_{i+1}$ are equivalent, thus also the result of the final step to its start term. As a consequence of this and of the equivalences for the previous steps, the entire prefix conversion sequence preserves the equivalence.
 
@@ -1173,18 +1173,6 @@ Such a $\sigma'$ exists by property 5. This step is derived using the ``Subst" r
 
 \begin{lemma}
 
-$extract\_des$ fulfils the extraction function properties.
-
-\begin{proof}
-
-TODO
-
-\end{proof}
-
-\end{lemma}
-
-\begin{lemma}
-
 Let $e$ be an helper extraction function that fulfils the extraction function properties. Write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. Let $s^0$ be a closed term. Further, let $s$ be a closed term which has only value immediate subterms in $prg$, but has a non-value immediate subterm in $\langle prg \rangle$, and where $s^0$ is the left-most such subterm. Denote $s$ as $s(s^0)$ in order to use it for contextual substitution of $s^0$ with some other term.
 
 Then there is a reduction sequence $s^0 \longrightarrow^*_{\langle prg \rangle} s^0_v$, where $s^0_v \sim s^0$ is a value in $\langle prg \rangle$. Especially this means $s \sim s(s^0_v)$, and that there is a reduction sequence (by applying the ``Cong" rule) $s(s^0) \longrightarrow^*_{\langle prg \rangle} s(s^0_v)$.
@@ -1225,7 +1213,7 @@ Suppose that $s^0$ ($= fun(t^1_v, ..., t^n_v)$) didn't match $q_r$. That is, $q_
 
 If at least (a) is true, the function name of $q$ is different from $fun$, as well, because $q \sim q_r$. This is the first intended consequence of the equivalence relations. But then $s^0$ wouldn't match $q$, contrary to the assumption.
 
-If only (b) is true, $fun(t^1_v, ..., t^n_v)$ wouldn't match $q$, either. This is because the number of destructor calls in $q_r$ is mirrored in $q$. \footnote{It is the result of adding the number of actual calls to the number of calls embedded in the function name of $q$.} because $q \sim q_r$. This is the second intended consequence of the equivalence relations. Since $k > 0$, this number is certainly larger than the number mirrored in just the name $fun$.
+If only (b) is true, $fun(t^1_v, ..., t^n_v)$ wouldn't match $q$, either. This is because the number of destructor calls in $q_r$ is mirrored in $q$, \footnote{It is the result of adding the number of actual calls to the number of calls embedded in the function name of $q$.} because $q \sim q_r$. This is the second intended consequence of the equivalence relations. Since $k > 0$, this number is certainly larger than the number mirrored in just the name $fun$.
 
 Use the induction hypothesis to reduce the immediate subterms of $t[\sigma]$ to values. By the same argument as in the previous paragraphs, it can be seen that, if $t[\sigma]$ reduces to something at all, this is equivalent to it.
 
@@ -1366,11 +1354,11 @@ We know that $e$ fulfils the extraction function properties. Using Lemma 2.1 for
 
 with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$.
 
-First note that Lemma 4 is applicable for $\langle prg \rangle$, because $trans = extract\_helpers(e)$ and $e$ fulfils the extraction function properties.
+First note that Lemma 3 is applicable for $\langle prg \rangle$, because $trans = extract\_helpers(e)$ and $e$ fulfils the extraction function properties.
 
 The desired sequence can be constructed as follows.
 
-Terms immediately under $\mathcal{E}$ in its structure that are values in $prg$ but aren't values in $\langle prg \rangle$ need to be reduced to equivalent values first. For this, Lemma 4 can be applied multiple times to produce sequences that, starting with $\mathcal{E}[s^0]$ and always reducing the left-most such subterm, achieve exactly that. Thus we obtain an initial reduction $s \longrightarrow^*_{\langle prg \rangle} \widetilde{\mathcal{E}}[s^0]$ with $\widetilde{\mathcal{E}}[s^0] \sim \mathcal{E}[s^0]$.
+Terms immediately under $\mathcal{E}$ in its structure that are values in $prg$ but aren't values in $\langle prg \rangle$ need to be reduced to equivalent values first. For this, Lemma 3 can be applied multiple times to produce sequences that, starting with $\mathcal{E}[s^0]$ and always reducing the left-most such subterm, achieve exactly that. Thus we obtain an initial reduction $s \longrightarrow^*_{\langle prg \rangle} \widetilde{\mathcal{E}}[s^0]$ with $\widetilde{\mathcal{E}}[s^0] \sim \mathcal{E}[s^0]$.
 
 By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0}$, for a $\widetilde{t^0} \sim t^0$. By applying the congruence rule we get $\widetilde{\mathcal{E}}[s^0] \longrightarrow_{\langle prg \rangle} \widetilde{\mathcal{E}}[\widetilde{t^0}] \sim \mathcal{E}[\widetilde{t^0}] \sim \mathcal{E}[t^0]$.
 
@@ -1382,11 +1370,11 @@ By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} \
 
 \item \textbf{``Subst" case}:
 
-The relevant sequence is constructed by Lemma 2.1. As stated in its proof, all the steps before the last are constructed using Lemma 4. It is also stated there that each step is equivalent to the start term, which can be seen by inspecting the proof of Lemma 4. Going through this proof, one can see that any step is constructed in such a way that it is equivalent to the previous.
+The relevant sequence is constructed by Lemma 2.1. As stated in its proof, all the steps before the last are constructed using Lemma 3. It is also stated there that each step is equivalent to the start term, which can be seen by inspecting the proof of Lemma 3. Going through this proof, one can see that any step is constructed in such a way that it is equivalent to the previous.
 
 \item \textbf{``Cong" case}:
 
-The relevant initial part of the sequence is constructed by Lemma 4. Again, by inspecting its proof, it can be seen that each step is equivalent to the start term.
+The relevant initial part of the sequence is constructed by Lemma 3. Again, by inspecting its proof, it can be seen that each step is equivalent to the start term.
 
 \end{enumerate}
 
