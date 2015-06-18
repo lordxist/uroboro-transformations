@@ -1175,61 +1175,40 @@ Such a $\sigma'$ exists by property 5. This step is derived using the ``Subst" r
 \begin{lemma}
 \label{lemma3}
 
-Let $e$ be an helper extraction function that fulfils the extraction function properties. Write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. Let $s^0$ be a closed term. Further, let $s$ be a closed term which has only value immediate subterms in $prg$, but has a non-value immediate subterm in $\langle prg \rangle$, and where $s^0$ is the left-most such subterm. Denote $s$ as $s(s^0)$ in order to use it for contextual substitution of $s^0$ with some other term.
+Let $e$ be an helper extraction function that fulfils the extraction function properties. Write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. Let $s$ be a closed term.
 
-Then there is a reduction sequence $s^0 \longrightarrow^*_{\langle prg \rangle} s^0_v$, where $s^0_v \sim s^0$ is a value in $\langle prg \rangle$. Especially this means $s \sim s(s^0_v)$, and that there is a reduction sequence (by applying the ``Cong" rule) $s(s^0) \longrightarrow^*_{\langle prg \rangle} s(s^0_v)$.
+If $s$ is irreducible in $prg$, then there is a reduction sequence $s \longrightarrow^*_{\langle prg \rangle} s_v$, where $s_v \sim s$ is irreducible in $\langle prg \rangle$.
 
 \begin{proof}
 
-First, note that by the definition of $extract\_helper$, each equation in $\langle prg \rangle$ results from the application of $e$ to an equation $r$ in $prg$. Thus this equation in $\langle prg \rangle$ has some properties that follow from the extraction function properties that the original equation in $prg$ fulfils. Specifically, the resulting equation is contained in $\langle r \rangle^e = \big\langle r', H \big\rangle$. For the properties of the equation it must be distinguished between those in $r'$ and those in the helper set $H$.
+First, note that by the definition of $extract\_helper$, each equation in $\langle prg \rangle$ results from the application of $e$ to an equation $r$ in $prg$; specifically, it is contained in $\langle r \rangle^e$. It can thus be distinguished between two different types of equations in $\langle prg \rangle$, those are given below.
 
-Now, the proof proceeds by induction on the structure of $s^0$.
+Now, the proof proceeds by induction on the structure of $s$.
 
+Suppose the lemma holds for the immediate subterms of $s$ (the induction hypothesis). This lets us reduce the immediate subterms of $s$ to equivalent values (in $\langle prg \rangle$) first (from left to right). Let $s^0$ be the result of these reductions; it is equivalent to $s$. Let
+\begin{equation*}
+s^0 \longrightarrow s^1 \longrightarrow ... \longrightarrow s^i \longrightarrow ...
+\end{equation*}
+be the possibly infinite reduction sequence starting with $s^0$. There are exactly two types of equations in $\langle prg \rangle$:
 \begin{itemize}
+\item Type 1: Those which do ``actual work" because they are the equivalent of an equation in $prg$. Precisely, such an equation $r'$ has the property that there is an $r$ of $prg$ such that: $q_{r'} \sim q_r$ and $t_{r'} \sim t_r$.
 
-\item \underline{Case 1}: $s^0 = con(t^1, ..., t^n)$.
-
-The desired sequence can be given as follows:
+\item Type 2: Those which are ``helper steps" used to provide for the syntactic changes of the transformation. Such an equation $r_h$ doesn't do any actual ``semantic change" to the term, precisely, it has the property $q_{r_h} \sim t_{r_h}$.
+\end{itemize}
+It will now be shown that each reduction step
 \begin{equation*}
-con(t^1, ..., t^n) \longrightarrow^* con(t^1_v, ..., t^n_v)
+s^i \longrightarrow s^{i+1}
 \end{equation*}
-Let $I \subseteq \{1, ..., n\}$ be the set of indices $i$ for which $t^i$ is not a value in $\langle prg \rangle$, and $t^j_v := t^j$ for all $j \not\in I$. The above sequence consists of sequences for each $i \in I$, in order of the $i$, where each sequence can be given as follows.
-\begin{equation*}
-con(t^1_v, ..., t^{i-1}_v, t^i, t^{i+1}, ..., t^n) \longrightarrow^* con(t^1_v, ..., t^{i-1}_v, t^i_v, t^{i+1}, ..., t^n)
-\end{equation*}
-We have such a sequence with $t^i \sim t^i_v$ by the induction hypothesis, applied to $t^i$.
+in the sequence above can only use equations of Type 2. Note that from this it immediately follows that $s^{i+1} \sim s^i$. The statement is proved by induction on $i \in \mathbb{N}$:
+\begin{itemize}
+\item $i = 0$: The immediate subterms of $s^0$ are values. Thus it can only reduce by the ``Subst" rule. Suppose there was an equation $r'$ in $\langle prg \rangle$ of Type 1, with an equivalent $r$ in $prg$, such that $s^0$ matched $q_{r'}$. $s \sim s^0$ is a value in $prg$, thus it doesn't match $r$. Especially, this means that $s \neq q_r[\sigma]$ for \textit{every} substitution $\sigma$. For terms of $prg$, it holds that, if they aren't equal, they aren't equivalent, thus $s \not\sim q_r[\sigma]$ for every $\sigma$. But, as supposed, $s^0$ matches $q_{r'}$, and thus $s^0 = q_{r'}[\sigma]$ for some $\sigma$. Since $r'$ has Type 1, it is $q_{r'} \sim q_r$, and from this it follows that $s \sim s^0 \sim q_r[\sigma]$, a contradiction.
 
-\item \underline{Case 2}: $s^0 = fun(t^1, ..., t^n)$.
-
-First, construct an initial sequence
-\begin{equation*}
-fun(t^1, ..., t^n) \longrightarrow^* fun(t^1_v, ..., t^n_v)
-\end{equation*}
-analogously to Case 1. If the result matches an equation $`` q = t "$ of $\langle prg \rangle$, add a step derived by applying the ``Subst" rule for this equation, with some $\sigma$ with $fun(t^1_v, ..., t^n_v) =^? q \searrow \sigma$.
-\begin{equation*}
-fun(t^1_v, ..., t^n_v) \longrightarrow t[\sigma]
-\end{equation*}
-It is $fun(t^1_v, ..., t^n_v) \sim t[\sigma]$, because $q \sim t$. This, in turn, can be shown as follows. For some equation $r$ of $prg$, $`` q = t "$ is contained in $\langle r \rangle^e = \big\langle r', H \big\rangle$. Consider the list of equations given in the definition of the extraction function properties. If $r$ is not the last of these equations, then, by property 6, it is $q \sim t$. If, on the other hand, it is the last of these equations, it is $q \sim q_r$, and it will be shown that $s^0$ matches $q_r$, contradicting the fact that $s^0$ is a value in $prg$.
-
-Suppose that $s^0$ ($= fun(t^1_v, ..., t^n_v)$) didn't match $q_r$. That is, $q_r$ has the form $fun_2(...).des_1(...)...des_k(...)$ with either (a) the name $fun_2$ different from $fun$, or (b) $k > 0$, or both.
-
-If at least (a) is true, the function name of $q$ is different from $fun$, as well, because $q \sim q_r$. This is the first intended consequence of the equivalence relations. But then $s^0$ wouldn't match $q$, contrary to the assumption.
-
-If only (b) is true, $fun(t^1_v, ..., t^n_v)$ wouldn't match $q$, either. This is because the number of destructor calls in $q_r$ is mirrored in $q$, \footnote{It is the result of adding the number of actual calls to the number of calls embedded in the function name of $q$.} because $q \sim q_r$. This is the second intended consequence of the equivalence relations. Since $k > 0$, this number is certainly larger than the number mirrored in just the name $fun$.
-
-Use the induction hypothesis to reduce the immediate subterms of $t[\sigma]$ to values. By the same argument as in the previous paragraphs, it can be seen that, if $t[\sigma]$ reduces to something at all, this is equivalent to it.
-
-This process can be repeated until a value obtains; it is equivalent to $s^0$.
-
-\item \underline{Case 3}: $s^0 = t^0.des(t^1, ..., t^n)$.
-
-First, construct an initial sequence
-\begin{equation*}
- t^0.des(t^1, ..., t^n) \longrightarrow^*  t^0_v.des(t^1_v, ..., t^n_v)
-\end{equation*}
-analogously to Case 1 (regard $t^0$ simply as an initial argument). This result then has to be reduced similarly to Case 2, with the only difference being that a rule with destructor pattern is used initially, instead of one with hole pattern.
+\item $i = i' + 1$: Each previous reduction step used the ``Subst" rule for an equation of Type 2. These preserve the property of a term that its immediate subterms are values. (TODO: Prove this from the extraction function properties, if possible, or prove it for the concrete transformations. -- A quick check showed that each of the Type 2 equations for any transformation does this.) Thus $s^i$ reduces by the ``Subst" rule, as well. Suppose there was an equation $r'$ in $\langle prg \rangle$ of Type 1, with an equivalent $r$ in $prg$, such that $s^i$ matched $q_{r'}$.
+By the induction hypothesis, it is $s^{i} \sim s^{i'}$. Further, it is $s^i \sim s^{i'} \sim ... \sim s^0$. $s^0$ doesn't match $q_{r'}$, and it is $s^0 \neq q_{r'}[\sigma]$ for every $\sigma$ and $s^0 \not\sim q_{r'}[\sigma]$. But, as supposed, $s^i$ matches $q_{r'}$, and thus $s^i = q_{r'}[\sigma]$ for some $\sigma$. It follows that $s^0 \sim s^i = q_{r'}[\sigma]$, a contradiction.
 
 \end{itemize}
+
+Finally, it needs to be shown that the reduction sequence given above is in fact not infinite. That is, it results in a value. That this value is equivalent to the start has already been shown. It has also been shown that each step uses only an equation of Type 2. These have the additional property that they reduce the ``pattern weight", (TODO: Prove that this is the case. It is rather easy to see since this is exactly what the Type 2 equations are responsible for.) which is defined to mean that the number of copatterns appearing in the term, or that of patterns, or both added together, has decreased, while neither the number of copatterns nor that of the patterns has increased. But this ``pattern weight" can obviously not decrease infinitely, which means that the number of equations used must be finite.
 
 \end{proof}
 
