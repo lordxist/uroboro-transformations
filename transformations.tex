@@ -945,7 +945,7 @@ r_1, ..., r_n, r_{n+1}, ..., r_{n+m}, r_{n+m+1}
 for $n, m \geq 0$ with properties following below.
 \begin{enumerate} 
 \item There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
-\item Set $q_i := q_r[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. It is $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
+\item Set $q_i := q_0[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. It is $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
 \item For any $\sigma^n_v$ that substitutes only with values there exist $\sigma^{n+1}_v, ..., \sigma^{n+m}_v$ that substitute only with values and for which it holds: $q_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$, $t_{r_{n+1}}[\sigma^{n+1}_v] = q_{r_{n+2}}$, ..., $t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}$.
 \item For $i \in \{1, ..., m\}$, $q_{r_{n+i}}$ is hole pattern. Further, if $m \neq 0$, $q_{r_{n+m+1}}$ is hole pattern.
 \item It is $t_{r_{n+m+1}} = t_r$. Further, for any $\sigma$ that substitutes only with values there exists a $\sigma'$ that substitutes only with values and for which it holds: $t_{r_{n+m}}[\sigma] = q_{r_{n+m+1}}[\sigma']$.
