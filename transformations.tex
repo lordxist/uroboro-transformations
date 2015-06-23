@@ -951,12 +951,12 @@ for an $n \geq 0$, with properties partially specific to the kind of $e$. First 
 \item If $n = 0$, then $\zeta = r$.
 \item For $i \in \{1, ..., n\}$ it is $q_{\epsilon_i} \sim t_{\epsilon_i}$. Further, it is $q_\zeta \sim q_r$ and $t_\zeta = t_r$.
 \item $\langle prg \rangle$ is deterministic.
-\item No equation of $\langle prg \rangle$ is ``partially dead".
+\item No equation of $\langle r \rangle^e$ is ``partially dead" with respect to $\langle prg \rangle$.
 \end{enumerate}
 
 \item \underline{Kind `A': ``Destructor extraction":} If $n \geq 1$ it holds that:
 \begin{enumerate}
-\item Set $q_0 := q_r$ and $q_i := q_0[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_i} \leftarrow t_{\epsilon_i}]$. It is $q_{\epsilon_1} < q_0, q_{\epsilon_2} < q_1, ..., q_{\epsilon_n} < q_{n-1}$.
+\item Set $q_0 := q_r$ and $q_i := q_0[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_i} \leftarrow t_{\epsilon_i}]$. It is $q_{\epsilon_1} < q_0, q_{\epsilon_2} < q_1, ..., q_{\epsilon_n} < q_{n-1}$, and $q_\zeta = q_n$.
 \end{enumerate}
 
 \item \underline{Kind `B': ``Constructor extraction":} If $n \geq 1$ it holds that:
@@ -1423,7 +1423,13 @@ The relevant initial part of the sequence is constructed by Lemma 3. Again, by i
 
 \begin{proof}[Proof for $extract\_outer\_des$]
 
-By induction on the structure of $q_r$; in any case, choose $q_0 := q_r$ and $\sigma^0_v = \sigma$.
+This extraction function is of Kind `A' (``Destructor extraction"). The properties are strengthened, as follows below, and then proved by induction on the structure of $q_r$.
+
+\underline{Induction-specific strengthening:}
+\begin{enumerate}
+\item The function name of $q_{\epsilon_1}$ is declared in $prg$.
+\item $q_{\epsilon_2}, ..., q_{\epsilon_n}$ are all destructor patterns, and unless $r = \zeta$, $q_\zeta$ is destructor pattern, too.
+\end{enumerate}
 
 \begin{itemize}
 
@@ -1432,7 +1438,20 @@ By induction on the structure of $q_r$; in any case, choose $q_0 := q_r$ and $\s
 \begin{equation*}
 \langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle
 \end{equation*}
-Choose $n = 0$, $m = 0$ and $r_1 = r$.\footnote{Note that the fifth property is vacuously true because there is no $t_{r_{n+m}}$.}
+The properties are now shown one by one.
+\begin{itemize}
+\item \underline{Common properties:}
+\begin{enumerate}
+\item Choose $n = 0$, $\zeta = r$.
+\item Clear because $n = 0$ and $\zeta = r$.
+\item
+\item The only equation $\zeta = r$ has a left-hand side that is a hole copattern, and thus cannot be ``partially dead".
+\end{enumerate}
+
+\item \underline{Kind `A':} Nothing to show because $n = 0$.
+
+\item \underline{Induction-specific strengthening:} Nothing to show because $n = 0$ and $r = \zeta$.
+\end{itemize}
 
 \item \underline{Case 2:} $q_r = q'.des(p_1, ..., p_k)$.
 
@@ -1440,16 +1459,50 @@ When $q'$ is hole pattern, it is
 \begin{equation*}
 \langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle,
 \end{equation*}
-and the argument is identical to Case 1. Otherwise, it is
+and the argument is identical to Case 1, with the exception of the non-``partially dead" property, which is shown identically to as if $q'$ was destructor pattern. Otherwise, it is
 \begin{multline*}
 \langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des}\\
 = \langle `` q' = hname(\langle q' \rangle^{vars}) ", \{\big\langle hsig, `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r " \big\rangle \} \rangle^{extract\_outer\_des},
 \end{multline*}
-with $hname$, $hsig$ as in the definition of $extract\_des$. (TODO: What follows is immediately clear when extraction is reformulated (with same meaning) to Writer monad style. See also the idea with the boxed plus in the proofs above for this.) Choose
+with $hname$, $hsig$ as in the definition of $extract\_des$. The induction hypothesis, applied to $q'$, yields an $n' \geq 0$ and $\epsilon'_1, ..., \epsilon'_{n'}$, and $\zeta'$, in $\langle r \rangle^e$ with the properties. Choose $n = n' + 1$, $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n'\}$, $epsilon_n = \zeta'$, and
 \begin{equation*}
-r_n = `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r ".
+\zeta = `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r ".
+\end{equation*} The properties are now shown one by one. (TODO: What follows is immediately clear when extraction is reformulated (with same meaning) to Writer monad style. See also the idea with the boxed plus in the proofs above for this.)
+\begin{itemize}
+\item \underline{Common properties:}
+\begin{enumerate}
+\item Irrelevant since $n = n' + 1 \geq 0 + 1$.
+\item By the induction hypothesis, it is $q_{\epsilon'_i} \sim t_{\epsilon'_i}$, and it has been chosen $\epsilon_i = \epsilon'_i$, for $i \in \{1, ..., n'\}$. $n$ has been chosen as $n' + 1$, and $\epsilon_n$ as $\zeta'$. By the induction hypothesis, $q_\zeta' \sim q' \sim hname(\langle q' \rangle^{vars}) \sim t_\zeta'$. Finally, $\zeta$ has been chosen such that its left-hand side is equivalent to $q_r$ and that its right-hand side is $t_r$.
+\item
+\item By the induction hypothesis,
+\begin{equation*}
+\langle `` q' = hname(\langle q' \rangle^{vars}) " \rangle^e
 \end{equation*}
-The second property of the induction hypothesis, applied to $q'$, yields $r_1, ..., r_{n'}$ in $\langle r \rangle^e$ with $q_{r_1} \leq q', q_{r_2} \leq q'_1, ..., q_{r_{n'}} \leq q'_{n'-1}$, with $q'_i := q'[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. It is clear that $q' \leq q_r$ and $q'_i \leq q_i$ for $i \in \{1, ..., m\}$. Choose $n = n'+1$ and $m = 0$ to obtain the properties.
+contains no ``partially dead" equations. Only
+\begin{equation*}
+`` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r "
+\end{equation*}
+remains to be considered. The only strict prefix of its left-hand side is $h := hname(\langle q' \rangle^{vars})$, that is, its function name isn't declared in $prg$. Consider an equation $r^*$ of $prg$. The equations of its transformation result $\langle r^* \rangle^e$ are $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$, with extraction function properties relative to $r^*$. This means that the function name of $q_{\epsilon^*_1}$ is declared in $prg$, unlike that of $h$, thus a term that matches it cannot match $h$. $h$ cannot match a term that matches $q_{\epsilon^*_i}$, for any $i \in \{2, ..., n\}$, because those are all destructor patterns. Finally, $h$ also cannot match a term that matches $q_{\zeta^*}$, because either (a) $\zeta^* = r^*$, and then $q_{\zeta^*}$ has a function name declared in $prg$, or (b) $q_{\zeta^*}$ is a destructor pattern.
+\end{enumerate}
+
+\item \underline{Kind `A':}
+\begin{enumerate}
+\item By the induction hypothesis, it is $q_{\epsilon'_1} \leq q', q_{\epsilon'_2} \leq q'_1, ..., q_{\epsilon'_{n'}} \leq q'_{n'-1}$, with $q'_i := q'[q_{\epsilon'_1} \leftarrow t_{\epsilon'_1}]...[q_{\epsilon'_i} \leftarrow t_{\epsilon'_i}]$. Since $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n'\}$ with $n' = n-1$, we have the property up to $n-1$, i.e., it remains to be shown that $q_{\epsilon_n} < q_{n-1}$ and $q_\zeta = q_n$. $q_{\epsilon_n}$ has been chosen as $q_\zeta'$, and by the induction hypothesis it is $q_\zeta' = q_n' = q_{n-1}$.
+\end{enumerate}
+
+\item \underline{Induction-specific properties:}
+\begin{enumerate}
+\item Follows from the induction hypothesis, since $q_{\epsilon_1} = q_{\epsilon'_1}$.
+\item For $q_{\epsilon_2}, ..., q_{\epsilon_{n-1}}$, follows from the induction hypothesis, because $q_{\epsilon_i} = q_{\epsilon'_i}$ for $i \in \{2, ..., n'\}$ and $n = n'$. It has been chosen $q_{\epsilon_n} = q_\zeta'$, and if $q' = q_\zeta'$, this is a destructor pattern, otherwise, by the induction hypothesis, it is a destructor pattern, too. Finally, $q_\zeta$ has been chosen to be a destructor pattern.
+\end{enumerate}
+
+\end{itemize}
+
+Choose
+\begin{equation*}
+\zeta = `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r ".
+\end{equation*}
+The induction hypothesis, applied to $q'$, yields $\epsilon_1, ..., \epsilon_{n'}$, and $\zeta'$, in $\langle r \rangle^e$ with $q_{\epsilon_1} \leq q', q_{\epsilon_2} \leq q'_1, ..., q_{\epsilon_{n'}} \leq q'_{n'-1}$, with $q'_i := q'[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_i} \leftarrow t_{\epsilon_i}]$. It is clear that $q' \leq q_r$ and $q'_i \leq q_i$ for $i \in \{1, ..., m\}$. Choose $n = n'+1$ and $\epsilon_n = \zeta'$ to obtain the properties.
 
 \end{itemize}
 
