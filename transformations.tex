@@ -938,19 +938,34 @@ Let $\mathcal{D}$ be a derivation of $t =^? q \searrow \sigma$.
 In the following, the convention that $q_r$ is the left-hand side of the equation $r$ is used.
 
 \begin{definition}[Extraction function properties]
-Let $e$ be an argument of $extract\_helpers$. $e$ is said to satisfy the extraction function properties iff, for any equation $r$, the equations within $\langle r \rangle^e$ are
+Let $e$ be an argument of $extract\_helpers$, and $prg$ a deterministic program without any ``partially dead" rules; write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. $e$ is said to satisfy the extraction function properties iff it is either of kind `A' or of kind `B'. These are defined such that, for any equation $r$ of $prg$, the equations within $\langle r \rangle^e$ are
 \begin{equation*}
-r_1, ..., r_n, r_{n+1}, ..., r_{n+m}, r_{n+m+1}
+\epsilon_1, ..., \epsilon_n, \zeta,
 \end{equation*}
-for $n, m \geq 0$ with properties following below.
-\begin{enumerate} 
-\item There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
-\item Set $q_i := q_0[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$. It is $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$.
-\item For any $\sigma^n_v$ that substitutes only with values there exist $\sigma^{n+1}_v, ..., \sigma^{n+m}_v$ that substitute only with values and for which it holds: $q_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$, $t_{r_{n+1}}[\sigma^{n+1}_v] = q_{r_{n+2}}$, ..., $t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}$.
-\item For $i \in \{1, ..., m\}$, $q_{r_{n+i}}$ is hole pattern. Further, if $m \neq 0$, $q_{r_{n+m+1}}$ is hole pattern.
-\item It is $t_{r_{n+m+1}} = t_r$. Further, for any $\sigma$ that substitutes only with values there exists a $\sigma'$ that substitutes only with values and for which it holds: $t_{r_{n+m}}[\sigma] = q_{r_{n+m+1}}[\sigma']$.
-\item For $i \in \{1, ..., n+m\}$ it is $q_{r_i} \sim t_{r_i}$. Further, it is $q_{r_{n+m+1}} \sim q_r$.
+for an $n \geq 0$, with properties partially specific to the kind of $e$. First listed are their common properties, then their respective specific properties.
+
+%%-- under construction
+\begin{itemize}
+\item \underline{Common properties:}
+\begin{enumerate}
+\item If $n = 0$, then $\zeta = r$.
+\item For $i \in \{1, ..., n\}$ it is $q_{\epsilon_i} \sim t_{\epsilon_i}$. Further, it is $q_\zeta \sim q_r$ and $t_\zeta = t_r$.
+\item $\langle prg \rangle$ is deterministic.
+\item No equation of $\langle prg \rangle$ is ``partially dead".
 \end{enumerate}
+
+\item \underline{Kind `A': ``Destructor extraction":} If $n \geq 1$ it holds that:
+\begin{enumerate}
+\item Set $q_0 := q_r$ and $q_i := q_0[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_i} \leftarrow t_{\epsilon_i}]$. It is $q_{\epsilon_1} < q_0, q_{\epsilon_2} < q_1, ..., q_{\epsilon_n} < q_{n-1}$.
+\end{enumerate}
+
+\item \underline{Kind `B': ``Constructor extraction":} If $n \geq 1$ it holds that:
+\begin{enumerate}
+\item There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
+\item For any $\sigma^1_v$ that substitutes only with values there exist $\sigma^2_v, ..., \sigma^n_v$ that substitute only with values and for which it holds: $t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v]$, $t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}$, ..., $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_{\epsilon_n}$.
+\item For $i \in \{2, ..., n\}$, $q_{\epsilon_i}$ is hole pattern. Further, $q_\zeta$ is hole pattern.
+\end{enumerate}
+\end{itemize}
 
 \end{definition}
 
@@ -977,14 +992,27 @@ then there is an equation $r$ in the equations of $prg$ such that $\langle r \ra
 
 \begin{enumerate}
 
-\item As we can see in the definition of $extract\_helpers$, the transformed program contains the equations within $\langle r \rangle^e = \big\langle r', H \big\rangle$, because $prg$ contains $r$. The desired sequence can be constructed as follows.
+\item
 
-%%- under construction
-\begin{enumerate}
+As we can see in the definition of $extract\_helpers$, the transformed program $\langle prg \rangle$ contains, for every equation $r^*$ of $prg$, the equations within $\langle r^* \rangle^e$, and no others. Especially, $\langle prg \rangle$ contains $\langle r \rangle^e$, because $prg$ contains $r$. The desired sequence can be constructed as follows; it will be distinguished between the two kinds that $e$ can have.
 
-\item First, the prefixes of $s = q_r[\sigma]$ are converted. By property 1 there is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$. Set $q_i := q_0[q_{r_1} \leftarrow t_{r_1}]...[q_{r_i} \leftarrow t_{r_i}]$.
-By property 2, we have equations $r_1, ..., r_n$ in $\langle r \rangle^e$ with $q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_n} \leq q_{n-1}$. 
-From this we have the sequence
+\begin{proof}[Proof for Kind `A'] Consider the equations that can be in $\langle r \rangle^e$. Two cases will be distinguished.
+
+\begin{itemize}
+
+\item $n = 0$. Then, by the first common property, it is $\zeta = r$ for the only rule $\zeta$ contained in $\langle r \rangle^e$. Thus it is $s = q_\zeta[\sigma]$. Consider the form of $q_\zeta[\sigma] = fun(t^0_1, ..., t^0_{n_0}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k})$. The desired sequence can be given as follows:
+\begin{equation*}
+s \longrightarrow^* fun((t^0_1)_v, ..., (t^0_{n_0})_v).des_1((t^1_1)_v, ..., (t^1_{n_1})_v)...des_k((t^k_1)_v, ..., (t^k_{n_k})_v) \longrightarrow t
+\end{equation*}
+First, the initial part of this sequence is constructed. The arguments $t^i_j$, which are values in $prg$, are reduced to their corresponding values $(t^i_j)_v \sim t^i_j$. We have such reductions by Lemma 3. Apply the ``Cong" rule, for an $\mathcal{E}$ detailed below, after each such reduction to obtain the reduction given below. All of those reductions, put behind one another, result in the initial part of the sequence.
+\begin{equation*}
+\mathcal{E}[t^i_j] \longrightarrow \mathcal{E}[(t^i_j)_v]
+\end{equation*}
+Such an $\mathcal{E}$ depends on the $i$ and $j$; it is constructed from $s$ by replacing the arguments to the left of $t^i_j$ with their corresponding values, as constructed for the previous steps, and leaving a hole for $t^i_j$. It remains to be shown why $\mathcal{E} = fun(...).des_1(...)...des_i(...[]...)...des_k(...)$ is actually a reduction context. I.e., why is it not possible to reduce $fun(...).des_1(...)...des_{i-1}(...)$? The arguments of $fun$ and of the destructors are values by construction. $fun(...).des_1(...)...des_l(...)$, for $l \in \{0, ..., i-1\}$, doesn't match any equation of $\langle prg \rangle$ because $\zeta$ would be ``partially dead" otherwise. This is because then there would be a term that matches both a prefix of $q_\zeta$ and this equation's left-hand side.
+
+Second, the final step of the sequence is derived. This is done by using the ``Subst" rule for $\zeta$.
+
+\item $n \geq 1$. First, the prefixes of $s = q_r[\sigma]$ are converted. Set $q_0 := q_r$, $\sigma^0_v := \sigma$, and $q_i := q_r[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_i} \leftarrow t_{\epsilon_i}]$. By property 1 of kind `A' there are equations $\epsilon_1, ..., \epsilon_n$ with $q_{\epsilon_1} \leq q_0, q_{\epsilon_2} \leq q_1, ..., q_{\epsilon_n} \leq q_{n-1}$. From this we have the sequence
 \begin{equation*}
 s = q_0[\sigma^0_v] \longrightarrow^* q_1[\sigma^1_v] \longrightarrow^* ... \longrightarrow^* q_n[\sigma^n_v];
 \end{equation*}
@@ -992,37 +1020,59 @@ the $\sigma^i_v$ are constructed iteratively, as follows below. This sequence co
 \begin{equation*}
 q_i[\sigma^i_v] \longrightarrow^* q_i[\sigma^{i+1}_v] \longrightarrow q_{i+1}[\sigma^{i+1}_v]
 \end{equation*}
-for each $i \in \{0, ..., n-1\}$. The initial part is responsible for reducing the immediate subterms of the prefix $q_{r_{i+1}}[\sigma^i_v] \leq q_i[\sigma^i_v]$ to values, resulting in $q_i[\sigma^{i+1}_v]$.
+for each $i \in \{0, ..., n-1\}$. The initial part is responsible for reducing the immediate subterms of the prefix $q_{\epsilon_{i+1}}[\sigma^i_v] \leq q_i[\sigma^i_v]$ to values, resulting in $q_i[\sigma^{i+1}_v]$. Afterwards, the last step is derived by using the ``Subst" rule for $\epsilon_{i+1}$.
 
-This initial part is constructed first. It suffices to reduce the patterns within $q_{r_{i+1}}[\sigma^i_v]$ from left to right, as will be shown next. The form of $q_{r_{i+1}}$ is $fun(p^0_1, ..., p^0_k).des_1(p^1_1, ..., p^1_{k_1})...des_l(p^l_1, ..., p^l_{k_l})$. By property 2, $q_{r_{i+1}}$ is the smallest prefix of $q_i$ that is a left-hand side in $\langle r \rangle^e$. The other equations that need to be considered are those within $\langle r^* \rangle^e$ for an $r^* \neq r$ of $prg$. By induction on the structure of $q_{r^*}$ it can be shown that, if such an equation is a strict prefix of $q_{r_{i+1}}$, then either $r$ or $r^*$ is a ``dead" rule in $prg$. It follows that there is no left-hand side that a strict prefix of $q_{r_{i+1}}[\sigma^i_v]$ matches. Thus it suffices to reduce the patterns from left to right.
+For the initial part of the sequence, it suffices to reduce the arguments of the function call and, of the destructor call, if any (from left to right), because there is no equation in $\langle prg \rangle$ that a strict prefix of $q_{\epsilon_{i+1}}[\sigma^i_v]$ matches. Otherwise $q_{\epsilon_{i+1}}$ would be ``partially dead"; the argument here is analogous to the ``$n = 0$" case.
 
-We have such a reduction for each pattern from Lemma 3 with a result equivalent to the start. This is because the subterm that is meant to be reduced is, by precondition, already a value in $prg$. It is clear that, in the result of reducing these subterms, within the subterms, the terms that $\sigma^i_v$ substituted for variables are now replaced with their corresponding values. Thus $\sigma^{i+1}_v$ can be defined by replacing exactly those terms with their corresponding values and keeping the others from $\sigma^i_v$.
+Second, the final step of the overall sequence is derived. This is done by using the ``Subst" rule for $\zeta$.
 
-The final step is derived by first using the ``Subst" rule for the equation $r_{i+1}$, reducing the prefix $q_{r_{i+1}}[\sigma^{i+1}_v] \leq q_i[\sigma^{i+1}_v]$ to $t_{r_{i+1}}[\sigma^{i+1}_v]$, and then applying the ``Cong" rule to reduce $q_i[\sigma^{i+1}_v]$ to $q_i[q_{r_{i+1}} \leftarrow t_{r_{i+1}}[\sigma^{i+1}_v]] =  q_i[q_{r_{i+1}} \leftarrow t_{r_{i+1}}][\sigma^{i+1}_v]= q_{i+1}[\sigma^{i+1}_v]$. That the ``Cong" rule can be applied is clear since the term reduced in the ``Subst" rule is a prefix of $q_i[\sigma^{i+1}_v]$ and thus there is no term to the left of it. By property 6, the left- and right-hand sides of $r_{i+1}$ are equivalent, thus also the result of the final step to its start term. As a consequence of this and of the equivalences for the previous steps, the entire prefix conversion sequence preserves the equivalence.
+\end{itemize}
 
-\item The second part of the sequence is concerned with the conversion of function calls until the final equation that leads to $\widetilde{t}$ can be used. By property 3, we have equations $r_{n+1}, ..., r_{n+m}$ in $\langle r \rangle^e$ with $q_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v], t_{r_{n+1}}[\sigma^{n+1}_v] = q_{r_{n+2}}[\sigma^{n+2}_v], ..., t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}[\sigma^{n+m+1}_v]$.\footnote{It can also be the case that $m=0$, then $t_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$ and the sequence constructed below is empty.}
+\end{proof}
+
+\begin{proof}[Proof for Kind `B'] Consider the equations that can be in $\langle r \rangle^e$. Two cases will be distinguished.
+
+\begin{itemize}
+\item $n = 0$. Then, by the first common property, it is $\zeta = r$ for the only rule $\zeta$ contained in $\langle r \rangle^e$. Thus it is $s = q_\zeta[\sigma]$. Consider the form of $q_\zeta[\sigma] = fun(t^0_1, ..., t^0_{n_0}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k})$. The desired sequence can be given as follows:
+\begin{equation*}
+s \longrightarrow^* fun((t^0_1)_v, ..., (t^0_{n_0})_v).des_1((t^1_1)_v, ..., (t^1_{n_1})_v)...des_k((t^k_1)_v, ..., (t^k_{n_k})_v) \longrightarrow t
+\end{equation*}
+The initial part of this sequence is concerned with reducing the $t^i_j$ to equivalent values. Its construction is identical to that of this case for an $e$ of Kind `A', consisting of reduction steps
+\begin{equation*}
+\mathcal{E}[t^i_j] \longrightarrow \mathcal{E}[(t^i_j)_v]
+\end{equation*}
+with $\mathcal{E}$ constructed as in Kind `A'. It will now be shown that $\mathcal{E}$ actually is a reduction context. Like in the proof for Kind `A' this is because $fun(...).des_1(...)...des_l(...)$ doesn't match any equation of $\langle prg \rangle$, for $l \in \{0, ..., i-1\}$. And again, this is because then $\zeta$ would be ``partially dead".
+
+Finally, the final step of the sequence is derived. This is done by using the ``Subst" rule for $\zeta$.
+
+\item $n \geq 1$. First, the arguments of the function and destructor calls need to be reduced to equivalent values, analogously to the ``$n = 0$" case, yielding an initial reduction sequence
+\begin{equation*}
+s = q_r[\sigma] \longrightarrow^* q_r[\sigma^0_v] \sim s,
+\end{equation*}
+with a $\sigma^0_v$ that substitutes only with values.
+
+By property 2, we have equations $\epsilon_1, ..., \epsilon_n, \zeta$ in $\langle r \rangle^e$ with $t_{\epsilon_1}[\sigma^0_v] = q_{\epsilon_2}[\sigma^1_v], t_{\epsilon_2}[\sigma^1_v] = q_{\epsilon_3}[\sigma^2_v], ..., t_{\epsilon_n}[\sigma^{n-1}_v] = q_\zeta[\sigma^n_v]$.
 From this we have the sequence
 \begin{equation*}
-q_n[\sigma^n_v] \longrightarrow t_{r_{n+1}}[\sigma^{n+1}_v] \longrightarrow ... \longrightarrow t_{r_{n+m}}[\sigma^{n+m}_v] = q_{r_{n+m+1}}[\sigma^{n+m+1}_v].
+s = q_{\epsilon_1}[\sigma^0_v] \longrightarrow t_{\epsilon_1}[\sigma^0_v] \longrightarrow ... \longrightarrow t_{\epsilon_n}[\sigma^{n-1}_v] = q_\zeta[\sigma^n_v] \longrightarrow t_\zeta[\sigma^n_v] =: \widetilde{t}.
 \end{equation*}
-Its first step and each of its following steps
+Its first step and, except for the last, each of its following steps
 \begin{equation*}
-t_{r_{n+i}}[\sigma^{n+i}_v] \longrightarrow t_{r_{n+i+1}}[\sigma^{n+i+1}_v]
+t_{\epsilon_i}[\sigma^{i-1}_v] \longrightarrow t_{\epsilon_{i+1}}[\sigma^i_v]
 \end{equation*}
-can be derived using the ``Subst" rule for the equation $q_{r_{n+i+1}} = t_{r_{n+i+1}}$. This is possible since, as stated above, by property 6 it is $q_n[\sigma^n_v] = q_{r_{n+1}}[\sigma^{n+1}_v]$ and $t_{r_{n+i}}[\sigma^{n+i}_v] = q_{r_{n+i+1}}[\sigma^{n+i+1}_v]$, respectively, and the immediate subterms of $q_{r_{n+i+1}}[\sigma^{n+i+1}_v]$ are values. This is because, by property 4, $q_{r_{n+i+1}}$ is hole pattern, and $\sigma^{n+i+1}_v$ substitutes only with values.
+can be derived using the ``Subst" rule for the equation $\epsilon_1$, and $\epsilon_{i+1}$, for $i \in \{1, ..., n-1\}$, respectively. This is possible because all immediate subterms of $t_{\epsilon_i}[\sigma^{i-1}_v] = q_{\epsilon_{i+1}}[\sigma^i_v]$ are values. This is because $\sigma^0_v$ substitutes only with values, and by property 2, $\sigma^{i+1}_v$ substitutes only with values when $\sigma^i_v$ does, and by property 3 $q_{\epsilon_{i+1}}$ is hole pattern.
 
-The function call conversion sequence preserves the equivalence because, by property 6, it is $q_{r_{n+i+1}} \sim t_{r_{n+i+1}}$ for each $i \in \{0, ..., m-1\}$.
+The final step is derived using the ``Subst" rule for $\zeta$, possible because all immediate subterms of $q_\zeta[\sigma^n_v]$ are values. This is because, as stated above, $\sigma^n_v$ substitutes only with values, and by property 3 $q_\zeta$ is hole pattern.
 
-\item After this, the final equation that leads to $\widetilde{t}$ can be used, as follows.
+Lastly, it will be shown why $\widetilde{t} \sim t$. By the common property 2 it is $q_{\epsilon_i} \sim t_{\epsilon_i}$ and $q_{\zeta} \sim q_r$, and thus
 \begin{equation*}
-t_{r_{n+m+1}}[\sigma^{n+m+1}_v] = q_{r_{n+m+1}}[\sigma'] \longrightarrow t_r[\sigma'] =: \widetilde{t}
+q_{\zeta}[\sigma^n_v] = t_{\epsilon^{n-1}_v}[\sigma^{n-1}_v] \sim q_{\epsilon^{n-1}_v}[\sigma^{n-1}_v] = t_{\epsilon^{n-2}_v} \sim ... \sim q_{\epsilon_1}[\sigma^0_v] = q_r[\sigma] \sim q_{\zeta}[\sigma],
 \end{equation*}
-Such a $\sigma'$ exists by property 5. This step is derived using the ``Subst" rule for the final equation $r_{n+m+1}$. This is possible because either (a) $m = 0$ and then $q_{r_{n+m+1}}[\sigma'] = q_{r_{n+1}}[\sigma^{n+1}_v] = q_n[\sigma^n_v]$, which only has immediate value subterms by construction, or (b) $q_{r_{n+m+1}}$ is hole pattern and $\sigma'$ substitutes only with values.
+which means that, for each of the variables they substitute, $\sigma^n_v$ and $\sigma$ substitute with equivalent values. Especially, this means that $t_r[\sigma^n_v] \sim t_r[\sigma]$. By the common property 2, it is $t_\zeta = t_r$, and it follows that $\widetilde{t} = t_\zeta[\sigma^n_v] = t_r[\sigma^n_v] \sim t_r[\sigma] = t$.
 
-It remains to be shown that $\widetilde{t} = t_r[\sigma']$ is equivalent to $t = t_r[\sigma]$. As shown above, the previous reduction steps preserve the equivalence, that is, it is $q_{r_{n+m+1}}[\sigma'] \sim q_r[\sigma]$. Because $q_{r_{n+m+1}} \sim q_r$ by property 6, it follows that $\sigma'$ and $\sigma$ substitute for the same variables, and for each variable, the terms that they substitute are equivalent. From this it immediately follows that $\widetilde{t} = t_r[\sigma'] \sim t_r[\sigma] = t$.
+\end{itemize}
 
-\end{enumerate}
-%%-
+\end{proof}
 
 \item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
 
