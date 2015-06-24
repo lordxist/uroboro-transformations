@@ -1718,7 +1718,7 @@ By the induction hypothesis, we have the property for $(q_r)^{-con}$. That is, w
 \item \underline{Common properties:}
 \begin{enumerate}
 \item Irrelevant since $n = n'+1 > 0$.
-\item It is $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, thus for these the property follows from the induction hypothesis. It is $\epsilon_n = \zeta'$, and by the induction hypothesis, it is $t_{\zeta'} = hname((q_r)^{-con}_{vars^+})$. By the strengthening of the induction hypothesis, $q_{\zeta'}$ is either $q_{heqn} = hname((q_r)^{-con}_{vars^-})$ or equivalent to $(q_r)^{-con}$. In both cases it is equivalent to $hname((q_r)^{-con}_{vars^+})$.
+\item It is $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, thus for these the property follows from the induction hypothesis. It is $\epsilon_n = \zeta'$, and by the induction hypothesis, it is $t_{\zeta'} = hname((q_r)^{-con}_{vars^+})$. By the strengthening of the induction hypothesis, $q_{\zeta'}$ is either $q_{heqn'} := hname((q_r)^{-con}_{vars^-})$ or equivalent to $(q_r)^{-con}$. In both cases it is equivalent to $hname((q_r)^{-con}_{vars^+})$.
 \item
 \item 
 \end{enumerate}
@@ -1726,37 +1726,21 @@ By the induction hypothesis, we have the property for $(q_r)^{-con}$. That is, w
 \item \underline{Kind `B': ``Constructor extraction":}
 \begin{enumerate}
 \item Set $\sigma'(x) = p_{con}[\sigma]$ for the variable $x$ replacing the left-most inner- most constructor pattern $p_{con}$, and $\sigma'(x) = \sigma(x)$ for other variables $x$. By the induction hypothesis, there is a $\sigma'^1_v$ with $(q_r)^{-con}[\sigma'] = q_{\epsilon'_1}[\sigma'^1_v]$. Choose $\sigma^1_v = \sigma'^1_v$. It is clear that $q_r[\sigma] = (q_r)^{-con}[\sigma'] = q_{\epsilon'_1}[\sigma'^1_v] = q_{\epsilon_1}[\sigma^1_v]$.
+
 \item By the induction hypothesis, and since $\sigma'^1_v = \sigma^1_v$ and $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, we have
 \begin{equation*}
 t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v], t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}[\sigma^3_v], ..., t_{\epsilon_{n-2}}[\sigma^{n-2}_v] = q_{\epsilon_{n-1}}[\sigma^{n-1}_v].
 \end{equation*}
-Also by the induction hypothesis, it is $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_\zeta[\sigma'^{n' +1}_v] = q_{\epsilon_n}[\sigma'^{n}_v]$ for a $\sigma'^{n}_v$; thus choose $\sigma^{n}_v = \sigma'^{n}_v$. 
-\item
+
+Also by the induction hypothesis, it is $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_\zeta[\sigma'^{n' +1}_v] = q_{\epsilon_n}[\sigma'^{n}_v]$ for a $\sigma'^{n}_v$; thus choose $\sigma^{n}_v = \sigma'^{n}_v$ to gain $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_{\epsilon_n}[\sigma^{n}_v]$.
+
+Finally, choose $\sigma^{n+1}_v$ as follows: Let $x^0$ be the variable at the front of $(q_r)^{-con}_{vars^+}$, and $p^0$ be the pattern at the front of $(q_r)^{-con}_{vars}$. Set $\sigma^{n+1}_v(x^0) = p^0[\sigma^n_v]$, and $\sigma^{n+1}_v(x) = \sigma^n_v(x)$ for $x \neq x^0$. Because $t_{\epsilon_n} = t_\zeta' = t_{heqn'} := hname(q^{-con}_{vars^+})$ by the strengthening of the induction hypothesis, it is $t_{\epsilon_n}[\sigma^n_v] = t_{heqn'}[\sigma^n_v] = hname(q^{-con}_{vars^-})[\sigma^{n+1}_v] = q_\zeta[\sigma^{n+1}_v]$.
+
+\item Since $q_{\epsilon_i} = q_{\epsilon'_i}$, for $i \in \{2, ..., n-1\}$, these are hole patterns by the induction hypothesis. The same goes for $q_{\epsilon_n} = q_\zeta'$. Finally, $\zeta$ has been chosen such that its left-hand side is a hole pattern.
 \end{enumerate}
 
-\item \underline{Induction-specific strengthening:} Nothing to show since $n = 0$.
+\item \underline{Induction-specific strengthening:} $\zeta$ has been chosen precisely to satisfy the strengthening.
 \end{itemize}
-
-\begin{enumerate}
-\item Set $\sigma'(x) = p_{con}[\sigma]$ for the variable $x$ replacing the left-most inner- most constructor pattern, and $\sigma'(x) = \sigma(x)$ for other variables $x$. By the induction hypothesis, there is a $q'_0$ and $\sigma'^0_v$ with $(q_r)^{-con}[\sigma'] = q'_0[\sigma'^0_v]$. Choose $q_0 = q'_0$ and $\sigma^0_v = \sigma'^0_v$. It is clear that $q_r[\sigma] = (q_r)^{-con}[\sigma'] = q_0[\sigma^0_v]$.
-\item By the induction hypothesis we have $r_1, ..., r_{n'}$ with
-\begin{equation*}
-q_{r_1} \leq q_0, q_{r_2} \leq q_1, ..., q_{r_{n'}} \leq q_{n-1}.
-\end{equation*}
-(Remember that $q_0$ was chosen as $q'_0$.) Choose $n = n'$.
-\item By the induction hypothesis we have $r'_{n + 1}, ..., r'_{n + m'}$ (since $n = n'$) with
-\begin{equation*}
-t_n[\sigma^n_v] = q_{r'_{n+1}}[\sigma^{n+1}_v], t_{r'_{n+1}}[\sigma^{n+1}_v] = q_{r'_{n+2}}, ..., t_{r'_{n+m'}}[\sigma^{n+m'}_v] = q_{r'_{n+m'+1}}
-\end{equation*}
-and an $r'_{n + m' + 1}$ and $\sigma'$ with
-\begin{equation*}
-t_{r_{n+m'}}[\sigma] = q_{r_{n+m'+1}}[\sigma'].
-\end{equation*}
-Choose $m = m' + 1$, $r_i = r'_i$ for $i \in \{n+1, ..., n+m\}$, and $\sigma^{n+m}_v = \sigma'$.
-\item As chosen, it is $r_i = r'_i$ for $i \in \{n+1, ..., n+m'\}$, and the left-hand sides of these equations are hole patterns by the induction hypothesis (unless $m' = 0$, but then there are no such equations). It also is, as chosen, $r_{n+m} = r'_{n+m'+1}$, which is a hole pattern by the induction hypothesis (of the strengthened statement).
-\item Choose $r_{n+m+1} = heqn$. By the induction hypothesis, it is $t_{r_{n+m'+1}} = t_{r_{n+m}} = hname((q_r)^{-con}_{vars^+})$. Further, as chosen, it is $q_{r_{n+m+1}} = hname((q_r)^{-con}_{vars^-})$. Thus, choose $\sigma'$ as follows: Let $x^0$ be the variable at the front of $(q_r)^{-con}_{vars^+}$, and $p^0$ be the pattern at the front of $(q_r)^{-con}_{vars}$. Set $\sigma'(x^0) = p^0[\sigma]$, and $\sigma'(x) = \sigma(x)$ for $x \neq x^0$.
-\item First, note again that $m = m'+1$, as chosen above. By the induction hypothesis, it is $q_{r_i} \sim t_{r_i}$ for $i \in \{1, ..., n+m'\}$ by the sixth property, and $t_{r_{n+m'+1}} = hname((q_r)^{-con}_{vars^+}$ by the fifth property. By the first strengthening property of the induction hypothesis, the left-hand side of $r_{n+m'+1}$ is either $hname(((q_r)^{-con})^{-con}_{vars^-})$ or $hname((q_r)^{-con}_{vars^+})$. In both cases it is equivalent to $hname((q_r)^{-con}_{vars^+})$.
-\end{enumerate}
 
 \end{itemize}
 
