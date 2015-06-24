@@ -1676,13 +1676,11 @@ and
 
 \begin{proof}[Proof for $extract$]
 
-By induction on the number $n_c$ of constructor patterns within the copattern that is the left-hand side of the argument of $extract$, the following strengthened statement will be proved:
+The extraction function is of Kind `B'. The properties are strengthened, as follows below, and then proved by induction on the number $n_c$ of constructor patterns within the copattern that is the left-hand side of the argument of $extract$.
 
-Let $\langle r \rangle^{extract} = \big\langle r', H \big\rangle$. Property 6 holds, and
-\begin{itemize}
-\item $r_{n+m+1} = r$ if $H = \emptyset$, and $r_{n+m+1} = heqn$ with $\langle r \rangle^{extract} = \langle r'', \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}$, otherwise
-\item The left-hand side of $r_{n+m+1}$ is hole pattern.
-\end{itemize}
+\underline{Induction-specific strengthening:}
+
+$\zeta = heqn$ with $\langle r \rangle^{extract} = \langle r', \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}$, unless $n = 0$.
 
 Proof by induction:
 
@@ -1693,14 +1691,52 @@ Then it is
 \begin{equation*}
 \langle r \rangle^{extract} = \big\langle r, \emptyset \big\rangle.
 \end{equation*}
-Trivial.
+Choose $n = 0$, $\zeta = r$. The properties are now shown one by one.
+
+\begin{itemize}
+\item \underline{Common properties:}
+\begin{enumerate}
+\item Clear.
+\item Clear because $n = 0$ and $\zeta = r$.
+\item
+\item 
+\end{enumerate}
+
+\item \underline{Kind `B': ``Constructor extraction":} Nothing to show since $n = 0$.
+
+\item \underline{Induction-specific strengthening:} Nothing to show since $n = 0$.
+\end{itemize}
 
 \item $n_c = n'_c + 1$.
 It is
 \begin{equation*}
 \langle r \rangle^{extract} = \langle `` (q_r)^{-con} = hname((q_r)^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}.
 \end{equation*}
-By the induction hypothesis, we have the property for $(q_r)^{-con}$.
+By the induction hypothesis, we have the property for $(q_r)^{-con}$. That is, we have $\epsilon'_1, ..., \epsilon'_{n'}, \zeta'$, for an $n' \geq 0$ with properties relative to $(q_r)^{-con}$. Choose $n = n'+1$, $\epsilon_i = \epsilon'_i$, for $i \in \{1, ..., n-1\}$, $\epsilon_n = \zeta'$, and $\zeta = heqn$.
+
+\begin{itemize}
+\item \underline{Common properties:}
+\begin{enumerate}
+\item Irrelevant since $n = n'+1 > 0$.
+\item It is $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, thus for these the property follows from the induction hypothesis. It is $\epsilon_n = \zeta'$, and by the induction hypothesis, it is $t_{\zeta'} = hname((q_r)^{-con}_{vars^+})$. By the strengthening of the induction hypothesis, $q_{\zeta'}$ is either $q_{heqn} = hname((q_r)^{-con}_{vars^-})$ or equivalent to $(q_r)^{-con}$. In both cases it is equivalent to $hname((q_r)^{-con}_{vars^+})$.
+\item
+\item 
+\end{enumerate}
+
+\item \underline{Kind `B': ``Constructor extraction":}
+\begin{enumerate}
+\item Set $\sigma'(x) = p_{con}[\sigma]$ for the variable $x$ replacing the left-most inner- most constructor pattern $p_{con}$, and $\sigma'(x) = \sigma(x)$ for other variables $x$. By the induction hypothesis, there is a $\sigma'^1_v$ with $(q_r)^{-con}[\sigma'] = q_{\epsilon'_1}[\sigma'^1_v]$. Choose $\sigma^1_v = \sigma'^1_v$. It is clear that $q_r[\sigma] = (q_r)^{-con}[\sigma'] = q_{\epsilon'_1}[\sigma'^1_v] = q_{\epsilon_1}[\sigma^1_v]$.
+\item By the induction hypothesis, and since $\sigma'^1_v = \sigma^1_v$ and $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, we have
+\begin{equation*}
+t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v], t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}[\sigma^3_v], ..., t_{\epsilon_{n-2}}[\sigma^{n-2}_v] = q_{\epsilon_{n-1}}[\sigma^{n-1}_v].
+\end{equation*}
+Also by the induction hypothesis, it is $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_\zeta[\sigma'^{n' +1}_v] = q_{\epsilon_n}[\sigma'^{n}_v]$ for a $\sigma'^{n}_v$; thus choose $\sigma^{n}_v = \sigma'^{n}_v$. 
+\item
+\end{enumerate}
+
+\item \underline{Induction-specific strengthening:} Nothing to show since $n = 0$.
+\end{itemize}
+
 \begin{enumerate}
 \item Set $\sigma'(x) = p_{con}[\sigma]$ for the variable $x$ replacing the left-most inner- most constructor pattern, and $\sigma'(x) = \sigma(x)$ for other variables $x$. By the induction hypothesis, there is a $q'_0$ and $\sigma'^0_v$ with $(q_r)^{-con}[\sigma'] = q'_0[\sigma'^0_v]$. Choose $q_0 = q'_0$ and $\sigma^0_v = \sigma'^0_v$. It is clear that $q_r[\sigma] = (q_r)^{-con}[\sigma'] = q_0[\sigma^0_v]$.
 \item By the induction hypothesis we have $r_1, ..., r_{n'}$ with
