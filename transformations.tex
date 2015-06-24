@@ -961,7 +961,7 @@ for an $n \geq 0$, with properties partially specific to the kind of $e$. First 
 
 \item \underline{Kind `B': ``Constructor extraction":} If $n \geq 1$ it holds that:
 \begin{enumerate}
-\item For each $\sigma$ that substitutes only with values, there is a $\sigma^1_v$ with $q_r[\sigma] = q_{\epsilon_1}[\sigma^1_v]$.
+\item For each $\sigma$ that substitutes only with values, there is a $\sigma^1_v$, that substitutes only with values, with $q_r[\sigma] = q_{\epsilon_1}[\sigma^1_v]$.
 \item There exist $\sigma^2_v, ..., \sigma^{n+1}_v$ that substitute only with values and for which it holds: $t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v]$, $t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}[\sigma^3_v]$, ..., $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_{\epsilon_n}[\sigma^n_v]$, and $t_{\epsilon_n}[\sigma^n_v] = q_\zeta[\sigma^{n+1}_v]$
 \item For $i \in \{2, ..., n\}$, $q_{\epsilon_i}$ is hole pattern. Further, $q_\zeta$ is hole pattern.
 \end{enumerate}
@@ -1051,24 +1051,24 @@ s = q_r[\sigma] \longrightarrow^* q_r[\sigma^0_v] \sim s,
 \end{equation*}
 with a $\sigma^0_v$ that substitutes only with values.
 
-By property 2, we have equations $\epsilon_1, ..., \epsilon_n, \zeta$ in $\langle r \rangle^e$ with $t_{\epsilon_1}[\sigma^0_v] = q_{\epsilon_2}[\sigma^1_v], t_{\epsilon_2}[\sigma^1_v] = q_{\epsilon_3}[\sigma^2_v], ..., t_{\epsilon_n}[\sigma^{n-1}_v] = q_\zeta[\sigma^n_v]$.
+By property 1 and 2, we have equations $\epsilon_1, ..., \epsilon_n, \zeta$ in $\langle r \rangle^e$ with $q_r[\sigma^0_v] = q_{\epsilon_1}[\sigma^1_v], t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v], t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}[\sigma^3_v], ..., t_{\epsilon_n}[\sigma^n_v] = q_\zeta[\sigma^{n+1}_v]$.
 From this we have the sequence
 \begin{equation*}
-s = q_{\epsilon_1}[\sigma^0_v] \longrightarrow t_{\epsilon_1}[\sigma^0_v] \longrightarrow ... \longrightarrow t_{\epsilon_n}[\sigma^{n-1}_v] = q_\zeta[\sigma^n_v] \longrightarrow t_\zeta[\sigma^n_v] =: \widetilde{t}.
+s = q_{\epsilon_1}[\sigma^1_v] \longrightarrow t_{\epsilon_1}[\sigma^1_v] \longrightarrow ... \longrightarrow t_{\epsilon_n}[\sigma^n_v] = q_\zeta[\sigma^{n+1}_v] \longrightarrow t_\zeta[\sigma^{n+1}_v] =: \widetilde{t}.
 \end{equation*}
-Its first step and, except for the last, each of its following steps
+Let $t_{\epsilon_0} := q_{\epsilon_1}$. Except for the last, each of the steps
 \begin{equation*}
-t_{\epsilon_i}[\sigma^{i-1}_v] \longrightarrow t_{\epsilon_{i+1}}[\sigma^i_v]
+t_{\epsilon_i}[\sigma^i_v] \longrightarrow t_{\epsilon_{i+1}}[\sigma^{i+1}_v]
 \end{equation*}
-can be derived using the ``Subst" rule for the equation $\epsilon_1$, and $\epsilon_{i+1}$, for $i \in \{1, ..., n-1\}$, respectively. This is possible because all immediate subterms of $t_{\epsilon_i}[\sigma^{i-1}_v] = q_{\epsilon_{i+1}}[\sigma^i_v]$ are values. This is because $\sigma^0_v$ substitutes only with values, and by property 2, $\sigma^{i+1}_v$ substitutes only with values when $\sigma^i_v$ does, and by property 3 $q_{\epsilon_{i+1}}$ is hole pattern.
+can be derived using the ``Subst" rule for the equation $\epsilon_i$, for $i \in \{0, ..., n-1\}$. This is possible because all immediate subterms of $t_{\epsilon_i}[\sigma^i_v] = q_{\epsilon_{i+1}}[\sigma^{i+1}_v]$ are values. This is because (a) $\sigma^0_v$ substitutes only with values, thus, by property 1, so does $\sigma^1_v$, and thus, by property 2, so do $\sigma^2_v, ..., \sigma^{n+1}_v$, and (b) by property 3 $q_{\epsilon_{i+1}}$ is hole pattern.
 
-The final step is derived using the ``Subst" rule for $\zeta$, possible because all immediate subterms of $q_\zeta[\sigma^n_v]$ are values. This is because, as stated above, $\sigma^n_v$ substitutes only with values, and by property 3 $q_\zeta$ is hole pattern.
+The final step is derived using the ``Subst" rule for $\zeta$, possible because all immediate subterms of $q_\zeta[\sigma^{n+1}_v]$ are values. This is because, by property 2, $\sigma^{n+1}_v$ substitutes only with values, and by property 3 $q_\zeta$ is hole pattern.
 
 Lastly, it will be shown why $\widetilde{t} \sim t$. By the common property 2 it is $q_{\epsilon_i} \sim t_{\epsilon_i}$ and $q_{\zeta} \sim q_r$, and thus
 \begin{equation*}
-q_{\zeta}[\sigma^n_v] = t_{\epsilon^{n-1}_v}[\sigma^{n-1}_v] \sim q_{\epsilon^{n-1}_v}[\sigma^{n-1}_v] = t_{\epsilon^{n-2}_v} \sim ... \sim q_{\epsilon_1}[\sigma^0_v] = q_r[\sigma] \sim q_{\zeta}[\sigma],
+q_{\zeta}[\sigma^{n+1}_v] = t_{\epsilon^n_v}[\sigma^n_v] \sim q_{\epsilon^n_v}[\sigma^n_v] = t_{\epsilon^{n-1}_v} \sim ... \sim q_{\epsilon_1}[\sigma^1_v] = q_r[\sigma^0_v] \sim q_{\zeta}[\sigma^0_v] \sim q_{\zeta}[\sigma],
 \end{equation*}
-which means that, for each of the variables they substitute, $\sigma^n_v$ and $\sigma$ substitute with equivalent values. Especially, this means that $t_r[\sigma^n_v] \sim t_r[\sigma]$. By the common property 2, it is $t_\zeta = t_r$, and it follows that $\widetilde{t} = t_\zeta[\sigma^n_v] = t_r[\sigma^n_v] \sim t_r[\sigma] = t$.
+which means that, for each of the variables they substitute, $\sigma^{n+1}_v$ and $\sigma$ substitute with equivalent values. Especially, this means that $t_r[\sigma^{n+1}_v] \sim t_r[\sigma]$. By the common property 2, it is $t_\zeta = t_r$, and it follows that $\widetilde{t} = t_\zeta[\sigma^{n+1}_v] = t_r[\sigma^{n+1}_v] \sim t_r[\sigma] = t$.
 
 \end{itemize}
 
