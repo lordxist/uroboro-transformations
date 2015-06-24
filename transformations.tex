@@ -1464,7 +1464,7 @@ and the argument is identical to Case 1, with the exception of the non-``partial
 \langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des}\\
 = \langle `` q' = hname(\langle q' \rangle^{vars}) ", \{\big\langle hsig, `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r " \big\rangle \} \rangle^{extract\_outer\_des},
 \end{multline*}
-with $hname$, $hsig$ as in the definition of $extract\_des$. The induction hypothesis, applied to $q'$, yields an $n' \geq 0$ and $\epsilon'_1, ..., \epsilon'_{n'}$, and $\zeta'$, in $\langle r \rangle^e$ with the properties. Choose $n = n' + 1$, $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n'\}$, $epsilon_n = \zeta'$, and
+with $hname$, $hsig$ as in the definition of $extract\_des$. The induction hypothesis, applied to $q'$, yields an $n' \geq 0$ and $\epsilon'_1, ..., \epsilon'_{n'}$, and $\zeta'$, in $\langle r \rangle^e$ with the properties. Choose $n = n' + 1$, $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n'\}$, $\epsilon_n = \zeta'$, and
 \begin{equation*}
 \zeta = `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r ".
 \end{equation*} The properties are now shown one by one. (TODO: What follows is immediately clear when extraction is reformulated (with same meaning) to Writer monad style. See also the idea with the boxed plus in the proofs above for this.)
@@ -1487,7 +1487,7 @@ remains to be considered. The only strict prefix of its left-hand side is $h := 
 
 \item \underline{Kind `A':}
 \begin{enumerate}
-\item By the induction hypothesis, it is $q_{\epsilon'_1} \leq q', q_{\epsilon'_2} \leq q'_1, ..., q_{\epsilon'_{n'}} \leq q'_{n'-1}$, with $q'_i := q'[q_{\epsilon'_1} \leftarrow t_{\epsilon'_1}]...[q_{\epsilon'_i} \leftarrow t_{\epsilon'_i}]$. Since $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n'\}$ with $n' = n-1$, we have the property up to $n-1$, i.e., it remains to be shown that $q_{\epsilon_n} < q_{n-1}$ and $q_\zeta = q_n$. $q_{\epsilon_n}$ has been chosen as $q_\zeta'$, and by the induction hypothesis it is $q_\zeta' = q_n' = q_{n-1}$.
+\item By the induction hypothesis, it is $q_{\epsilon'_1} < q', q_{\epsilon'_2} < q'_1, ..., q_{\epsilon'_{n'}} < q'_{n'-1}$, with $q'_i := q'[q_{\epsilon'_1} \leftarrow t_{\epsilon'_1}]...[q_{\epsilon'_i} \leftarrow t_{\epsilon'_i}]$. Since $\epsilon_i = \epsilon'_i$, $q' < q_r$, and $q'_i < q_i$, for $i \in \{1, ..., n'\}$ with $n' = n-1$, we have the property up to $n-1$, i.e., it remains to be shown that $q_{\epsilon_n} < q_{n-1}$ and $q_\zeta = q_n$. $q_{\epsilon_n}$ has been chosen as $q_\zeta'$, and by the induction hypothesis it is $q_{\zeta'} = q'_{n'} = q'[q_{\epsilon'_1} \leftarrow t_{\epsilon'_1}]...[q_{\epsilon'_{n'}} \leftarrow t_{\epsilon'_{n'}}] = q'[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_{n-1}} \leftarrow t_{\epsilon_{n-1}}] = q_{n-1}$. And it is $q_n = q'_{n-1}.des(p_1, ..., p_k)[q_{\epsilon_n} \leftarrow t_{\epsilon_n}] = q'_{n-1}[q_{\epsilon_n} \leftarrow t_{\epsilon_n}].des(p_1, ..., p_k)$ and, by the induction hypothesis, $t_{\epsilon_n} = t_{\zeta'} = hname(\langle q' \rangle^{vars})$.
 \end{enumerate}
 
 \item \underline{Induction-specific properties:}
@@ -1497,12 +1497,6 @@ remains to be considered. The only strict prefix of its left-hand side is $h := 
 \end{enumerate}
 
 \end{itemize}
-
-Choose
-\begin{equation*}
-\zeta = `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r ".
-\end{equation*}
-The induction hypothesis, applied to $q'$, yields $\epsilon_1, ..., \epsilon_{n'}$, and $\zeta'$, in $\langle r \rangle^e$ with $q_{\epsilon_1} \leq q', q_{\epsilon_2} \leq q'_1, ..., q_{\epsilon_{n'}} \leq q'_{n'-1}$, with $q'_i := q'[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_i} \leftarrow t_{\epsilon_i}]$. It is clear that $q' \leq q_r$ and $q'_i \leq q_i$ for $i \in \{1, ..., m\}$. Choose $n = n'+1$ and $\epsilon_n = \zeta'$ to obtain the properties.
 
 \end{itemize}
 
