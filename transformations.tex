@@ -961,8 +961,8 @@ for an $n \geq 0$, with properties partially specific to the kind of $e$. First 
 
 \item \underline{Kind `B': ``Constructor extraction":} If $n \geq 1$ it holds that:
 \begin{enumerate}
-\item There is a $q_0$ and $\sigma^0_v$ with $q_r[\sigma] = q_0[\sigma^0_v]$.
-\item For any $\sigma^1_v$ that substitutes only with values there exist $\sigma^2_v, ..., \sigma^n_v$ that substitute only with values and for which it holds: $t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v]$, $t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}$, ..., $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_{\epsilon_n}$.
+\item For each $\sigma$ that substitutes only with values, there is a $\sigma^1_v$ with $q_r[\sigma] = q_{\epsilon_1}[\sigma^1_v]$.
+\item There exist $\sigma^2_v, ..., \sigma^{n+1}_v$ that substitute only with values and for which it holds: $t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v]$, $t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}[\sigma^3_v]$, ..., $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_{\epsilon_n}[\sigma^n_v]$, and $t_{\epsilon_n}[\sigma^n_v] = q_\zeta[\sigma^{n+1}_v]$
 \item For $i \in \{2, ..., n\}$, $q_{\epsilon_i}$ is hole pattern. Further, $q_\zeta$ is hole pattern.
 \end{enumerate}
 \end{itemize}
@@ -1611,7 +1611,7 @@ TODO (very similar to $extract\_outer\_des$)
 
 \end{proof}
 
-\begin{proof}[Proof for $extract\_patterns$] The following cases need to be distinguished.
+\begin{proof}[Proof for $extract\_patterns$] This extraction function is of Kind `B' (``Constructor extraction"). The following cases need to be distinguished.
 
 \begin{itemize}
 
@@ -1619,33 +1619,56 @@ TODO (very similar to $extract\_outer\_des$)
 
 $\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_r = t_r ", \emptyset \big\rangle$
 
-Choose $n = 0$, $m = 0$, $r_1 = r$.\footnote{Note again that the fifth property is vacuously true because there is no $t_{r_{n+m}}$.}
+Choose $n = 0$ and $\zeta = r$. The properties are now shown one by one.
+
+\begin{itemize}
+\item \underline{Common properties:}
+\begin{enumerate}
+\item Clear.
+\item Clear because $n = 0$ and $\zeta = r$.
+\item
+\item 
+\end{enumerate}
+
+\item \underline{Kind `B': ``Constructor extraction":} Nothing to show since $n = 0$.
+
+\end{itemize}
 
 \item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
 
 The argument is identical to that in Case 1.
 
 \item \underline{Case 3}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
+\begin{multline*}
+\langle q \rangle^{extract\_patterns}\\
+= \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{ \big\langle hsig, heqn \big\rangle \} \big\rangle
+\end{multline*}
+with $hname, hsig, heqn$ as in the definition of $extract\_patterns$. Choose $n = 1$ and
+\begin{equation*}
+\epsilon_1 = `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ".
+\end{equation*}
+and
+\begin{equation*}
+\zeta = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = t_r ".
+\end{equation*}
 
-$\langle q \rangle^{extract\_patterns}$\\
-$= \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{ \big\langle hsig, heqn \big\rangle \} \big\rangle $
-
-with $hname, hsig, heqn$ as in the definition of $extract\_patterns$.
-
+\begin{itemize}
+\item \underline{Common properties:}
 \begin{enumerate}
-\item Choose $q_0 = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$, $\sigma^0_v(x_i) = p_i[\sigma]$, $\sigma^0_v(x'_i) = p'_i[\sigma]$.
-\item Choose $n = 1$ and
-\begin{equation*}
-r_1 = `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ".
-\end{equation*}
-\item Choose $m = 0$.
-\item Irrelevant because $m = 0$.
-\item Choose $\sigma'$ such that $x_i[\sigma] = p_i[\sigma']$, and
-\begin{equation*}
-r_2 = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = t_r ".
-\end{equation*}
-\item The only relevant equation is $r_1$ as chosen above, for which the equivalence holds by definition.
+\item Irrelevant since $n = 1$.
+\item $\epsilon_1$ has been chosen such that its sides are equivalent, and $\zeta$ has been chosen such that $q_\zeta \sim q$ and its right-hand side is $t_r$.
+\item
+\item 
 \end{enumerate}
+
+\item \underline{Kind `B': ``Constructor extraction":}
+\begin{enumerate}
+\item Choose $q_0 = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$, $\sigma^1_v(x_i) = p_i[\sigma]$, $\sigma^1_v(x'_i) = p'_i[\sigma]$.
+\item Choose $\sigma^2_v$ such that $x_i[\sigma^1_v] = p_i[\sigma^2_v]$ and $x'_i[\sigma^1_v] = p'_i[\sigma^2_v]$.
+\item Clear because $n < 2$ and $q_\zeta = hname(p_1, ..., p_n, p'_1, ..., p'_k)$.
+\end{enumerate}
+
+\end{itemize}
 
 \end{itemize}
 
