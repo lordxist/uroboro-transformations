@@ -839,7 +839,10 @@ $ s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg 
 
 Strong bisimulation implies the weak kind of bisimulation as given by (1a), (1b) and (2). It is always shown in its stead whenever possible. The proof of each side of strong bisimulation proceeds analogously to that of (1a) (but always with $n = 1$).
 
-It's always assumed that the program that is transformed is well-typed. It also is assumed that no term is stuck, i.e., it can either be reduced or is a value. Finally, it is assumed that the program to be transformed contains no ``dead" rules, i.e., every rule must be able to be used in a ``Subst" derivation step by at least one term.
+It's always assumed that the program that is transformed is well-typed. It also is assumed that no term is stuck, i.e., it can either be reduced or is a value. Finally, it is assumed that the program to be transformed is deterministic, i.e., no term can be reduced by two or more rules, and contains no ``partially dead" rules, as defined below.
+
+\begin{definition}[Partial deadness] A rule $r$ of a program $prg$ is partially dead with repect to $prg$ iff there is a term that matches $r$ and has a strict prefix that matches another rule of $prg$.
+\end{definition}
 
 Note/TODO: The well-typedness of the transformed program will be shown in a separate section.
 
