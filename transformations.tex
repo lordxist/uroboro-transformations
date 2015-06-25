@@ -941,7 +941,11 @@ Let $\mathcal{D}$ be a derivation of $t =^? q \searrow \sigma$.
 In the following, the convention that $q_r$ is the left-hand side of the equation $r$ is used.
 
 \begin{definition}[Extraction function properties]
-Let $e$ be an argument of $extract\_helpers$, and $prg$ a deterministic program without any ``partially dead" rules; write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. $e$ is said to satisfy the extraction function properties iff it is either of kind `A' or of kind `B'. These are defined such that, for any equation $r$ of $prg$, the equations within $\langle r \rangle^e$ are
+Let $e$ be an argument of $extract\_helpers$, and $prg$ a deterministic program without any ``partially dead" rules; write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. $e$ is said to satisfy the extraction function properties iff it is either of kind `A' or of kind `B'. These are defined such that $\langle prg \rangle$ has the whole-program properties that it is
+\begin{center}
+deterministic and contains no ``partially dead" rules
+\end{center}
+and, for any equation $r$ of $prg$, the equations within $\langle r \rangle^e$ are
 \begin{equation*}
 \epsilon_1, ..., \epsilon_n, \zeta,
 \end{equation*}
