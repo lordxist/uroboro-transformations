@@ -1497,7 +1497,7 @@ with $hname$, $hsig$ as in the definition of $extract\_des$. The induction hypot
 
 \underline{Whole-program properties:} That $\langle prg \rangle$ is deterministic and contains no ``partially dead" rules follows from the statement below:
 \begin{center}
-For any equation $r$ whose left-hand side's function name is declared in $prg$:\\
+For any equation $r$ with $q_r \leq q^{ext}$ for a left-hand side $q^{ext}$ in $prg$ with either (a) $r$ itself contained in $prg$, or (b) $q_r$ destructor pattern and $t_r = hname(\langle q_r \rangle^{vars})$, the following holds:\\
 Let $t$ be a term that matches an equation $r'$ in $\langle r \rangle^e$. No prefix of $t$ matches an equation of $\langle prg \rangle$ different from $r'$.
 \end{center}
 This is now proved by induction on the structure of $q_r$.
@@ -1507,11 +1507,11 @@ TODO: the proof (or the statement above) has to be corrected, because currently 
 \begin{itemize}
 \item $q_r$ is hole pattern:
 
-Then $\langle r \rangle^e$ contains only $r$. Because $q_r$ is hole pattern, the only prefix of a term $t$ that matches $q_r$ is $t$ itself; further, $q_r$ has a function name declared in $prg$, and so has $t$. For any other equation $r^*$ of $prg$, by the rule-specific properties, the equations in $\langle r^* \rangle^e$ are either:
+Then $\langle r \rangle^e$ contains only $r$. Because $q_r$ is hole pattern, the only prefix of a term $t$ that matches $q_r$ is $t$ itself; further, $q_r$ has a function name declared in $prg$, and so has $t$. Also, because $q_r$ is hole pattern, $r$ is contained in $prg$. For any other equation $r^*$ of $prg$, by the rule-specific properties, the equations in $\langle r^* \rangle^e$ are either:
 \begin{itemize}
-\item only $r^*$: Then, when $t$ matched $r^*$ in addition to $r$, $prg$ would be nondeterministic, contrary to the assumption.
+\item only $r^*$: Then, when $t$ matched $r^*$ in addition to $r$, the rule of which $q^{ext}$ is the left-hand side would be ``partially dead" because of $r^*$.
 
-\item $\epsilon_1, ... \epsilon_n, \zeta$, with the rule-specific properties for $r^*$: All of these equations except $\epsilon_1$ have left-hand sides with function names not declared in $prg$, other than $t$, thus $t$ doesn't match them. $\epsilon_1$ is a prefix of $r^*$. Suppose that $t$ matched $\epsilon_1$ in addition to $r$. Then $t$ can be extended to a $t'$ that matches $r^*$, while $t$, a prefix of $t'$, matches $r$. This means the equation $r^*$ of $prg$ would be ``partially dead", contrary to assumption.
+\item $\epsilon_1, ... \epsilon_n, \zeta$, with the rule-specific properties for $r^*$: All of these equations except $\epsilon_1$ have left-hand sides with function names not declared in $prg$, other than $t$, thus $t$ doesn't match them. $\epsilon_1$ is a prefix of $r^*$. Suppose that $t$ matched $\epsilon_1$ in addition to $r$. Then $t$ can be extended to a $t'$ that matches $r^*$, while $t$, a prefix of $t'$, matches $r$. This means the equation $r^*$ of $prg$ would be ``partially dead" because of $r$, contrary to assumption.
 \end{itemize}
 
 \item $q_r = q'.des(p_1, ..., p_k)$:
@@ -1523,9 +1523,16 @@ Then $\langle r \rangle^e$ contains only $r$; the only copattern to consider is 
 
 First, consider its only strict prefix $q'$. Every strict prefix $t_p$ of $t$ matches $q'$; $t_p$ thus has a function name declared in $prg$. Consider an equation $r^*$ of $prg$. The equations of its transformation result $\langle r^* \rangle^e$ are $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$, with extraction function properties relative to $r^*$.
 
-If it is $n > 0$, the function names of $q_{\epsilon_2}, ..., q_{\epsilon_n}$, and $q_\zeta$ aren't declared in $prg$, other than that of $t_p$, thus it cannot match these copatterns. For the remaining copattern, $q_{\epsilon_1} < q_{r^*}$, consider the relevant input fragment of $extract\_helpers(extract\_outer\_des)$. (TODO: this fragment has to be different from the current for this to work: roughly, for any function def. with destructors: every pattern in a lhs function call needs to be replaced (``split") with its most specific counterpart appearing anywhere in the function def.) The pattern arguments of the function call of $q_{r^*}$ are the most specific of their form appearing in the function definition. This is also the case with $q_{\epsilon_1}$ and the transformed function definition. But, $q'$ is also a prefix of $q_{r^*}$, and thus, for the same reason, its pattern arguments are also the most specific appearing in the function definition. When $t_p$ matches both $q'$ and $q_{\epsilon_1}$, they are both the most specific of the form that $t_p$ can match, and thus they are the same.
+If it is $n > 0$, the function names of $q_{\epsilon^*_2}, ..., q_{\epsilon^*_n}$, and $q_{\zeta^*}$ aren't declared in $prg$, other than that of $t_p$, thus it cannot match these copatterns. The remaining copattern, $q_{\epsilon^*_1}$, is a destructor pattern, other than $q'$, thus $t_p$ doesn't match it.
 
-If, otherwise $n = 0$, it is $\zeta = r$. When $t$ matched both $r$ and $r^*$, $prg$ wouldn't be deterministic, contrary to assumption.
+If, otherwise $n = 0$, it is $\zeta^* = r^*$. When $t_p$ matched $q_{r^*}$, since it also matches $q' < q_r \leq q^{exp}$, the equation of $q^{exp}$ would be ``partially dead" because of $r^*$, contrary to assumption.
+
+Second, consider $q_r$ itself and the term $t$ that matches it. Again, consider an $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
+
+If $n > 0$, the function names of $q_{\epsilon^*_2}, ..., q_{\epsilon^*_n}$, and $q_{\zeta^*}$ aren't declared in $prg$, other than that of $t$, thus it cannot match these copatterns. What remains is $q_{\epsilon^*_1} < q_{r^*}$. When $t$ matches $q_{\epsilon^*_1}$, it matches both a prefix of $q_{r^*}$ and a prefix $q_r$ of $q^{exp}$, and these prefixes have both the most specific patterns of their forms, thus they are the same: $q_{\epsilon^*_1} = q_r$. We also know that either (a) $r$ is in $prg$, and then $r^* > r$ would be ``partially dead", contrary to assumption, or (b) $t_r = hname(\langle q_r \rangle^{vars})$, and then, since $q_{\epsilon^*_1} = q_r$ and $t_{\epsilon^*_1} = hname(\langle q_{\epsilon^*_1} \rangle^{vars})$, it is $\epsilon^*_1 = r$, also contrary to assumption.
+
+(TODO: the input fragment of the first current transformation step (of both defunc. and refunc.) has to be different from the current for this to work: roughly, for any function def. with destructors: every pattern in a lhs function call needs to be replaced (``split") with its most specific counterpart appearing anywhere in the function def.)
+(TODO: Analogous to the TODO above, the new transformation also has to change patterns in destructor arguments.)
 
 \item \underline{Case 2:} $q'$ is destructor pattern.
 
@@ -1543,11 +1550,13 @@ contains no ``partially dead" equations or equations that overlap with other equ
 \begin{equation*}
 `` h.des(p_1, ..., p_k) = t_r "
 \end{equation*}
-remains to be considered. 
+remains to be considered.
 
 First, consider its only strict prefix $h$; its function name isn't declared in $prg$. Consider an equation $r^*$ of $prg$. The equations of its transformation result $\langle r^* \rangle^e$ are $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$, with extraction function properties relative to $r^*$. This means that the function name of $q_{\epsilon^*_1}$ is declared in $prg$, unlike that of $h$, thus a term that matches it cannot match $h$. $h$ cannot match a term that matches $q_{\epsilon^*_i}$, for any $i \in \{2, ..., n\}$, because those are all destructor patterns. Finally, $h$ also cannot match a term that matches $q_{\zeta^*}$, because either (a) $\zeta^* = r^*$, and then $q_{\zeta^*}$ has a function name declared in $prg$, or (b) $q_{\zeta^*}$ is a destructor pattern.
 
-Second, consider $h.des(p_1, ..., p_k)$ itself. Again, consider the equations $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$ of the transformation result of an equation $r^*$. The function name of $q_{\epsilon_1}$ is declared in $prg$, unlike that of $h$. If the function name of one of $q_{\epsilon_2}, ..., q_{\epsilon_n}, q_\zeta$ were equal to that of $h$, $q'.des(p_1, ..., p_k) = q_r$ would be a prefix of $q_{r^*}$. It follows that $r^*$ would be ``partially dead" in $prg$ because of $r$, contrary to assumption.
+Second, consider $h.des(p_1, ..., p_k)$ itself. Again, consider the equations $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$ of the transformation result of an equation $r^*$. The function name of $q_{\epsilon^*_1}$ is declared in $prg$, unlike that of $h$. If the function name of one of $q_{\epsilon^*_2}, ..., q_{\epsilon^*_n}, q_{\zeta^*}$ were equal to that of $h$, $q'.des(p_1, ..., p_k) = q_r$ would be a prefix of $q_{r^*}$. It has the most specific patterns of its form inside its function definition, and thus $h.des(p_1, ..., p_k)$ has the most specific patterns of its form inside its function definition.
+
+The same holds for $q_{r^*}$ and the relevant equation $r'$ in $\langle r^* \rangle^e$. It follows that $h.des(p_1, ..., p_k)$ \textit{is} the left-hand side of $r'$. For all $r'$ except $\zeta^*$, since for these two equations the left-hand sides are equivalent to the right-hand sides, and the right-hand sides are hole patterns, the right-hand sides and thus the rules have to be the same. For $\zeta^*$, we know that its left-hand side is identical to $h.des(p_1, ..., p_k) = q_\zeta$, for the $\zeta$ relative to $r$, and thus the left-hand sides of $r$ and $r^*$ are identical. But then it would be $q_{r^*} \leq q^{ext}$, and thus $r^*$ would be ``partially dead" because of the equation of $q^{ext}$, contrary to assumption.
 
 \end{itemize}
 
