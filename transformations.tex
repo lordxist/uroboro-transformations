@@ -1673,7 +1673,9 @@ TODO (very similar to $extract\_outer\_des$)
 
 \end{proof}
 
-\begin{proof}[Proof for $extract\_patterns$] This extraction function is of Kind `B' (``Constructor extraction"). The following cases need to be distinguished.
+\begin{proof}[Proof for $extract\_patterns$] This extraction function is of Kind `B' (``Constructor extraction"). First, the rule-specific properties are proved, then the whole-program properties.
+
+\underline{Rule-specific properties:} The following cases need to be distinguished.
 
 \begin{itemize}
 
@@ -1688,8 +1690,6 @@ Choose $n = 0$ and $\zeta = r$. The properties are now shown one by one.
 \begin{enumerate}
 \item Clear.
 \item Clear because $n = 0$ and $\zeta = r$.
-\item
-\item 
 \end{enumerate}
 
 \item \underline{Kind `B': ``Constructor extraction":} Nothing to show since $n = 0$.
@@ -1731,6 +1731,47 @@ and
 \end{enumerate}
 
 \end{itemize}
+
+\end{itemize}
+
+\underline{Whole-program properties:} For every equation $r$ of $prg$, it is shown that a term that matches an equation of $\langle r \rangle^e$ matches no other equation of $\langle prg \rangle$. The following cases need to be distinguished.
+
+\begin{itemize}
+
+\item \underline{Case 1}: $q_r$ is hole pattern:
+
+Then $\langle r \rangle^e$ contains only $r$. Consider another equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$. If $n > 0$, all of these except $\epsilon^*_1$ have left-hand sides with function names not declared in $prg$, other than $r$, and $q_{\epsilon^*_1}$ is destructor pattern, also unlike $r$. Otherwise, if $n = 0$, it is $\zeta^* = r^*$, and if a term matched both $r^*$ and $r$, $prg$ would be nondeterministic, contrary to assumption.
+
+\item \underline{Case 2}: $q_r = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
+
+Then $\langle r \rangle^e$ contains only $r$. Consider another equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
+
+If $n > 0$, all of these except $\epsilon^*_1$ have left-hand sides with function names not declared in $prg$, other than $r$. And $q_{\epsilon^*_1}$ is simply $q_{r^*}$ with its patterns replaced with variables. If a term matched both $q_{\epsilon^*_1}$ and $q_r$, since both have only variables as patterns, they would be identical. Thus $q_{r^*}$ and $q_r$ would overlap and $prg$ would be nondeterministic, contrary to assumption.
+
+Otherwise, if $n = 0$, it is $\zeta^* = r^*$. And if a term matched both $r^*$ and $r$, $prg$ would be nondeterministic, contrary to assumption.
+
+\item \underline{Case 3}: $q_r = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
+
+Then $\langle r \rangle^e$ contains only
+\begin{equation*}
+\epsilon_1 = ``fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hfun(x_1, ..., x_n, x'_1, ..., x'_k)"
+\end{equation*}
+and
+\begin{equation*}
+\zeta = ``hfun(p_1, ..., p_n, p'_1, ..., p'_k) = t_r".
+\end{equation*}
+
+First, consider the first equation $\epsilon_1$. Consider an equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
+
+If $n > 0$, all of these except $\epsilon^*_1$ have left-hand sides with function names not declared in $prg$, unlike $\epsilon_1$. When a term $t$ matches $q_{\epsilon_1}$ and $q_{\epsilon^*_1}$, it follows that $q_{\epsilon_1} = q_{\epsilon^*_1}$, since, for both equations, all of their patterns are variables. But the right-hand side of $\epsilon^*_1$ is built from its left-hand side in the same way that the right-hand side of $\epsilon_1$ is built from the left-hand side of $\epsilon_1$, and thus $\epsilon^*_1$ and $\epsilon_1$ are the same.
+
+If otherwise $n = 0$, it is $\zeta^* = r^*$. A term $t$ that matches $\epsilon_1$ also matches $r$, because $q_{\epsilon_1}$ is simply $q_r$ with all of its patterns replaced by variables. If $t$ matched $\zeta^* = r^*$ as well, $prg$ would be nondeterministic, contrary to assumption.
+
+Second, consider the other equation contained in $\langle r \rangle^e$, $\zeta$. Again, consider an equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
+
+If $n > 0$, that is, specifically for this extraction function, it is $n = 1$, and of the two equations in $\langle r^* \rangle^e$, only $\zeta^*$ needs to be considered, because $\epsilon^*_1$ has a function name declared in $prg$, unlike $\zeta$. For any term $t = hfun(t_1, ..., t_n, t'_1, ..., t'_k)$ that matches $q_\zeta$ there is a term $t^0 = fun(t_1, ..., t_n).des(t'_1, ..., t'_k)$ that matches $q_r$. If $t$ matched $q_{\zeta^*}$, as well, $t^0$ would also match $q_{r^*}$ in the same way, and thus $prg$ would be nondeterministic, contrary to assumption.
+
+If otherwise $n = 0$, it is $\zeta^* = r^*$. Thus $q_{\zeta^*}$ has a function name declared in $prg$, unlike $\zeta$.
 
 \end{itemize}
 
