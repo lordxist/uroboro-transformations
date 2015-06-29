@@ -1779,7 +1779,9 @@ If otherwise $n = 0$, it is $\zeta^* = r^*$. Thus $q_{\zeta^*}$ has a function n
 
 \begin{proof}[Proof for $extract$]
 
-The extraction function is of Kind `B'. The properties are strengthened, as follows below, and then proved by induction on the number $n_c$ of constructor patterns within the copattern that is the left-hand side of the argument of $extract$.
+The extraction function is of Kind `B' (``Constructor extraction"). First, the rule-specific properties are proved, then the whole-program properties.
+
+\underline{Rule-specific properties:} The properties are strengthened, as follows below, and then proved by induction on the number $n_c$ of constructor patterns within the copattern that is the left-hand side of the argument of $extract$.
 
 \underline{Induction-specific strengthening:}
 
@@ -1801,8 +1803,6 @@ Choose $n = 0$, $\zeta = r$. The properties are now shown one by one.
 \begin{enumerate}
 \item Clear.
 \item Clear because $n = 0$ and $\zeta = r$.
-\item
-\item 
 \end{enumerate}
 
 \item \underline{Kind `B': ``Constructor extraction":} Nothing to show since $n = 0$.
@@ -1822,8 +1822,6 @@ By the induction hypothesis, we have the property for $(q_r)^{-con}$. That is, w
 \begin{enumerate}
 \item Irrelevant since $n = n'+1 > 0$.
 \item It is $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, thus for these the property follows from the induction hypothesis. It is $\epsilon_n = \zeta'$, and by the induction hypothesis, it is $t_{\zeta'} = hname((q_r)^{-con}_{vars^+})$. By the strengthening of the induction hypothesis, $q_{\zeta'}$ is either $q_{heqn'} := hname((q_r)^{-con}_{vars^-})$ or equivalent to $(q_r)^{-con}$. In both cases it is equivalent to $hname((q_r)^{-con}_{vars^+})$.
-\item
-\item 
 \end{enumerate}
 
 \item \underline{Kind `B': ``Constructor extraction":}
@@ -1844,6 +1842,34 @@ Finally, choose $\sigma^{n+1}_v$ as follows: Let $x^0$ be the variable at the fr
 
 \item \underline{Induction-specific strengthening:} $\zeta$ has been chosen precisely to satisfy the strengthening.
 \end{itemize}
+
+\end{itemize}
+
+\underline{Whole-program properties:} For every equation $r$ with $q_r = (...((q_{r'})^{-con})^{-con}...)^{-con}$ for an $r'$ of $prg$, it is shown that a term that matches an equation of $\langle r \rangle^e$ matches no other equation of $\langle prg \rangle$. The proof is by induction on the number of constructor patterns $n_c$ in $q_r$.
+
+\begin{itemize}
+
+\item $n_c = 0$.
+
+Then $r$ is the only equation in $\langle r \rangle^e$. Consider another equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
+
+If $n > 0$, all of these except $\epsilon^*_1$ have left-hand sides with function names not declared in $prg$, unlike $r$. $q_r$ has no constructors, as has $q_{\epsilon^*_1}$. If a term matched both, they thus would be the same, and thus $(...((q_{r'})^{-con})^{-con}...)^{-con} = q_r = q_{\epsilon^*_1} = (...((q_{r^*})^{-con})^{-con}...)^{-con}$. This means that $r'$ and $r^*$ would overlap, thus $prg$ would be nondeterministic, contrary to assumption.
+
+If otherwise $n = 0$, it would be $\zeta^* = r^*$, and $\zeta^*$ would contain no constructors. If a term matched both $r$ and $\zeta^* = r^*$, they thus would be the same, contrary to assumption.
+
+\item $n_c = n'_c + 1$. Then it is
+\begin{equation*}
+\langle r \rangle^{extract} = \langle `` (q_r)^{-con} = hname((q_r)^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}.
+\end{equation*}
+By the induction hypothesis, the equations in
+\begin{equation*}
+\langle `` (q_r)^{-con} = hname((q_r)^{-con}_{vars^+}) " \rangle^{extract}
+\end{equation*}
+have the desired property. It remains to be shown that a term $t$ that matches $heqn$ doesn't match another equation of $\langle prg \rangle$. Consider such an equation; it is contained in $\langle r^* \rangle^e$ for an $r^*$ of $prg$, that is, it is one of $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
+
+If $n > 0$, the function name of $q_{\epsilon^*_1}$ is declared in $prg$, unlike that of $q_{heqn}$. Suppose a term matched both (a) one of $\epsilon^*_2, ..., \epsilon^*_n, \zeta^*$, and (b) $heqn$. Especially, this would mean that the function names of these two left-hand sides are the same, and this means that $(q_r)^{-con} = (...((q_{r^*})^{-con})^{-con}...)^{-con}$. But from this, since $q_r = (...((q_{r'})^{-con})^{-con}...)^{-con}$, it would follow that $q_{r'}$ and $q_{r^*}$ overlap, thus $prg$ would be nondeterministic, contrary to assumption.
+
+If otherwise $n = 0$, it would be $\zeta^* = r^*$, and $q_{r^*}$ has a function name declared in $prg$, unlike $q_{heqn}$.
 
 \end{itemize}
 
