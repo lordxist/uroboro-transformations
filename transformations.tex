@@ -133,6 +133,48 @@ where
 & \langle `` q = t ", H \rangle^{extract\_des} = \big\langle `` q = t ", H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
 \end{alignat*}
 
+\item Both the defunctionalization and the refunctionalization described in the sections below require one shared preprocessing step, $align\_patterns$. This step is necessary for destructor extraction to work correctly.
+
+For programs, $align\_patterns$ is defined as follows.
+\begin{alignat*}{4}
+\langle prg \rangle^{align\_patterns} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && &&\quad \{ `` q' = t " ~ | ~ q' \in Q_q, `` q = t " \in eqns \} \} \\
+& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
+& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
+\end{alignat*}
+with
+\begin{equation*}
+Q_{fun(p_1, ..., p_n)} = \{fun(p_1, ..., p_n)\}
+\end{equation*}
+and
+\begin{equation*}
+Q_{q^0.des(p_1, ..., p_k)} = \langle \overline{q^0} \rangle^{align_patterns}.des(p_1, ..., p_k)
+\end{equation*}
+with
+\begin{equation*}
+\overline{fun(p_1, ..., p_n)} = fun(\_, ..., \_)
+\end{equation*}
+and
+\begin{equation*}
+\overline{q^0.des(p_1, ..., p_k)} = \overline{q^0}.des(\_, ..., \_)
+\end{equation*}
+Here, the $\_$ represent holes which are used to describe generic forms of copatterns. For instance, one generic form of $fun(p_1, ..., p_n).des(p_1, ..., p_k)$ is $fun(\_, ..., \_).des(\_, ..., \_)$. What precisely a generic form for a copattern is can be simply defined inductively, starting with setting $\_$ as being a generic form for any pattern.
+
+TODO: the rest of the definition
+
+...
+
+\begin{equation*}
+\langle \mathcal{C} \rangle^{a\_p} = \bigcup_{con} \{con(t_1, ..., t_n) ~ | ~ t_i \in \langle \mathcal{C}[con(\_, ..., \_, [], \_, ..., \_)] \rangle^{a\_p} \},
+\end{equation*}
+if $\exists$ lhs in $def$ with a prefix of the form of $\mathcal{C}[con(\_, ..., \_)$,
+\begin{equation*}
+\langle \mathcal{C} \rangle^{a\_p} = \{x\},
+\end{equation*}
+otherwise.
+
+...
+
 \item For the examples below the following data types will be used (as if they were in a standard library):
 \begin{lstlisting}
 
