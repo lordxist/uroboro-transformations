@@ -2030,9 +2030,9 @@ fun(t^0_1, ..., t^0_{n_0}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_
 \end{equation*}
 $\widetilde{\mathcal{E}}[\widetilde{s'}]$ has the form
 \begin{equation*}
-fun'(\widetilde{t^0_1}, ..., \widetilde{t^0_{n'_0}}).des'_1(\widetilde{t^0_{n'_0 + 1}}, ..., \widetilde{t^0_{n'_1}})...des'_k(\widetilde{t^0_{n'_{k-1} +1}}, ..., \widetilde{t^0_{n_0}}).des_1(\widetilde{t^1_1} ...,\widetilde{ t^1_{n_1}})...des_k(\widetilde{t^k_1}, ..., \widetilde{t^k_{n_k}})
+fun'(s^0_1, ..., s^0_{n'_0}).des'_1(s^0_1, ..., s^0_{n'_1})...des'_{k'}(s^0_1, ..., s^0_{n'_{k'}}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k}),
 \end{equation*}
-Thus, it actually is an evaluation context in $prg$, i.e., all of its immediate subterms left of the hole are irreducible in $prg$. To see this, consider such the highest-level subterms that can be possibly be reduced (Note: this is possible under the first proposed change, because then prefixes can't be reduced using the congruence rule); those are precisely the $\widetilde{t^i_j}$. Suppose it reduced in $prg$, then, by Lemma 4 (TODO: prove such a lemma), $t^i_j$ would reduce in $\langle prg \rangle$, contrary to the fact that it is a value in $prg$ because it is to the left of the hole in $\mathcal{E}$.
+where each of the $s^i_j$ is equivalent to exactly one of the $t^0_i$. Thus, it actually is an evaluation context in $prg$, i.e., all of its immediate subterms left of the hole are irreducible in $prg$. To see this, consider such the highest-level subterms that can be possibly be reduced (Note: this is possible under the first proposed change, because then prefixes can't be reduced using the congruence rule); those are precisely the $s^i_j$. Suppose it reduced in $prg$, then, by Lemma 4 (TODO: prove such a lemma), the equivalent term among the $t^0_i$ would reduce in $\langle prg \rangle$, contrary to the fact that it is a value in $prg$ because it is to the left of the hole in $\mathcal{E}$.
 
 \end{enumerate}
 
