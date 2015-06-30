@@ -158,22 +158,24 @@ and
 \begin{equation*}
 \overline{q^0.des(p_1, ..., p_k)} = \overline{q^0}.des(\_, ..., \_)
 \end{equation*}
-Here, the $\_$ represent holes which are used to describe generic forms of copatterns. For instance, one generic form of $fun(p_1, ..., p_n).des(p_1, ..., p_k)$ is $fun(\_, ..., \_).des(\_, ..., \_)$. What precisely a generic form for a copattern is can be simply defined inductively, starting with setting $\_$ as being a generic form for any pattern.
+Here, the $\_$ represent holes which are used to describe generic forms of copatterns. For instance, one generic form of $fun(p_1, ..., p_n).des(p_1, ..., p_k)$ is $fun(\_, ..., \_).des(\_, ..., \_)$. The generic forms for a given copattern can be simply defined inductively, starting with setting $\_$ as being a generic form for any pattern.
 
-TODO: the rest of the definition
+For generic forms of copatterns, $align\_patterns$ is defined as follows. Let $q_\_ = fun(\_, ..., \_).des_1(\_, ..., \_)...des_k(\_, ..., \_)$, and $q^i_\_$ be the context that obtains by replacing the $i$-th hole in $q_\_$ with another kind of hole $[]$ used for plugging other contexts into it.
+\begin{multline*}
+\langle q_\_ \rangle^{align\_patterns} = \\
+fun(\langle q^1_\_ \rangle^{a\_p}, ..., \langle q^{n_0}_\_ \rangle^{a\_p}).des_1(\langle q^{n_0 + 1}_\_ \rangle^{a\_p}, ..., \langle q^{n_1}_\_ \rangle^{a\_p})...des_k(\langle q^{n_{k-1} + 1}_\_ \rangle^{a\_p}, ..., \langle q^{n_k}_\_ \rangle^{a\_p})
+\end{multline*}
 
-...
+Finally, $a\_p$ for such contexts is defined as follows.
 
 \begin{equation*}
 \langle \mathcal{C} \rangle^{a\_p} = \bigcup_{con} \{con(t_1, ..., t_n) ~ | ~ t_i \in \langle \mathcal{C}[con(\_, ..., \_, [], \_, ..., \_)] \rangle^{a\_p} \},
 \end{equation*}
-if $\exists$ lhs in $def$ with a prefix of the form of $\mathcal{C}[con(\_, ..., \_)$,
+if $\exists$ lhs in $def$ with a prefix of the generic form $\mathcal{C}[con(\_, ..., \_)]$,
 \begin{equation*}
 \langle \mathcal{C} \rangle^{a\_p} = \{x\},
 \end{equation*}
 otherwise.
-
-...
 
 \item For the examples below the following data types will be used (as if they were in a standard library):
 \begin{lstlisting}
