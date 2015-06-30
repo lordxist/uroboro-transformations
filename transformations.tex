@@ -1022,6 +1022,7 @@ for an $n \geq 0$, with properties partially specific to the kind of $e$. First 
 \begin{enumerate}
 \item If $n = 0$, then $\zeta = r$.
 \item For $i \in \{1, ..., n\}$ it is $q_{\epsilon_i} \sim t_{\epsilon_i}$. Further, it is $q_\zeta \sim q_r$ and $t_\zeta = t_r$.
+\item For any term $t$ matching one of $\epsilon_1, ..., \epsilon_n$ returning a $\sigma$, if the immediate subterms of $t$ are values, so are the immediate subterms of the respective $t_{\epsilon_i}[\sigma]$.
 \end{enumerate}
 
 \item \underline{Kind `A': ``Destructor extraction":} If $n \geq 1$ it holds that:
@@ -1327,7 +1328,7 @@ in the sequence above can only use equations of Type 2. Note that from this it i
 \begin{itemize}
 \item $i = 0$: The immediate subterms of $s^0$ are values. Thus it can only reduce by the ``Subst" rule. Suppose there was an equation $r'$ in $\langle prg \rangle$ of Type 1, with an equivalent $r$ in $prg$, such that $s^0$ matched $q_{r'}$. $s \sim s^0$ is a value in $prg$, thus it doesn't match $r$. Especially, this means that $s \neq q_r[\sigma]$ for \textit{every} substitution $\sigma$. For terms of $prg$, it holds that, if they aren't equal, they aren't equivalent, thus $s \not\sim q_r[\sigma]$ for every $\sigma$. But, as supposed, $s^0$ matches $q_{r'}$, and thus $s^0 = q_{r'}[\sigma]$ for some $\sigma$. Since $r'$ has Type 1, it is $q_{r'} \sim q_r$, and from this it follows that $s \sim s^0 \sim q_r[\sigma]$, a contradiction.
 
-\item $i = i' + 1$: Each previous reduction step used the ``Subst" rule for an equation of Type 2. These preserve the property of a term that its immediate subterms are values. (TODO: Prove this from the extraction function properties, if possible, or prove it for the concrete transformations. -- A quick check showed that each of the Type 2 equations for any transformation does this.) Thus $s^i$ reduces by the ``Subst" rule, as well. Suppose there was an equation $r'$ in $\langle prg \rangle$ of Type 1, with an equivalent $r$ in $prg$, such that $s^i$ matched $q_{r'}$.
+\item $i = i' + 1$: Each previous reduction step used the ``Subst" rule for an equation of Type 2. By the third common extraction function property, these preserve the property of a term that its immediate subterms are values. Thus $s^i$ reduces by the ``Subst" rule, as well. Suppose there was an equation $r'$ in $\langle prg \rangle$ of Type 1, with an equivalent $r$ in $prg$, such that $s^i$ matched $q_{r'}$.
 By the induction hypothesis, it is $s^{i} \sim s^{i'}$. Further, it is $s^i \sim s^{i'} \sim ... \sim s^0$. $s^0$ doesn't match $q_{r'}$, and it is $s^0 \neq q_{r'}[\sigma]$ for every $\sigma$ and $s^0 \not\sim q_{r'}[\sigma]$. But, as supposed, $s^i$ matches $q_{r'}$, and thus $s^i = q_{r'}[\sigma]$ for some $\sigma$. It follows that $s^0 \sim s^i = q_{r'}[\sigma]$, a contradiction.
 
 \end{itemize}
@@ -1516,6 +1517,7 @@ The properties are now shown one by one.
 \begin{enumerate}
 \item Choose $n = 0$, $\zeta = r$.
 \item Clear because $n = 0$ and $\zeta = r$.
+\item Clear because $n = 0$.
 \end{enumerate}
 
 \item \underline{Kind `A':} Nothing to show because $n = 0$.
@@ -1543,6 +1545,7 @@ with $hname$, $hsig$ as in the definition of $extract\_des$. The induction hypot
 \begin{enumerate}
 \item Irrelevant since $n = n' + 1 \geq 0 + 1$.
 \item By the induction hypothesis, it is $q_{\epsilon'_i} \sim t_{\epsilon'_i}$, and it has been chosen $\epsilon_i = \epsilon'_i$, for $i \in \{1, ..., n'\}$. $n$ has been chosen as $n' + 1$, and $\epsilon_n$ as $\zeta'$. By the induction hypothesis, $q_\zeta' \sim q' \sim hname(\langle q' \rangle^{vars}) \sim t_\zeta'$. Finally, $\zeta$ has been chosen such that its left-hand side is equivalent to $q_r$ and that its right-hand side is $t_r$.
+\item It has been chosen $\epsilon_i = \epsilon'_i$, for $i \in \{1, ..., n-1\}$, thus, for these equations, we have the property by the induction hypothesis. It is $t_{\epsilon_n} = t_{\zeta'} = hname(\langle q' \rangle^{vars})$. When a term $t$, that substitutes only with values, matches $q_{\epsilon_n}$, it is $t = q_{\epsilon_n}[\sigma]$ for some $\sigma$ that substitutes only with values. It follows that $hname(\langle q' \rangle^{vars})[\sigma]$ only has value subterms, as well.
 \end{enumerate}
 
 \item \underline{Kind `A':}
@@ -1750,6 +1753,7 @@ Choose $n = 0$ and $\zeta = r$. The properties are now shown one by one.
 \begin{enumerate}
 \item Clear.
 \item Clear because $n = 0$ and $\zeta = r$.
+\item Clear because $n = 0$.
 \end{enumerate}
 
 \item \underline{Kind `B': ``Constructor extraction":} Nothing to show since $n = 0$.
@@ -1779,8 +1783,7 @@ and
 \begin{enumerate}
 \item Irrelevant since $n = 1$.
 \item $\epsilon_1$ has been chosen such that its sides are equivalent, and $\zeta$ has been chosen such that $q_\zeta \sim q$ and its right-hand side is $t_r$.
-\item
-\item 
+\item Consider a term $t$ with only irreducible subterms, that matches $q_{\epsilon_1}$. It is $t = q_{\epsilon_1}[\sigma]$ for some $\sigma$ that substitutes only with values. Further, it is $t_{\epsilon_1}[\sigma] = hname(x_1, ..., x_n, x'_1, ..., x'_k)[\sigma]$, and this has only values as subterms.
 \end{enumerate}
 
 \item \underline{Kind `B': ``Constructor extraction":}
@@ -1863,6 +1866,7 @@ Choose $n = 0$, $\zeta = r$. The properties are now shown one by one.
 \begin{enumerate}
 \item Clear.
 \item Clear because $n = 0$ and $\zeta = r$.
+\item Clear because $n = 0$.
 \end{enumerate}
 
 \item \underline{Kind `B': ``Constructor extraction":} Nothing to show since $n = 0$.
@@ -1882,6 +1886,7 @@ By the induction hypothesis, we have the property for $(q_r)^{-con}$. That is, w
 \begin{enumerate}
 \item Irrelevant since $n = n'+1 > 0$.
 \item It is $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, thus for these the property follows from the induction hypothesis. It is $\epsilon_n = \zeta'$, and by the induction hypothesis, it is $t_{\zeta'} = hname((q_r)^{-con}_{vars^+})$. By the strengthening of the induction hypothesis, $q_{\zeta'}$ is either $q_{heqn'} := hname((q_r)^{-con}_{vars^-})$ or equivalent to $(q_r)^{-con}$. In both cases it is equivalent to $hname((q_r)^{-con}_{vars^+})$.
+\item It is $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, thus for these the property follows from the induction hypothesis. It is $t_{\epsilon_n} = t_{\zeta'} = hname((q_r)^{-con}_{vars^+})$, thus all of its immediate subterms are variables. Consider a term $t$ with only irreducible immediate subterms that matches $q_{\epsilon_n}$; it is $t = q_{\epsilon_n}[\sigma]$ for a $\sigma$ that substitutes only with values. Thus $hname((q_r)^{-con}_{vars^+})[\sigma]$ only has irreducible immediate subterms, as well.
 \end{enumerate}
 
 \item \underline{Kind `B': ``Constructor extraction":}
