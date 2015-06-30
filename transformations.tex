@@ -1040,7 +1040,8 @@ In the following, the convention that $q_r$ is the left-hand side of the equatio
 \begin{definition}[Extraction function properties]
 Let $e$ be an argument of $extract\_helpers$, and $prg$ a deterministic program without any ``partially dead" rules; write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. $e$ is said to satisfy the extraction function properties iff it is either of kind `A' or of kind `B'. These are defined such that $\langle prg \rangle$ has the whole-program properties that it is
 \begin{center}
-deterministic and contains no ``partially dead" rules
+deterministic and contains no ``partially dead" rules\\
+(Note: this is unnecessary under the first proposed change to the semantics)
 \end{center}
 and, for any equation $r$ of $prg$, the equations within $\langle r \rangle^e$ are
 \begin{equation*}
@@ -1114,6 +1115,8 @@ First, the initial part of this sequence is constructed. The arguments $t^i_j$, 
 \end{equation*}
 Such an $\mathcal{E}$ depends on the $i$ and $j$; it is constructed from $s$ by replacing the arguments to the left of $t^i_j$ with their corresponding values, as constructed for the previous steps, and leaving a hole for $t^i_j$. It remains to be shown why $\mathcal{E} = fun(...).des_1(...)...des_i(...[]...)...des_k(...)$ is actually a reduction context. I.e., why is it not possible to reduce $fun(...).des_1(...)...des_{i-1}(...)$? The arguments of $fun$ and of the destructors are values by construction. $fun(...).des_1(...)...des_l(...)$, for $l \in \{0, ..., i-1\}$, doesn't match any equation of $\langle prg \rangle$ because $\zeta$ would be ``partially dead" otherwise. This is because then there would be a term that matches both a prefix of $q_\zeta$ and this equation's left-hand side.
 
+(Note: Under the first proposed change for the semantics: The above argument can replaced by simply stating that it can be directly seen that $\mathcal{E}$ is a reduction context, because of its form and the $(t^i_j)_v$ being values.) 
+
 Second, the final step of the sequence is derived. This is done by using the ``Subst" rule for $\zeta$.
 
 \item $n \geq 1$. First, the prefixes of $s = q_r[\sigma]$ are converted. Set $q_0 := q_r$, $\sigma^0_v := \sigma$, and $q_i := q_r[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_i} \leftarrow t_{\epsilon_i}]$. By property 1 of kind `A' there are equations $\epsilon_1, ..., \epsilon_n$ with $q_{\epsilon_1} \leq q_0, q_{\epsilon_2} \leq q_1, ..., q_{\epsilon_n} \leq q_{n-1}$. From this we have the sequence
@@ -1146,6 +1149,8 @@ The initial part of this sequence is concerned with reducing the $t^i_j$ to equi
 \mathcal{E}[t^i_j] \longrightarrow \mathcal{E}[(t^i_j)_v]
 \end{equation*}
 with $\mathcal{E}$ constructed as in Kind `A'. It will now be shown that $\mathcal{E}$ actually is a reduction context. Like in the proof for Kind `A' this is because $fun(...).des_1(...)...des_l(...)$ doesn't match any equation of $\langle prg \rangle$, for $l \in \{0, ..., i-1\}$. And again, this is because then $\zeta$ would be ``partially dead".
+
+(Note: Under the first proposed change for the semantics: Again, the above argument can replaced by simply stating that it can be directly seen that $\mathcal{E}$ is a reduction context, because of its form and the $(t^i_j)_v$ being values.) 
 
 Finally, the final step of the sequence is derived. This is done by using the ``Subst" rule for $\zeta$.
 
