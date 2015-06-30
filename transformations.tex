@@ -1950,6 +1950,61 @@ If otherwise $n = 0$, it would be $\zeta^* = r^*$, and $q_{r^*}$ has a function 
 
 \subsection{Proofs of (2)}
 
+%%-- under construction
+
+\begin{proposition}
+
+Let $e$ be any helper extraction function with the extraction function properties. Then let $trans$ be a transformation which doesn't affect input terms, and for programs, is defined as $extract\_helpers(e)$.
+
+Statement (2) holds for $trans$.
+
+\begin{proof}[Proof of (2)] By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$, with $s \not\sim t$.
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$\mathcal{D}_{\textrm{PM}}$}
+\UnaryInfC{$\langle s \rangle =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
+\UnaryInfC{$s \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
+\end{prooftree}
+
+with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+By the extraction function properties, since $s \not\sim t$, it can only be the case that $`` q = s' " = \zeta$ for the $\zeta$ in $\langle r \rangle^e$. Choose $\widetilde{s} := q_r[\sigma]$ and $\widetilde{t} := t_r[\sigma]$.
+
+\item \textbf{``Cong" case}:
+
+\begin{prooftree}
+\AxiomC{$s' \longrightarrow_{\langle prg \rangle} t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$}
+\end{prooftree}
+
+with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$.
+
+By the induction hypothesis we have $\widetilde{s'} \longrightarrow_{prg} \widetilde{t'}$, for some $\widetilde{s'} \sim s'$ and $\widetilde{t'} \sim t'$. Apply the congruence rule to get the desired
+\begin{equation*}
+s = \mathcal{E}[s'] \sim \widetilde{\mathcal{E}}[\widetilde{s'}] \longrightarrow_{prg} \widetilde{\mathcal{E}}[\widetilde{t'}] \sim \mathcal{E}[t'] = t,
+\end{equation*}
+for an $\widetilde{\mathcal{E}} \sim \mathcal{E}$ with all names declared in $prg$, which, for each extraction function, exists by the definition of its equivalence relation. Also by this definition, $\widetilde{\mathcal{E}}$ is unique, and for a $\mathcal{E}[s']$ of the form
+\begin{equation*}
+fun(t^0_1, ..., t^0_{n_0}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k})
+\end{equation*}
+$\widetilde{\mathcal{E}}[\widetilde{s'}]$ has the form
+\begin{equation*}
+fun'(\widetilde{t^0_1}, ..., \widetilde{t^0_{n'_0}}).des'_1(\widetilde{t^0_{n'_0 + 1}}, ..., \widetilde{t^0_{n'_1}})...des'_k(\widetilde{t^0_{n'_{k-1} +1}}, ..., \widetilde{t^0_{n_0}}).des_1(\widetilde{t^1_1} ...,\widetilde{ t^1_{n_1}})...des_k(\widetilde{t^k_1}, ..., \widetilde{t^k_{n_k}})
+\end{equation*}
+Thus, it actually is an evaluation context in $prg$, i.e., all of its immediate subterms left of the hole are irreducible in $prg$. To see this, consider such the highest-level subterms that can be possibly be reduced (TODO: this depends upon the reduction semantics, they have to be changed to not admit reduction of prefixes in the congruence rule); those are precisely the $\widetilde{t^i_j}$. Suppose it reduced in $prg$, then, by Lemma 4 (TODO: prove such a lemma), $t^i_j$ would reduce in $\langle prg \rangle$, contrary to the fact that it is a value in $prg$ because it is to the left of the hole in $\mathcal{E}$.
+
+\end{enumerate}
+
+\end{proof}
+
+\end{proposition}
+
+%%--
+
 TODO: momentarily contains the old versions of some proofs of (1a), (1b) and other old versions that all still need to be reworked
 
 \subsubsection{Eliminate multiple destructors}
