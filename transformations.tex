@@ -135,6 +135,27 @@ where
 
 \item Both the defunctionalization and the refunctionalization described in the sections below require one shared preprocessing step, $align\_patterns$. This step is necessary for destructor extraction to work correctly.
 
+The purpose of $align\_patterns$ is to bring the patterns inside the copatterns within one function definition to the same level of specification. Consider the following example:
+
+\begin{lstlisting}
+
+fun().d1(c1()).d1() = t_1
+fun().d1(c2()).d1() = t_2
+fun().d1(x).d2() = t_3
+
+\end{lstlisting}
+
+Here, the third equation's left-hand side has a catch-all pattern (variable) in its first destructor call $d1$. The first destructor in the first and second equations' left-hand sides is also $d1$, but the patterns there are the constructors $c1()$ and $c2()$, respectively; they have a higher level of specification than the catch-all pattern. For destructor extraction to work correctly, the catch-all pattern therefore must be split. Such splitting steps are what $align\_patterns$ is doing. The result of $align\_patterns$ applied to the above function definition is:
+
+\begin{lstlisting}
+
+fun().d1(c1()).d1() = t_1
+fun().d1(c2()).d1() = t_2
+fun().d1(c1()).d2() = t_3
+fun().d1(c2()).d2() = t_3
+
+\end{lstlisting}
+
 For programs, $align\_patterns$ is defined as follows.
 \begin{alignat*}{4}
 \langle prg \rangle^{align\_patterns} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
