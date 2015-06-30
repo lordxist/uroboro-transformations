@@ -782,7 +782,13 @@ if the immediate subterms of $t$ are values:
 \begin{framed}
 \textbf{TODO: Proposed changes}
 \begin{itemize}
-\item TODO 1: proposed change for preliminary version: not the immediate subterms, but the arguments of the function and the destructors. Especially, this means that prefixes can't be reduced, but this may be desirable in some cases, which brings us to TODO 2.
+\item TODO 1: proposed change for preliminary version: not the immediate subterms, but the arguments of the function and the destructors. And the evaluation context is
+\begin{alignat*}{3}
+&\mathcal{E} &::=  ~& [] ~ | ~ fun(v^*, \mathcal{E}, t^*) ~ | ~ con(v^*, \mathcal{E}, t^*) ~ | ~ \mathcal{E}_{vcall}.des(t^*) ~ | ~ vcall.des(v^*, \mathcal{E}, t^*)&\\
+&\mathcal{E}_{vcall} &::= &fun(v^*, \mathcal{E}, v^*) ~ | ~ \mathcal{E}_{vcall}.des(v^*) ~ | ~ vcall.des(v^*, \mathcal{E}, v^*)&\\
+&vcall &::= & fun(v^*) ~ | ~ vcall.des(v^*)&
+\end{alignat*}
+Especially, this means that prefixes can't be reduced, but this may be desirable in some cases, which brings us to TODO 2.
 \item TODO 2: proposed change for final version -- this version needs changes in the extraction functions --: the most specific pattern that is matched by any prefix is used.
 
 \underline{Example:}
