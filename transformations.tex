@@ -38,6 +38,8 @@
 \usepackage{bussproofs}
 \usepackage{fixltx2e}
 \usepackage{hyperref}
+\usepackage{framed}
+\usepackage{stmaryrd}
 
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
@@ -776,6 +778,30 @@ if the immediate subterms of $t$ are values:
 \RightLabel{Subst}
 \UnaryInfC{$t \longrightarrow t'[\sigma]$}
 \end{prooftree}
+
+\begin{framed}
+\textbf{TODO: Proposed changes}
+\begin{itemize}
+\item TODO 1: proposed change for preliminary version: not the immediate subterms, but the arguments of the function and the destructors. Especially, this means that prefixes can't be reduced, but this may be desirable in some cases, which brings us to TODO 2.
+\item TODO 2: proposed change for final version -- this version needs changes in the extraction functions --: the most specific pattern that is matched by any prefix is used.
+
+\underline{Example:}
+
+Program:
+\begin{lstlisting}[mathescape]
+fun() = $t_1$
+fun().des() = $t_2$
+\end{lstlisting}
+
+Reductions:
+\begin{flalign*}
+&fun() \longrightarrow t_1&\\
+&fun().des() \longrightarrow t_2&\\
+&\textrm{Not (!) a reduction:}&\\
+&fun().des() \longarrownot\longrightarrow t_1.des()&
+\end{flalign*}
+\end{itemize}
+\end{framed}
 
 Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
 
