@@ -1989,6 +1989,42 @@ If otherwise $n = 0$, it would be $\zeta^* = r^*$, and $q_{r^*}$ has a function 
 
 %%-- under construction
 
+\begin{lemma}
+
+For any term $t$ that reduces in $prg$, all terms equivalent to $t$ reduce in $\langle prg \rangle$.
+
+\begin{proof}
+
+The set of equations of $\langle prg \rangle$ is exactly the union of all sets of equations in $\langle r \rangle^e$, for all equations $r$ of $prg$. Consider a term $t$ that reduces in $prg$. By induction on the derivation of the reduction, it will be shown that any term $\widetilde{t} \sim t$ is reducible in $\langle prg \rangle$.
+
+\begin{itemize}
+\item \underline{Case 1:} $t$ reduces by the ``Subst" rule for an $r$.
+
+If $t$ reduces in such a way, so does any term $\widetilde{t} \sim t$ by the ``Subst" rule for an equation of $\langle r \rangle^e$. It suffices to show it matches such an equation, because if a reducible subterm prevents the reduction of $\widetilde{t}$ by the ``Subst" rule, it is still the case that $\widetilde{t}$ is reducible, because of this subterm.
+
+Now, this equation that $\widetilde{t}$ matches will be specified; the two kinds of extraction functions will be distinguished. In any case, the equations in $\langle r \rangle^e$ are $\epsilon_1, ..., \epsilon_n, \zeta$, with properties as given by the extraction function properties.
+
+\begin{itemize}
+\item \underline{Kind `A' (``Destructor extraction"):}
+
+If $n = 0$, then $\zeta = r$. For terms $t$ that match such an equation, the set of equivalent terms consists only of $t$ itself (TODO: new property). Thus it is $\widetilde{t} = t$, and this matches $\zeta = r$, as we already know.
+
+If otherwise $n > 0$, then there is an equation $\epsilon_i$ with $q_{\epsilon_i} < q_r$ ...
+
+TODO
+
+\end{itemize}
+
+\item \underline{Case 2:} $t$ reduces by the ``Cong" rule.
+
+TODO
+
+\end{itemize}
+
+\end{proof}
+
+\end{lemma}
+
 \begin{proposition}
 
 Let $e$ be any helper extraction function with the extraction function properties. Then let $trans$ be a transformation which doesn't affect input terms, and for programs, is defined as $extract\_helpers(e)$.
