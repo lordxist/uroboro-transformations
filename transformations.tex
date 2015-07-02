@@ -42,8 +42,11 @@
 \usepackage{stmaryrd}
 
 \newtheorem{lemma}{Lemma}
+\newtheorem*{lemma*}{Lemma}
 \newtheorem{proposition}{Proposition}
+\newtheorem*{proposition*}{Proposition}
 \newtheorem{definition}{Definition}
+\newtheorem*{definition*}{Definition}
 
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
@@ -1528,6 +1531,8 @@ The relevant initial part of the sequence is constructed by Lemma 3. Again, by i
 
 \end{proposition}
 
+%%--
+
 \subsubsection{Proofs for extraction function properties}
 
 \begin{proof}[Proof for $extract\_outer\_des$]
@@ -2977,5 +2982,183 @@ But it is $prg' \subseteq prg$, as can be seen in the definition of $r''$. This 
 The argument here is identical to that of this case of this direction in the proof for $d''$.
 
 \end{proof}
+
+\pagebreak
+%%-- under construction
+\begin{framed}
+\textbf{Under Construction}
+
+\subsection*{Extraction function properties}
+
+Write $\langle prg \rangle$ for $\langle prg \rangle^{extract\_helpers(e, funs)}$ when $e, funs$ are arbitrary or clear from the context. Write $\epsilon_r, \zeta_r$ for the transformed original and the auxiliary equation in $\langle r \rangle^e$ whenever there is such an auxiliary equation. Otherwise, it is always the case that $\langle r \rangle^e$ contains only $r$ itself.
+
+\begin{definition*}[Extraction function properties]
+An extraction function $e$ is said to satisfy the extraction function properties iff
+
+\begin{enumerate}
+\item $\forall r \not\in Rules(\langle prg \rangle): s \longrightarrow^{\textrm{Subst}_r}_{prg} t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \sim t$.
+
+\item If $s$ reduces in $prg$, so does every $\widetilde{s} \sim s$ in $\langle prg \rangle$.
+
+\item For every equation $r$ of $prg$:
+\begin{enumerate}
+\item A possible $\epsilon_r$ reduces (non-strictly) the number of constructors and that of destructors, and reduces strictly either the number of constructors or that of destructors, or both.
+
+\item The equations in $\langle r \rangle^e$ preserve the property of a term that all of its reduction-relevant subterms are values.
+\end{enumerate}
+
+\end{enumerate}
+
+\end{definition*}
+
+\subsection*{extract\_des:}
+
+\begin{lemma*}
+
+$extract\_des$ satisfies the first extraction function property.
+
+\begin{proof}
+
+Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. From the definition of $extract\_helpers$ and $extract\_des$ we thus know that $q_r$ is a destructor copattern. By inversion, we know the form of $s$ is $s^0.des(\overline{t})$ The desired sequence can be given as follows.
+\begin{alignat*}{3}
+s &\longrightarrow^* &s^0_{subv}.des(\overline{t}) = q_{\epsilon_r}[\sigma_\epsilon].des(\overline{t})\\
+&\longrightarrow &t_{\epsilon_r}.des(\overline{t})\\
+&\longrightarrow^*  &t_{\epsilon_r}.des(\overline{t_v}) = q_{\zeta_r}[\sigma_\zeta]\\
+&\longrightarrow &t_{\zeta_r} =: \widetilde{t}
+\end{alignat*}
+The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s^0$ to equivalent values. We have such a sequence by Lemma ?, because $s^0$ matches $q_{\epsilon_r}$, by the definition of $\epsilon_r$ and because $s = s^0.des(\overline{t})$ and $s$ matches $q_r$.
+
+Similarly, the second multi-step part is concerned with reducing the $\overline{t}$ to equivalent values.
+
+Now, the two one-step parts of the sequence are derived.
+\begin{enumerate}
+\item The first step is derived as given below.
+\begin{prooftree}
+\AxiomC{$s^0_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
+\RightLabel{\scriptsize Subst with $\epsilon_r$}
+\UnaryInfC{$s^0_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
+\RightLabel{\scriptsize Cong}
+\UnaryInfC{$\mathcal{E}[s^0_{subv}] \longrightarrow \mathcal{E}[t_{\epsilon_r}[\sigma_\epsilon]]$}
+\end{prooftree}
+with $\mathcal{E} = [].des(\overline{t})$. $s^0_{subv}$ matches $q_{\epsilon_r}$ because $s = s^0.des(\overline{t})$ and $q_r = q_{\epsilon_r}.des(\overline{p})$ and $s$ matches $q_r$. It remains to be shown (a) why $\mathcal{E}$ is actually an evaluation context, and (b) why no ``Subst" rule can take precedence over the ``Cong" rule as used in the derivation.
+
+\begin{enumerate}
+\item $\mathcal{E}$ is derived as given below.
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{\scriptsize Hole}
+\UnaryInfC{$[]$}
+\RightLabel{\scriptsize Frame/Des}
+\UnaryInfC{$[].des(\overline{t})$}
+\end{prooftree}
+
+\item The only extension of $s^0_{subv}$ within $s^0_{subv}.des(\overline{t})$ is $s^0_{subv}.des(\overline{t})$ itself. Suppose this term matched a lhs of $\langle prg \rangle$. Each equation of $\langle prg \rangle$ either appears identical in $prg$, or there are $\epsilon_{r'}$ and $\zeta_{r'}$ in a $\langle r' \rangle^e$ for an $r'$ of $prg$.
+
+The first case can be excluded, since (a) the function definition of $r'$ is the same as that of $r$, and this function definition has been affected since $r$ was actually transformed, and (b) $r'$ is transformed to $\epsilon_{r'}$ and $\zeta_{r'}$ because $q_{r'}$ is a destructor copattern since it is a matched by $s^0_{subv}.des(\overline{t})$.
+
+The second case can also be excluded, because this would mean that there are overlapping patterns in the function definition, but these were eliminated by the pre-transformation.
+
+\end{enumerate}
+
+\item The second step is derived as given below.
+\begin{prooftree}
+\AxiomC{$t_{\epsilon_r}[\sigma_\epsilon].des(\overline{t_v}) =^? q_{\zeta_r} \searrow \sigma_\zeta$}
+\RightLabel{\scriptsize Subst with $\zeta_r$}
+\UnaryInfC{$t_{\epsilon_r}[\sigma_\epsilon].des(\overline{t_v}) \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
+\end{prooftree}
+The relevant subterms of $s^0_{subv}$ were values, thus also the terms that $\sigma_\epsilon$ substituted with. And $t_{\epsilon_r}[\sigma_\epsilon]$ contains no reduction-relevant subterms, as well. $t_[\epsilon_r]$ matches $q_{\zeta_r}$ by the definition of $\epsilon_r$ and $\zeta_r$.
+
+\end{enumerate}
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract\_des$ satisfies the second extraction function property.
+
+\begin{proof}
+
+From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
+
+Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
+\begin{equation*}
+\langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(\langle q \rangle^{vars})[\sigma].\overline{des(\overline{p}[\sigma])},
+\end{equation*}
+for some $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has exactly one top-level destructor call ($des_1$).
+
+If it has more than one top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a  possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
+
+Finally, if $\widetilde{s}$ had no top-level destructor calls, i.e., it is an application of the helper function, then there would exist equations in $prg$ which overlap. To see this, consider the form of $s \sim \widetilde{s}$: It matches a $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, as stated above. As a consequence, $q$ and $q.des_1(\overline{p})$ overlap. But this is prevented by the pre-transformation.
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract\_des$ satisfies the third extraction function property.
+
+\begin{proof}
+
+Both (a) and (b) can be easily seen in the definition of $extract\_des$.
+
+\end{proof}
+
+\end{lemma*}
+
+\subsection*{extract\_patterns:}
+
+TODO
+
+\subsection*{extract:}
+
+TODO
+
+\subsection*{Proofs of bisimulation}
+
+\begin{proposition*}
+
+Let $e$ be any helper extraction function with the extraction function properties. Then let $trans$ be a transformation which doesn't affect input terms, and for programs, is defined as $extract\_helpers(e)$.
+
+Statement (1) holds for $trans$.
+
+\begin{proof}
+
+\begin{enumerate}
+\item \textbf{``Subst" case}:
+
+\begin{prooftree}
+\AxiomC{$s =^? q_r \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $r \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow t_r[\sigma]$}
+\end{prooftree}
+
+with $t_r[\sigma] = t$; the reduction-relevant subterms of $s$ are values. The transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+
+When $r$ is also an equation of $\langle prg \rangle$, it suffices to (a) by Lemma ?, reduce the reduction-relevant subterms of $s$ to equivalent values, and then (b) apply the ``Subst" rule for $r$ to get a reduction to a term equivalent to $t$.
+
+When, otherwise, $r$ is not an equation of $\langle prg \rangle$, we have the desired sequence by the first extraction function property.
+
+\item \textbf{``Cong" case}:
+
+\begin{prooftree}
+\AxiomC{$s^0 \longrightarrow t^0$}
+\RightLabel{\scriptsize Cong}
+\UnaryInfC{$\mathcal{E}[s^0] \longrightarrow \mathcal{E}[t^0]$}
+\end{prooftree}
+
+with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$. By the induction hypothesis, we have a reduction sequence $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0} \sim t^0$.
+
+It suffices to (a) by Lemma ?, reduce the reduction-relevant subterms of $\mathcal{E}[s^0]$ left of $s^0$ to equivalent values, and then (b) use the ``Cong" rule, with the new context $\widetilde{\mathcal{E}}$ (around $s^0$) yielded by this, on the reduction sequence obtained from the induction hypothesis.
+
+\end{enumerate}
+
+\end{proof}
+
+\end{proposition*}
+
+\end{framed}
 
 \end{document}
