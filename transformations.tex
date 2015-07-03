@@ -3110,11 +3110,155 @@ Both (a) and (b) can be easily seen in the definition of $extract\_des$.
 
 \subsection*{extract\_patterns:}
 
-TODO
+\begin{lemma*}
+
+$extract\_patterns$ satisfies the first extraction function property.
+
+\begin{proof}
+
+Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. The desired sequence can be given as follows.
+\begin{alignat*}{3}
+s &\longrightarrow^* &s_{subv} = q_{\epsilon_r}[\sigma_\epsilon]\\
+&\longrightarrow &t_{\epsilon_r}\\
+&\longrightarrow^*  &(t_{\epsilon_r}[\sigma_\epsilon])_{subv} = q_{\zeta_r}[\sigma_\zeta]\\
+&\longrightarrow &t_{\zeta_r}[\sigma_\zeta] =: \widetilde{t}
+\end{alignat*}
+The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s$ to equivalent values. We have such a sequence by Lemma ?.
+
+Similarly, the second multi-step part is concerned with reducing the reduction-relevant subterms of $t_{\epsilon_r}$ to equivalent values.
+
+Now, the two one-step parts of the sequence are derived.
+
+\begin{enumerate}
+\item The first step is derived as given below.
+\begin{prooftree}
+\AxiomC{$s_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
+\RightLabel{\scriptsize Subst with $\epsilon_r$}
+\UnaryInfC{$s_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
+\end{prooftree}
+$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with all patterns replaced by variables.
+
+\item The second step is derived as given below.
+\begin{prooftree}
+\AxiomC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} =^? q_{\zeta_r} \searrow \sigma_\zeta$}
+\RightLabel{\scriptsize Subst with $\zeta_r$}
+\UnaryInfC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
+\end{prooftree}
+$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with all variables replaced by the patterns of $q_r$.
+
+\end{enumerate}
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract\_patterns$ satisfies the second extraction function property.
+
+\begin{proof}
+
+From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
+
+Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
+\begin{equation*}
+\langle fun, \overline{des}, prg^0 \rangle^{autogen}(\overline{x}, \overline{x'})[\sigma].\overline{des(\overline{p}[\sigma])},
+\end{equation*}
+for some $q_r = fun(\overline{x}.\overline{des(\overline{x'})}$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has no top-level destructor calls.
+
+If it has one or more top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract\_patterns$ satisfies the third extraction function property.
+
+\begin{proof}
+
+Both (a) and (b) can be easily seen in the definition of $extract\_patterns$.
+
+\end{proof}
+
+\end{lemma*}
 
 \subsection*{extract:}
 
-TODO
+\begin{lemma*}
+
+$extract$ satisfies the first extraction function property.
+
+\begin{proof}
+
+Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. The desired sequence can be given as follows.
+\begin{alignat*}{3}
+s &\longrightarrow^* &s_{subv} = q_{\epsilon_r}[\sigma_\epsilon]\\
+&\longrightarrow &t_{\epsilon_r}\\
+&\longrightarrow^*  &(t_{\epsilon_r}[\sigma_\epsilon])_{subv} = q_{\zeta_r}[\sigma_\zeta]\\
+&\longrightarrow &t_{\zeta_r}[\sigma_\zeta] =: \widetilde{t}
+\end{alignat*}
+The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s$ to equivalent values. We have such a sequence by Lemma ?.
+
+Similarly, the second multi-step part is concerned with reducing the reduction-relevant subterms of $t_{\epsilon_r}$ to equivalent values.
+
+Now, the two one-step parts of the sequence are derived.
+
+\begin{enumerate}
+\item The first step is derived as given below.
+\begin{prooftree}
+\AxiomC{$s_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
+\RightLabel{\scriptsize Subst with $\epsilon_r$}
+\UnaryInfC{$s_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
+\end{prooftree}
+$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with one pattern replaced by a variable and put in front of the other patterns.
+
+\item The second step is derived as given below.
+\begin{prooftree}
+\AxiomC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} =^? q_{\zeta_r} \searrow \sigma_\zeta$}
+\RightLabel{\scriptsize Subst with $\zeta_r$}
+\UnaryInfC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
+\end{prooftree}
+$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with the variable in front replaced by the respective pattern of $q_r$ (that, in $q_{\epsilon_r}$, was replaced by a variable and put in front).
+
+\end{enumerate}
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract$ satisfies the second extraction function property.
+
+\begin{proof}
+
+From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
+
+Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
+\begin{equation*}
+\langle \langle (q_r)^{-con} \rangle^{name\_pattern} \rangle^{autogen}((q_r)^{-con}_{vars^+})[\sigma].\overline{des(\overline{p}[\sigma])},
+\end{equation*}
+for some $q_r$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has no top-level destructor calls.
+
+If it has one or more top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract$ satisfies the third extraction function property.
+
+\begin{proof}
+
+Both (a) and (b) can be easily seen in the definition of $extract$.
+
+\end{proof}
+
+\end{lemma*}
 
 \subsection*{Proofs of bisimulation}
 
