@@ -3170,6 +3170,22 @@ Both (a) and (b) can be easily seen in the definition of $extract\_des$.
 
 \end{lemma*}
 
+\begin{lemma*}
+
+Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ don't contain lhss with overlapping prefixes, especially, this means these programs are deterministic. Then neither does $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(e, funs)}$, for arbitrary $funs$, $e = extract\_des^s$ with $s$ as $`` >1 "$ or $`` >0 "$.
+
+\begin{proof}
+
+Consider an atomic step of the extraction, i.e, the extraction out of a single equation. The lemma follows by combining the proofs for the atomic steps. It suffices to consider such steps which actually change the equations, i.e., they replace an equation $r$ of $prg$ with $\epsilon_r$ and $\zeta_r$. The lhss of $\epsilon_r$ and $\zeta_r$, and their prefixes, can't overlap, since they have different function names by definition. Now, consider another equation $r'$, contained in both the program before the atomic step transformation and afterwards.
+
+First, compare $q_{r'}$ to $q_{\epsilon_r} < q_r$: Any two of their respective prefixes are also prefixes of $q_{r'}$ and $q_{\epsilon_r}$, respectively, which by assumption don't overlap.
+
+Second, compare $q_{r'}$ to $q_{\zeta_r}$. If any of their respective prefixes overlap, $r'$ and $\zeta_r$ are in the same function definition, thus the lhs of $r'$ results from the extraction of a destructor out of some $r^*$ contained in a predecessor $prg^i$ of $prg$. This $prg^i$ also contains a lhs $q_{r^\#}$ of which $q_{r'}$ is a prefix. If a prefix of $q_{r'}$ overlaps with one of $q_{\zeta_r}$, so does a prefix of $q_{r'}$, which is also a prefix of $q_{r^\#}$, with one of $q_{r^*}$, contrary to assumption.
+
+\end{proof}
+
+\end{lemma*}
+
 \subsection*{extract\_patterns:}
 
 \begin{lemma*}
