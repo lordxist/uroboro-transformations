@@ -152,7 +152,40 @@ where
 &\quad \textrm{if $q$ is hole pattern}
 \end{alignat*}
 
-\item Both the defunctionalization and the refunctionalization described in the sections below require one shared preprocessing step, $align\_patterns$. This step is necessary for destructor extraction to work correctly.
+\item For the examples below the following data types will be used (as if they were in a standard library):
+\begin{lstlisting}
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+data Bool where
+  true(): Bool
+  false(): Bool
+
+\end{lstlisting}
+
+\item In general, the implementations of defunctionalization and refunctionalization only work with programs which don't depend upon the order of their rules. Especially, that means that a function such as the following won't be transformed correctly:
+\begin{lstlisting}
+
+function foo where
+  foo(zero()) = zero()
+  foo(succ(zero()) = zero()
+  foo(x) = x
+
+\end{lstlisting}
+
+Thanks are due to Yufei Cai and Paolo Giarrusso for this observation. Future work might add a transformation from rule-order dependent to rule-order independent programs.
+
+\end{itemize}
+
+\subsection{Common pre-transformations}
+
+The transformations of this subsection are to be applied before either the defunctionalization or the refunctionalization as defined in the following sections.
+
+\subsubsection{align\_patterns}
+
+This step is necessary for destructor extraction to work correctly.
 
 The purpose of $align\_patterns$ is to bring the patterns inside the copatterns within one function definition to the same level of specification. Consider the following example:
 
@@ -216,33 +249,6 @@ if $\exists$ lhs in $def$ with a prefix of the generic form $\mathcal{C}[con(\_,
 \langle \mathcal{C} \rangle^{a\_p} = \{x\},
 \end{equation*}
 otherwise.
-
-\item For the examples below the following data types will be used (as if they were in a standard library):
-\begin{lstlisting}
-
-data Nat where
-  zero(): Nat
-  succ(Nat): Nat
-
-data Bool where
-  true(): Bool
-  false(): Bool
-
-\end{lstlisting}
-
-\item In general, the implementations of defunctionalization and refunctionalization only work with programs which don't depend upon the order of their rules. Especially, that means that a function such as the following won't be transformed correctly:
-\begin{lstlisting}
-
-function foo where
-  foo(zero()) = zero()
-  foo(succ(zero()) = zero()
-  foo(x) = x
-
-\end{lstlisting}
-
-Thanks are due to Yufei Cai and Paolo Giarrusso for this observation. Future work might add a transformation from rule-order dependent to rule-order independent programs.
-
-\end{itemize}
 
 \section{Defunctionalization of Uroboro}
 
