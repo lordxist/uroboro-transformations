@@ -430,7 +430,21 @@ $\langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle 
 
 \section{Refunctionalization of Uroboro}
 
-Refunctionalizing programs: $\langle prg \rangle^r = \langle \langle prg \rangle^{unmix_r} \rangle^{r'}$
+Refunctionalizing programs: $\langle prg \rangle^r = \langle \langle \langle prg \rangle^{extract\_outer\_des_r} \rangle^{unmix_r} \rangle^{r'}$
+
+TODO: Refunc. has been corrected to first care about the
+multiple destructor calls containing constructors. Implement these changes.
+
+%%-- under construction
+Extract outer destructor calls containing constructors:
+
+$\langle prg \rangle^{extract\_outer\_des_r} = \langle \langle prg \rangle^{extract\_helpers(extract\_des, funs)} \rangle^{extract\_outer\_des_r}$, if $prg$ contains mixed function definitions
+
+with the affected functions $funs$ being those functions of $prg$ which have multiple destructor calls containing constructors
+
+$\langle prg \rangle^{extract\_outer\_des_r} = prg$, otherwise
+
+%%--
 
 Extract destructor calls from mixed function defs into helper functions:
 \begin{alignat*}{3}
@@ -462,7 +476,9 @@ Refunctionalizing programs without mixed function defs: $\langle prg \rangle^{r'
 
 Disentangling (extract undesired pattern matching into helper functions):
 
-$disentangle_r = extract\_helpers(extract)$
+$disentangle_r = step2 \circ step1$
+
+$step1 = extract\_helpers(extract\_patterns)$
 
 Extraction from one equation into helper functions (returns a pair of the changed original equation and the set of the helper functions):
 
@@ -477,12 +493,6 @@ Define the following for a copattern $q$:
 \end{itemize}
 
 \begin{alignat*}{3}
-&\langle `` q = t ", H \rangle^{extract} = \langle `` q^{-con} = hname (q^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract} \span\span \\
-&\quad \textrm{with } && hname = \langle \langle q^{-con} \rangle^{name\_pattern} \rangle^{autogen}, \\
-&\quad && hsig = `` hname(\langle q^{-con}_{vars^+} \rangle^{vartypes}): \sigma ", \\
-&\quad && heqn = `` hname(q^{-con}_{vars^-}) = t ", \\
-&\quad && `` \tau.des_k(...): \sigma " = \langle des_k \rangle^{sig}, \\
-&\quad \textrm{if } q = fun(p_1^0, ..., p_n^0).des_1(p_1^1, ..., p_{n_1}^1)...des_k(p_1^k, ..., p_{n_k}^k), k \geq 1 \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
 &\langle `` q = t ", H \rangle^{extract} = \langle `` q^{-con'} = hname (q^{-con'}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \rangle^{extract} \span\span \\
 &\quad \textrm{with } && hname = \langle \langle q^{-con'} \rangle^{name\_pattern} \rangle^{autogen}, \\
 &\quad && hsig = `` hname(\langle q^{-con'}_{vars^+} \rangle^{vartypes}): \sigma ", \\
@@ -495,11 +505,7 @@ Define the following for a copattern $q$:
 
 \begin{framed}
 
-Alternative definition for $disentangle_r$, not quite equivalent, but with the resulting fragment being the same. This definition is to be used for the simplified proofs.
-
-$disentangle_r = step2 \circ step1$
-
-$step1 = extract\_helpers(extract\_patterns)$ (TODO: needs slight modification of $extract\_patterns$ such that all destructor patterns are targeted)
+Alternative, but equivalent definition for $step2$, to be used for the simplified proofs.
 
 $\langle prg \rangle^{step2} = \langle \langle prg \rangle^{extract\_helpers(extract)} \rangle^{step2}$, if there is lhs in $prg$ of the form $fun(con(p_1^0, ..., p_k^0), p^1_1, ..., p^1_n)$, $\exists p_i^j$: $p_i^j$ is constructor pattern
 
