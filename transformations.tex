@@ -138,6 +138,20 @@ where
 & \langle `` q = t ", H \rangle^{extract\_des} = \big\langle `` q = t ", H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
 \end{alignat*}
 
+\item Define the extraction of the constructors of a copattern with exactly one destructor as follows:
+\begin{alignat*}{3}
+&\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \rangle^{extract\_patterns} \\
+&\quad = \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle \\
+&\quad \textrm{with } hname= \langle fun, des, prg \rangle^{autogen}, \\
+&\quad hsig = hname(\tau_1, ..., \tau_n, \tau'_1, ..., \tau'_k): \tau \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, \sigma.des(\tau'_1, ..., \tau'_k): \tau = \langle des \rangle^{sig} \\
+&\quad heqn = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = t ", \\
+&\quad \textrm{if } \exists p \in \{p_1, ..., p_n, p'_1, ..., p'_k\}: p \textrm{ is constructor application} \\
+&\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \rangle^{extract\_patterns} = \big\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \big\rangle, \\
+&\quad \textrm{otherwise} \\
+&\langle `` q = t ", H \rangle^{extract\_patterns} = \big\langle `` q = t ", H \big\rangle, \\
+&\quad \textrm{if $q$ is hole pattern}
+\end{alignat*}
+
 \item Both the defunctionalization and the refunctionalization described in the sections below require one shared preprocessing step, $align\_patterns$. This step is necessary for destructor extraction to work correctly.
 
 The purpose of $align\_patterns$ is to bring the patterns inside the copatterns within one function definition to the same level of specification. Consider the following example:
@@ -327,20 +341,6 @@ Defunctionalizing programs without mixed function defs: $\langle prg \rangle^{d'
 Disentangling (extract undesired pattern matching into helper functions):
 
 $\langle prg \rangle^{disentangle_d} = \langle prg \rangle^{extract\_helpers(extract\_patterns)}$
-
-Extract undesired pattern matching of a single equation into a helper function:
-\begin{alignat*}{3}
-&\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \rangle^{extract\_patterns} \\
-&\quad = \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle \\
-&\quad \textrm{with } hname= \langle fun, des, prg \rangle^{autogen}, \\
-&\quad hsig = hname(\tau_1, ..., \tau_n, \tau'_1, ..., \tau'_k): \tau \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, \sigma.des(\tau'_1, ..., \tau'_k): \tau = \langle des \rangle^{sig} \\
-&\quad heqn = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = t ", \\
-&\quad \textrm{if } \exists p \in \{p_1, ..., p_n, p'_1, ..., p'_k\}: p \textrm{ is constructor application} \\
-&\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \rangle^{extract\_patterns} = \big\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \big\rangle, \\
-&\quad \textrm{otherwise} \\
-&\langle `` q = t ", H \rangle^{extract\_patterns} = \big\langle `` q = t ", H \big\rangle, \\
-&\quad \textrm{if $q$ is hole pattern}
-\end{alignat*}
 
 Example:
 
