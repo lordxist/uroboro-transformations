@@ -3115,7 +3115,7 @@ Now, the two one-step parts of the sequence are derived.
 \RightLabel{\scriptsize Cong}
 \UnaryInfC{$\mathcal{E}[s^0_{subv}] \longrightarrow \mathcal{E}[t_{\epsilon_r}[\sigma_\epsilon]]$}
 \end{prooftree}
-with $\mathcal{E} = [].des(\overline{t})$. $s^0_{subv}$ matches $q_{\epsilon_r}$ because $s = s^0.des(\overline{t})$ and $q_r = q_{\epsilon_r}.des(\overline{p})$ and $s$ matches $q_r$. It remains to be shown (a) why $\mathcal{E}$ is actually an evaluation context, and (b) why no ``Subst" rule can take precedence over the ``Cong" rule as used in the derivation.
+with $\mathcal{E} = [].des(\overline{t})$. $s^0_{subv}$ matches $q_{\epsilon_r}$ because $s = s^0.des(\overline{t})$ and $q_r = q_{\epsilon_r}.des(\overline{p})$ and $s$ matches $q_r$. The two sides of $\epsilon_r$ are equivalent by definition, thus $s^0_{subv}$ and $t_{\epsilon_r}[\sigma_\epsilon]$ are, too. It remains to be shown (a) why $\mathcal{E}$ is actually an evaluation context, and (b) why no ``Subst" rule can take precedence over the ``Cong" rule as used in the derivation.
 
 \begin{enumerate}
 \item $\mathcal{E}$ is derived as given below.
@@ -3141,7 +3141,7 @@ The second case can also be excluded, because this would mean that there are ove
 \RightLabel{\scriptsize Subst with $\zeta_r$}
 \UnaryInfC{$t_{\epsilon_r}[\sigma_\epsilon].des(\overline{t_v}) \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
 \end{prooftree}
-The relevant subterms of $s^0_{subv}$ were values, thus also the terms that $\sigma_\epsilon$ substituted with. And $t_{\epsilon_r}[\sigma_\epsilon]$ contains no reduction-relevant subterms, as well. $t_[\epsilon_r]$ matches $q_{\zeta_r}$ by the definition of $\epsilon_r$ and $\zeta_r$.
+The relevant subterms of $s^0_{subv}$ were values, thus also the terms that $\sigma_\epsilon$ substituted with. And $t_{\epsilon_r}[\sigma_\epsilon]$ contains no reduction-relevant subterms, as well. $t_[\epsilon_r]$ matches $q_{\zeta_r}$ by the definition of $\epsilon_r$ and $\zeta_r$. Because $t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\zeta]$ is equivalent to $s = q_r[\sigma]$, $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta] \sim t_r[\sigma_\zeta]$.
 
 \end{enumerate}
 
@@ -3233,7 +3233,7 @@ Now, the two one-step parts of the sequence are derived.
 \RightLabel{\scriptsize Subst with $\epsilon_r$}
 \UnaryInfC{$s_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
 \end{prooftree}
-$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with all patterns replaced by variables.
+$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with all patterns replaced by variables. $s_{subv}$ is equivalent to $t_{\epsilon_r}$, because, by definition, the two sides of $\epsilon_r$ are equivalent.
 
 \item The second step is derived as given below.
 \begin{prooftree}
@@ -3241,7 +3241,7 @@ $s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r
 \RightLabel{\scriptsize Subst with $\zeta_r$}
 \UnaryInfC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
 \end{prooftree}
-$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with all variables replaced by the patterns of $q_r$.
+$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with all variables replaced by the patterns of $q_r$. $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta]$ because $t_{\zeta_r} \sim t_r$ and $q[\sigma] \sim t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\epsilon]$ and $q_r \sim q_{\zeta_r}$.
 
 \end{enumerate}
 
@@ -3331,7 +3331,7 @@ Now, the two one-step parts of the sequence are derived.
 \RightLabel{\scriptsize Subst with $\epsilon_r$}
 \UnaryInfC{$s_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
 \end{prooftree}
-$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with one pattern replaced by a variable and put in front of the other patterns.
+$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with one pattern replaced by a variable and put in front of the other patterns. $s_{subv}$ is equivalent to $t_{\epsilon_r}$, because, by definition, the two sides of $\epsilon_r$ are equivalent.
 
 \item The second step is derived as given below.
 \begin{prooftree}
@@ -3339,7 +3339,7 @@ $s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r
 \RightLabel{\scriptsize Subst with $\zeta_r$}
 \UnaryInfC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
 \end{prooftree}
-$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with the variable in front replaced by the respective pattern of $q_r$ (that, in $q_{\epsilon_r}$, was replaced by a variable and put in front).
+$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with the variable in front replaced by the respective pattern of $q_r$ (that, in $q_{\epsilon_r}$, was replaced by a variable and put in front). $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta]$ because $t_{\zeta_r} \sim t_r$ and $q[\sigma] \sim t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\epsilon]$ and $q_r \sim q_{\zeta_r}$.
 
 \end{enumerate}
 
