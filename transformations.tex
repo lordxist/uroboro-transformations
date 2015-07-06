@@ -3351,6 +3351,22 @@ Both (a) and (b) can be easily seen in the definition of $extract$.
 
 \end{lemma*}
 
+\begin{lemma*}
+
+Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ be deterministic. Then so is $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(extract, funs)}$, for arbitrary $funs$.
+
+\begin{proof}
+
+Consider an atomic step of the extraction, i.e, the extraction out of a single equation. The lemma follows by combining the proofs for the atomic steps. It suffices to consider such steps which actually change the equations, i.e., they replace an equation $r$ of $prg$ with $\epsilon_r$ and $\zeta_r$. The lhss of $\epsilon_r$ and $\zeta_r$, and their prefixes, can't overlap, since they have different function names by definition. Now, consider another equation $r'$, contained in both the program before the atomic step transformation and afterwards.
+
+First, compare $q_{r'}$ to $q_{\epsilon_r}$: $q_{\epsilon_r}$ is simply $q_r$ with one of its patterns replaced by variables, thus, a term that matches $q_{\epsilon_r}$ also matches $q_r$. If it also matched $q_{r'}$, the program before the atomic step transformation would be nondeterministic, contrary to assumption.
+
+Second, compare $q_{r'}$ to $q_{\zeta_r}$: The lhs of $\zeta_r$ results from the extraction out of an $r^*$ of a $prg^i$. It is also contained in all predecessors of $prg^i$, that is, all $prg^k$ with $k \leq i$. The same holds for $r'$ with an $r^\#$, for a $prg^j$ and its predecessors. From a term that matches $q_{r'}$, a term can be constructed that matches $r^\#$, and the same for $q_{\zeta_r}$ and $r^*$. Because this construction is the same in both cases, when a term matches both $q_{r'}$ and $q_{\zeta_r}$, there is a term that matches both $q_{r^\#}$ and $q_{r^*}$. And these lhss are found together in one program, either in $prg^i$ when $i \leq j$, or in $prg^j$, otherwise. But this would contradict the assumption that all these programs were deterministic.
+
+\end{proof}
+
+\end{lemma*}
+
 \subsection*{Proofs of bisimulation}
 
 \begin{proposition*}
