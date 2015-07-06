@@ -524,43 +524,28 @@ $\langle prg \rangle^{step2} = prg$, otherwise
 
 \end{framed}
 
-Splitting of the first argument in hole patterns
-
-(as in $fun(x,...) = t \rightarrow \{fun(con_1(...),...) = t, fun(con_2(...),...) = t\}$):
-
-\begin{alignat*}{5}
-\langle prg \rangle^{split} & = ~&& \{ ~&& \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \span\span\span\span \\
-& && && \bigcup && \{ && \{ fun(con(y_1, ..., y_k), x_2, ..., x_n) = t[con(y_1, ..., y_k)/x_1] \\
-& && && && && | ~ `` con(\sigma_1, ..., \sigma_k): \tau_1 " \in prg; ~ y_1, ..., y_k, x_2, ..., x_n \textrm{ all distinct} \} \\
-& && && && | ~ `` fun(x_1, x_2, ..., x_n) = t " \in eqns \} \span\span \\
-& && && \cup \{ fun(con(...), ...) = t ~ | ~ `` fun(con(...), ...) = t " \in eqns \} \span\span\span\span \\
-& && && \cup \{ q.des(...) = t ~ | ~ `` q.des(...) = t " \in eqns \} \span\span\span\span \\
-& && | `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg, n > 0 \textrm{ and } \tau_1 \textrm{ is data type} \} \span\span\span\span\span\span \\
-& \cup && \{ && def \in prg ~ | ~ def \textrm{ is function def. with signature } fun(\tau_1, ..., \tau_n): \sigma, \span\span\span\span \\
-& && &&\quad \textrm{ with } n = 0 \textrm{ or } \tau_1 \textrm{ is codata type} \} \span\span\span\span \\
-& \cup && \{ && def \in prg ~ | ~ def \textrm{ is (co)data def.} \} \span\span\span\span
-\end{alignat*}
-
 Actual refunctionalization (for programs without mixed function defs and with constructor applications only in the first data type argument of a hole pattern):
 
 This uses the automatic refunctionalization of Uroboro in the paper of Rendel, Trieflinger, and Ostermann, from now on referred to as $r^{core}$.
 
 Technical note: As $r^{core}$ doesn't allow destructor terms in its inputs, they have to be converted beforehand. This conversion is the same as that of $r$ for terms below, restricted to destructor terms. Call this conversion lifted to programs (in the way that all destructor terms on right-hand sides or as subterms of them are converted) $des\_conv$.
 
+TODO: has been changed to allow for data type variables as first arguments. Implement this change along with removing the implementation for $split$.
+
 \begin{alignat*}{3}
 \langle prg \rangle^{r''} & = ~&& \langle \langle && \{ def \in prg ~ | ~ def \textrm{ is data def. or} \\ & && &&\quad \textrm{ function def. with equations } eqns \neq \emptyset: \forall e \in eqns: e \textrm{ has no destr. pattern}, \\
-& && &&\qquad \textrm{the function has a first argument with data type } \} \rangle^{des\_conv} \rangle^{r^{core}} \\
+& && &&\qquad \textrm{the first argument of the lhs isn't a variable } \} \rangle^{des\_conv} \rangle^{r^{core}} \\
 & \cup && \{ && \textrm{\textbf{codata }} ... ~ | ~ `` \textrm{\textbf{codata }} ... " \in prg \} \\
 & \cup && \{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \{ p = \langle t, prg \rangle^r ~ | ~ "p = t" \in eqns \} \\
 & && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } \forall e \in eqns: e \textrm{ has destr. pattern} \\
-& && &&\quad \textrm{or where } n = 0 \textrm{ or where } \tau_1 \textrm{ is codata type} \} 
+& && &&\quad \textrm{or where } n = 0 \textrm{ or where the first argument of the lhs is a variable} \} 
 \end{alignat*}
 
 Refunctionalizing terms: \\
 $\langle x, prg \rangle^r = x$ \\
 $\langle s.des(t_1, ..., t_n), prg \rangle^r = \langle s, prg \rangle^r .des(\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
 $\langle fun(t_1, ..., t_n), prg \rangle^r = fun(\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$, \\
-if ``\textbf{function} $fun(\tau_n, ..., \tau_n): \sigma$ \textbf{where} $eqns$" $\in prg$  with $\forall e \in eqns: e$ has destructor pattern or where $n = 0$ or where $\tau_1$ is codata type  \\
+if ``\textbf{function} $fun(\tau_n, ..., \tau_n): \sigma$ \textbf{where} $eqns$" $\in prg$  with $\forall e \in eqns: e$ has destructor pattern or where $n = 0$ or where the first argument of the lhs is a variable \\
 $\langle fun(t_1, ..., t_n), prg \rangle^r = \langle t_1, prg \rangle^r .\langle fun, prg \rangle^r (\langle t_2, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$, \\
 otherwise \\
 $\langle con(t_1, ..., t_n), prg \rangle^r = \langle con, prg \rangle^r (\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
