@@ -99,8 +99,8 @@ it is always assumed (without explicitly placing an argument for $prg$) that the
 \item \textbf{Helper extraction:} For a function $e$ that takes (along with the whole program $prg$, which will be omitted for brevity) an equation $eqn$ and a set $H$, that contains pairs of helper equations and signatures, and returns $\langle eqn, H \rangle^e := \big\langle eqn', H' \big\rangle$, with $eqn'$ the changed equation and $H'$ the changed helpers set, define $extract\_helpers(e)$ as follows:
 
 \begin{alignat*}{4}
-\langle prg \rangle^{extract\_helpers(e)} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{e} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
+\langle prg \rangle^{extract\_helpers(e)}_{prg^0} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{e}_{prg^0} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
 & && && \cup && \{ \textrm{\textbf{function }} sig \textrm{\textbf{ where }} \\
 & && && &&\quad \{ heqn ~ | ~ \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
 & && && && | ~  \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
@@ -110,10 +110,12 @@ it is always assumed (without explicitly placing an argument for $prg$) that the
 
 where
 \begin{itemize}
-\item $H_{eqns} = \{ \big\langle hsig, heqn \big\rangle \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{e} ~ | ~ eqn \in eqns \}$
+\item $H_{eqns} = \{ \big\langle hsig, heqn \big\rangle \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{e}_{prg^0} ~ | ~ eqn \in eqns \}$
 
-\item $\langle eqn \rangle^{e}$ is short for $\langle eqn, \emptyset \rangle^{e}$
+\item $\langle eqn \rangle^{e}_{prg^0}$ is short for $\langle eqn, \emptyset \rangle^{e}_{prg^0}$
 \end{itemize}
+
+Whenever $prg^0$ is left unspecified, it is assumed to be $prg$.
 
 \item In the following, a function definition (or its equations) is called mixed if it contains a rule where the copattern is a destructor pattern and another rule where the copattern is a hole pattern.
 
@@ -129,18 +131,18 @@ where
 
 \item Define the extraction of the final destructor in the given copattern as follows:
 \begin{alignat*}{2}
-& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \big\rangle \span\span \\
+& \langle `` q.des(p_1, ..., p_k) = t ", H \rangle^{extract\_des}_{prg} = \big\langle `` q = hname(\langle q \rangle^{vars})  ", \{ \big\langle hsig, heqn \big\rangle \} \cup H \big\rangle \span\span \\
 &\quad \textrm{with } hname = \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}, \span\span \\
 &\quad hsig = hname(\tau_1, ..., \tau_n): \sigma \span\span \\
 &\quad \textrm{ where } && fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig} \textrm{ if } q = fun(...)\\
 &\quad && \tau.des(\tau_1, ..., \tau_k) : \sigma = \langle des \rangle^{sig} \textrm{ if } q = q'.des(...) \\
 &\quad heqn = `` hname(\langle q \rangle^{vars}).des(p_1, ..., p_k) = t  " \span\span \\
-& \langle `` q = t ", H \rangle^{extract\_des} = \big\langle `` q = t ", H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
+& \langle `` q = t ", H \rangle^{extract\_des}_{prg} = \big\langle `` q = t ", H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
 \end{alignat*}
 
 \item Define the extraction of the constructors of a copattern with exactly one destructor as follows:
 \begin{alignat*}{3}
-&\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \rangle^{extract\_patterns} \\
+&\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \rangle^{extract\_patterns}_{prg} \\
 &\quad = \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle \\
 &\quad \textrm{with } hname= \langle fun, des, prg \rangle^{autogen}, \\
 &\quad hsig = hname(\tau_1, ..., \tau_n, \tau'_1, ..., \tau'_k): \tau \textrm{ where } fun(\tau_1, ..., \tau_n): \sigma = \langle fun \rangle^{sig}, \sigma.des(\tau'_1, ..., \tau'_k): \tau = \langle des \rangle^{sig} \\
@@ -148,7 +150,7 @@ where
 &\quad \textrm{if } \exists p \in \{p_1, ..., p_n, p'_1, ..., p'_k\}: p \textrm{ is constructor application} \\
 &\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \rangle^{extract\_patterns} = \big\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \big\rangle, \\
 &\quad \textrm{otherwise} \\
-&\langle `` q = t ", H \rangle^{extract\_patterns} = \big\langle `` q = t ", H \big\rangle, \\
+&\langle `` q = t ", H \rangle^{extract\_patterns}_{prg} = \big\langle `` q = t ", H \big\rangle, \\
 &\quad \textrm{if $q$ is hole pattern}
 \end{alignat*}
 
@@ -277,9 +279,11 @@ Extract outer destructor calls of a single equation (a destructor call after a d
 \begin{framed}
 Alternative, but equivalent definition for $elim\_multi\_des$, to be used for the simplified proofs.
 
-$\langle prg \rangle^{elim\_multi\_des} = \langle \langle prg \rangle^{extract\_helpers(extract\_des^{>1})} \rangle^{elim\_multi\_des}$, if $prg$ contains outer destructors
+$\langle prg \rangle^{elim\_multi\_des} := \langle prg \rangle^{elim\_multi\_des}_{prg}$
 
-$\langle prg \rangle^{elim\_multi\_des} = prg$, otherwise
+$\langle prg \rangle^{elim\_multi\_des}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract\_des^{>1})}_{prg^0} \rangle^{elim\_multi\_des}_{prg^0}$, if $prg$ contains outer destructors
+
+$\langle prg \rangle^{elim\_multi\_des}_{prg^0} = prg$, otherwise
 
 \end{framed}
 %%--
@@ -294,11 +298,13 @@ Extract destructor calls from mixed function defs into helper functions:
 \begin{framed}
 Alternative, but equivalent (for this fragment; contains unnecessary recursion which makes it identical to $unmix_r$) definition for $unmix_d$, to be used for the simplified proofs.
 
-$\langle prg \rangle^{unmix_d} = \langle \langle prg \rangle^{extract\_helpers(extract\_des, funs)} \rangle^{unmix_d}$, if $prg$ contains mixed function definitions
+$\langle prg \rangle^{unmix_d} := \langle prg \rangle^{unmix_d}_{prg}$
+
+$\langle prg \rangle^{unmix_d}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract\_des, funs)}_{prg^0} \rangle^{unmix_d}_{prg^0}$, if $prg$ contains mixed function definitions
 
 with the affected functions $funs$ being those functions of $prg$ which are mixed
 
-$\langle prg \rangle^{unmix_d} = prg$, otherwise
+$\langle prg \rangle^{unmix_d}_{prg^0} = prg$, otherwise
 
 \end{framed}
 %%--
@@ -469,11 +475,13 @@ Here $extract\_all\_des$ is simply the iterated version of $extract\_des$:
 \begin{framed}
 Alternative, but equivalent definition for $unmix_r$, to be used for the simplified proofs.
 
-$\langle prg \rangle^{unmix_r} = \langle \langle prg \rangle^{extract\_helpers(extract\_des, funs)} \rangle^{unmix_r}$, if $prg$ contains mixed function definitions
+$\langle prg \rangle^{unmix_r} := \langle prg \rangle^{unmix_r}_{prg}$
+
+$\langle prg \rangle^{unmix_r}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract\_des, funs)}_{prg^0} \rangle^{unmix_r}_{prg^0}$, if $prg$ contains mixed function definitions
 
 with the affected functions $funs$ being those functions of $prg$ which are mixed
 
-$\langle prg \rangle^{unmix_r} = prg$, otherwise
+$\langle prg \rangle^{unmix_r}_{prg^0} = prg$, otherwise
 
 \end{framed}
 %%--
@@ -513,18 +521,20 @@ Define the following for a copattern $q$:
 
 Alternative, but equivalent definition for $step2$, to be used for the simplified proofs.
 
-$\langle prg \rangle^{step2} = \langle \langle prg \rangle^{extract\_helpers(extract)} \rangle^{step2}$, if there is lhs in $prg$ of the form $fun(con(p_1^0, ..., p_k^0), p^1_1, ..., p^1_n)$, $\exists p_i^j$: $p_i^j$ is constructor pattern
+$\langle prg \rangle^{step2} := \langle prg \rangle^{step2}_{prg}$
 
-$\langle prg \rangle^{step2} = prg$, otherwise
+$\langle prg \rangle^{step2}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract)}_{prg^0} \rangle^{step2}_{prg^0}$, if there is lhs in $prg$ of the form $fun(con(p_1^0, ..., p_k^0), p^1_1, ..., p^1_n)$, $\exists p_i^j$: $p_i^j$ is constructor pattern
+
+$\langle prg \rangle^{step2}_{prg^0} = prg$, otherwise
 
 \begin{alignat*}{3}
-&\langle `` q = t ", H \rangle^{extract} = \big\langle `` q^{-con'} = hname (q^{-con'}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle \span\span \\
-&\quad \textrm{with } && hname = \langle \langle q^{-con'} \rangle^{name\_pattern} \rangle^{autogen}, \\
+&\langle `` q = t ", H \rangle^{extract}_{prg} = \big\langle `` q^{-con'} = hname (q^{-con'}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle \span\span \\
+&\quad \textrm{with } && hname = \langle \langle q^{-con'} \rangle^{name\_pattern}, prg \rangle^{autogen}, \\
 &\quad && hsig = `` hname(\langle q^{-con'}_{vars^+} \rangle^{vartypes}): \sigma ", \\
 &\quad && heqn = `` hname(q^{-con'}_{vars^-}) = t ", \\
 &\quad && `` fun(...): \sigma " = \langle fun \rangle^{sig}, \\
 &\quad \textrm{if } q = fun(con(p_1^0, ..., p_k^0), p^1_1, ..., p^1_n) \textrm{ and } \exists p_i^j: p_i^j \textrm{ is constructor pattern} \span\span \\
-&\langle `` q = t ", H \rangle^{extract} = \big\langle `` q = t ", H \big\rangle, \span\span \\
+&\langle `` q = t ", H \rangle^{extract}_{prg} = \big\langle `` q = t ", H \big\rangle, \span\span \\
 &\quad \textrm{otherwise} \span\span
 \end{alignat*}
 
