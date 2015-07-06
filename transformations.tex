@@ -924,23 +924,9 @@ In this section it is shown that the transformations above preserve the semantic
 
 \end{itemize}
 
-The equivalence relation $\sim$ for terms is different for each transformation, and always meant with respect to a program $prg$. Its purpose is to capture the ``sameness" of some terms that arises from the ``splitting" of a function definition into multiple definitions in the transformation. This notion of equivalence for terms can be extended to copatterns and patterns, since each of them is syntactically identical to a term. It has a number of intended consequences, which are listed below:
+The equivalence relation $\sim$ for terms is different for each extraction function, and always meant with respect to a program $prg$. Its purpose is to capture the ``sameness" of some terms that arises from the ``splitting" of a function definition into multiple definitions in the transformation. This notion of equivalence for terms can be extended to copatterns and patterns, since each of them is syntactically identical to a term.
 
-TODO: extract from the proofs (see the TODOs there)
-
-\begin{itemize}
-
-\item Let $q$ be a copattern with its function name $fun$ different from $fun'$, and both of those names declared in $prg$. If $q' \sim q$ for a copattern $q'$, the function name of $q'$ is different from $fun'$, as well.
-
-\item Let two terms $s,t$ have the following forms: $s = fun(...).des_1(...)...des_k()$ and $t = fun'(...).des'_1(...)...des'_l(...)$, with $k \neq l$, and with $fun$ and $fun'$ declared in $prg$. For any $\widetilde{s} \sim s$ and $\widetilde{t} \sim t$ it is $\widetilde{s} \not\sim \widetilde{t}$.
-
-The second intended consequence is easy to show, because each equivalence relation ``mirrors" the number of destructor calls in the helper function name. This means that the result of adding the number of actual calls of a well-typed term of $\langle prg \rangle$ to the number of calls embedded in its helper function name is equal to the number of calls of the equivalent term well-typed in $prg$.
-
-TODO: demonstrate that these intended consequences actually hold for each transformation
-
-\end{itemize}
-
-For a transformation, the corresponding equivalence relation is defined as the smallest equivalence relation for which some general and some specific properties hold. The general properties are shared by all equivalence relations.
+For an extraction function, the corresponding equivalence relation is defined as the smallest equivalence relation for which some general and some specific properties hold. The general properties are shared by all equivalence relations.
 
 The general properties are the following:
 
@@ -954,23 +940,7 @@ The general properties are the following:
 
 \end{itemize}
 
-There is only one specific property for $elim\_multi\_des$, as follows:
-
-\begin{itemize}
-
-\item If $\sigma$ and $\widetilde{\sigma}$ substitute the same variables, and for every term $t$ that $\sigma$ substitutes for a variable $x$, it is $t \sim \widetilde{t}$ for the term that $\widetilde{\sigma}$ subtitutes for $x$: $q[\sigma] \sim \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}(\langle q \rangle^{vars})[\widetilde{\sigma}]$
-
-\end{itemize}
-
-There is only one specific property for $disentangle_d$, as follows:
-
-\begin{itemize}
-
-\item If $t_i \sim \widetilde{t_i}$ for $i \in \{1, ..., n\}$ and $t'_j \sim \widetilde{t'_j}$ for $j \in \{1, ..., k\}$: $fun(t_1, ..., t_n).des(t'_1, ..., t'_k) \sim \langle fun, des, prg \rangle^{autogen}(\widetilde{t_1}, ..., \widetilde{t_n}, \widetilde{t'_1}, ..., \widetilde{t'_k})$
-
-\end{itemize}
-
-All of these equivalence relations are defined such that, for an equation $`` q = t "$ of $prg$, unless $q = t$, it is $q \not\sim t$.
+The specific properties are given in the respective section for the proofs of the extraction function properties of the extraction function.
 
 %%- old bisim. statements
 %\begin{itemize}
@@ -1008,14 +978,11 @@ $ s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg 
 
 Strong bisimulation implies the weak kind of bisimulation as given by (1a), (1b) and (2). It is always shown in its stead whenever possible. The proof of each side of strong bisimulation proceeds analogously to that of (1a) (but always with $n = 1$).
 
-It's always assumed that the program that is transformed is well-typed. It also is assumed that no term is stuck, i.e., it can either be reduced or is a value. Finally, it is assumed that the program to be transformed is deterministic, i.e., no term can be reduced by two or more rules, and contains no ``partially dead" rules, as defined below.
-
-\begin{definition}[Partial deadness] A rule $r$ of a program $prg$ is partially dead with repect to $prg$ iff there is a term that matches $r$ and has a strict prefix that matches another rule of $prg$.
-\end{definition}
+It's always assumed that the program that is transformed is well-typed. It also is assumed that no term is stuck, i.e., it can either be reduced or is a value.
 
 Note/TODO: The well-typedness of the transformed program will be shown in a separate section.
 
-For the proofs of these properties the following lemmas will be needed:
+For the proofs of these properties the following lemmas and definitions will be needed:
 
 \begin{lemma}[Inversion lemma for pattern matching]
 
@@ -1076,336 +1043,26 @@ Let $\mathcal{D}$ be a derivation of $t =^? q \searrow \sigma$.
 
 \end{lemma}
 
-%%-- old version of lemma 2
-%\begin{lemma}
-%
-%Let $e$ be a helper extraction function, i.e., a function that can be an argument of $extract\_helpers$ as defined in section 1. For any program $prg$ and any two closed terms $s,t$ it holds that:
-%
-%\begin{enumerate}
-%
-%\item If $s =^? q \searrow \sigma$, $s'[\sigma] = t$ for a rule $(q, s') \in \textrm{Rules}(prg)$ and $\langle (q, s') \rangle^e = \big\langle r, H \big\rangle$ such that there is a reduction sequence from $s$ to $t$ with respect to $\{ r \} \cup \{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$,
-%
-%then $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
-%
-%\item If for a rule $(q, s') \in \textrm{Rules}(\langle prg \rangle^{extract\_helpers(e)})$ it holds that $s =^? q \searrow \sigma$, $s'[\sigma] = t$,
-%
-%then there is an equation $r$ in the equations of $prg$ such that $\langle r \rangle^e$ contains $`` q = s' "$.
-%
-%\end{enumerate}
-%
-%\begin{proof} ~
-%\begin{enumerate}
-%\item Let the conditions be satisfied. As we can see in the definition of $extract\_helpers$, for every equation $eqn$ in the original program, the transformed program contains the equation $r$ and the equations in the set $\{ heqn ~ | ~ \big\langle hsig, heqn \big\rangle \in H \}$, with $\big\langle r, H \big\rangle = \langle eqn \rangle^e$. Thus there is a reduction sequence from $s$ to $t$ with respect to the equations of the transformed program: $s \longrightarrow_{\langle prg \rangle^{extract\_helpers(e)}}^* t$.
-%
-%\item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
-%
-%\end{enumerate}
-%\end{proof}
-%
-%\end{lemma}
-%%--
+Write $\langle prg \rangle$ for $\langle prg \rangle^{extract\_helpers(e, funs)}$ when $e, funs$ are arbitrary or clear from the context. Write $\epsilon_r, \zeta_r$ for the transformed original and the auxiliary equation in $\langle r \rangle^e$ whenever there is such an auxiliary equation. Otherwise, it is always the case that $\langle r \rangle^e$ contains only $r$ itself.
 
-%%-- under construction
+\begin{definition*}[Extraction function properties]
+An extraction function $e$ is said to satisfy the extraction function properties iff
 
-In the following, the convention that $q_r$ is the left-hand side of the equation $r$ is used.
-
-\begin{definition}[Extraction function properties]
-Let $e$ be an argument of $extract\_helpers$, and $prg$ a deterministic program without any ``partially dead" rules; write $\langle prg \rangle$ short for $\langle prg \rangle^{extract\_helpers(e)}$. $e$ is said to satisfy the extraction function properties iff it is either of kind `A' or of kind `B'. These are defined such that $\langle prg \rangle$ has the whole-program properties that it is
-\begin{center}
-deterministic and contains no ``partially dead" rules\\
-(Note: this is unnecessary under the first proposed change to the semantics)
-\end{center}
-and, for any equation $r$ of $prg$, the equations within $\langle r \rangle^e$ are
-\begin{equation*}
-\epsilon_1, ..., \epsilon_n, \zeta,
-\end{equation*}
-for an $n \geq 0$, with properties partially specific to the kind of $e$. First listed are their common properties, then their respective specific properties.
-
-%%-- under construction
-\begin{itemize}
-\item \underline{Common properties:}
 \begin{enumerate}
-\item If $n = 0$, then $\zeta = r$.
-\item For $i \in \{1, ..., n\}$ it is $q_{\epsilon_i} \sim t_{\epsilon_i}$. Further, it is $q_\zeta \sim q_r$ and $t_\zeta = t_r$.
-\item For any term $t$ matching one of $\epsilon_1, ..., \epsilon_n$ returning a $\sigma$, if the immediate subterms of $t$ are values, so are the immediate subterms of the respective $t_{\epsilon_i}[\sigma]$.
-\item For any of $\epsilon_1, ..., \epsilon_n$ it holds that: The number of constructors on the right-hand side is smaller or equal to that of the left-hand side, the same for destructors. Further, either the number of constructors, or that of destructors, or both, is strictly smaller on the right-hand side compared to the left-hand side.
+\item $\forall r \not\in Rules(\langle prg \rangle): s \longrightarrow^{\textrm{Subst}_r}_{prg} t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \sim t$.
+
+\item If $s$ reduces in $prg$, so does every $\widetilde{s} \sim s$ in $\langle prg \rangle$.
+
+\item For every equation $r$ of $prg$:
+\begin{enumerate}
+\item A possible $\epsilon_r$ reduces (non-strictly) the number of constructors and that of destructors, and reduces strictly either the number of constructors or that of destructors, or both.
+
+\item The equations in $\langle r \rangle^e$ preserve the property of a term that all of its reduction-relevant subterms are values.
 \end{enumerate}
-
-\item \underline{Kind `A': ``Destructor extraction":} If $n \geq 1$ it holds that:
-\begin{enumerate}
-\item Set $q_0 := q_r$ and $q_i := q_0[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_i} \leftarrow t_{\epsilon_i}]$. It is $q_{\epsilon_1} < q_0, q_{\epsilon_2} < q_1, ..., q_{\epsilon_n} < q_{n-1}$, and $q_\zeta = q_n$.
-\end{enumerate}
-
-\item \underline{Kind `B': ``Constructor extraction":} If $n \geq 1$ it holds that:
-\begin{enumerate}
-\item For each $\sigma$ that substitutes only with values, there is a $\sigma^1_v$, that substitutes only with values, with $q_r[\sigma] = q_{\epsilon_1}[\sigma^1_v]$.
-\item There exist $\sigma^2_v, ..., \sigma^{n+1}_v$ that substitute only with values and for which it holds: $t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v]$, $t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}[\sigma^3_v]$, ..., $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_{\epsilon_n}[\sigma^n_v]$, and $t_{\epsilon_n}[\sigma^n_v] = q_\zeta[\sigma^{n+1}_v]$
-\item For $i \in \{2, ..., n\}$, $q_{\epsilon_i}$ is hole pattern. Further, $q_\zeta$ is hole pattern.
-\end{enumerate}
-\end{itemize}
-
-\end{definition}
-
-\begin{lemma}
-\label{lemma2}
-
-Let $e$ be an argument of $extract\_helpers$ that satisfies the extraction function properties, and let $prg$ be a deterministic program (TODO: define this as not containing any two rules which both match the same term).
-
-For any two closed terms $s,t$ it holds that:
-
-\begin{enumerate}
-
-\item If $s =^? q_r \searrow \sigma$, $t_r[\sigma] = t$ for some equation $r := `` q_r = t_r "$ of $prg$, and the (immediate) subterms of $s$ are values in $prg$,
-
-then $s \longrightarrow^*_{\langle prg \rangle^{extract\_helpers(e)}} t'$ for a $t'$ with $t' \sim t$.
-
-\item If for a rule $(q, s') \in \textrm{Rules}(\langle prg \rangle^{extract\_helpers(e)})$ it holds that $s =^? q \searrow \sigma$, $s'[\sigma] = t$,
-
-then there is an equation $r$ in the equations of $prg$ such that $\langle r \rangle^e$ contains $`` q = s' "$.
 
 \end{enumerate}
 
-\begin{proof}
-
-\begin{enumerate}
-
-\item
-
-As we can see in the definition of $extract\_helpers$, the transformed program $\langle prg \rangle$ contains, for every equation $r^*$ of $prg$, the equations within $\langle r^* \rangle^e$, and no others. Especially, $\langle prg \rangle$ contains $\langle r \rangle^e$, because $prg$ contains $r$. The desired sequence can be constructed as follows; it will be distinguished between the two kinds that $e$ can have.
-
-\begin{proof}[Proof for Kind `A'] Consider the equations that can be in $\langle r \rangle^e$. Two cases will be distinguished.
-
-\begin{itemize}
-
-\item $n = 0$. Then, by the first common property, it is $\zeta = r$ for the only rule $\zeta$ contained in $\langle r \rangle^e$. Thus it is $s = q_\zeta[\sigma]$. Consider the form of $q_\zeta[\sigma] = fun(t^0_1, ..., t^0_{n_0}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k})$. The desired sequence can be given as follows:
-\begin{equation*}
-s \longrightarrow^* fun((t^0_1)_v, ..., (t^0_{n_0})_v).des_1((t^1_1)_v, ..., (t^1_{n_1})_v)...des_k((t^k_1)_v, ..., (t^k_{n_k})_v) \longrightarrow t
-\end{equation*}
-First, the initial part of this sequence is constructed. The arguments $t^i_j$, which are values in $prg$, are reduced to their corresponding values $(t^i_j)_v \sim t^i_j$. We have such reductions by Lemma 3. Apply the ``Cong" rule, for an $\mathcal{E}$ detailed below, after each such reduction to obtain the reduction given below. All of those reductions, put behind one another, result in the initial part of the sequence.
-\begin{equation*}
-\mathcal{E}[t^i_j] \longrightarrow \mathcal{E}[(t^i_j)_v]
-\end{equation*}
-Such an $\mathcal{E}$ depends on the $i$ and $j$; it is constructed from $s$ by replacing the arguments to the left of $t^i_j$ with their corresponding values, as constructed for the previous steps, and leaving a hole for $t^i_j$. It remains to be shown why $\mathcal{E} = fun(...).des_1(...)...des_i(...[]...)...des_k(...)$ is actually a reduction context. I.e., why is it not possible to reduce $fun(...).des_1(...)...des_{i-1}(...)$? The arguments of $fun$ and of the destructors are values by construction. $fun(...).des_1(...)...des_l(...)$, for $l \in \{0, ..., i-1\}$, doesn't match any equation of $\langle prg \rangle$ because $\zeta$ would be ``partially dead" otherwise. This is because then there would be a term that matches both a prefix of $q_\zeta$ and this equation's left-hand side.
-
-(Note: Under the first proposed change for the semantics: The above argument can replaced by simply stating that it can be directly seen that $\mathcal{E}$ is a reduction context, because of its form and the $(t^i_j)_v$ being values.) 
-
-Second, the final step of the sequence is derived. This is done by using the ``Subst" rule for $\zeta$.
-
-\item $n \geq 1$. First, the prefixes of $s = q_r[\sigma]$ are converted. Set $q_0 := q_r$, $\sigma^0_v := \sigma$, and $q_i := q_r[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_i} \leftarrow t_{\epsilon_i}]$. By property 1 of kind `A' there are equations $\epsilon_1, ..., \epsilon_n$ with $q_{\epsilon_1} \leq q_0, q_{\epsilon_2} \leq q_1, ..., q_{\epsilon_n} \leq q_{n-1}$. From this we have the sequence
-\begin{equation*}
-s = q_0[\sigma^0_v] \longrightarrow^* q_1[\sigma^1_v] \longrightarrow^* ... \longrightarrow^* q_n[\sigma^n_v];
-\end{equation*}
-the $\sigma^i_v$ are constructed iteratively, as follows below. This sequence consists of the sequences
-\begin{equation*}
-q_i[\sigma^i_v] \longrightarrow^* q_i[\sigma^{i+1}_v] \longrightarrow q_{i+1}[\sigma^{i+1}_v]
-\end{equation*}
-for each $i \in \{0, ..., n-1\}$. The initial part is responsible for reducing the immediate subterms of the prefix $q_{\epsilon_{i+1}}[\sigma^i_v] \leq q_i[\sigma^i_v]$ to values, resulting in $q_i[\sigma^{i+1}_v]$. Afterwards, the last step is derived by using the ``Subst" rule for $\epsilon_{i+1}$.
-
-For the initial part of the sequence, it suffices to reduce the arguments of the function call and, of the destructor call, if any (from left to right), because there is no equation in $\langle prg \rangle$ that a strict prefix of $q_{\epsilon_{i+1}}[\sigma^i_v]$ matches. Otherwise $q_{\epsilon_{i+1}}$ would be ``partially dead"; the argument here is analogous to the ``$n = 0$" case.
-
-Second, the final step of the overall sequence is derived. This is done by using the ``Subst" rule for $\zeta$.
-
-\end{itemize}
-
-\end{proof}
-
-\begin{proof}[Proof for Kind `B'] Consider the equations that can be in $\langle r \rangle^e$. Two cases will be distinguished.
-
-\begin{itemize}
-\item $n = 0$. Then, by the first common property, it is $\zeta = r$ for the only rule $\zeta$ contained in $\langle r \rangle^e$. Thus it is $s = q_\zeta[\sigma]$. Consider the form of $q_\zeta[\sigma] = fun(t^0_1, ..., t^0_{n_0}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k})$. The desired sequence can be given as follows:
-\begin{equation*}
-s \longrightarrow^* fun((t^0_1)_v, ..., (t^0_{n_0})_v).des_1((t^1_1)_v, ..., (t^1_{n_1})_v)...des_k((t^k_1)_v, ..., (t^k_{n_k})_v) \longrightarrow t
-\end{equation*}
-The initial part of this sequence is concerned with reducing the $t^i_j$ to equivalent values. Its construction is identical to that of this case for an $e$ of Kind `A', consisting of reduction steps
-\begin{equation*}
-\mathcal{E}[t^i_j] \longrightarrow \mathcal{E}[(t^i_j)_v]
-\end{equation*}
-with $\mathcal{E}$ constructed as in Kind `A'. It will now be shown that $\mathcal{E}$ actually is a reduction context. Like in the proof for Kind `A' this is because $fun(...).des_1(...)...des_l(...)$ doesn't match any equation of $\langle prg \rangle$, for $l \in \{0, ..., i-1\}$. And again, this is because then $\zeta$ would be ``partially dead".
-
-(Note: Under the first proposed change for the semantics: Again, the above argument can replaced by simply stating that it can be directly seen that $\mathcal{E}$ is a reduction context, because of its form and the $(t^i_j)_v$ being values.) 
-
-Finally, the final step of the sequence is derived. This is done by using the ``Subst" rule for $\zeta$.
-
-\item $n \geq 1$. First, the arguments of the function and destructor calls need to be reduced to equivalent values, analogously to the ``$n = 0$" case, yielding an initial reduction sequence
-\begin{equation*}
-s = q_r[\sigma] \longrightarrow^* q_r[\sigma^0_v] \sim s,
-\end{equation*}
-with a $\sigma^0_v$ that substitutes only with values.
-
-By property 1 and 2, we have equations $\epsilon_1, ..., \epsilon_n, \zeta$ in $\langle r \rangle^e$ with $q_r[\sigma^0_v] = q_{\epsilon_1}[\sigma^1_v], t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v], t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}[\sigma^3_v], ..., t_{\epsilon_n}[\sigma^n_v] = q_\zeta[\sigma^{n+1}_v]$.
-From this we have the sequence
-\begin{equation*}
-s = q_{\epsilon_1}[\sigma^1_v] \longrightarrow t_{\epsilon_1}[\sigma^1_v] \longrightarrow ... \longrightarrow t_{\epsilon_n}[\sigma^n_v] = q_\zeta[\sigma^{n+1}_v] \longrightarrow t_\zeta[\sigma^{n+1}_v] =: \widetilde{t}.
-\end{equation*}
-Let $t_{\epsilon_0} := q_{\epsilon_1}$. Except for the last, each of the steps
-\begin{equation*}
-t_{\epsilon_i}[\sigma^i_v] \longrightarrow t_{\epsilon_{i+1}}[\sigma^{i+1}_v]
-\end{equation*}
-can be derived using the ``Subst" rule for the equation $\epsilon_i$, for $i \in \{0, ..., n-1\}$. This is possible because all immediate subterms of $t_{\epsilon_i}[\sigma^i_v] = q_{\epsilon_{i+1}}[\sigma^{i+1}_v]$ are values. This is because (a) $\sigma^0_v$ substitutes only with values, thus, by property 1, so does $\sigma^1_v$, and thus, by property 2, so do $\sigma^2_v, ..., \sigma^{n+1}_v$, and (b) by property 3 $q_{\epsilon_{i+1}}$ is hole pattern.
-
-The final step is derived using the ``Subst" rule for $\zeta$, possible because all immediate subterms of $q_\zeta[\sigma^{n+1}_v]$ are values. This is because, by property 2, $\sigma^{n+1}_v$ substitutes only with values, and by property 3 $q_\zeta$ is hole pattern.
-
-Lastly, it will be shown why $\widetilde{t} \sim t$. By the common property 2 it is $q_{\epsilon_i} \sim t_{\epsilon_i}$ and $q_{\zeta} \sim q_r$, and thus
-\begin{equation*}
-q_{\zeta}[\sigma^{n+1}_v] = t_{\epsilon^n_v}[\sigma^n_v] \sim q_{\epsilon^n_v}[\sigma^n_v] = t_{\epsilon^{n-1}_v} \sim ... \sim q_{\epsilon_1}[\sigma^1_v] = q_r[\sigma^0_v] \sim q_{\zeta}[\sigma^0_v] \sim q_{\zeta}[\sigma],
-\end{equation*}
-which means that, for each of the variables they substitute, $\sigma^{n+1}_v$ and $\sigma$ substitute with equivalent values. Especially, this means that $t_r[\sigma^{n+1}_v] \sim t_r[\sigma]$. By the common property 2, it is $t_\zeta = t_r$, and it follows that $\widetilde{t} = t_\zeta[\sigma^{n+1}_v] = t_r[\sigma^{n+1}_v] \sim t_r[\sigma] = t$.
-
-\end{itemize}
-
-\end{proof}
-
-\item As we can see in the definition of $extract\_helpers$, $\langle prg \rangle^{extract\_helpers(e)}$ contains only equations that are contained in $\langle r \rangle^{e} = \big\langle eqn', H \big\rangle$, be they either $eqn'$ or contained in $H$, for some $r$ from the equations of $prg$.
-
-\end{enumerate}
-
-\end{proof}
-
-\end{lemma}
-
-%%- old version of Lemma 3
-%\begin{lemma}
-%
-%If there is a reduction $s \longrightarrow_{prg} t$, for a program $prg$ and $s,t$ well-typed with respect to $prg$, that, in its derivation, uses only an equation $r$ and equations within a helpers set $H$,
-%
-%then there is a reduction sequence $s \longrightarrow^*_{prg'} t$ for some $prg'$ that contains only the equations in $\langle r, H \rangle^{extract\_des}_{prg}$.
-%
-%\begin{proof} Let $r := `` q' = s' "$. If $q'$ is hole pattern, it is
-%\begin{equation*}
-%\langle r, H \rangle^{extract\_des} = \big\langle r, H \big\rangle
-%\end{equation*}
-%The resulting equations are the same as the original. By setting $prg' = prg$ we have the desired $s \longrightarrow^*_{prg'} t$ (which has only one step $s \longrightarrow_{prg'} t$).
-%
-%Next, consider the case where $q'$ is $q.des(p_1, ..., p_k)$. It is thus
-%\begin{equation*}
-%\langle r, H \rangle^{extract\_des} = \big\langle `` q = hname(\langle q \rangle^{vars}) ", \{\big\langle hsig, heqn \big\rangle\} \cup H \big\rangle
-%\end{equation*}
-%with $hname$, $hsig$, $heqn$ as in the definition of $extract\_des$. Especially it is $heqn = `` q_h = s' "$, with $q_h$ defined as $hname(\langle q \rangle^{vars}).des(p_1, ..., p_k)$. A sequence $s \longrightarrow^*_{prg'} t$, for a program $prg'$ that contains only the equations in $\langle r, H \rangle^{extract\_des}$ and the same data and codata definitions as $prg$, can be constructed for any reduction $s \longrightarrow_{prg} t$ by induction on the structure of its derivation.
-%
-%\begin{enumerate}
-%
-%\item \textbf{``Subst" case}:
-%
-%The derivation of $s \longrightarrow_{prg} t$ can either use $r$ or one of the equations within $H$.
-%
-%\underline{It uses an equation $`` q_H = t_H "$ within $H$.} By inversion we have the following form for the derivation:
-%
-%\begin{prooftree}
-%\AxiomC{$s =^? q_H \searrow \sigma_H$}
-%\RightLabel{\scriptsize Subst with $(q_H, t_H)$}
-%\UnaryInfC{$s \longrightarrow t_H[\sigma_H]$}
-%\end{prooftree}
-%
-%with $t_H[\sigma_H] =t$; the immediate subterms of $s$ values in $prg$. They need not be values in $prg'$, which is why the key part of the construction below is concerned with their reduction to values.
-%
-%Since the subterms of $s$ are values in $prg$, we already know they don't match any left-hand side of $H$. Of the two other equations' left-hand sides, only $q$ can possibly be matched by such a subterm. This is because the left-hand side of the other, $q_h$, has a function name that is different from any in $prg$. Thus the subterm wouldn't typecheck in $prg$ if it were to match against $q_h$.
-%
-%By Lemma 4 we have a reduction sequence
-%\begin{equation*}
-%s(s^1, ..., s^n) \longrightarrow^*_{prg} s(s^1_v, ..., s^n_v)
-%\end{equation*}
-%where all subterms of $s(s^1_v, ..., s^n_v)$ are values in $prg$, and with $s \sim s(s^1_v, ..., s^n_v)$.
-%
-%This reduction sequence is the initial part of the desired sequence. After it, only one final step follows, derived as given below.
-%\begin{prooftree}
-%\AxiomC{$s(s^1_v, ..., s^n_v) =^? q_H \searrow \sigma'_H$}
-%\RightLabel{\scriptsize Subst with $(q_H, t_H)$}
-%\UnaryInfC{$s(s^1_v, ..., s^n_v) \longrightarrow t_H[\sigma'_H]$}
-%\end{prooftree}
-%From $s \sim s(s^1_v, ..., s^n_v)$ and $s =^? q_H \searrow \sigma_H$ it follows that $t_H[\sigma'_H] \sim t_H[\sigma_H]$.
-%
-%\underline{The derivation uses $r$.} By inversion, we have a derivation of $s \longrightarrow_{prg} t$ that looks as follows:
-%
-%\begin{prooftree}
-%\AxiomC{$s^{0} =^? q \searrow \sigma_0$}
-%\AxiomC{$s^{1} =^? p_1 \searrow \sigma_1$}
-%\AxiomC{...}
-%\AxiomC{$s^{k} =^? p_k \searrow \sigma_k$}
-%\RightLabel{\scriptsize PM\textsubscript{Des}}
-%\QuaternaryInfC{$s =^? q' \searrow \sigma$}
-%\RightLabel{\scriptsize Subst with $(q', s')$}
-%\UnaryInfC{$s \longrightarrow s'[\sigma]$}
-%\end{prooftree}
-%
-%Here it is $s = s^{0}.des(s^{1}, ..., s^{k})$, $\sigma = \sigma_0, ..., \sigma_k$ and $s'[\sigma] = t$.
-%
-%We also know that $s^{0}, s^1, ..., s^k$, as subterms of $s$, are values with respect to the equations of $prg$.
-%
-%Let $t_h := hname(\langle q \rangle^{vars})[\sigma_0]$. The desired sequence consists of the following steps:
-%\begin{equation*}
-%s \longrightarrow t_h.des(s^{1}, ..., s^{k}) \longrightarrow^* t_h(...).des(s^{1}_v, ..., s^{k}_v) \longrightarrow s'[\sigma']
-%\end{equation*}
-%The derivations for the first and the last step are given below. The intermediate sequence, which we have by Lemma 4, is necessary to reduce every $s^i$ that is not a value with respect to $prg'$ to such a value $s^i_v$. From Lemma 4 we also have
-%\begin{equation*}
-%t_h.des(s^{1}, ..., s^{k}) \sim t_h(...).des(s^{1}_v, ..., s^{k}_v)
-%\end{equation*}
-%$t_h(...)$ stands for $t_h$ with some of its subterms substituted with an equivalent subterm (especially it is $t_h(...) \sim t_h$).
-%
-%What follows are the derivations of the first and last step, in order.
-%
-%\begin{prooftree}
-%\AxiomC{$s^{0} =^? q \searrow \sigma_0$}
-%\RightLabel{\scriptsize Subst with $(q, `` hname(\langle q \rangle^{vars}) ")$}
-%\UnaryInfC{$s^0 \longrightarrow hname(\langle q \rangle^{vars})[\sigma_0]$}
-%\RightLabel{\scriptsize Cong}
-%\UnaryInfC{$s \longrightarrow hname(\langle q \rangle^{vars})[\sigma_0].des(s^1, ..., s^k)$}
-%\end{prooftree}
-%
-%\begin{prooftree}
-%\AxiomC{$t_h(...) =^? hname(\langle q \rangle^{vars}) \searrow \sigma'_0$}
-%\AxiomC{$s^{1}_v =^? p_1 \searrow \sigma'_1$}
-%\AxiomC{...}
-%\AxiomC{$s^{k}_v =^? p_k \searrow \sigma'_k$}
-%\RightLabel{\scriptsize PM\textsubscript{Des}}
-%\QuaternaryInfC{$t_h(...).des(s^1_v, ..., s^k_v) =^? q_h \searrow \sigma'$}
-%\RightLabel{\scriptsize Subst with $(q_h, s')$}
-%\UnaryInfC{$t_h(...).des(s^1_v, ..., s^k_v) \longrightarrow s'[\sigma']$}
-%\end{prooftree}
-%
-%It is $s \sim t_h.des(s^1, ..., s^k) \sim t_h(...).des(s^1_v, ..., s^k_v)$ and thus $s'[\sigma'] \sim s'[sigma] = t$.
-%
-%For these two derivations, what also needs to be shown is the value judgement, with respect to $prg'$, for several terms used in derivation steps which require them to be values. For each such term, it suffices to show that it matches neither against $q$ nor against $q_h$, as those are the only two left-hand sides in $prg'$.
-%
-%\begin{itemize}
-%
-%\item immediate subterms of $s^0$: These terms cannot match against $q$ because $s^0$ already matches against $q$. They can also not match against $q_h$ because then they wouldn't typecheck against $prg$ (as subterms of $s$) in the first place, as $prg$ doesn't contain the function name of $q_h$.
-%
-%\item $hname(\langle q \rangle^{vars})[\sigma_0]$: This term cannot match against $q$ because its function name is different from any function name in $prg$. It also cannot match against $q_h$ because $q_h$ is a destructor pattern while the term is not a destructor call.
-%
-%\end{itemize}
-%
-%\item \textbf{``Cong" case}:
-%
-%By inversion we have the following form for the derivation:
-%\begin{prooftree}
-%\AxiomC{$s_0 \longrightarrow t_0$}
-%\RightLabel{\scriptsize Cong}
-%\UnaryInfC{$\mathcal{E}[s_0] \longrightarrow \mathcal{E}[t_0]$}
-%\end{prooftree}
-%with $\mathcal{E}[s_0] = s, \mathcal{E}[t_0] = t$. By the induction hypothesis, we have
-%\begin{equation*}
-%s_0 \longrightarrow_{prg'} t_0
-%\end{equation*}
-%The following sequence will be constructed:
-%\begin{equation*}
-%\mathcal{E}[s_0] \longrightarrow^* \mathcal{E'}[s_0] \longrightarrow \mathcal{E'}[t_0]
-%\end{equation*}
-%The final step is derived by using the ``Cong" rule on the step we have from the induction hypothesis. The initial sequence is necessary to turn all terms in $\mathcal{E}$ that are values in $prg$ into values in $prg'$ ($\mathcal{E'}$ is defined by this change).
-%
-%We already know that a value term (with respect to $prg$) appearing in $\mathcal{E}$ doesn't match against any left-hand side in $H$. It also cannot match against $q_h$ because that copattern has a function name not in $prg$, and the term is well-typed in $prg$. The only left-hand side that the term could possibly match against is $q$.
-%
-%Lemma 4 can now be used in a limited form to obtain
-%\begin{equation*}
-%\mathcal{E}[s_0] \longrightarrow^* \mathcal{E'}[s_0]
-%\end{equation*}
-%For this, the reduction sequence construction in Lemma 4 is only carried out up to (and not including) $s_0$. This turns all values with respect to $prg$ in $\mathcal{E}$ into values in $\mathcal{E'}$ with respect to $prg'$. Just as with the complete construction of Lemma 4, it is $\mathcal{E}[s_0] \sim \mathcal{E'}[s_0]$. Replacing $s_0$ with $t_0$, it follows that $\mathcal{E'}[t_0] \sim \mathcal{E}[t_0] = t$.
-%
-%\end{enumerate}
-%
-%\end{proof}
-%
-%\end{lemma}
-%%-
+\end{definition*}
 
 \begin{lemma}
 \label{lemma3}
@@ -1449,150 +1106,44 @@ Finally, it needs to be shown that the reduction sequence given above is in fact
 
 \end{lemma}
 
-%%- old version of Lemma 4
-%\begin{lemma}
-%
-%Let $s(s^1, ..., s^n)$ be any closed term $s$ with its proper outer-most subterms $s^i$, from left to right, that match against $q$, for some copattern $q$. This notation for $s$ will be used for contextual substitution. Also, let there be a rule $(q, s')$ with $s^i =^? q \searrow \sigma$ and $s'[\sigma] \sim s^i$. Finally, let $prg$ be a program that contains no rule other than $(q, s')$ that any subterm of $s$ matches against, and with respect to which $s'[\sigma_v]$ is a value, for any substitution $\sigma_v$ that substitutes only with values.
-%
-%Then there is a reduction sequence $s \longrightarrow^*_{prg} s(s^1_v, ..., s^n_v)$ that uses only $(q, s')$ in its derivation, with all $s^i_v$ values in $prg$ and $s^i_v \sim s^i$. Especially, these last properties are equivalent with the properties that all proper subterms of $s(s^1_v, ..., s^n_v)$ are values in $prg$, and that $s \sim s(s^1_v, ..., s^n_v)$.
-%
-%\begin{proof} By induction on the structure of $s$.
-%
-%\begin{enumerate}
-%
-%\item $s = con(t^1, ..., t^k)$.
-%
-%Let $I \subseteq \{1, ..., k\}$ be the set of indices $i$ for which either $t^i$ or one of its subterms matches $q$. Set $t^i_v := t^i$ for $i \not\in I$. The desired sequence can be given as follows:
-%\begin{equation*}
-%con(t^1, ..., t^k) \longrightarrow^* con(t^1_v, ..., t^k_v)
-%\end{equation*}
-%It consists of the sequences
-%\begin{equation*}
-%con(t^1_v, ..., t^{i-1}_v, t^i, t^{i+1}, ..., t^k) \longrightarrow^* con(t^1_v, ..., t^{i-1}_v, t^i_v, t^{i+1}, ..., t^k)
-%\end{equation*}
-%for each $i \in I$, in ascending order. It will be shown that $t^i_v \sim t^i$ for each $i \in I$, from which $con(t^1, ..., t^k) \sim con(t^1_v, ..., t^k_v)$ follows (since $t^i_v = t^i$ for $i \not\in I$).
-%Three cases for $i \in I$ must be distinguished.
-%
-%Case 1: $t^i$ matches $q$, but not any of its proper subterms. Then the above sequence consists only of one step, which can be derived as follows.
-%\begin{prooftree}
-%\AxiomC{$t^i =^? q \searrow \sigma^i$}
-%\RightLabel{\scriptsize Subst with $(q, s')$}
-%\UnaryInfC{$t^i \longrightarrow s'[\sigma^i]$}
-%\RightLabel{\scriptsize Cong}
-%\UnaryInfC{$con(..., t^i, ...) \longrightarrow con(..., t^i_v, ...)$}
-%\end{prooftree}
-%Set $t^i_v := s'[\sigma^i]$. It is a value because $\sigma^i$ can only substitute with values since the proper subterms of $t^i$ are values. Clearly $t^i$ is a proper outer-most subterm of $s$ matching $q$, thus $t^i \sim s'[\sigma^i] = t^i_v$.
-%
-%Case 2: $t^i$ doesn't match $q$, but at least one of its proper subterms does. Then, by the induction hypothesis, we have the following sequence that uses only $(q, s')$:
-%\begin{equation*}
-%t^i \longrightarrow^* t'^i
-%\end{equation*}
-%The subterms of $t'^i$ are values in $prg$, set $t^i_v := t'^i$. We get the above sequence for $i$ by applying the ``Cong" rule at each step. We also know from the induction hypothesis that $t^i \sim t'^i = t^i_v$.
-%
-%Case 3: $t^i$ and at least one of its proper subterms matches $q$. Then first retrieve a sequence like in Case 2 and add to that a step as in Case 1 (use this lemma with the result of the Case 2 sequence for this). $t^i \sim t^i_v$ follows from the equivalences shown in Case 2 and Case 1 by transitivity.
-%
-%\item $s = fun(t^1, ..., t^k)$.
-%
-%This case can be shown analogously to $s = con(t^1, ..., t^k)$.
-%
-%\item $s = t^0.des(t^1, ..., t^k)$.
-%
-%The following sequence will be constructed:
-%\begin{equation*}
-%t^0.des(t^1, ..., t^k) \longrightarrow^* t'^0_v.des(t'^1_v, ..., t'^k_v)
-%\end{equation*}
-%By the induction hypothesis, we have sequences from $t^i$ to a $t'^i$ with $t^i \sim t'^i$ and with only values as proper subterms of $t'^i$, for every $i \in \{0, ..., k\}$. Apply the ``Cong" rule at each step and add the sequences behind one another (in ascending order of $i$) to retrieve the following sequence, which is the initial part of the constructed sequence.
-%\begin{equation*}
-%t^0.des(t^1, ..., t^k) \longrightarrow^* t'^0.des(t'^1, ..., t'^k)
-%\end{equation*}
-%Set $t'^i_v := t'^i$ for each $i \in \{0, ..., k\}$ where $t'^i$ doesn't match against $q$. Add a step
-%\begin{equation*}
-%t'^0.des(t'^1, ..., t'^k) \longrightarrow t'^0_v.des(t'^1, ..., t'^k)
-%\end{equation*}
-%if $t'^0$ matches against $q$. Add further steps, in ascending order of $i$, for every $i \in \{1, ..., k\}$ where $t'^i$ matches against $q$:
-%\begin{equation*}
-%t'^0_v.des(t'^1_v, ..., t'^{i-1}_v, t'^i, t'^{i+1} ..., t^k) \longrightarrow t'^0_v.des(t'^1_v, ..., t'^{i-1}_v, t'^i_v, t'^{i+1} ..., t^k)
-%\end{equation*}
-%Those steps can all be derived analogously to 1., Case 1, and the desired properties of $t'^i_v$ can also be shown analogously to there.
-%
-%\end{enumerate}
-%
-%\end{proof}
-%
-%\end{lemma}
-
-%%--
-
-%%-- under construction
-
 \subsection{Proofs of (1a) and (1b)}
 
-The bisimulation statements (1a) and (1b) hold for $unmix_r$ (TODO: redefine, see TODO in its proof of (1a)), $elim\_outer\_des$ and $disentangle_d$ by virtue of Proposition 1 below. This is because they are all defined as $extract\_helpers(e)$ for some helper extraction function $e$ with the extraction function properties, and don't affect input terms. The relevant helper extraction functions are $extract\_outer\_des$, $extract\_all\_des$, and $extract\_patterns$, and their extraction function properties are proved in the subsection that follows Proposition 1.
+Call the bisimulation statements (1a) and (1b) combined statement (1). It holds for the transformations $elim_multi_des$, $unmix$ and $disentangle$ of both de- and refunctionalization by virtue of Proposition 1 below. This is because they are all defined as a recursive concatenation of $extract\_helpers(e)$ for some helper extraction function $e$ with the extraction function properties, and don't affect input terms. The relevant helper extraction functions are $extract\_des$, $extract\_patterns$, and $extract$, and their extraction function properties are proved in the subsection that follows Proposition 1.
 
 \begin{proposition}
 
 Let $e$ be any helper extraction function with the extraction function properties. Then let $trans$ be a transformation which doesn't affect input terms, and for programs, is defined as $extract\_helpers(e)$.
 
-\begin{enumerate}
+Statement (1) holds for $trans$.
 
-\item Statement (1a) holds for $trans$.
-
-\item Statement (1b) holds for $trans$.
-
-\end{enumerate}
-
-\begin{proof} ~
-
-\begin{enumerate}
-
-\item By induction on the structure of $\mathcal{D}$.
+\begin{proof}
 
 \begin{enumerate}
 \item \textbf{``Subst" case}:
 
 \begin{prooftree}
-\AxiomC{$s =^? q \searrow \sigma$}
-\RightLabel{\scriptsize Subst with $(q, s') \in \textrm{Rules}(prg)$}
-\UnaryInfC{$s \longrightarrow s'[\sigma]$}
+\AxiomC{$s =^? q_r \searrow \sigma$}
+\RightLabel{\scriptsize Subst with $r \in \textrm{Rules}(prg)$}
+\UnaryInfC{$s \longrightarrow t_r[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = t$; the immediate subterms of $s$ are values. This transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
+with $t_r[\sigma] = t$; the reduction-relevant subterms of $s$ are values. The transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
 
-We know that $e$ fulfils the extraction function properties. Using \hyperref[lemma2]{ Lemma 2.1 } for $e$ and $(q_r, t_r) = (q, s')$, this gives us the desired $s \longrightarrow_{\langle prg \rangle}^* t'$ for a $t' \sim t$, since $trans = extract\_helpers(e)$.
+When $r$ is also an equation of $\langle prg \rangle$, it suffices to (a) by Lemma ?, reduce the reduction-relevant subterms of $s$ to equivalent values, and then (b) apply the ``Subst" rule for $r$ to get a reduction to a term equivalent to $t$.
+
+When, otherwise, $r$ is not an equation of $\langle prg \rangle$, we have the desired sequence by the first extraction function property.
 
 \item \textbf{``Cong" case}:
 
 \begin{prooftree}
 \AxiomC{$s^0 \longrightarrow t^0$}
-\RightLabel{Cong}
+\RightLabel{\scriptsize Cong}
 \UnaryInfC{$\mathcal{E}[s^0] \longrightarrow \mathcal{E}[t^0]$}
 \end{prooftree}
 
-with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$.
+with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$. By the induction hypothesis, we have a reduction sequence $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0} \sim t^0$.
 
-First note that Lemma 3 is applicable for $\langle prg \rangle$, because $trans = extract\_helpers(e)$ and $e$ fulfils the extraction function properties.
-
-The desired sequence can be constructed as follows.
-
-Terms immediately under $\mathcal{E}$ in its structure that are values in $prg$ but aren't values in $\langle prg \rangle$ need to be reduced to equivalent values first. For this, Lemma 3 can be applied multiple times to produce sequences that, starting with $\mathcal{E}[s^0]$ and always reducing the left-most such subterm, achieve exactly that. Thus we obtain an initial reduction $s \longrightarrow^*_{\langle prg \rangle} \widetilde{\mathcal{E}}[s^0]$ with $\widetilde{\mathcal{E}}[s^0] \sim \mathcal{E}[s^0]$.
-
-By the induction hypothesis we have $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0}$, for a $\widetilde{t^0} \sim t^0$. By applying the congruence rule we get $\widetilde{\mathcal{E}}[s^0] \longrightarrow_{\langle prg \rangle} \widetilde{\mathcal{E}}[\widetilde{t^0}] \sim \mathcal{E}[\widetilde{t^0}] \sim \mathcal{E}[t^0]$.
-
-\end{enumerate}
-
-\item By inspecting the proof of 1.
-
-\begin{enumerate}
-
-\item \textbf{``Subst" case}:
-
-The relevant sequence is constructed by \hyperref[lemma2]{ Lemma 2.1 }. As stated in its proof, all the steps before the last are constructed using \hyperref[lemma3]{ Lemma 3 }. It is also stated there that each step is equivalent to the start term, which can be seen by inspecting the proof of \hyperref[lemma3]{ Lemma 3 }. Going through this proof, one can see that any step is constructed in such a way that it is equivalent to the previous.
-
-\item \textbf{``Cong" case}:
-
-The relevant initial part of the sequence is constructed by Lemma 3. Again, by inspecting its proof, it can be seen that each step is equivalent to the start term.
-
-\end{enumerate}
+It suffices to (a) by Lemma ?, reduce the reduction-relevant subterms of $\mathcal{E}[s^0]$ left of $s^0$ to equivalent values, and then (b) use the ``Cong" rule, with the new context $\widetilde{\mathcal{E}}$ (around $s^0$) yielded by this, on the reduction sequence obtained from the induction hypothesis.
 
 \end{enumerate}
 
@@ -1600,504 +1151,324 @@ The relevant initial part of the sequence is constructed by Lemma 3. Again, by i
 
 \end{proposition}
 
-%%--
-
 \subsubsection{Proofs for extraction function properties}
 
-\begin{proof}[Proof for $extract\_outer\_des$]
+\subsection*{extract\_des:}
 
-This extraction function is of Kind `A' (``Destructor extraction"). First, the rule-specific properties are proved, then the whole-program properties.
-
-\underline{Rule-specific properties:} The properties are strengthened, as follows below, and then proved by induction on the structure of $q_r$.
-
-\underline{Induction-specific strengthening:}
-\begin{enumerate}
-\item The function name of $q_{\epsilon_1}$ is declared in $prg$.
-\item $q_{\epsilon_2}, ..., q_{\epsilon_n}$ are all destructor patterns, and unless $r = \zeta$, $q_\zeta$ is destructor pattern, too.
-\end{enumerate}
-
-\begin{itemize}
-
-\item \underline{Case 1:} $q_r$ is hole pattern.
-
+Specific property for the equivalence relation belonging to $extract\_des$:
 \begin{equation*}
-\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle
+q[\sigma] \sim \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(\langle q \rangle^{vars})[\sigma]
 \end{equation*}
-The properties are now shown one by one.
-\begin{itemize}
-\item \underline{Induction-specific strengthening:} Nothing to show because $n = 0$ and $r = \zeta$.
+iff $q.des_1(\overline{p})$ is a lhs in $prg$ such that its equation $r$ is actually transformed to $\epsilon_r$, $\zeta_r$.
 
-\item \underline{Common properties:}
-\begin{enumerate}
-\item Choose $n = 0$, $\zeta = r$.
-\item Clear because $n = 0$ and $\zeta = r$.
-\item Clear because $n = 0$.
-\item Clear because $n = 0$.
-\end{enumerate}
+\begin{lemma*}
 
-\item \underline{Kind `A':} Nothing to show because $n = 0$.
-\end{itemize}
-
-\item \underline{Case 2:} $q_r = q'.des(p_1, ..., p_k)$.
-
-When $q'$ is hole pattern, it is
-\begin{equation*}
-\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle,
-\end{equation*}
-and the argument is identical to Case 1. Otherwise, it is
-\begin{multline*}
-\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des}\\
-= \langle `` q' = hname(\langle q' \rangle^{vars}) ", \{\big\langle hsig, `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r " \big\rangle \} \rangle^{extract\_outer\_des},
-\end{multline*}
-with $hname$, $hsig$ as in the definition of $extract\_des$. The induction hypothesis, applied to $q'$, yields an $n' \geq 0$ and $\epsilon'_1, ..., \epsilon'_{n'}$, and $\zeta'$, in $\langle r \rangle^e$ with the properties. Choose $n = n' + 1$, $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n'\}$, $\epsilon_n = \zeta'$, and
-\begin{equation*}
-\zeta = `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r ".
-\end{equation*} The properties are now shown one by one. (TODO: What follows is immediately clear when extraction is reformulated (with same meaning) to Writer monad style. See also the idea with the boxed plus in the proofs above for this.)
-\begin{itemize}
-\item \underline{Induction-specific properties:}
-\begin{enumerate}
-\item Follows from the induction hypothesis, since $q_{\epsilon_1} = q_{\epsilon'_1}$.
-\item For $q_{\epsilon_2}, ..., q_{\epsilon_{n-1}}$, follows from the induction hypothesis, because $q_{\epsilon_i} = q_{\epsilon'_i}$ for $i \in \{2, ..., n'\}$ and $n = n'$. It has been chosen $q_{\epsilon_n} = q_\zeta'$, and if $q' = q_\zeta'$, this is a destructor pattern, otherwise, by the induction hypothesis, it is a destructor pattern, too. Finally, $q_\zeta$ has been chosen to be a destructor pattern.
-\end{enumerate}
-
-\item \underline{Common properties:}
-\begin{enumerate}
-\item Irrelevant since $n = n' + 1 \geq 0 + 1$.
-\item By the induction hypothesis, it is $q_{\epsilon'_i} \sim t_{\epsilon'_i}$, and it has been chosen $\epsilon_i = \epsilon'_i$, for $i \in \{1, ..., n'\}$. $n$ has been chosen as $n' + 1$, and $\epsilon_n$ as $\zeta'$. By the induction hypothesis, $q_\zeta' \sim q' \sim hname(\langle q' \rangle^{vars}) \sim t_\zeta'$. Finally, $\zeta$ has been chosen such that its left-hand side is equivalent to $q_r$ and that its right-hand side is $t_r$.
-\item It has been chosen $\epsilon_i = \epsilon'_i$, for $i \in \{1, ..., n-1\}$, thus, for these equations, we have the property by the induction hypothesis. It is $t_{\epsilon_n} = t_{\zeta'} = hname(\langle q' \rangle^{vars})$. When a term $t$, that substitutes only with values, matches $q_{\epsilon_n}$, it is $t = q_{\epsilon_n}[\sigma]$ for some $\sigma$ that substitutes only with values. It follows that $hname(\langle q' \rangle^{vars})[\sigma]$ only has value subterms, as well.
-\item It has been chosen $\epsilon_i = \epsilon'_i$, for $i \in \{1, ..., n-1\}$, thus, for these equations, we have the property by the induction hypothesis. It is $t_{\epsilon_n} = t_{\zeta'} = hname(\langle q' \rangle^{vars})$. It is clear that its number of constructors is smaller or equal than that of $q_{\epsilon_n}$, because $t_{\epsilon_n}$ has no constructors. The number of destructors is strictly smaller, because $q_{\epsilon_n}$ is a destructor copattern, and $hname(\langle q' \rangle^{vars})$ isn't.
-\end{enumerate}
-
-\item \underline{Kind `A':}
-\begin{enumerate}
-\item By the induction hypothesis, it is $q_{\epsilon'_1} < q', q_{\epsilon'_2} < q'_1, ..., q_{\epsilon'_{n'}} < q'_{n'-1}$, with $q'_i := q'[q_{\epsilon'_1} \leftarrow t_{\epsilon'_1}]...[q_{\epsilon'_i} \leftarrow t_{\epsilon'_i}]$. Since $\epsilon_i = \epsilon'_i$, $q' < q_r$, and $q'_i < q_i$, for $i \in \{1, ..., n'\}$ with $n' = n-1$, we have the property up to $n-1$, i.e., it remains to be shown that $q_{\epsilon_n} < q_{n-1}$ and $q_\zeta = q_n$. $q_{\epsilon_n}$ has been chosen as $q_\zeta'$, and by the induction hypothesis it is $q_{\zeta'} = q'_{n'} = q'[q_{\epsilon'_1} \leftarrow t_{\epsilon'_1}]...[q_{\epsilon'_{n'}} \leftarrow t_{\epsilon'_{n'}}] = q'[q_{\epsilon_1} \leftarrow t_{\epsilon_1}]...[q_{\epsilon_{n-1}} \leftarrow t_{\epsilon_{n-1}}] = q_{n-1}$. And it is $q_n = q'_{n-1}.des(p_1, ..., p_k)[q_{\epsilon_n} \leftarrow t_{\epsilon_n}] = q'_{n-1}[q_{\epsilon_n} \leftarrow t_{\epsilon_n}].des(p_1, ..., p_k)$ and, by the induction hypothesis, $t_{\epsilon_n} = t_{\zeta'} = hname(\langle q' \rangle^{vars})$.
-\end{enumerate}
-
-\end{itemize}
-
-\end{itemize}
-
-\underline{Whole-program properties:} That $\langle prg \rangle$ is deterministic and contains no ``partially dead" rules follows from the statement below:
-\begin{center}
-For any equation $r$ with $q_r \leq q^{ext}$ for a left-hand side $q^{ext}$ in $prg$ with either (a) $r$ itself contained in $prg$, or (b) $q_r$ destructor pattern and $t_r = hname(\langle q_r \rangle^{vars})$, the following holds:\\
-Let $t$ be a term that matches an equation $r'$ in $\langle r \rangle^e$. No prefix of $t$ matches an equation of $\langle prg \rangle$ different from $r'$.
-\end{center}
-This is now proved by induction on the structure of $q_r$.
-
-\begin{itemize}
-\item $q_r$ is hole pattern:
-
-Then $\langle r \rangle^e$ contains only $r$. Because $q_r$ is hole pattern, the only prefix of a term $t$ that matches $q_r$ is $t$ itself; further, $q_r$ has a function name declared in $prg$, and so has $t$. Also, because $q_r$ is hole pattern, $r$ is contained in $prg$. For any other equation $r^*$ of $prg$, by the rule-specific properties, the equations in $\langle r^* \rangle^e$ are either:
-\begin{itemize}
-\item only $r^*$: Then, when $t$ matched $r^*$ in addition to $r$, the rule of which $q^{ext}$ is the left-hand side would be ``partially dead" because of $r^*$.
-
-\item $\epsilon_1, ... \epsilon_n, \zeta$, with the rule-specific properties for $r^*$: All of these equations except $\epsilon_1$ have left-hand sides with function names not declared in $prg$, other than $t$, thus $t$ doesn't match them. $\epsilon_1$ is a prefix of $r^*$. Suppose that $t$ matched $\epsilon_1$ in addition to $r$. Then $t$ can be extended to a $t'$ that matches $r^*$, while $t$, a prefix of $t'$, matches $r$. This means the equation $r^*$ of $prg$ would be ``partially dead" because of $r$, contrary to assumption.
-\end{itemize}
-
-\item $q_r = q'.des(p_1, ..., p_k)$:
-
-\begin{itemize}
-\item \underline{Case 1:} $q'$ is hole pattern.
-
-Then $\langle r \rangle^e$ contains only $r$; the only copattern to consider is $q_r$.
-
-First, consider its only strict prefix $q'$. Every strict prefix $t_p$ of $t$ matches $q'$; $t_p$ thus has a function name declared in $prg$. Consider an equation $r^*$ of $prg$. The equations of its transformation result $\langle r^* \rangle^e$ are $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$, with extraction function properties relative to $r^*$.
-
-If it is $n > 0$, the function names of $q_{\epsilon^*_2}, ..., q_{\epsilon^*_n}$, and $q_{\zeta^*}$ aren't declared in $prg$, other than that of $t_p$, thus it cannot match these copatterns. The remaining copattern, $q_{\epsilon^*_1}$, is a destructor pattern, other than $q'$, thus $t_p$ doesn't match it.
-
-If, otherwise $n = 0$, it is $\zeta^* = r^*$. When $t_p$ matched $q_{r^*}$, since it also matches $q' < q_r \leq q^{exp}$, the equation of $q^{exp}$ would be ``partially dead" because of $r^*$, contrary to assumption.
-
-Second, consider $q_r$ itself and the term $t$ that matches it. Again, consider an $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
-
-If $n > 0$, the function names of $q_{\epsilon^*_2}, ..., q_{\epsilon^*_n}$, and $q_{\zeta^*}$ aren't declared in $prg$, other than that of $t$, thus it cannot match these copatterns. What remains is $q_{\epsilon^*_1} < q_{r^*}$. When $t$ matches $q_{\epsilon^*_1}$, it matches both a prefix of $q_{r^*}$ and a prefix $q_r$ of $q^{exp}$. Because of the preprocessing done by $align\_patterns$, these prefixes have both the most specific patterns of their forms, thus they are the same: $q_{\epsilon^*_1} = q_r$. We also know that either (a) $r$ is in $prg$, and then $r^* > r$ would be ``partially dead", contrary to assumption, or (b) $t_r = hname(\langle q_r \rangle^{vars})$, and then, since $q_{\epsilon^*_1} = q_r$ and $t_{\epsilon^*_1} = hname(\langle q_{\epsilon^*_1} \rangle^{vars})$, it is $\epsilon^*_1 = r$, also contrary to assumption.
-
-\item \underline{Case 2:} $q'$ is destructor pattern.
-
-\begin{multline*}
-\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des}\\
-= \langle `` q' = hname(\langle q' \rangle^{vars}) ", \{\big\langle hsig, `` hname(\langle q' \rangle^{vars}).des(p_1, ..., p_k) = t_r " \big\rangle \} \rangle^{extract\_outer\_des},
-\end{multline*}
-with $hname$, $hsig$ as in the definition of $extract\_des$.
-
-By the induction hypothesis,
-\begin{equation*}
-\langle `` q' = hname(\langle q' \rangle^{vars}) " \rangle^e
-\end{equation*}
-contains no ``partially dead" equations or equations that overlap with other equations. Let $h := hname(\langle q' \rangle^{vars})$. Only
-\begin{equation*}
-`` h.des(p_1, ..., p_k) = t_r "
-\end{equation*}
-remains to be considered.
-
-First, consider its only strict prefix $h$; its function name isn't declared in $prg$. Consider an equation $r^*$ of $prg$. The equations of its transformation result $\langle r^* \rangle^e$ are $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$, with extraction function properties relative to $r^*$. This means that the function name of $q_{\epsilon^*_1}$ is declared in $prg$, unlike that of $h$, thus a term that matches it cannot match $h$. $h$ cannot match a term that matches $q_{\epsilon^*_i}$, for any $i \in \{2, ..., n\}$, because those are all destructor patterns. Finally, $h$ also cannot match a term that matches $q_{\zeta^*}$, because either (a) $\zeta^* = r^*$, and then $q_{\zeta^*}$ has a function name declared in $prg$, or (b) $q_{\zeta^*}$ is a destructor pattern.
-
-Second, consider $h.des(p_1, ..., p_k)$ itself. Again, consider the equations $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$ of the transformation result of an equation $r^*$. The function name of $q_{\epsilon^*_1}$ is declared in $prg$, unlike that of $h$. If the function name of one of $q_{\epsilon^*_2}, ..., q_{\epsilon^*_n}, q_{\zeta^*}$ were equal to that of $h$, $q'.des(p_1, ..., p_k) = q_r$ would be a prefix of $q_{r^*}$. Because of the preprocessing done by $align\_patterns$, it has the most specific patterns of its form inside its function definition, and thus $h.des(p_1, ..., p_k)$ has the most specific patterns of its form inside its function definition.
-
-The same holds for $q_{r^*}$ and the relevant equation $r'$ in $\langle r^* \rangle^e$. It follows that $h.des(p_1, ..., p_k)$ \textit{is} the left-hand side of $r'$. For all $r'$ except $\zeta^*$, since for these two equations the left-hand sides are equivalent to the right-hand sides, and the right-hand sides are hole patterns, the right-hand sides and thus the rules have to be the same. For $\zeta^*$, we know that its left-hand side is identical to $h.des(p_1, ..., p_k) = q_\zeta$, for the $\zeta$ relative to $r$, and thus the left-hand sides of $r$ and $r^*$ are identical. But then it would be $q_{r^*} \leq q^{ext}$, and thus $r^*$ would be ``partially dead" because of the equation of $q^{ext}$, contrary to assumption.
-
-\end{itemize}
-
-\end{itemize}
-
-%(momentarily the first part of the ??? property)
-%
-%For each equation $r = `` q_r = t_r "$ there is an equation $r' = `` q_{r'} = t_{r'} "$ in $\langle `` q_r = t_r " \rangle^{extract\_outer\_des}$ such that the following holds:
-%
-%Let $\sigma$ be a substitution that covers the variables in $q_r$, and let $s^1, ..., s^n$ be the immediate subterms (from left to right) of $q_r[\sigma]$. In order to use it for contextual substitution, write $q_r[\sigma](s^1, ..., s^n)$ for $q_r[\sigma]$ and its subterms (from left to right). There is a substitution $\sigma_v$, which substitutes only with values, such that $q_{r'}[\sigma_v] = q_r[\sigma](s^1_v, ..., s^n_v)$.
-%
-%Proof:
-%
-%$\sigma_v$ is always constructed as follows, for each of its variables $x$:
-%\begin{equation*}
-%\sigma_v(x) = (\sigma(x))_v
-%\end{equation*}
-%
-%\begin{itemize}
-%
-%\item \underline{Case 1:} $q_r$ is hole pattern or has only one destructor.
-%
-%Then it is $\langle r \rangle^{extract\_outer\_des} = \big\langle r, \emptyset \big\rangle$. Choose $r' = r$.
-%
-%\begin{itemize}
-%
-%\item \underline{Case 1.1:} $q_r$ is hole pattern, i.e., $q_r = fun(p_1, ..., p_k)$.
-%
-%It is
-%\begin{multline*}
-%q_{r'}[\sigma_v] = q_r[\sigma_v] = fun(p_1, ..., p_k)[\sigma_v] = fun(p_1[\sigma_v], ..., p_k[\sigma_v]) \\
-%= fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = fun(s^1_v, ..., s^k_v) = q_r[\sigma](s^1_v, ..., s^k_v)
-%\end{multline*}
-%because $p_i[\sigma_v] = (p_i[\sigma])_v$, as can be easily shown by induction on the structure of the pattern and using $\sigma_v(x) = (\sigma(x))_v$.
-%
-%\item \underline{Case 1.2:} $q_r = fun(p_1, ..., p_k).des(p'_1, ..., p'_l)$.
-%
-%It is
-%\begin{multline*}
-%q_{r'}[\sigma_v] = q_r[\sigma_v] = (fun(p_1, ..., p_k).des(p'_1, ..., p'_l))[\sigma_v] \\
-%= fun(p_1[\sigma_v], ..., p_k[\sigma_v]).des(p'_1[\sigma_v], ..., p'_l[\sigma_v]) \\
-%= fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v).des((p'_1[\sigma])_v, ..., (p'_l[\sigma])_v) \\
-%= (fun(p_1[\sigma], ..., p_k[\sigma]))_v.des((p'_1[\sigma])_v, ..., (p'_l[\sigma])_v) = s^1_v.des(s^2_v, ..., s^{l+1}_v)
-%\end{multline*}
-%because $(fun(p_1[\sigma], ..., p_k[\sigma]))_v = fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$. This will be shown next.
-%
-%Suppose that $fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$ could further reduce in $\langle prg \rangle$, which would only be possible by the ``Subst" rule using a left-hand side of the form $fun(...)$. By induction on the structure of the copattern $q$, it can be easily shown that $\langle `` q = t " \rangle^{extract\_outer\_des}$ (for arbitrary $t$) can only contain a left-hand side of the form $fun(...)$ (a hole pattern) if $q = fun(...)$. It follows that there already is a left-hand side of the form $fun(...)$ in $prg$. But then $fun(p_1[\sigma], ..., p_k[\sigma])$ would not be a value in $prg$, contrary to the assumption. Thus $fun((p_1[\sigma])_v, ..., (p_k[\sigma])_v)$ cannot reduce further in $\langle prg \rangle$ and is a value.\footnote{It has codata type because otherwise $fun(p_1[\sigma], ..., p_k[\sigma])$ would not be a value in $prg$.}
-%
-%\end{itemize}
-%
-%\item \underline{Case 2:} $q_r = q'.des(p_1, ..., p_k)$ with $q'$ a destructor pattern.
-%
-%Then it is
-%\begin{multline*}
-%\langle r \rangle^{extract\_outer\_des} = \langle \langle r \rangle^{extract\_des} \rangle^{extract\_outer\_des} \\
-%= \langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract\_outer\_des}
-%\end{multline*}
-%with $hsig, heqn$ as in the definition of $extract\_des$, especially 
-%\begin{equation*}
-%heqn = ``  \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}.des(p_1, ..., p_k) = t_r "
-%\end{equation*}
-%This equation $heqn$ is also in $\langle r \rangle^{extract\_outer\_des}$. (TODO: This is immediately clear when extraction is reformulated (with same meaning) to Writer monad style. See also the idea with the boxed plus in the proofs above for this.) Choose $r' = heqn$. It is
-%\begin{multline*}
-%q_{r'}[\sigma_v] = (\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}.des(p_1, ..., p_k))[\sigma_v] \\
-%= (\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]).des(p_1[\sigma_v], ..., p_k[\sigma_v]) \\
-%= (q'[\sigma])_v.des((p_1[\sigma])_v, ..., (p_k[\sigma])_v) = q_r[\sigma](s^1_v, ..., s^{k+1}_v)
-%\end{multline*}
-%because
-%\begin{equation*}
-%\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v] = (q'[\sigma])_v,
-%\end{equation*}
-%which will be shown next. For this, let $q' = q''.des'(p_1, ..., p_l)$. It is now proved by induction on the structure of $q''$ that $q'[\sigma]$ reduces to $\langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]$.
-%
-%\begin{itemize}
-%
-%\item $q'' = fun(p'_1, ..., p'_m)$:
-%\begin{multline*}
-%(q'[\sigma])_v = (fun(p'_1[\sigma], ..., p'_m[\sigma]).des(p_1[\sigma], ..., p_l[\sigma]))_v\\
-%= (fun((p'_1[\sigma])_v, ..., (p'_m[\sigma])_v)_v.des((p_1[\sigma])_v, ..., (p_l[\sigma])_v))_v \\
-%= ((fun(p'_1[\sigma_v], ..., p'_m[\sigma_v]))_v.des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
-%= (((fun(p'_1, ..., p'_m))[\sigma_v])_v.des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v \\
-%= (q'[\sigma_v])_v = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]
-%\end{multline*}
-%The last equation is derived by using the equation
-%\begin{equation*}
-%`` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} "
-%\end{equation*}
-%for the reduction of $q'[\sigma_v]$ by the ``Subst" rule. This equation is contained in $\langle r \rangle^{extract\_outer\_des}$ because
-%\begin{multline*}
-%\langle r \rangle^{extract\_outer\_des} \\
-%= \langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract\_outer\_des}\\
-%= \big\langle `` q' = \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen} " , \{\big\langle hsig, heqn \big\rangle\} \big\rangle
-%\end{multline*}
-%
-%\item $q'' = q^0.des(p'_1, ..., p'_m)$:
-%\begin{multline*}
-%(q'[\sigma])_v = ... =  ((q^0[\sigma])_v.des(p'_1[\sigma_v], ..., p'_m[\sigma_v]).des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
-%= (\langle \textrm{extract}, \langle q^0 \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v].des(p'_1[\sigma_v], ..., p'_m[\sigma_v]).des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v\\
-%= (\langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v].des(p_1[\sigma_v], ..., p_l[\sigma_v]))_v \\
-%= (\langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m).des(p_1, ..., p_l) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v])_v\\
-%= \langle \textrm{extract}, \langle q^0.des(p'_1, ..., p'_m).des(p_1, ..., p_l) \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]\\
-%= \langle \textrm{extract}, \langle q' \rangle^{name\_pattern}, prg \rangle^{autogen}[\sigma_v]
-%\end{multline*}
-%
-%\end{itemize}
-%
-%\end{itemize}
-
-\end{proof}
-
-\begin{proof}[Proof for $extract\_all\_des$]
-
-TODO (very similar to $extract\_outer\_des$)
-
-\end{proof}
-
-\begin{proof}[Proof for $extract\_patterns$] This extraction function is of Kind `B' (``Constructor extraction"). First, the rule-specific properties are proved, then the whole-program properties.
-
-\underline{Rule-specific properties:} The following cases need to be distinguished.
-
-\begin{itemize}
-
-\item \underline{Case 1}: $q_r$ is hole pattern:
-
-$\langle `` q_r = t_r " \rangle^{extract\_patterns} = \big\langle `` q_r = t_r ", \emptyset \big\rangle$
-
-Choose $n = 0$ and $\zeta = r$. The properties are now shown one by one.
-
-\begin{itemize}
-\item \underline{Common properties:}
-\begin{enumerate}
-\item Clear.
-\item Clear because $n = 0$ and $\zeta = r$.
-\item Clear because $n = 0$.
-\item Clear because $n = 0$.
-\end{enumerate}
-
-\item \underline{Kind `B': ``Constructor extraction":} Nothing to show since $n = 0$.
-
-\end{itemize}
-
-\item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
-
-The argument is identical to that in Case 1.
-
-\item \underline{Case 3}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
-\begin{multline*}
-\langle q \rangle^{extract\_patterns}\\
-= \big\langle `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ", \{ \big\langle hsig, heqn \big\rangle \} \big\rangle
-\end{multline*}
-with $hname, hsig, heqn$ as in the definition of $extract\_patterns$. Choose $n = 1$ and
-\begin{equation*}
-\epsilon_1 = `` fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hname(x_1, ..., x_n, x'_1, ..., x'_k) ".
-\end{equation*}
-and
-\begin{equation*}
-\zeta = `` hname(p_1, ..., p_n, p'_1, ..., p'_k) = t_r ".
-\end{equation*}
-
-\begin{itemize}
-\item \underline{Common properties:}
-\begin{enumerate}
-\item Irrelevant since $n = 1$.
-\item $\epsilon_1$ has been chosen such that its sides are equivalent, and $\zeta$ has been chosen such that $q_\zeta \sim q$ and its right-hand side is $t_r$.
-\item Consider a term $t$ with only irreducible subterms, that matches $q_{\epsilon_1}$. It is $t = q_{\epsilon_1}[\sigma]$ for some $\sigma$ that substitutes only with values. Further, it is $t_{\epsilon_1}[\sigma] = hname(x_1, ..., x_n, x'_1, ..., x'_k)[\sigma]$, and this has only values as subterms.
-\item Clear because $\epsilon_1$ has been chosen such that its left-hand side is a destructor pattern, its right-hand side isn't, and both sides don't have any constructors at all.
-\end{enumerate}
-
-\item \underline{Kind `B': ``Constructor extraction":}
-\begin{enumerate}
-\item Choose $q_0 = fun(x_1, ..., x_n).des(x'_1, ..., x'_k)$, $\sigma^1_v(x_i) = p_i[\sigma]$, $\sigma^1_v(x'_i) = p'_i[\sigma]$.
-\item Choose $\sigma^2_v$ such that $x_i[\sigma^1_v] = p_i[\sigma^2_v]$ and $x'_i[\sigma^1_v] = p'_i[\sigma^2_v]$.
-\item Clear because $n < 2$ and $q_\zeta = hname(p_1, ..., p_n, p'_1, ..., p'_k)$.
-\end{enumerate}
-
-\end{itemize}
-
-\end{itemize}
-
-\underline{Whole-program properties:} For every equation $r$ of $prg$, it is shown that a term that matches an equation of $\langle r \rangle^e$ matches no other equation of $\langle prg \rangle$. The following cases need to be distinguished.
-
-\begin{itemize}
-
-\item \underline{Case 1}: $q_r$ is hole pattern:
-
-Then $\langle r \rangle^e$ contains only $r$. Consider another equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$. If $n > 0$, all of these except $\epsilon^*_1$ have left-hand sides with function names not declared in $prg$, other than $r$, and $q_{\epsilon^*_1}$ is destructor pattern, also unlike $r$. Otherwise, if $n = 0$, it is $\zeta^* = r^*$, and if a term matched both $r^*$ and $r$, $prg$ would be nondeterministic, contrary to assumption.
-
-\item \underline{Case 2}: $q_r = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\not\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
-
-Then $\langle r \rangle^e$ contains only $r$. Consider another equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
-
-If $n > 0$, all of these except $\epsilon^*_1$ have left-hand sides with function names not declared in $prg$, other than $r$. And $q_{\epsilon^*_1}$ is simply $q_{r^*}$ with its patterns replaced with variables. If a term matched both $q_{\epsilon^*_1}$ and $q_r$, since both have only variables as patterns, they would be identical. Thus $q_{r^*}$ and $q_r$ would overlap and $prg$ would be nondeterministic, contrary to assumption.
-
-Otherwise, if $n = 0$, it is $\zeta^* = r^*$. And if a term matched both $r^*$ and $r$, $prg$ would be nondeterministic, contrary to assumption.
-
-\item \underline{Case 3}: $q_r = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$, $\exists p \in \{ p_1, ..., p_n, p'_1, ..., p'_k \}: p$ is constructor application:
-
-Then $\langle r \rangle^e$ contains only
-\begin{equation*}
-\epsilon_1 = ``fun(x_1, ..., x_n).des(x'_1, ..., x'_k) = hfun(x_1, ..., x_n, x'_1, ..., x'_k)"
-\end{equation*}
-and
-\begin{equation*}
-\zeta = ``hfun(p_1, ..., p_n, p'_1, ..., p'_k) = t_r".
-\end{equation*}
-
-First, consider the first equation $\epsilon_1$. Consider an equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
-
-If $n > 0$, all of these except $\epsilon^*_1$ have left-hand sides with function names not declared in $prg$, unlike $\epsilon_1$. When a term $t$ matches $q_{\epsilon_1}$ and $q_{\epsilon^*_1}$, it follows that $q_{\epsilon_1} = q_{\epsilon^*_1}$, since, for both equations, all of their patterns are variables. But the right-hand side of $\epsilon^*_1$ is built from its left-hand side in the same way that the right-hand side of $\epsilon_1$ is built from the left-hand side of $\epsilon_1$, and thus $\epsilon^*_1$ and $\epsilon_1$ are the same.
-
-If otherwise $n = 0$, it is $\zeta^* = r^*$. A term $t$ that matches $\epsilon_1$ also matches $r$, because $q_{\epsilon_1}$ is simply $q_r$ with all of its patterns replaced by variables. If $t$ matched $\zeta^* = r^*$ as well, $prg$ would be nondeterministic, contrary to assumption.
-
-Second, consider the other equation contained in $\langle r \rangle^e$, $\zeta$. Again, consider an equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
-
-If $n > 0$, that is, specifically for this extraction function, it is $n = 1$, and of the two equations in $\langle r^* \rangle^e$, only $\zeta^*$ needs to be considered, because $\epsilon^*_1$ has a function name declared in $prg$, unlike $\zeta$. For any term $t = hfun(t_1, ..., t_n, t'_1, ..., t'_k)$ that matches $q_\zeta$ there is a term $t^0 = fun(t_1, ..., t_n).des(t'_1, ..., t'_k)$ that matches $q_r$. If $t$ matched $q_{\zeta^*}$, as well, $t^0$ would also match $q_{r^*}$ in the same way, and thus $prg$ would be nondeterministic, contrary to assumption.
-
-If otherwise $n = 0$, it is $\zeta^* = r^*$. Thus $q_{\zeta^*}$ has a function name declared in $prg$, unlike $\zeta$.
-
-\end{itemize}
-
-\end{proof}
-
-\begin{proof}[Proof for $extract$]
-
-The extraction function is of Kind `B' (``Constructor extraction"). First, the rule-specific properties are proved, then the whole-program properties.
-
-\underline{Rule-specific properties:} The properties are strengthened, as follows below, and then proved by induction on the number $n_c$ of constructor patterns within the copattern that is the left-hand side of the argument of $extract$.
-
-\underline{Induction-specific strengthening:}
-
-$\zeta = heqn$ with $\langle r \rangle^{extract} = \langle r', \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}$, unless $n = 0$.
-
-Proof by induction:
-
-\begin{itemize}
-
-\item $n_c = 0$.
-Then it is
-\begin{equation*}
-\langle r \rangle^{extract} = \big\langle r, \emptyset \big\rangle.
-\end{equation*}
-Choose $n = 0$, $\zeta = r$. The properties are now shown one by one.
-
-\begin{itemize}
-\item \underline{Induction-specific strengthening:} Nothing to show since $n = 0$.
-
-\item \underline{Common properties:}
-\begin{enumerate}
-\item Clear.
-\item Clear because $n = 0$ and $\zeta = r$.
-\item Clear because $n = 0$.
-\item Clear because $n = 0$.
-\end{enumerate}
-
-\item \underline{Kind `B': ``Constructor extraction":} Nothing to show since $n = 0$.
-\end{itemize}
-
-\item $n_c = n'_c + 1$.
-It is
-\begin{equation*}
-\langle r \rangle^{extract} = \langle `` (q_r)^{-con} = hname((q_r)^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}.
-\end{equation*}
-By the induction hypothesis, we have the property for $(q_r)^{-con}$. That is, we have $\epsilon'_1, ..., \epsilon'_{n'}, \zeta'$, for an $n' \geq 0$ with properties relative to $(q_r)^{-con}$. Choose $n = n'+1$, $\epsilon_i = \epsilon'_i$, for $i \in \{1, ..., n-1\}$, $\epsilon_n = \zeta'$, and $\zeta = heqn$.
-
-\begin{itemize}
-\item \underline{Induction-specific strengthening:} $\zeta$ has been chosen precisely to satisfy the strengthening.
-
-\item \underline{Common properties:}
-\begin{enumerate}
-\item Irrelevant since $n = n'+1 > 0$.
-\item It is $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, thus for these the property follows from the induction hypothesis. It is $\epsilon_n = \zeta'$, and by the induction hypothesis, it is $t_{\zeta'} = hname((q_r)^{-con}_{vars^+})$. By the strengthening of the induction hypothesis, $q_{\zeta'}$ is either $q_{heqn'} := hname((q_r)^{-con}_{vars^-})$ or equivalent to $(q_r)^{-con}$. In both cases it is equivalent to $hname((q_r)^{-con}_{vars^+})$.
-\item It is $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, thus for these the property follows from the induction hypothesis. It is $t_{\epsilon_n} = t_{\zeta'} = hname((q_r)^{-con}_{vars^+})$, thus all of its immediate subterms are variables. Consider a term $t$ with only irreducible immediate subterms that matches $q_{\epsilon_n}$; it is $t = q_{\epsilon_n}[\sigma]$ for a $\sigma$ that substitutes only with values. Thus $hname((q_r)^{-con}_{vars^+})[\sigma]$ only has irreducible immediate subterms, as well.
-\item It is $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, thus for these the property follows from the induction hypothesis. It is $\epsilon_n = \zeta'$, and by the induction hypothesis, it is $q_{\zeta'} = hname(((q_r)^{-con})^{-con}_{vars^-})$ and $t_{\zeta'} = hname((q_r)^{-con}_{vars^+})$. Both sides have no destructors, and the right-hand side has no constructors, unlike the left-hand side.
-\end{enumerate}
-
-\item \underline{Kind `B': ``Constructor extraction":}
-\begin{enumerate}
-\item Set $\sigma'(x) = p_{con}[\sigma]$ for the variable $x$ replacing the left-most inner- most constructor pattern $p_{con}$, and $\sigma'(x) = \sigma(x)$ for other variables $x$. By the induction hypothesis, there is a $\sigma'^1_v$ with $(q_r)^{-con}[\sigma'] = q_{\epsilon'_1}[\sigma'^1_v]$. Choose $\sigma^1_v = \sigma'^1_v$. It is clear that $q_r[\sigma] = (q_r)^{-con}[\sigma'] = q_{\epsilon'_1}[\sigma'^1_v] = q_{\epsilon_1}[\sigma^1_v]$.
-
-\item By the induction hypothesis, and since $\sigma'^1_v = \sigma^1_v$ and $\epsilon_i = \epsilon'_i$ for $i \in \{1, ..., n-1\}$, we have
-\begin{equation*}
-t_{\epsilon_1}[\sigma^1_v] = q_{\epsilon_2}[\sigma^2_v], t_{\epsilon_2}[\sigma^2_v] = q_{\epsilon_3}[\sigma^3_v], ..., t_{\epsilon_{n-2}}[\sigma^{n-2}_v] = q_{\epsilon_{n-1}}[\sigma^{n-1}_v].
-\end{equation*}
-
-Also by the induction hypothesis, it is $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_\zeta[\sigma'^{n' +1}_v] = q_{\epsilon_n}[\sigma'^{n}_v]$ for a $\sigma'^{n}_v$; thus choose $\sigma^{n}_v = \sigma'^{n}_v$ to gain $t_{\epsilon_{n-1}}[\sigma^{n-1}_v] = q_{\epsilon_n}[\sigma^{n}_v]$.
-
-Finally, choose $\sigma^{n+1}_v$ as follows: Let $x^0$ be the variable at the front of $(q_r)^{-con}_{vars^+}$, and $p^0$ be the pattern at the front of $(q_r)^{-con}_{vars}$. Set $\sigma^{n+1}_v(x^0) = p^0[\sigma^n_v]$, and $\sigma^{n+1}_v(x) = \sigma^n_v(x)$ for $x \neq x^0$. Because $t_{\epsilon_n} = t_\zeta' = t_{heqn'} := hname(q^{-con}_{vars^+})$ by the strengthening of the induction hypothesis, it is $t_{\epsilon_n}[\sigma^n_v] = t_{heqn'}[\sigma^n_v] = hname(q^{-con}_{vars^-})[\sigma^{n+1}_v] = q_\zeta[\sigma^{n+1}_v]$.
-
-\item Since $q_{\epsilon_i} = q_{\epsilon'_i}$, for $i \in \{2, ..., n-1\}$, these are hole patterns by the induction hypothesis. The same goes for $q_{\epsilon_n} = q_\zeta'$. Finally, $\zeta$ has been chosen such that its left-hand side is a hole pattern.
-\end{enumerate}
-
-\end{itemize}
-
-\end{itemize}
-
-\underline{Whole-program properties:} For every equation $r$ with $q_r = (...((q_{r'})^{-con})^{-con}...)^{-con}$ for an $r'$ of $prg$, it is shown that a term that matches an equation of $\langle r \rangle^e$ matches no other equation of $\langle prg \rangle$. The proof is by induction on the number of constructor patterns $n_c$ in $q_r$.
-
-\begin{itemize}
-
-\item $n_c = 0$.
-
-Then $r$ is the only equation in $\langle r \rangle^e$. Consider another equation $r^*$ of $prg$ with its transformation result $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
-
-If $n > 0$, all of these except $\epsilon^*_1$ have left-hand sides with function names not declared in $prg$, unlike $r$. $q_r$ has no constructors, as has $q_{\epsilon^*_1}$. If a term matched both, they thus would be the same, and thus $(...((q_{r'})^{-con})^{-con}...)^{-con} = q_r = q_{\epsilon^*_1} = (...((q_{r^*})^{-con})^{-con}...)^{-con}$. This means that $r'$ and $r^*$ would overlap, thus $prg$ would be nondeterministic, contrary to assumption.
-
-If otherwise $n = 0$, it would be $\zeta^* = r^*$, and $\zeta^*$ would contain no constructors. If a term matched both $r$ and $\zeta^* = r^*$, they thus would be the same, contrary to assumption.
-
-\item $n_c = n'_c + 1$. Then it is
-\begin{equation*}
-\langle r \rangle^{extract} = \langle `` (q_r)^{-con} = hname((q_r)^{-con}_{vars^+}) ", \{\big\langle hsig, heqn \big\rangle\} \rangle^{extract}.
-\end{equation*}
-By the induction hypothesis, the equations in
-\begin{equation*}
-\langle `` (q_r)^{-con} = hname((q_r)^{-con}_{vars^+}) " \rangle^{extract}
-\end{equation*}
-have the desired property. It remains to be shown that a term $t$ that matches $heqn$ doesn't match another equation of $\langle prg \rangle$. Consider such an equation; it is contained in $\langle r^* \rangle^e$ for an $r^*$ of $prg$, that is, it is one of $\epsilon^*_1, ..., \epsilon^*_n, \zeta^*$.
-
-If $n > 0$, the function name of $q_{\epsilon^*_1}$ is declared in $prg$, unlike that of $q_{heqn}$. Suppose a term matched both (a) one of $\epsilon^*_2, ..., \epsilon^*_n, \zeta^*$, and (b) $heqn$. Especially, this would mean that the function names of these two left-hand sides are the same, and this means that $(q_r)^{-con} = (...((q_{r^*})^{-con})^{-con}...)^{-con}$. But from this, since $q_r = (...((q_{r'})^{-con})^{-con}...)^{-con}$, it would follow that $q_{r'}$ and $q_{r^*}$ overlap, thus $prg$ would be nondeterministic, contrary to assumption.
-
-If otherwise $n = 0$, it would be $\zeta^* = r^*$, and $q_{r^*}$ has a function name declared in $prg$, unlike $q_{heqn}$.
-
-\end{itemize}
-
-\end{proof}
-
-\subsection{Proofs of (2)}
-
-%%-- under construction
-
-\begin{lemma}
-
-For any term $t$ that reduces in $prg$, all terms equivalent to $t$ reduce in $\langle prg \rangle$.
+$extract\_des$ satisfies the first extraction function property.
 
 \begin{proof}
 
-The set of equations of $\langle prg \rangle$ is exactly the union of all sets of equations in $\langle r \rangle^e$, for all equations $r$ of $prg$. Consider a term $t$ that reduces in $prg$. By induction on the derivation of the reduction, it will be shown that any term $\widetilde{t} \sim t$ is reducible in $\langle prg \rangle$.
+Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. From the definition of $extract\_helpers$ and $extract\_des$ we thus know that $q_r$ is a destructor copattern. By inversion, we know the form of $s$ is $s^0.des(\overline{t})$ The desired sequence can be given as follows.
+\begin{alignat*}{3}
+s &\longrightarrow^* &s^0_{subv}.des(\overline{t}) = q_{\epsilon_r}[\sigma_\epsilon].des(\overline{t})\\
+&\longrightarrow &t_{\epsilon_r}.des(\overline{t})\\
+&\longrightarrow^*  &t_{\epsilon_r}.des(\overline{t_v}) = q_{\zeta_r}[\sigma_\zeta]\\
+&\longrightarrow &t_{\zeta_r} =: \widetilde{t}
+\end{alignat*}
+The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s^0$ to equivalent values. We have such a sequence by Lemma ?, because $s^0$ matches $q_{\epsilon_r}$, by the definition of $\epsilon_r$ and because $s = s^0.des(\overline{t})$ and $s$ matches $q_r$.
 
-\begin{itemize}
-\item \underline{Case 1:} $t$ reduces by the ``Subst" rule for an $r$.
+Similarly, the second multi-step part is concerned with reducing the $\overline{t}$ to equivalent values.
 
-If $t$ reduces in such a way, so does any term $\widetilde{t} \sim t$ by the ``Subst" rule for an equation of $\langle r \rangle^e$. It suffices to show it matches such an equation, because if a reducible subterm prevents the reduction of $\widetilde{t}$ by the ``Subst" rule, it is still the case that $\widetilde{t}$ is reducible, because of this subterm.
+Now, the two one-step parts of the sequence are derived.
+\begin{enumerate}
+\item The first step is derived as given below.
+\begin{prooftree}
+\AxiomC{$s^0_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
+\RightLabel{\scriptsize Subst with $\epsilon_r$}
+\UnaryInfC{$s^0_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
+\RightLabel{\scriptsize Cong}
+\UnaryInfC{$\mathcal{E}[s^0_{subv}] \longrightarrow \mathcal{E}[t_{\epsilon_r}[\sigma_\epsilon]]$}
+\end{prooftree}
+with $\mathcal{E} = [].des(\overline{t})$. $s^0_{subv}$ matches $q_{\epsilon_r}$ because $s = s^0.des(\overline{t})$ and $q_r = q_{\epsilon_r}.des(\overline{p})$ and $s$ matches $q_r$. The two sides of $\epsilon_r$ are equivalent by definition, thus $s^0_{subv}$ and $t_{\epsilon_r}[\sigma_\epsilon]$ are, too. It remains to be shown (a) why $\mathcal{E}$ is actually an evaluation context, and (b) why no ``Subst" rule can take precedence over the ``Cong" rule as used in the derivation.
 
-Now, this equation that $\widetilde{t}$ matches will be specified; the two kinds of extraction functions will be distinguished. In any case, the equations in $\langle r \rangle^e$ are $\epsilon_1, ..., \epsilon_n, \zeta$, with properties as given by the extraction function properties.
+\begin{enumerate}
+\item $\mathcal{E}$ is derived as given below.
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{\scriptsize Hole}
+\UnaryInfC{$[]$}
+\RightLabel{\scriptsize Frame/Des}
+\UnaryInfC{$[].des(\overline{t})$}
+\end{prooftree}
 
-\begin{itemize}
-\item \underline{Kind `A' (``Destructor extraction"):}
+\item The only extension of $s^0_{subv}$ within $s^0_{subv}.des(\overline{t})$ is $s^0_{subv}.des(\overline{t})$ itself. Suppose this term matched a lhs of $\langle prg \rangle$. Each equation of $\langle prg \rangle$ either appears identical in $prg$, or there are $\epsilon_{r'}$ and $\zeta_{r'}$ in a $\langle r' \rangle^e$ for an $r'$ of $prg$.
 
-If $n = 0$, then $\zeta = r$. For terms $t$ that match such an equation, the set of equivalent terms consists only of $t$ itself (TODO: new property). Thus it is $\widetilde{t} = t$, and this matches $\zeta = r$, as we already know.
+The first case can be excluded, since (a) the function definition of $r'$ is the same as that of $r$, and this function definition has been affected since $r$ was actually transformed, and (b) $r'$ is transformed to $\epsilon_{r'}$ and $\zeta_{r'}$ because $q_{r'}$ is a destructor copattern since it is a matched by $s^0_{subv}.des(\overline{t})$.
 
-If otherwise $n > 0$, then there is an equation $\epsilon_i$ with $q_{\epsilon_i} < q_r$ ...
+The second case can also be excluded, because this would mean that there are overlapping patterns in the function definition, but these were eliminated by the pre-transformation.
 
-TODO
+\end{enumerate}
 
-\end{itemize}
+\item The second step is derived as given below.
+\begin{prooftree}
+\AxiomC{$t_{\epsilon_r}[\sigma_\epsilon].des(\overline{t_v}) =^? q_{\zeta_r} \searrow \sigma_\zeta$}
+\RightLabel{\scriptsize Subst with $\zeta_r$}
+\UnaryInfC{$t_{\epsilon_r}[\sigma_\epsilon].des(\overline{t_v}) \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
+\end{prooftree}
+The relevant subterms of $s^0_{subv}$ were values, thus also the terms that $\sigma_\epsilon$ substituted with. And $t_{\epsilon_r}[\sigma_\epsilon]$ contains no reduction-relevant subterms, as well. $t_[\epsilon_r]$ matches $q_{\zeta_r}$ by the definition of $\epsilon_r$ and $\zeta_r$. Because $t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\zeta]$ is equivalent to $s = q_r[\sigma]$, $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta] \sim t_r[\sigma_\zeta]$.
 
-\item \underline{Case 2:} $t$ reduces by the ``Cong" rule.
-
-TODO
-
-\end{itemize}
+\end{enumerate}
 
 \end{proof}
 
-\end{lemma}
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract\_des$ satisfies the second extraction function property.
+
+\begin{proof}
+
+From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
+
+Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
+\begin{equation*}
+\langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(\langle q \rangle^{vars})[\sigma].\overline{des(\overline{p}[\sigma])},
+\end{equation*}
+for some $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has exactly one top-level destructor call ($des_1$).
+
+If it has more than one top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a  possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
+
+Finally, if $\widetilde{s}$ had no top-level destructor calls, i.e., it is an application of the helper function, then there would exist equations in $prg$ which overlap. To see this, consider the form of $s \sim \widetilde{s}$: It matches a $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, as stated above. As a consequence, $q$ and $q.des_1(\overline{p})$ overlap. But this is prevented by the pre-transformation.
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract\_des$ satisfies the third extraction function property.
+
+\begin{proof}
+
+Both (a) and (b) can be easily seen in the definition of $extract\_des$.
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ don't contain lhss with overlapping prefixes, especially, this means these programs are deterministic. Then neither does $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(e, funs)}$, for arbitrary $funs$, $e = extract\_des^s$ with $s$ as $`` >1 "$ or $`` >0 "$.
+
+\begin{proof}
+
+Consider an atomic step of the extraction, i.e, the extraction out of a single equation. The lemma follows by combining the proofs for the atomic steps. It suffices to consider such steps which actually change the equations, i.e., they replace an equation $r$ of $prg$ with $\epsilon_r$ and $\zeta_r$. The lhss of $\epsilon_r$ and $\zeta_r$, and their prefixes, can't overlap, since they have different function names by definition. Now, consider another equation $r'$, contained in both the program before the atomic step transformation and afterwards.
+
+First, compare $q_{r'}$ to $q_{\epsilon_r} < q_r$: Any two of their respective prefixes are also prefixes of $q_{r'}$ and $q_{\epsilon_r}$, respectively, which by assumption don't overlap.
+
+Second, compare $q_{r'}$ to $q_{\zeta_r}$. If any of their respective prefixes overlap, $r'$ and $\zeta_r$ are in the same function definition, thus the lhs of $r'$ results from the extraction of a destructor out of some $r^*$ contained in a predecessor $prg^i$ of $prg$. This $prg^i$ also contains a lhs $q_{r^\#}$ of which $q_{r'}$ is a prefix. If a prefix of $q_{r'}$ overlaps with one of $q_{\zeta_r}$, so does a prefix of $q_{r'}$, which is also a prefix of $q_{r^\#}$, with one of $q_{r^*}$, contrary to assumption.
+
+\end{proof}
+
+\end{lemma*}
+
+\subsection*{extract\_patterns:}
+
+Specific property for the equivalence relation belonging to $extract\_patterns$:
+\begin{equation*}
+fun(\overline{p}).des(\overline{p'})[\sigma] \sim \langle fun, des, prg^0 \rangle^{autogen}(\overline{p}, \overline{p'})[\sigma]
+\end{equation*}
+iff $fun(\overline{p}).des(\overline{p'})$ is a lhs in $prg$ such that its equation $r$ is actually transformed to $\epsilon_r$, $\zeta_r$.
+
+\begin{lemma*}
+
+$extract\_patterns$ satisfies the first extraction function property.
+
+\begin{proof}
+
+Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. The desired sequence can be given as follows.
+\begin{alignat*}{3}
+s &\longrightarrow^* &s_{subv} = q_{\epsilon_r}[\sigma_\epsilon]\\
+&\longrightarrow &t_{\epsilon_r}\\
+&\longrightarrow^*  &(t_{\epsilon_r}[\sigma_\epsilon])_{subv} = q_{\zeta_r}[\sigma_\zeta]\\
+&\longrightarrow &t_{\zeta_r}[\sigma_\zeta] =: \widetilde{t}
+\end{alignat*}
+The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s$ to equivalent values. We have such a sequence by Lemma ?.
+
+Similarly, the second multi-step part is concerned with reducing the reduction-relevant subterms of $t_{\epsilon_r}$ to equivalent values.
+
+Now, the two one-step parts of the sequence are derived.
+
+\begin{enumerate}
+\item The first step is derived as given below.
+\begin{prooftree}
+\AxiomC{$s_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
+\RightLabel{\scriptsize Subst with $\epsilon_r$}
+\UnaryInfC{$s_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
+\end{prooftree}
+$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with all patterns replaced by variables. $s_{subv}$ is equivalent to $t_{\epsilon_r}$, because, by definition, the two sides of $\epsilon_r$ are equivalent.
+
+\item The second step is derived as given below.
+\begin{prooftree}
+\AxiomC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} =^? q_{\zeta_r} \searrow \sigma_\zeta$}
+\RightLabel{\scriptsize Subst with $\zeta_r$}
+\UnaryInfC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
+\end{prooftree}
+$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with all variables replaced by the patterns of $q_r$. $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta]$ because $t_{\zeta_r} \sim t_r$ and $q[\sigma] \sim t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\epsilon]$ and $q_r \sim q_{\zeta_r}$.
+
+\end{enumerate}
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract\_patterns$ satisfies the second extraction function property.
+
+\begin{proof}
+
+From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
+
+Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
+\begin{equation*}
+\langle fun, \overline{des}, prg^0 \rangle^{autogen}(\overline{x}, \overline{x'})[\sigma].\overline{des(\overline{p}[\sigma])},
+\end{equation*}
+for some $q_r = fun(\overline{x}.\overline{des(\overline{x'})}$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has no top-level destructor calls.
+
+If it has one or more top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract\_patterns$ satisfies the third extraction function property.
+
+\begin{proof}
+
+Both (a) and (b) can be easily seen in the definition of $extract\_patterns$.
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ be deterministic. Then so is $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(extract\_patterns, funs)}$, for arbitrary $funs$.
+
+\begin{proof}
+
+Consider an atomic step of the extraction, i.e, the extraction out of a single equation. The lemma follows by combining the proofs for the atomic steps. It suffices to consider such steps which actually change the equations, i.e., they replace an equation $r$ of $prg$ with $\epsilon_r$ and $\zeta_r$. The lhss of $\epsilon_r$ and $\zeta_r$, and their prefixes, can't overlap, since they have different function names by definition. Now, consider another equation $r'$, contained in both the program before the atomic step transformation and afterwards.
+
+First, compare $q_{r'}$ to $q_{\epsilon_r}$: $q_{\epsilon_r}$ is simply $q_r$ with all of its patterns replaced by variables, thus, a term that matches $q_{\epsilon_r}$ also matches $q_r$. If it also matched $q_{r'}$, the program before the atomic step transformation would be nondeterministic, contrary to assumption.
+
+Second, compare $q_{r'}$ to $q_{\zeta_r}$: The lhs of $\zeta_r$ results from the extraction out of an $r^*$ of a $prg^i$. It is also contained in all predecessors of $prg^i$, that is, all $prg^k$ with $k \leq i$. The same holds for $r'$ with an $r^\#$, for a $prg^j$ and its predecessors. From a term that matches $q_{r'}$, a term can be constructed that matches $r^\#$, and the same for $q_{\zeta_r}$ and $r^*$. Because this construction is the same in both cases, when a term matches both $q_{r'}$ and $q_{\zeta_r}$, there is a term that matches both $q_{r^\#}$ and $q_{r^*}$. And these lhss are found together in one program, either in $prg^i$ when $i \leq j$, or in $prg^j$, otherwise. But this would contradict the assumption that all these programs were deterministic.
+
+\end{proof}
+
+\end{lemma*}
+
+\subsection*{extract:}
+
+Specific property for the equivalence relation belonging to $extract\_patterns$:
+\begin{equation*}
+q^{-con'}[\sigma] \sim \langle \langle q^{-con'} \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(q^{-con'}_{vars^+})[\sigma]
+\end{equation*}
+iff $q$ is a lhs in $prg$ such that its equation $r$ is actually transformed to $\epsilon_r$, $\zeta_r$.
+
+\begin{lemma*}
+
+$extract$ satisfies the first extraction function property.
+
+\begin{proof}
+
+Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. The desired sequence can be given as follows.
+\begin{alignat*}{3}
+s &\longrightarrow^* &s_{subv} = q_{\epsilon_r}[\sigma_\epsilon]\\
+&\longrightarrow &t_{\epsilon_r}\\
+&\longrightarrow^*  &(t_{\epsilon_r}[\sigma_\epsilon])_{subv} = q_{\zeta_r}[\sigma_\zeta]\\
+&\longrightarrow &t_{\zeta_r}[\sigma_\zeta] =: \widetilde{t}
+\end{alignat*}
+The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s$ to equivalent values. We have such a sequence by Lemma ?.
+
+Similarly, the second multi-step part is concerned with reducing the reduction-relevant subterms of $t_{\epsilon_r}$ to equivalent values.
+
+Now, the two one-step parts of the sequence are derived.
+
+\begin{enumerate}
+\item The first step is derived as given below.
+\begin{prooftree}
+\AxiomC{$s_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
+\RightLabel{\scriptsize Subst with $\epsilon_r$}
+\UnaryInfC{$s_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
+\end{prooftree}
+$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with one pattern replaced by a variable and put in front of the other patterns. $s_{subv}$ is equivalent to $t_{\epsilon_r}$, because, by definition, the two sides of $\epsilon_r$ are equivalent.
+
+\item The second step is derived as given below.
+\begin{prooftree}
+\AxiomC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} =^? q_{\zeta_r} \searrow \sigma_\zeta$}
+\RightLabel{\scriptsize Subst with $\zeta_r$}
+\UnaryInfC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
+\end{prooftree}
+$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with the variable in front replaced by the respective pattern of $q_r$ (that, in $q_{\epsilon_r}$, was replaced by a variable and put in front). $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta]$ because $t_{\zeta_r} \sim t_r$ and $q[\sigma] \sim t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\epsilon]$ and $q_r \sim q_{\zeta_r}$.
+
+\end{enumerate}
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract$ satisfies the second extraction function property.
+
+\begin{proof}
+
+From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
+
+Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
+\begin{equation*}
+\langle \langle (q_r)^{-con} \rangle^{name\_pattern} \rangle^{autogen}((q_r)^{-con}_{vars^+})[\sigma].\overline{des(\overline{p}[\sigma])},
+\end{equation*}
+for some $q_r$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has no top-level destructor calls.
+
+If it has one or more top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+$extract$ satisfies the third extraction function property.
+
+\begin{proof}
+
+Both (a) and (b) can be easily seen in the definition of $extract$.
+
+\end{proof}
+
+\end{lemma*}
+
+\begin{lemma*}
+
+Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ be deterministic. Then so is $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(extract, funs)}$, for arbitrary $funs$.
+
+\begin{proof}
+
+Consider an atomic step of the extraction, i.e, the extraction out of a single equation. The lemma follows by combining the proofs for the atomic steps. It suffices to consider such steps which actually change the equations, i.e., they replace an equation $r$ of $prg$ with $\epsilon_r$ and $\zeta_r$. The lhss of $\epsilon_r$ and $\zeta_r$, and their prefixes, can't overlap, since they have different function names by definition. Now, consider another equation $r'$, contained in both the program before the atomic step transformation and afterwards.
+
+First, compare $q_{r'}$ to $q_{\epsilon_r}$: $q_{\epsilon_r}$ is simply $q_r$ with one of its patterns replaced by variables, thus, a term that matches $q_{\epsilon_r}$ also matches $q_r$. If it also matched $q_{r'}$, the program before the atomic step transformation would be nondeterministic, contrary to assumption.
+
+Second, compare $q_{r'}$ to $q_{\zeta_r}$: The lhs of $\zeta_r$ results from the extraction out of an $r^*$ of a $prg^i$. It is also contained in all predecessors of $prg^i$, that is, all $prg^k$ with $k \leq i$. The same holds for $r'$ with an $r^\#$, for a $prg^j$ and its predecessors. From a term that matches $q_{r'}$, a term can be constructed that matches $r^\#$, and the same for $q_{\zeta_r}$ and $r^*$. Because this construction is the same in both cases, when a term matches both $q_{r'}$ and $q_{\zeta_r}$, there is a term that matches both $q_{r^\#}$ and $q_{r^*}$. And these lhss are found together in one program, either in $prg^i$ when $i \leq j$, or in $prg^j$, otherwise. But this would contradict the assumption that all these programs were deterministic.
+
+\end{proof}
+
+\end{lemma*}
+
+\subsection{Proofs of (2)}
 
 \begin{proposition}
 
@@ -2142,7 +1513,7 @@ $\widetilde{\mathcal{E}}[\widetilde{s'}]$ has the form
 \begin{equation*}
 fun'(s^0_1, ..., s^0_{n'_0}).des'_1(s^0_1, ..., s^0_{n'_1})...des'_{k'}(s^0_1, ..., s^0_{n'_{k'}}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k}),
 \end{equation*}
-where each of the $s^i_j$ is equivalent to exactly one of the $t^0_i$. Thus, it actually is an evaluation context in $prg$, i.e., all of its immediate subterms left of the hole are irreducible in $prg$. To see this, consider such the highest-level subterms that can be possibly be reduced (Note: this is possible under the first proposed change, because then prefixes can't be reduced using the congruence rule); those are precisely the $s^i_j$. Suppose it reduced in $prg$, then, by Lemma 4 (TODO: prove such a lemma), the equivalent term among the $t^0_i$ would reduce in $\langle prg \rangle$, contrary to the fact that it is a value in $prg$ because it is to the left of the hole in $\mathcal{E}$.
+where each of the $s^i_j$ is equivalent to exactly one of the $t^0_i$. Thus, it actually is an evaluation context in $prg$, i.e., all of its immediate subterms left of the hole are irreducible in $prg$. To see this, consider such the highest-level subterms that can be possibly be reduced (Note: this is possible under the first proposed change, because then prefixes can't be reduced using the congruence rule); those are precisely the $s^i_j$. Suppose it reduced in $prg$, then, by the second extraction function property, the equivalent term among the $t^0_i$ would reduce in $\langle prg \rangle$, contrary to the fact that it is a value in $prg$ because it is to the left of the hole in $\mathcal{E}$.
 
 \end{enumerate}
 
@@ -3051,393 +2422,5 @@ But it is $prg' \subseteq prg$, as can be seen in the definition of $r''$. This 
 The argument here is identical to that of this case of this direction in the proof for $d''$.
 
 \end{proof}
-
-\pagebreak
-%%-- under construction
-\begin{framed}
-\textbf{Under Construction}
-
-\subsection*{Extraction function properties}
-
-Write $\langle prg \rangle$ for $\langle prg \rangle^{extract\_helpers(e, funs)}$ when $e, funs$ are arbitrary or clear from the context. Write $\epsilon_r, \zeta_r$ for the transformed original and the auxiliary equation in $\langle r \rangle^e$ whenever there is such an auxiliary equation. Otherwise, it is always the case that $\langle r \rangle^e$ contains only $r$ itself.
-
-\begin{definition*}[Extraction function properties]
-An extraction function $e$ is said to satisfy the extraction function properties iff
-
-\begin{enumerate}
-\item $\forall r \not\in Rules(\langle prg \rangle): s \longrightarrow^{\textrm{Subst}_r}_{prg} t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \sim t$.
-
-\item If $s$ reduces in $prg$, so does every $\widetilde{s} \sim s$ in $\langle prg \rangle$.
-
-\item For every equation $r$ of $prg$:
-\begin{enumerate}
-\item A possible $\epsilon_r$ reduces (non-strictly) the number of constructors and that of destructors, and reduces strictly either the number of constructors or that of destructors, or both.
-
-\item The equations in $\langle r \rangle^e$ preserve the property of a term that all of its reduction-relevant subterms are values.
-\end{enumerate}
-
-\end{enumerate}
-
-\end{definition*}
-
-\subsection*{extract\_des:}
-
-Specific property for the equivalence relation belonging to $extract\_des$:
-\begin{equation*}
-q[\sigma] \sim \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(\langle q \rangle^{vars})[\sigma]
-\end{equation*}
-iff $q.des_1(\overline{p})$ is a lhs in $prg$ such that its equation $r$ is actually transformed to $\epsilon_r$, $\zeta_r$.
-
-\begin{lemma*}
-
-$extract\_des$ satisfies the first extraction function property.
-
-\begin{proof}
-
-Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. From the definition of $extract\_helpers$ and $extract\_des$ we thus know that $q_r$ is a destructor copattern. By inversion, we know the form of $s$ is $s^0.des(\overline{t})$ The desired sequence can be given as follows.
-\begin{alignat*}{3}
-s &\longrightarrow^* &s^0_{subv}.des(\overline{t}) = q_{\epsilon_r}[\sigma_\epsilon].des(\overline{t})\\
-&\longrightarrow &t_{\epsilon_r}.des(\overline{t})\\
-&\longrightarrow^*  &t_{\epsilon_r}.des(\overline{t_v}) = q_{\zeta_r}[\sigma_\zeta]\\
-&\longrightarrow &t_{\zeta_r} =: \widetilde{t}
-\end{alignat*}
-The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s^0$ to equivalent values. We have such a sequence by Lemma ?, because $s^0$ matches $q_{\epsilon_r}$, by the definition of $\epsilon_r$ and because $s = s^0.des(\overline{t})$ and $s$ matches $q_r$.
-
-Similarly, the second multi-step part is concerned with reducing the $\overline{t}$ to equivalent values.
-
-Now, the two one-step parts of the sequence are derived.
-\begin{enumerate}
-\item The first step is derived as given below.
-\begin{prooftree}
-\AxiomC{$s^0_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
-\RightLabel{\scriptsize Subst with $\epsilon_r$}
-\UnaryInfC{$s^0_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
-\RightLabel{\scriptsize Cong}
-\UnaryInfC{$\mathcal{E}[s^0_{subv}] \longrightarrow \mathcal{E}[t_{\epsilon_r}[\sigma_\epsilon]]$}
-\end{prooftree}
-with $\mathcal{E} = [].des(\overline{t})$. $s^0_{subv}$ matches $q_{\epsilon_r}$ because $s = s^0.des(\overline{t})$ and $q_r = q_{\epsilon_r}.des(\overline{p})$ and $s$ matches $q_r$. The two sides of $\epsilon_r$ are equivalent by definition, thus $s^0_{subv}$ and $t_{\epsilon_r}[\sigma_\epsilon]$ are, too. It remains to be shown (a) why $\mathcal{E}$ is actually an evaluation context, and (b) why no ``Subst" rule can take precedence over the ``Cong" rule as used in the derivation.
-
-\begin{enumerate}
-\item $\mathcal{E}$ is derived as given below.
-\begin{prooftree}
-\AxiomC{}
-\RightLabel{\scriptsize Hole}
-\UnaryInfC{$[]$}
-\RightLabel{\scriptsize Frame/Des}
-\UnaryInfC{$[].des(\overline{t})$}
-\end{prooftree}
-
-\item The only extension of $s^0_{subv}$ within $s^0_{subv}.des(\overline{t})$ is $s^0_{subv}.des(\overline{t})$ itself. Suppose this term matched a lhs of $\langle prg \rangle$. Each equation of $\langle prg \rangle$ either appears identical in $prg$, or there are $\epsilon_{r'}$ and $\zeta_{r'}$ in a $\langle r' \rangle^e$ for an $r'$ of $prg$.
-
-The first case can be excluded, since (a) the function definition of $r'$ is the same as that of $r$, and this function definition has been affected since $r$ was actually transformed, and (b) $r'$ is transformed to $\epsilon_{r'}$ and $\zeta_{r'}$ because $q_{r'}$ is a destructor copattern since it is a matched by $s^0_{subv}.des(\overline{t})$.
-
-The second case can also be excluded, because this would mean that there are overlapping patterns in the function definition, but these were eliminated by the pre-transformation.
-
-\end{enumerate}
-
-\item The second step is derived as given below.
-\begin{prooftree}
-\AxiomC{$t_{\epsilon_r}[\sigma_\epsilon].des(\overline{t_v}) =^? q_{\zeta_r} \searrow \sigma_\zeta$}
-\RightLabel{\scriptsize Subst with $\zeta_r$}
-\UnaryInfC{$t_{\epsilon_r}[\sigma_\epsilon].des(\overline{t_v}) \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
-\end{prooftree}
-The relevant subterms of $s^0_{subv}$ were values, thus also the terms that $\sigma_\epsilon$ substituted with. And $t_{\epsilon_r}[\sigma_\epsilon]$ contains no reduction-relevant subterms, as well. $t_[\epsilon_r]$ matches $q_{\zeta_r}$ by the definition of $\epsilon_r$ and $\zeta_r$. Because $t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\zeta]$ is equivalent to $s = q_r[\sigma]$, $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta] \sim t_r[\sigma_\zeta]$.
-
-\end{enumerate}
-
-\end{proof}
-
-\end{lemma*}
-
-\begin{lemma*}
-
-$extract\_des$ satisfies the second extraction function property.
-
-\begin{proof}
-
-From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
-
-Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
-\begin{equation*}
-\langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(\langle q \rangle^{vars})[\sigma].\overline{des(\overline{p}[\sigma])},
-\end{equation*}
-for some $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has exactly one top-level destructor call ($des_1$).
-
-If it has more than one top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a  possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
-
-Finally, if $\widetilde{s}$ had no top-level destructor calls, i.e., it is an application of the helper function, then there would exist equations in $prg$ which overlap. To see this, consider the form of $s \sim \widetilde{s}$: It matches a $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, as stated above. As a consequence, $q$ and $q.des_1(\overline{p})$ overlap. But this is prevented by the pre-transformation.
-
-\end{proof}
-
-\end{lemma*}
-
-\begin{lemma*}
-
-$extract\_des$ satisfies the third extraction function property.
-
-\begin{proof}
-
-Both (a) and (b) can be easily seen in the definition of $extract\_des$.
-
-\end{proof}
-
-\end{lemma*}
-
-\begin{lemma*}
-
-Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ don't contain lhss with overlapping prefixes, especially, this means these programs are deterministic. Then neither does $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(e, funs)}$, for arbitrary $funs$, $e = extract\_des^s$ with $s$ as $`` >1 "$ or $`` >0 "$.
-
-\begin{proof}
-
-Consider an atomic step of the extraction, i.e, the extraction out of a single equation. The lemma follows by combining the proofs for the atomic steps. It suffices to consider such steps which actually change the equations, i.e., they replace an equation $r$ of $prg$ with $\epsilon_r$ and $\zeta_r$. The lhss of $\epsilon_r$ and $\zeta_r$, and their prefixes, can't overlap, since they have different function names by definition. Now, consider another equation $r'$, contained in both the program before the atomic step transformation and afterwards.
-
-First, compare $q_{r'}$ to $q_{\epsilon_r} < q_r$: Any two of their respective prefixes are also prefixes of $q_{r'}$ and $q_{\epsilon_r}$, respectively, which by assumption don't overlap.
-
-Second, compare $q_{r'}$ to $q_{\zeta_r}$. If any of their respective prefixes overlap, $r'$ and $\zeta_r$ are in the same function definition, thus the lhs of $r'$ results from the extraction of a destructor out of some $r^*$ contained in a predecessor $prg^i$ of $prg$. This $prg^i$ also contains a lhs $q_{r^\#}$ of which $q_{r'}$ is a prefix. If a prefix of $q_{r'}$ overlaps with one of $q_{\zeta_r}$, so does a prefix of $q_{r'}$, which is also a prefix of $q_{r^\#}$, with one of $q_{r^*}$, contrary to assumption.
-
-\end{proof}
-
-\end{lemma*}
-
-\subsection*{extract\_patterns:}
-
-Specific property for the equivalence relation belonging to $extract\_patterns$:
-\begin{equation*}
-fun(\overline{p}).des(\overline{p'})[\sigma] \sim \langle fun, des, prg^0 \rangle^{autogen}(\overline{p}, \overline{p'})[\sigma]
-\end{equation*}
-iff $fun(\overline{p}).des(\overline{p'})$ is a lhs in $prg$ such that its equation $r$ is actually transformed to $\epsilon_r$, $\zeta_r$.
-
-\begin{lemma*}
-
-$extract\_patterns$ satisfies the first extraction function property.
-
-\begin{proof}
-
-Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. The desired sequence can be given as follows.
-\begin{alignat*}{3}
-s &\longrightarrow^* &s_{subv} = q_{\epsilon_r}[\sigma_\epsilon]\\
-&\longrightarrow &t_{\epsilon_r}\\
-&\longrightarrow^*  &(t_{\epsilon_r}[\sigma_\epsilon])_{subv} = q_{\zeta_r}[\sigma_\zeta]\\
-&\longrightarrow &t_{\zeta_r}[\sigma_\zeta] =: \widetilde{t}
-\end{alignat*}
-The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s$ to equivalent values. We have such a sequence by Lemma ?.
-
-Similarly, the second multi-step part is concerned with reducing the reduction-relevant subterms of $t_{\epsilon_r}$ to equivalent values.
-
-Now, the two one-step parts of the sequence are derived.
-
-\begin{enumerate}
-\item The first step is derived as given below.
-\begin{prooftree}
-\AxiomC{$s_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
-\RightLabel{\scriptsize Subst with $\epsilon_r$}
-\UnaryInfC{$s_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
-\end{prooftree}
-$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with all patterns replaced by variables. $s_{subv}$ is equivalent to $t_{\epsilon_r}$, because, by definition, the two sides of $\epsilon_r$ are equivalent.
-
-\item The second step is derived as given below.
-\begin{prooftree}
-\AxiomC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} =^? q_{\zeta_r} \searrow \sigma_\zeta$}
-\RightLabel{\scriptsize Subst with $\zeta_r$}
-\UnaryInfC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
-\end{prooftree}
-$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with all variables replaced by the patterns of $q_r$. $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta]$ because $t_{\zeta_r} \sim t_r$ and $q[\sigma] \sim t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\epsilon]$ and $q_r \sim q_{\zeta_r}$.
-
-\end{enumerate}
-
-\end{proof}
-
-\end{lemma*}
-
-\begin{lemma*}
-
-$extract\_patterns$ satisfies the second extraction function property.
-
-\begin{proof}
-
-From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
-
-Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
-\begin{equation*}
-\langle fun, \overline{des}, prg^0 \rangle^{autogen}(\overline{x}, \overline{x'})[\sigma].\overline{des(\overline{p}[\sigma])},
-\end{equation*}
-for some $q_r = fun(\overline{x}.\overline{des(\overline{x'})}$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has no top-level destructor calls.
-
-If it has one or more top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
-
-\end{proof}
-
-\end{lemma*}
-
-\begin{lemma*}
-
-$extract\_patterns$ satisfies the third extraction function property.
-
-\begin{proof}
-
-Both (a) and (b) can be easily seen in the definition of $extract\_patterns$.
-
-\end{proof}
-
-\end{lemma*}
-
-\begin{lemma*}
-
-Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ be deterministic. Then so is $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(extract\_patterns, funs)}$, for arbitrary $funs$.
-
-\begin{proof}
-
-Consider an atomic step of the extraction, i.e, the extraction out of a single equation. The lemma follows by combining the proofs for the atomic steps. It suffices to consider such steps which actually change the equations, i.e., they replace an equation $r$ of $prg$ with $\epsilon_r$ and $\zeta_r$. The lhss of $\epsilon_r$ and $\zeta_r$, and their prefixes, can't overlap, since they have different function names by definition. Now, consider another equation $r'$, contained in both the program before the atomic step transformation and afterwards.
-
-First, compare $q_{r'}$ to $q_{\epsilon_r}$: $q_{\epsilon_r}$ is simply $q_r$ with all of its patterns replaced by variables, thus, a term that matches $q_{\epsilon_r}$ also matches $q_r$. If it also matched $q_{r'}$, the program before the atomic step transformation would be nondeterministic, contrary to assumption.
-
-Second, compare $q_{r'}$ to $q_{\zeta_r}$: The lhs of $\zeta_r$ results from the extraction out of an $r^*$ of a $prg^i$. It is also contained in all predecessors of $prg^i$, that is, all $prg^k$ with $k \leq i$. The same holds for $r'$ with an $r^\#$, for a $prg^j$ and its predecessors. From a term that matches $q_{r'}$, a term can be constructed that matches $r^\#$, and the same for $q_{\zeta_r}$ and $r^*$. Because this construction is the same in both cases, when a term matches both $q_{r'}$ and $q_{\zeta_r}$, there is a term that matches both $q_{r^\#}$ and $q_{r^*}$. And these lhss are found together in one program, either in $prg^i$ when $i \leq j$, or in $prg^j$, otherwise. But this would contradict the assumption that all these programs were deterministic.
-
-\end{proof}
-
-\end{lemma*}
-
-\subsection*{extract:}
-
-Specific property for the equivalence relation belonging to $extract\_patterns$:
-\begin{equation*}
-q^{-con'}[\sigma] \sim \langle \langle q^{-con'} \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(q^{-con'}_{vars^+})[\sigma]
-\end{equation*}
-iff $q$ is a lhs in $prg$ such that its equation $r$ is actually transformed to $\epsilon_r$, $\zeta_r$.
-
-\begin{lemma*}
-
-$extract$ satisfies the first extraction function property.
-
-\begin{proof}
-
-Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. The desired sequence can be given as follows.
-\begin{alignat*}{3}
-s &\longrightarrow^* &s_{subv} = q_{\epsilon_r}[\sigma_\epsilon]\\
-&\longrightarrow &t_{\epsilon_r}\\
-&\longrightarrow^*  &(t_{\epsilon_r}[\sigma_\epsilon])_{subv} = q_{\zeta_r}[\sigma_\zeta]\\
-&\longrightarrow &t_{\zeta_r}[\sigma_\zeta] =: \widetilde{t}
-\end{alignat*}
-The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s$ to equivalent values. We have such a sequence by Lemma ?.
-
-Similarly, the second multi-step part is concerned with reducing the reduction-relevant subterms of $t_{\epsilon_r}$ to equivalent values.
-
-Now, the two one-step parts of the sequence are derived.
-
-\begin{enumerate}
-\item The first step is derived as given below.
-\begin{prooftree}
-\AxiomC{$s_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
-\RightLabel{\scriptsize Subst with $\epsilon_r$}
-\UnaryInfC{$s_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
-\end{prooftree}
-$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with one pattern replaced by a variable and put in front of the other patterns. $s_{subv}$ is equivalent to $t_{\epsilon_r}$, because, by definition, the two sides of $\epsilon_r$ are equivalent.
-
-\item The second step is derived as given below.
-\begin{prooftree}
-\AxiomC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} =^? q_{\zeta_r} \searrow \sigma_\zeta$}
-\RightLabel{\scriptsize Subst with $\zeta_r$}
-\UnaryInfC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
-\end{prooftree}
-$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with the variable in front replaced by the respective pattern of $q_r$ (that, in $q_{\epsilon_r}$, was replaced by a variable and put in front). $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta]$ because $t_{\zeta_r} \sim t_r$ and $q[\sigma] \sim t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\epsilon]$ and $q_r \sim q_{\zeta_r}$.
-
-\end{enumerate}
-
-\end{proof}
-
-\end{lemma*}
-
-\begin{lemma*}
-
-$extract$ satisfies the second extraction function property.
-
-\begin{proof}
-
-From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
-
-Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
-\begin{equation*}
-\langle \langle (q_r)^{-con} \rangle^{name\_pattern} \rangle^{autogen}((q_r)^{-con}_{vars^+})[\sigma].\overline{des(\overline{p}[\sigma])},
-\end{equation*}
-for some $q_r$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has no top-level destructor calls.
-
-If it has one or more top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
-
-\end{proof}
-
-\end{lemma*}
-
-\begin{lemma*}
-
-$extract$ satisfies the third extraction function property.
-
-\begin{proof}
-
-Both (a) and (b) can be easily seen in the definition of $extract$.
-
-\end{proof}
-
-\end{lemma*}
-
-\begin{lemma*}
-
-Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ be deterministic. Then so is $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(extract, funs)}$, for arbitrary $funs$.
-
-\begin{proof}
-
-Consider an atomic step of the extraction, i.e, the extraction out of a single equation. The lemma follows by combining the proofs for the atomic steps. It suffices to consider such steps which actually change the equations, i.e., they replace an equation $r$ of $prg$ with $\epsilon_r$ and $\zeta_r$. The lhss of $\epsilon_r$ and $\zeta_r$, and their prefixes, can't overlap, since they have different function names by definition. Now, consider another equation $r'$, contained in both the program before the atomic step transformation and afterwards.
-
-First, compare $q_{r'}$ to $q_{\epsilon_r}$: $q_{\epsilon_r}$ is simply $q_r$ with one of its patterns replaced by variables, thus, a term that matches $q_{\epsilon_r}$ also matches $q_r$. If it also matched $q_{r'}$, the program before the atomic step transformation would be nondeterministic, contrary to assumption.
-
-Second, compare $q_{r'}$ to $q_{\zeta_r}$: The lhs of $\zeta_r$ results from the extraction out of an $r^*$ of a $prg^i$. It is also contained in all predecessors of $prg^i$, that is, all $prg^k$ with $k \leq i$. The same holds for $r'$ with an $r^\#$, for a $prg^j$ and its predecessors. From a term that matches $q_{r'}$, a term can be constructed that matches $r^\#$, and the same for $q_{\zeta_r}$ and $r^*$. Because this construction is the same in both cases, when a term matches both $q_{r'}$ and $q_{\zeta_r}$, there is a term that matches both $q_{r^\#}$ and $q_{r^*}$. And these lhss are found together in one program, either in $prg^i$ when $i \leq j$, or in $prg^j$, otherwise. But this would contradict the assumption that all these programs were deterministic.
-
-\end{proof}
-
-\end{lemma*}
-
-\subsection*{Proofs of bisimulation}
-
-\begin{proposition*}
-
-Let $e$ be any helper extraction function with the extraction function properties. Then let $trans$ be a transformation which doesn't affect input terms, and for programs, is defined as $extract\_helpers(e)$.
-
-Statement (1) holds for $trans$.
-
-\begin{proof}
-
-\begin{enumerate}
-\item \textbf{``Subst" case}:
-
-\begin{prooftree}
-\AxiomC{$s =^? q_r \searrow \sigma$}
-\RightLabel{\scriptsize Subst with $r \in \textrm{Rules}(prg)$}
-\UnaryInfC{$s \longrightarrow t_r[\sigma]$}
-\end{prooftree}
-
-with $t_r[\sigma] = t$; the reduction-relevant subterms of $s$ are values. The transformation doesn't change input terms, thus $\langle s \rangle = s$, $\langle t \rangle = t$.
-
-When $r$ is also an equation of $\langle prg \rangle$, it suffices to (a) by Lemma ?, reduce the reduction-relevant subterms of $s$ to equivalent values, and then (b) apply the ``Subst" rule for $r$ to get a reduction to a term equivalent to $t$.
-
-When, otherwise, $r$ is not an equation of $\langle prg \rangle$, we have the desired sequence by the first extraction function property.
-
-\item \textbf{``Cong" case}:
-
-\begin{prooftree}
-\AxiomC{$s^0 \longrightarrow t^0$}
-\RightLabel{\scriptsize Cong}
-\UnaryInfC{$\mathcal{E}[s^0] \longrightarrow \mathcal{E}[t^0]$}
-\end{prooftree}
-
-with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$. By the induction hypothesis, we have a reduction sequence $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0} \sim t^0$.
-
-It suffices to (a) by Lemma ?, reduce the reduction-relevant subterms of $\mathcal{E}[s^0]$ left of $s^0$ to equivalent values, and then (b) use the ``Cong" rule, with the new context $\widetilde{\mathcal{E}}$ (around $s^0$) yielded by this, on the reduction sequence obtained from the induction hypothesis.
-
-\end{enumerate}
-
-\end{proof}
-
-\end{proposition*}
-
-\end{framed}
 
 \end{document}
