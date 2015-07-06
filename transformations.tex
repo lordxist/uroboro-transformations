@@ -3082,6 +3082,12 @@ An extraction function $e$ is said to satisfy the extraction function properties
 
 \subsection*{extract\_des:}
 
+Specific property for the equivalence relation belonging to $extract\_des$:
+\begin{equation*}
+q[\sigma] \sim \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(\langle q \rangle^{vars})[\sigma]
+\end{equation*}
+iff $q.des_1(\overline{p})$ is a lhs in $prg$ such that its equation $r$ is actually transformed to $\epsilon_r$, $\zeta_r$.
+
 \begin{lemma*}
 
 $extract\_des$ satisfies the first extraction function property.
@@ -3195,6 +3201,12 @@ Second, compare $q_{r'}$ to $q_{\zeta_r}$. If any of their respective prefixes o
 
 \subsection*{extract\_patterns:}
 
+Specific property for the equivalence relation belonging to $extract\_patterns$:
+\begin{equation*}
+fun(\overline{p}).des(\overline{p'})[\sigma] \sim \langle fun, des, prg^0 \rangle^{autogen}(\overline{p}, \overline{p'})[\sigma]
+\end{equation*}
+iff $fun(\overline{p}).des(\overline{p'})$ is a lhs in $prg$ such that its equation $r$ is actually transformed to $\epsilon_r$, $\zeta_r$.
+
 \begin{lemma*}
 
 $extract\_patterns$ satisfies the first extraction function property.
@@ -3286,6 +3298,12 @@ Second, compare $q_{r'}$ to $q_{\zeta_r}$: The lhs of $\zeta_r$ results from the
 \end{lemma*}
 
 \subsection*{extract:}
+
+Specific property for the equivalence relation belonging to $extract\_patterns$:
+\begin{equation*}
+q^{-con'}[\sigma] \sim \langle \langle q^{-con'} \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(q^{-con'}_{vars^+})[\sigma]
+\end{equation*}
+iff $q$ is a lhs in $prg$ such that its equation $r$ is actually transformed to $\epsilon_r$, $\zeta_r$.
 
 \begin{lemma*}
 
