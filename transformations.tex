@@ -262,6 +262,42 @@ if $\exists$ lhs in $def$ with a prefix of the generic form $\mathcal{C}[con(\_,
 \end{equation*}
 otherwise.
 
+\subsubsection{split\_overlaps}
+
+This step is also necessary for destructor extraction to work correctly.
+
+The purpose of $split\_overlaps$ is to eliminate any overlapping patterns. Consider the following example:
+
+\begin{lstlisting}
+
+fun().d1() = t_1
+fun().d1().d2() = t_2
+
+\end{lstlisting}
+
+When destructor extraction is applied to this to eliminate the destructor $d_2$ in the second line, the function definition of $fun$ in the transformed program looks as follows:
+
+\begin{lstlisting}
+
+fun().d1() = t_1
+fun().d1() = h
+
+\end{lstlisting}
+
+Here, $h$ stands for the call to the helper equation. The resulting program is nondeterministic, even though the original wasn't. Such a case needs to be avoided, which is what $split\_overlaps$ achieves: It pre-transforms the original program in the following way:
+
+\begin{lstlisting}
+
+fun1().d1() = t_1
+
+fun2().d1().d2() = t_2
+
+\end{lstlisting}
+
+The overlapping equations have been distributed to two different function definitions. This also requires the transforming of terms; basically, it has to be decided which of the new functions the term's function call represents: $fun().d1()$ transforms to $fun1().d1()$, and $fun().d1().d2()$ to $fun2().d1().d2()$.
+
+TODO: define $split\_overlaps$
+
 \section{Defunctionalization of Uroboro}
 
 \begin{itemize}
