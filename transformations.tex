@@ -1132,7 +1132,7 @@ Finally, it needs to be shown that the reduction sequence given above is in fact
 
 \subsection{Proofs of (1a) and (1b)}
 
-Call the bisimulation statements (1a) and (1b) combined statement (1). It holds for the transformations $elim_multi_des$, $unmix$ and $disentangle$ of both de- and refunctionalization by virtue of Proposition 1 below. This is because they are all defined as a recursive concatenation of $extract\_helpers(e)$ for some helper extraction function $e$ with the extraction function properties, and don't affect input terms. The relevant helper extraction functions are $extract\_des$, $extract\_patterns$, and $extract_con$, and their extraction function properties are proved in the subsection that follows Proposition 1.
+Call the bisimulation statements (1a) and (1b) combined statement (1). It holds for the transformations $elim_multi_des$, $unmix$ and $disentangle$ of both de- and refunctionalization by virtue of Proposition 1 below. This is because they are all defined as a recursive composition of $extract\_helpers(e)$ for some helper extraction function $e$ with the extraction function properties, and don't affect input terms. The relevant helper extraction functions are $extract\_des$, $extract\_patterns$, and $extract\_con$, and their extraction function properties are proved in the subsection that follows Proposition 1.
 
 \begin{proposition}
 
