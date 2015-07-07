@@ -140,6 +140,16 @@ Whenever $prg^0$ is left unspecified, it is assumed to be $prg$.
 & \langle `` q = t ", H \rangle^{extract\_des}_{prg} = \big\langle `` q = t ", H \big\rangle, \textrm{if $q$ is hole pattern} \span\span
 \end{alignat*}
 
+\begin{framed}
+
+For the alternative definitions of extraction functions used in the proofs, the following variant will be used.
+
+$\langle `` q = t ", H \rangle^{extract\_des^s}_{prg} = \langle `` q = t ", H \rangle^{extract\_des}_{prg}$, if $q$ has $s$ destructors
+
+$\langle `` q = t ", H \rangle^{extract\_des^s}_{prg} = \big\langle `` q = t ", H \big\rangle$, otherwise
+
+\end{framed}
+
 \item Define the extraction of the constructors of a copattern with exactly one destructor as follows:
 \begin{alignat*}{3}
 &\langle `` fun(p_1, ..., p_n).des(p'_1, ..., p'_k) = t ", H \rangle^{extract\_patterns}_{prg} \\
@@ -279,11 +289,13 @@ Extract outer destructor calls of a single equation (a destructor call after a d
 \begin{framed}
 Alternative, but equivalent definition for $elim\_multi\_des$, to be used for the simplified proofs.
 
-$\langle prg \rangle^{elim\_multi\_des} := \langle prg \rangle^{elim\_multi\_des}_{prg}$
+$\langle prg \rangle^{elim\_multi\_des} := \langle prg \rangle^{elim\_multi\_des^m}_{prg}$
 
-$\langle prg \rangle^{elim\_multi\_des}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract\_des^{>1})}_{prg^0} \rangle^{elim\_multi\_des}_{prg^0}$, if $prg$ contains outer destructors
+with $m$ the maximum number of destructors in any lhs of $prg$
 
-$\langle prg \rangle^{elim\_multi\_des}_{prg^0} = prg$, otherwise
+$\langle prg \rangle^{elim\_multi\_des^s}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract\_des^s)}_{prg^0} \rangle^{elim\_multi\_des^{s-1}}_{prg^0}$, if $prg$ contains outer destructors
+
+$\langle prg \rangle^{elim\_multi\_des^s}_{prg^0} = prg$, otherwise
 
 \end{framed}
 %%--
@@ -298,13 +310,15 @@ Extract destructor calls from mixed function defs into helper functions:
 \begin{framed}
 Alternative, but equivalent (for this fragment; contains unnecessary recursion which makes it identical to $unmix_r$) definition for $unmix_d$, to be used for the simplified proofs.
 
-$\langle prg \rangle^{unmix_d} := \langle prg \rangle^{unmix_d}_{prg}$
+$\langle prg \rangle^{unmix_d} := \langle prg \rangle^{unmix_d^m}_{prg}$
 
-$\langle prg \rangle^{unmix_d}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract\_des, funs)}_{prg^0} \rangle^{unmix_d}_{prg^0}$, if $prg$ contains mixed function definitions
+with $m$ the maximum number of destructors in mixed function definitions
+
+$\langle prg \rangle^{unmix_d^s}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract\_des^s, funs)}_{prg^0} \rangle^{unmix_d^{s-1}}_{prg^0}$, if $prg$ contains mixed function definitions
 
 with the affected functions $funs$ being those functions of $prg$ which are mixed
 
-$\langle prg \rangle^{unmix_d}_{prg^0} = prg$, otherwise
+$\langle prg \rangle^{unmix_d^s}_{prg^0} = prg$, otherwise
 
 \end{framed}
 %%--
@@ -475,13 +489,15 @@ Here $extract\_all\_des$ is simply the iterated version of $extract\_des$:
 \begin{framed}
 Alternative, but equivalent definition for $unmix_r$, to be used for the simplified proofs.
 
-$\langle prg \rangle^{unmix_r} := \langle prg \rangle^{unmix_r}_{prg}$
+$\langle prg \rangle^{unmix_r} := \langle prg \rangle^{unmix_r^m}_{prg}$
 
-$\langle prg \rangle^{unmix_r}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract\_des, funs)}_{prg^0} \rangle^{unmix_r}_{prg^0}$, if $prg$ contains mixed function definitions
+with $m$ the maximum number of destructors in mixed function definitions
+
+$\langle prg \rangle^{unmix_r^s}_{prg^0} = \langle \langle prg \rangle^{extract\_helpers(extract\_des^s, funs)}_{prg^0} \rangle^{unmix_r^{s-1}}_{prg^0}$, if $prg$ contains mixed function definitions
 
 with the affected functions $funs$ being those functions of $prg$ which are mixed
 
-$\langle prg \rangle^{unmix_r}_{prg^0} = prg$, otherwise
+$\langle prg \rangle^{unmix_r^s}_{prg^0} = prg$, otherwise
 
 \end{framed}
 %%--
@@ -1258,15 +1274,17 @@ Both (a) and (b) can be easily seen in the definition of $extract\_des$.
 
 \begin{lemma*}
 
-Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ don't contain lhss with overlapping prefixes, especially, this means these programs are deterministic. Then neither does $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(e, funs)}$, for arbitrary $funs$, $e = extract\_des^s$ with $s$ as $`` >1 "$ or $`` >0 "$.
+Let $prg$ and all programs $prg^i$ in the intermediate transformation steps from $prg^0$ to $prg$ don't contain overlapping lhss, especially, this means these programs are deterministic. Then neither does $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(e, funs)}$, for arbitrary $funs$, $e = extract\_des^s$ with $s > 0$.
 
 \begin{proof}
 
-Consider an atomic step of the extraction, i.e, the extraction out of a single equation. The lemma follows by combining the proofs for the atomic steps. It suffices to consider such steps which actually change the equations, i.e., they replace an equation $r$ of $prg$ with $\epsilon_r$ and $\zeta_r$. The lhss of $\epsilon_r$ and $\zeta_r$, and their prefixes, can't overlap, since they have different function names by definition. Now, consider another equation $r'$, contained in both the program before the atomic step transformation and afterwards.
+Consider equations $r, r'$ of $prg$; their transformation results will be compared.
 
-First, compare $q_{r'}$ to $q_{\epsilon_r} < q_r$: Any two of their respective prefixes are also prefixes of $q_{r'}$ and $q_{\epsilon_r}$, respectively, which by assumption don't overlap.
+First, consider the case that the number of destructors of both $r$ and $r'$ is $< s$; their transformation result is $r$ and $r'$, respectively. We already know that these don't overlap.
 
-Second, compare $q_{r'}$ to $q_{\zeta_r}$. If any of their respective prefixes overlap, $r'$ and $\zeta_r$ are in the same function definition, thus the lhs of $r'$ results from the extraction of a destructor out of some $r^*$ contained in a predecessor $prg^i$ of $prg$. This $prg^i$ also contains a lhs $q_{r^\#}$ of which $q_{r'}$ is a prefix. If a prefix of $q_{r'}$ overlaps with one of $q_{\zeta_r}$, so does a prefix of $q_{r'}$, which is also a prefix of $q_{r^\#}$, with one of $q_{r^*}$, contrary to assumption.
+Second, consider the case that the number of destructors of both $r$ and $r'$ is $s$; their transformation result is $\epsilon_r, \zeta_r$, and $\epsilon_{r'}, \zeta_r$, respectively. Because of $align\_patterns$, $r$ and $r'$ also have the same level of pattern specification. It follows that, by their definition, $\epsilon_r$ and $\epsilon_{r'}$ are the same, and that $\zeta_r$ and $\zeta_{r'}$ only overlap if $r$ and $r'$ do, which would contradict the assumption. $\zeta_r$ and $\epsilon_{r'}$, or $\zeta_{r'}$ and $\epsilon_r$, respectively, can't overlap, since, by their definition, their function names are different.
+
+Third, consider the case that the number of destructors of $r$ is $s$ and that of $r'$ is $< s$ (or the other way around, assumed w.l.o.g.). This means that $r'$ needs to be compared with the transformation result $\epsilon_r, \zeta_r$ of $r$. Destructors are never extracted out of function definitions with auto-generated names, i.e., names fresh in $prg^0$. It follows that $\zeta_r$ and $r'$ can't overlap since their function names must be different. When a term matches both $q_{\epsilon_r} < q_r$ and $q_{r'}$, $q_r$ and $q_{r'}$ overlap, contrary to assumption.
 
 \end{proof}
 
