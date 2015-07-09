@@ -34,7 +34,7 @@ Automatic refunctionalization consists of the following steps:
 
 For the core de- and refunctionalization, strong bisimulation holds, which will be proven in the respective section.
 
-For each of the preprocessing steps, a kind of weak bisimulation holds. Each such step is defined as a recursive composition of one of the basic building blocks described in the next section. That weak bisimulation holds for the step is therefore shown by showing it for the lifted extraction function that serves as the building block. This will be done with the help of the propositions below. First, the precise kind of bisimulation is defined by the three statements below. For this, let angular brackets denote the lifted extraction function.
+For each of the preprocessing steps, a kind of weak bisimulation holds. Let angular brackets denote the transformation, and let $prg$ be any program to be transformed. It holds that:
 
 \begin{itemize}
 \item $s \longrightarrow_{prg} t \implies s  \longrightarrow^*_{\langle prg \rangle} \tilde{t}$ for a $\tilde{t} \sim t$ (1a)
@@ -56,22 +56,28 @@ Here, $\sim$ is an equivalence relation; $s \sim t$ reads as: ``$s$ and $t$ repr
 
 \end{itemize}} for which $q[\sigma] \sim \langle q \rangle^{\sim}_{prg}[\sigma]$ holds.
 
-As proven in the propositions that follow, the weak bisimulation statements hold for all extraction functions that satisfy a number of properties defined below, simply called the \textit{extraction function properties}.
+Each preprocessing step is defined as a recursive composition of one of the basic building blocks described in the next section. That weak bisimulation holds for the step is therefore shown by showing it that, for the lifted extraction function $e$ that serves as the building block, the following statements hold. Write $\langle prg \rangle$ for $\langle prg \rangle^{extract\_helpers(e)}$ and $prg^0$ for the original program that is the input of the entire transformation step.
+
+\begin{itemize}
+\item For $s,t$ with names declared in $prg^0$: $s \longrightarrow_{prg} t \implies s  \longrightarrow^*_{\langle prg \rangle} \tilde{t}$ for a $\tilde{t} \sim t$ (1a)
+
+\item for all terms $s'$ in the sequence of (1a), with the exception of the last ($t'$), it is $s \sim s'$ (1b)
+
+\item For $s,t$ with $s$ equivalent to a term with names declared in $prg^0$ and $s \not\sim t$: $s \longrightarrow_{\langle prg \rangle} t \implies \tilde{s} \longrightarrow_{prg} \tilde{t}$ for $\tilde{s} \sim s, \tilde{t} \sim t$ (2)
+
+\end{itemize}
+
+As proven in the propositions that follow, these weak bisimulation statements hold for all extraction functions that satisfy a number of properties defined below, simply called the \textit{extraction function properties}. Therefore, in its respective section, the bisimulation will be shown for an extraction function by showing that it satisfies these properties.
 
 \begin{definition}[Extraction function properties]
-An extraction function $e$ is said to satisfy the extraction function properties iff
+An extraction function $e$ is said to satisfy the extraction function properties iff, for $s$ with names declared in $prg^0$:
 
 \begin{enumerate}
 \item $\forall r \not\in Rules(\langle prg \rangle): s \longrightarrow^{\textrm{Subst}_r}_{prg} t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \sim t$.
 
 \item If $s$ reduces in $prg$, so does every $\widetilde{s} \sim s$ in $\langle prg \rangle$.
 
-\item For every equation $r$ of $prg$:
-\begin{enumerate}
-\item A possible $\epsilon_r$ reduces (non-strictly) the number of constructors and that of destructors, and reduces strictly either the number of constructors or that of destructors, or both.
-
-\item The equations in $\langle r \rangle^e$ preserve the property of a term that all of its reduction-relevant subterms are values.
-\end{enumerate}
+\item If $s$ is irreducible in $prg$, then there is a reduction sequence $s \longrightarrow^*_{\langle prg \rangle} s_v$, where $s \sim s_v$ is irreducible in $prg$.
 
 \end{enumerate}
 
@@ -96,7 +102,7 @@ If the program $prg$ has no overlapping lhss, statements (1a) and (1b) hold for 
 
 with $t_r[\sigma] = t$; the reduction-relevant subterms of $s$ are values.
 
-When $r$ is also an equation of $\langle prg \rangle$, it suffices to (a) by Lemma ?, reduce the reduction-relevant subterms of $s$ to equivalent values, and then (b) apply the ``Subst" rule for $r$ to get a reduction to a term equivalent to $t$.
+When $r$ is also an equation of $\langle prg \rangle$, it suffices to (a) by the third extraction function property, reduce the reduction-relevant subterms of $s$ to equivalent values, and then (b) apply the ``Subst" rule for $r$ to get a reduction to a term equivalent to $t$.
 
 When, otherwise, $r$ is not an equation of $\langle prg \rangle$, we have the desired sequence by the first extraction function property.
 
@@ -110,7 +116,7 @@ When, otherwise, $r$ is not an equation of $\langle prg \rangle$, we have the de
 
 with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$. By the induction hypothesis, we have a reduction sequence $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0} \sim t^0$.
 
-It suffices to (a) by Lemma ?, reduce the reduction-relevant subterms of $\mathcal{E}[s^0]$ left of $s^0$ to equivalent values, and then (b) use the ``Cong" rule, with the new context $\widetilde{\mathcal{E}}$ (around $s^0$) yielded by this, on the reduction sequence obtained from the induction hypothesis.
+It suffices to (a) by the third extraction function property, reduce the reduction-relevant subterms of $\mathcal{E}[s^0]$ left of $s^0$ to equivalent values, and then (b) use the ``Cong" rule, with the new context $\widetilde{\mathcal{E}}$ (around $s^0$) yielded by this, on the reduction sequence obtained from the induction hypothesis.
 
 \end{enumerate}
 
@@ -160,7 +166,7 @@ $\widetilde{\mathcal{E}}[\widetilde{s'}]$ has the form
 \begin{equation*}
 fun'(s^0_1, ..., s^0_{n'_0}).des'_1(s^0_1, ..., s^0_{n'_1})...des'_{k'}(s^0_1, ..., s^0_{n'_{k'}}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k}),
 \end{equation*}
-where each of the $s^i_j$ is equivalent to exactly one of the $t^0_i$. Thus, it actually is an evaluation context in $prg$, i.e., all of its reduction-relevant subterms left of the hole are irreducible in $prg$. To see this, suppose such a subterm reduced in $prg$, then, by the second extraction function property, the equivalent term among the $t^0_i$ would reduce in $\langle prg \rangle$, contrary to the fact that it is a value in $prg$ because it is to the left of the hole in $\mathcal{E}$.
+where each of the $s^i_j$ is equivalent to exactly one of the $t^0_i$. Thus, it actually is an evaluation context in $prg$, i.e., all of its reduction-relevant subterms left of the hole are irreducible in $prg$. To see this, suppose such a subterm reduced in $prg$, then, by the second extraction function property, the equivalent term among the $t^0_i$ would reduce in $\langle prg \rangle$, contrary to the fact that it is a value in $\langle prg \rangle$ because it is to the left of the hole in $\mathcal{E}$.
 
 \end{enumerate}
 
@@ -187,7 +193,7 @@ The destructor extraction function is called $extract\_des$ and defined in Figur
 
 For each copattern $q$ and program $prg$, define the helper function name for a given copattern
 \begin{equation*}
-\langle q \rangle^{hname}_{prg} := \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}
+\langle q \rangle^{hname}_{prg} := \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg^0 \rangle^{autogen}
 \end{equation*}
 and the respective helper function signature
 \begin{equation*}
@@ -195,16 +201,11 @@ and the respective helper function signature
 \end{equation*}
 
 The equivalent function for $extract\_des$ is defined as follows:
-\begin{equation*}
-\langle q \rangle^{\sim}_{prg} := \langle q \rangle^{hname}_{prg}(\langle q \rangle^{vars}).
-\end{equation*}
-
- Below, a wrapper for $extract\_des$ is defined that only extracts destructors out of copatterns with a given number of destructors.
 \[
-    \langle `` q = t ", H \rangle^{extract\_des^s}_{prg} = 
+    \langle q \rangle^{\sim}_{prg} :=
 \begin{cases}
-    \langle `` q = t ", H \rangle^{extract\_des}_{prg},& \text{if $q$ has $s$ destructors}\\
-    \big\langle `` q = t ", H \big\rangle,                   & \text{otherwise}
+    \langle q \rangle^{hname}_{prg}(\langle q \rangle^{vars}),& \text{if $q.des(\overline{p})$ is a lhs in $prg$} \\
+    q,                                                                                      & \text{otherwise}
 \end{cases}
 \]
 
@@ -223,7 +224,7 @@ s &\longrightarrow^* &s^0_{subv}.des(\overline{t}) = q_{\epsilon_r}[\sigma_\epsi
 &\longrightarrow^*  &t_{\epsilon_r}.des(\overline{t_v}) = q_{\zeta_r}[\sigma_\zeta]\\
 &\longrightarrow &t_{\zeta_r} =: \widetilde{t}
 \end{alignat*}
-The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s^0$ to equivalent values. We have such a sequence by Lemma ?, because $s^0$ matches $q_{\epsilon_r}$, by the definition of $\epsilon_r$ and because $s = s^0.des(\overline{t})$ and $s$ matches $q_r$.
+The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s^0$ to equivalent values. We have such a sequence by the third extraction property, because $s^0$ matches $q_{\epsilon_r}$, by the definition of $\epsilon_r$ and because $s = s^0.des(\overline{t})$ and $s$ matches $q_r$.
 
 Similarly, the second multi-step part is concerned with reducing the $\overline{t}$ to equivalent values.
 
@@ -237,25 +238,7 @@ Now, the two one-step parts of the sequence are derived.
 \RightLabel{\scriptsize Cong}
 \UnaryInfC{$\mathcal{E}[s^0_{subv}] \longrightarrow \mathcal{E}[t_{\epsilon_r}[\sigma_\epsilon]]$}
 \end{prooftree}
-with $\mathcal{E} = [].des(\overline{t})$. $s^0_{subv}$ matches $q_{\epsilon_r}$ because $s = s^0.des(\overline{t})$ and $q_r = q_{\epsilon_r}.des(\overline{p})$ and $s$ matches $q_r$. The two sides of $\epsilon_r$ are equivalent by definition, thus $s^0_{subv}$ and $t_{\epsilon_r}[\sigma_\epsilon]$ are, too. It remains to be shown (a) why $\mathcal{E}$ is actually an evaluation context, and (b) why no ``Subst" rule can take precedence over the ``Cong" rule as used in the derivation.
-
-\begin{enumerate}
-\item $\mathcal{E}$ is derived as given below.
-\begin{prooftree}
-\AxiomC{}
-\RightLabel{\scriptsize Hole}
-\UnaryInfC{$[]$}
-\RightLabel{\scriptsize Frame/Des}
-\UnaryInfC{$[].des(\overline{t})$}
-\end{prooftree}
-
-\item The only extension of $s^0_{subv}$ within $s^0_{subv}.des(\overline{t})$ is $s^0_{subv}.des(\overline{t})$ itself. Suppose this term matched a lhs of $\langle prg \rangle$. Each equation of $\langle prg \rangle$ either appears identical in $prg$, or there are $\epsilon_{r'}$ and $\zeta_{r'}$ in a $\langle r' \rangle^e$ for an $r'$ of $prg$.
-
-The first case can be excluded, since (a) the function definition of $r'$ is the same as that of $r$, and this function definition has been affected since $r$ was actually transformed, and (b) $r'$ is transformed to $\epsilon_{r'}$ and $\zeta_{r'}$ because $q_{r'}$ is a destructor copattern since it is a matched by $s^0_{subv}.des(\overline{t})$.
-
-The second case can also be excluded, because this would mean that there are overlapping patterns in the function definition, but these were eliminated by the pre-transformation.
-
-\end{enumerate}
+with $\mathcal{E} = [].des(\overline{t})$. $s^0_{subv}$ matches $q_{\epsilon_r}$ because $s = s^0.des(\overline{t})$ and $q_r = q_{\epsilon_r}.des(\overline{p})$ and $s$ matches $q_r$. The two sides of $\epsilon_r$ are equivalent by definition, thus $s^0_{subv}$ and $t_{\epsilon_r}[\sigma_\epsilon]$ are, too.
 
 \item The second step is derived as given below.
 \begin{prooftree}
@@ -287,7 +270,7 @@ for some $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, and its equati
 
 If it has more than one top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a  possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
 
-Finally, if $\widetilde{s}$ had no top-level destructor calls, i.e., it is an application of the helper function, then there would exist equations in $prg$ which overlap. To see this, consider the form of $s \sim \widetilde{s}$: It matches a $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, as stated above. As a consequence, $q$ and $q.des_1(\overline{p})$ overlap. But this is prevented by the pre-transformation.
+Finally, if $\widetilde{s}$ had no top-level destructor calls, i.e., it is an application of the helper function, then there would exist equations in $prg^0$ which overlap. To see this, consider the form of $s \sim \widetilde{s}$: It matches a $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, as stated above. $q$ 
 
 \end{proof}
 
@@ -299,7 +282,13 @@ $extract\_des$ satisfies the third extraction function property.
 
 \begin{proof}
 
-Both (a) and (b) can be easily seen in the definition of $extract\_des$.
+First, note that by the definition of extract helper, two equations in $\langle prg \rangle$ results from the application of $e$ to an equation $r$ in $prg$; specifically, they are the two equations $\epsilon_r, \zeta_r$ contained in $\langle r \rangle^e$. The other equations are taken over from $prg$ unchanged. By the third extraction function property, the two sides of $\epsilon_r$ are equivalent, and $\zeta_r$ is equivalent to the equation $r$ of $prg$, i.e., $q_{\zeta_r} \sim q_r$ and $t_{\zeta_r} \sim t_r$.
+
+Suppose the lemma holds for the reduction-relevant subterms of $s$ (the induction hypothesis). This lets us reduce these subterms of $s$ to equivalent values (in $\langle prg \rangle$) first (from left to right). Let $s_0$ be the result of these reductions; it is equivalent to s. The desired reduction sequence is
+\begin{equation*}
+s \longrightarrow^* s_0 (\longrightarrow s_v).
+\end{equation*}
+The initial part of the reduction is derived as described above. The final step is only necessary if $s_0$ can still reduce in $\langle prg \rangle$. This can only be the case if it matches $q_{\epsilon_r}$, because (a) it can't match $q_{\zeta_r}$ since its function name isn't declared in $prg^0$, and (b) if it matched an unchanged equation of $prg$, it wouldn't be a value in $prg$. Thus, if at all, $s_0$ reduces by the ``Subst" rule for $\epsilon_r$ to a $s_v$; the two sides of $\epsilon_r$ are equivalent and therefore $s_0 \sim s_v$. $s_v$ can't reduce any further, because it is an instance of $t_{\epsilon_r}$, which has no destructor, and has a function name not declared in $prg^0$, and these functions only have definitions with destructor copattern lhss. If it doesn't reduce, set $s_v := s_0$.
 
 \end{proof}
 
@@ -307,7 +296,39 @@ Both (a) and (b) can be easily seen in the definition of $extract\_des$.
 
 \subsection{Constructor extraction}
 
-...
+\begin{figure}
+\vspace{2.4in}
+\[
+    \langle `` q = t " \rangle^{extract\_des}_{prg} =\\
+\begin{cases}
+    \big\langle `` q^{-con} =  \langle q \rangle^{\sim}_{prg} ", \big\langle \langle q \rangle^{hsig}_{prg}, `` \langle q \rangle^{hname}_{prg}(q^{-con}_{vars^-}) = t  " \big\rangle \big\rangle,& \text{if $q$ contains a constructor other than a left outer-most} \\
+   \big\langle `` fun(\overline{p}) = t " \big\rangle,& \text{otherwise}
+\end{cases}
+\]
+\caption{Extraction function $extract\_con$.}
+\end{figure}
+
+The constructor extraction function is called $extract\_con$ and defined in Figure 3-1. The definition uses functions defined in the next paragraph.
+
+For each copattern $q$ and program $prg$, define the helper function name for a given copattern
+\begin{equation*}
+\langle q \rangle^{hname}_{prg} := \langle \langle q^{-con} \rangle^{name\_pattern}, prg^0 \rangle^{autogen}
+\end{equation*}
+and the respective helper function signature
+\begin{equation*}
+\langle q \rangle^{hsig}_{prg} := \langle q \rangle^{hname}_{prg}(\langle q^{-con}_{vars^+} \rangle^{vartypes}_{prg}): \langle q \rangle^{rtype}_{prg}.
+\end{equation*}
+
+The equivalent function for $extract\_con$ is defined as follows:
+\[
+    \langle q \rangle^{\sim}_{prg} :=
+\begin{cases}
+    \langle q \rangle^{hname}_{prg}(q^{-con}_{vars^+}),& \text{if $q$ contains a constructor other than a left outer-most} \\
+    q,                                                                                      & \text{otherwise}
+\end{cases}
+\]
+
+Constructor extraction satisfies the extraction function properties. This is proven in the following three lemmas.
 
 \subsection{Extraction of all constructors from a single-destructor copattern}
 
