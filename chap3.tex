@@ -56,10 +56,10 @@ Here, $\sim$ is an equivalence relation; $s \sim t$ reads as: ``$s$ and $t$ repr
 
 \end{itemize}} for which $q[\sigma] \sim \langle q \rangle^{\sim}_{prg}[\sigma]$ holds.
 
-As proven in the propositions that follow, these weak bisimulation statements hold for all extraction functions that satisfy a number of properties defined below, simply called the \textit{extraction function properties}. Therefore, in its respective section, the bisimulation will be shown for an extraction function by showing that it satisfies these properties.
+As proven in the propositions that follow, these weak bisimulation statements hold for all extraction functions that satisfy a number of properties defined below, simply called the \textit{extraction function properties}. Therefore, in its respective section, the bisimulation will be shown for an extraction function by showing that it satisfies these properties. For the bisimulation to hold at each step, it must also be the case that the step preserves the property that the program has no overlapping lhss. This will also be shown in the respective section of each building block.
 
 \begin{definition}[Extraction function properties]
-An extraction function $e$ is said to satisfy the extraction function properties iff, for $s$ with names declared in $prg^0$:
+An extraction function $e$ is said to satisfy the extraction function properties iff:
 
 \begin{enumerate}
 \item $\forall r \not\in Rules(\langle prg \rangle): s \longrightarrow^{\textrm{Subst}_r}_{prg} t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \sim t$.
@@ -278,6 +278,26 @@ Suppose the lemma holds for the reduction-relevant subterms of $s$ (the inductio
 s \longrightarrow^* s_0 (\longrightarrow s_v).
 \end{equation*}
 The initial part of the reduction is derived as described above. The final step is only necessary if $s_0$ can still reduce in $\langle prg \rangle$. This can only be the case if it matches $q_{\epsilon_r}$, because (a) it can't match $q_{\zeta_r}$ since its function name isn't declared in $prg$, and (b) if it matched an unchanged equation of $prg$, it wouldn't be a value in $prg$. Thus, if at all, $s_0$ reduces by the ``Subst" rule for $\epsilon_r$ to a $s_v$; the two sides of $\epsilon_r$ are equivalent and therefore $s_0 \sim s_v$. $s_v$ can't reduce any further, because it is an instance of $t_{\epsilon_r}$, which has no destructor, and has a function name not declared in $prg$, and these functions only have definitions with destructor copattern lhss. If it doesn't reduce, set $s_v := s_0$.
+
+\end{proof}
+
+\end{lemma}
+
+Finally, it is proven that destructor extraction preserves the property that the program has no overlapping lhss. 
+
+\begin{lemma}
+
+If $prg$ has no overlapping lhss, neither has $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(extract\_des)}$.
+
+\begin{proof}
+
+An equation of $\langle prg \rangle$ is either taken over unchanged from $prg$, or it is one of $\epsilon_r, \zeta_r$ for an $r$ of $prg$. This means that the $\epsilon$ equations have to be compared with other $\epsilon$ equations, $\zeta$ with other $\zeta$, $\epsilon$ with unchanged. $\zeta$ equations needn't be compared with $\epsilon$ or unchanged equations, since the latter two have lhss with function names declared in $prg$, while the function name of the lhs of the $\zeta$ equation is fresh in $prg$. Any two unchanged equations also needn't be compared, since we already know they don't overlap.
+
+First, compare any two $\epsilon$ equations. Their immediate prefixes are lhss in $prg$, thus if the $\epsilon$ equations overlapped, so would two lhss in $prg$. But we know that they don't.
+
+Second, compare any two $\zeta$ equations. By their definition, they can only overlap if the equations they are generated from overlap, which we know they don't.
+
+Third, compare an $\epsilon$ equation with an unchanged equation. All equations $r$ which are transformed to a pair of equations $\epsilon_r, \zeta_r$ have the same number of destructors. Because of $align\_patterns$, their immediate prefixes also have the same level of pattern specification. Thus, if the $\epsilon$ equations overlap, their lhss are the same. By their definition, the right-hand sides are identical, as well, thus the two $\epsilon$ equations are one and the same.
 
 \end{proof}
 
