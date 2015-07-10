@@ -34,7 +34,7 @@ Automatic refunctionalization consists of the following steps:
 
 For the core de- and refunctionalization, strong bisimulation holds, which will be proven in the respective section.
 
-For each of the preprocessing steps, a kind of weak bisimulation holds. Let angular brackets denote the transformation, and let $prg$ be any program to be transformed. It holds that:
+Each preprocessing step is defined as a recursive composition of one of the basic building blocks described in the next section. One such building block is an extraction function lifted to programs with $extract\_helpers$. For the lifted extraction function, a weak kind of bisimulation holds. Let angular brackets denote this transformation, and let $prg$ be the program to be transformed. When $prg$ has no overlapping lhss, it holds that:
 
 \begin{itemize}
 \item $s \longrightarrow_{prg} t \implies s  \longrightarrow^*_{\langle prg \rangle} \tilde{t}$ for a $\tilde{t} \sim t$ (1a)
@@ -55,17 +55,6 @@ Here, $\sim$ is an equivalence relation; $s \sim t$ reads as: ``$s$ and $t$ repr
 \item If $t_i \sim \widetilde{t_i}$ for $i \in \{0, ..., n\}$: $t_0.des(t_1, ..., t_n) \sim \widetilde{t_0}.des(\widetilde{t_1}, ..., \widetilde{t_n})$ 
 
 \end{itemize}} for which $q[\sigma] \sim \langle q \rangle^{\sim}_{prg}[\sigma]$ holds.
-
-Each preprocessing step is defined as a recursive composition of one of the basic building blocks described in the next section. That weak bisimulation holds for the step is therefore shown by showing it that, for the lifted extraction function $e$ that serves as the building block, the following statements hold. Write $\langle prg \rangle$ for $\langle prg \rangle^{extract\_helpers(e)}$ and $prg^0$ for the original program that is the input of the entire transformation step.
-
-\begin{itemize}
-\item For $s,t$ with names declared in $prg^0$: $s \longrightarrow_{prg} t \implies s  \longrightarrow^*_{\langle prg \rangle} \tilde{t}$ for a $\tilde{t} \sim t$ (1a)
-
-\item for all terms $s'$ in the sequence of (1a), with the exception of the last ($t'$), it is $s \sim s'$ (1b)
-
-\item For $s,t$ with $s$ equivalent to a term with names declared in $prg^0$ and $s \not\sim t$: $s \longrightarrow_{\langle prg \rangle} t \implies \tilde{s} \longrightarrow_{prg} \tilde{t}$ for $\tilde{s} \sim s, \tilde{t} \sim t$ (2)
-
-\end{itemize}
 
 As proven in the propositions that follow, these weak bisimulation statements hold for all extraction functions that satisfy a number of properties defined below, simply called the \textit{extraction function properties}. Therefore, in its respective section, the bisimulation will be shown for an extraction function by showing that it satisfies these properties.
 
@@ -193,7 +182,7 @@ The destructor extraction function is called $extract\_des$ and defined in Figur
 
 For each copattern $q$ and program $prg$, define the helper function name for a given copattern
 \begin{equation*}
-\langle q \rangle^{hname}_{prg} := \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg^0 \rangle^{autogen}
+\langle q \rangle^{hname}_{prg} := \langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg \rangle^{autogen}
 \end{equation*}
 and the respective helper function signature
 \begin{equation*}
@@ -217,7 +206,7 @@ $extract\_des$ satisfies the first extraction function property.
 
 \begin{proof}
 
-Let $r$ be the equation in $prg$ used in $s \longrightarrow^{\textrm{Subst}}_{prg} t$. We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. From the definition of $extract\_helpers$ and $extract\_des$ we thus know that $q_r$ is a destructor copattern. By inversion, we know the form of $s$ is $s^0.des(\overline{t})$ The desired sequence can be given as follows.
+We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. From the definition of $extract\_helpers$ and $extract\_des$ we thus know that $q_r$ is a destructor copattern. By inversion, we know the form of $s$ is $s^0.des(\overline{t})$ The desired sequence can be given as follows.
 \begin{alignat*}{3}
 s &\longrightarrow^* &s^0_{subv}.des(\overline{t}) = q_{\epsilon_r}[\sigma_\epsilon].des(\overline{t})\\
 &\longrightarrow &t_{\epsilon_r}.des(\overline{t})\\
@@ -264,13 +253,13 @@ From the first extraction function property, it is already clear that $s$ itself
 
 Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
 \begin{equation*}
-\langle \textrm{extract}, \langle q \rangle^{name\_pattern}, prg^0 \rangle^{autogen}(\langle q \rangle^{vars})[\sigma].\overline{des(\overline{p}[\sigma])},
+\langle q \rangle^{\sim}_{prg}.\overline{des(\overline{p})}[\sigma],
 \end{equation*}
 for some $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has exactly one top-level destructor call ($des_1$).
 
 If it has more than one top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a  possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
 
-Finally, if $\widetilde{s}$ had no top-level destructor calls, i.e., it is an application of the helper function, then there would exist equations in $prg^0$ which overlap. To see this, consider the form of $s \sim \widetilde{s}$: It matches a $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, as stated above. $q$ 
+Finally, if $\widetilde{s}$ had no top-level destructor calls, i.e., it is an application of the helper function, then there would exist equations in $prg$ which overlap. To see this, consider the form of $s \sim \widetilde{s}$: It matches a $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, as stated above. But then $q$ and $q.des_1(\overline{p})$ overlap, contrary to assumption.
 
 \end{proof}
 
@@ -282,13 +271,13 @@ $extract\_des$ satisfies the third extraction function property.
 
 \begin{proof}
 
-First, note that by the definition of extract helper, two equations in $\langle prg \rangle$ results from the application of $e$ to an equation $r$ in $prg$; specifically, they are the two equations $\epsilon_r, \zeta_r$ contained in $\langle r \rangle^e$. The other equations are taken over from $prg$ unchanged. By the third extraction function property, the two sides of $\epsilon_r$ are equivalent, and $\zeta_r$ is equivalent to the equation $r$ of $prg$, i.e., $q_{\zeta_r} \sim q_r$ and $t_{\zeta_r} \sim t_r$.
+First, note that by the definition of extract helper, some equations in $\langle prg \rangle$ result from the application of $e$ to an equation $r$ in $prg$; specifically, they are the two equations $\epsilon_r, \zeta_r$ contained in $\langle r \rangle^e$. The other equations are taken over from $prg$ unchanged. By the third extraction function property, the two sides of $\epsilon_r$ are equivalent, and $\zeta_r$ is equivalent to the equation $r$ of $prg$, i.e., $q_{\zeta_r} \sim q_r$ and $t_{\zeta_r} \sim t_r$.
 
 Suppose the lemma holds for the reduction-relevant subterms of $s$ (the induction hypothesis). This lets us reduce these subterms of $s$ to equivalent values (in $\langle prg \rangle$) first (from left to right). Let $s_0$ be the result of these reductions; it is equivalent to s. The desired reduction sequence is
 \begin{equation*}
 s \longrightarrow^* s_0 (\longrightarrow s_v).
 \end{equation*}
-The initial part of the reduction is derived as described above. The final step is only necessary if $s_0$ can still reduce in $\langle prg \rangle$. This can only be the case if it matches $q_{\epsilon_r}$, because (a) it can't match $q_{\zeta_r}$ since its function name isn't declared in $prg^0$, and (b) if it matched an unchanged equation of $prg$, it wouldn't be a value in $prg$. Thus, if at all, $s_0$ reduces by the ``Subst" rule for $\epsilon_r$ to a $s_v$; the two sides of $\epsilon_r$ are equivalent and therefore $s_0 \sim s_v$. $s_v$ can't reduce any further, because it is an instance of $t_{\epsilon_r}$, which has no destructor, and has a function name not declared in $prg^0$, and these functions only have definitions with destructor copattern lhss. If it doesn't reduce, set $s_v := s_0$.
+The initial part of the reduction is derived as described above. The final step is only necessary if $s_0$ can still reduce in $\langle prg \rangle$. This can only be the case if it matches $q_{\epsilon_r}$, because (a) it can't match $q_{\zeta_r}$ since its function name isn't declared in $prg$, and (b) if it matched an unchanged equation of $prg$, it wouldn't be a value in $prg$. Thus, if at all, $s_0$ reduces by the ``Subst" rule for $\epsilon_r$ to a $s_v$; the two sides of $\epsilon_r$ are equivalent and therefore $s_0 \sim s_v$. $s_v$ can't reduce any further, because it is an instance of $t_{\epsilon_r}$, which has no destructor, and has a function name not declared in $prg$, and these functions only have definitions with destructor copattern lhss. If it doesn't reduce, set $s_v := s_0$.
 
 \end{proof}
 
