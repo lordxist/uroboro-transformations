@@ -171,15 +171,41 @@ By the induction hypothesis we have $\widetilde{s'} \longrightarrow_{prg} \widet
 \begin{equation*}
 s = \mathcal{E}[s'] \sim \widetilde{\mathcal{E}}[\widetilde{s'}] \longrightarrow_{prg} \widetilde{\mathcal{E}}[\widetilde{t'}] \sim \mathcal{E}[t'] = t,
 \end{equation*}
-for an $\widetilde{\mathcal{E}} \sim \mathcal{E}$ with all names declared in $prg$, which, for each extraction function, exists by the definition of its equivalence relation. Also by this definition, $\widetilde{\mathcal{E}}$ is unique, and for a $\mathcal{E}[s']$ of the form
+for an $\widetilde{\mathcal{E}} \sim \mathcal{E}$, that contains only names declared in $prg$ and which will now be constructed from $\mathcal{E}$ inductively.
+
+\begin{itemize}
+
+\item $\mathcal{E} = []$:
+
+Define $\widetilde{\mathcal{E}} = \mathcal{E}$.
+
+\item $\mathcal{E} = [].\overline{des(\overline{t})}$:
+
+Define $\widetilde{\mathcal{E}} = [].\overline{des(\overline{\widetilde{t}})}$.
+
+\item $\mathcal{E} = fun(\overline{v}, \mathcal{E}', \overline{t}).\overline{des(\overline{t'})}$, with $fun$ declared in $prg$:
+
+We have $\widetilde{\mathcal{E}'}$ inductively, and can define: $\widetilde{\mathcal{E}} = fun(\overline{\widetilde{v}}, \mathcal{E}', \overline{\widetilde{t}}).\overline{des(\overline{\widetilde{t'}})}$.
+
+\item $\mathcal{E} = fun(\overline{v}).\overline{des(\overline{v'})}.des'(\overline{v''}, \mathcal{E}', \overline{t}).\overline{des''(\overline{t'})}$, with $fun$ declared in $prg$:
+
+Analogously to the previous case.
+
+\item $\mathcal{E} = fun(\overline{v}, \mathcal{E}', \overline{t}).\overline{des(\overline{t'})}$, with $fun$ not declared in $prg$:
+
+We have $\widetilde{\mathcal{E}'}$ inductively. Further, we know
 \begin{equation*}
-fun(t^0_1, ..., t^0_{n_0}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k})
+fun(\overline{v}, \mathcal{E}', \overline{t}) = fun(\overline{p}, \mathcal{E}', \overline{p'})[\sigma] = \langle q_{\mathcal{E}'} \rangle^{\sim}_{prg}[\sigma] \sim q_{\mathcal{E}'}[\widetilde{\sigma}]
 \end{equation*}
-$\widetilde{\mathcal{E}}[\widetilde{s'}]$ has the form
-\begin{equation*}
-fun'(s^0_1, ..., s^0_{n'_0}).des'_1(s^0_1, ..., s^0_{n'_1})...des'_{k'}(s^0_1, ..., s^0_{n'_{k'}}).des_1(t^1_1, ..., t^1_{n_1})...des_k(t^k_1, ..., t^k_{n_k}),
-\end{equation*}
-where each of the $s^i_j$ is equivalent to exactly one of the $t^0_i$. Thus, it actually is an evaluation context in $prg$, i.e., all of its reduction-relevant subterms left of the hole are irreducible in $prg$. To see this, suppose such a subterm reduced in $prg$, then, by the second extraction function property, the equivalent term among the $t^0_i$ would reduce in $\langle prg \rangle$, contrary to the fact that it is a value in $\langle prg \rangle$ because it is to the left of the hole in $\mathcal{E}$.
+for a $q$ with all names declared in $prg$, where $q_{\mathcal{E}'}$ stands for $q$ with the relevant pattern replaced by the context $\mathcal{E}'$. Thus we can define: $\widetilde{\mathcal{E}} = q[\widetilde{\sigma}].\overline{des(\overline{\widetilde{t'}})}$.
+
+\item $\mathcal{E} = fun(\overline{v}).\overline{des(\overline{v'})}.des'(\overline{v''}, \mathcal{E}', \overline{t}).\overline{des''(\overline{t'})}$, with $fun$ not declared in $prg$:
+
+Analogously to the previous case.
+
+\end{itemize}
+
+Here $\widetilde{t}$ for a term $t$ stands for a term that is equivalent in $t$ but has all of its names declared in $prg$. Such a term can be construed from $t$ analogously to how the evaluation context was constructed. When a term $v$ is a value in $\langle prg \rangle$, so is $\widetilde{v}$ by the second extraction function property. To see this, suppose $\widetilde{v} \sim v$ reduced in $prg$, then, by the property, so would $v$ in $\langle prg \rangle$, contrary to fact.
 
 \end{enumerate}
 
@@ -449,7 +475,7 @@ The only kind of equation that remains is an $\epsilon_r$. Suppose $t$ reduces b
 
 \subsubsection{Proof of ``no overlap" preservation}
 
-Finally, it is proven that constructor extraction preserves the property that the program has no overlapping lhss. For this, note that $extract\_con$ also preserves the ``alignment of patterns'' property that $align\_patterns$ establishes, since it doesn't touch patterns.
+Finally, it is proven that constructor extraction preserves the property that the program has no overlapping lhss. For this, note that $extract\_con$ also preserves the ``alignment of patterns'' property that $align\_patterns$ establishes, since patterns are either not touched or uniformly replaced by variables.
 
 \begin{lemma}
 
@@ -457,7 +483,13 @@ If $prg$ has no overlapping lhss, neither has $\langle prg \rangle := \langle pr
 
 \begin{proof}
 
-TODO
+An equation of $\langle prg \rangle$ is either taken over unchanged from $prg$, or it is one of $\epsilon_r, \zeta_r$ for an $r$ of $prg$. This means that the $\epsilon$ equations have to be compared with other $\epsilon$ equations, $\zeta$ with other $\zeta$, $\epsilon$ with unchanged. $\zeta$ equations needn't be compared with $\epsilon$ or unchanged equations, since the latter two have lhss with function names declared in $prg$, while the function name of the lhs of the $\zeta$ equation is fresh in $prg$. Any two unchanged equations also needn't be compared, since we already know they don't overlap.
+
+First, compare any two $\epsilon$ equations. In $prg$, there are two lhss that are these equations' lhss with one variable replaced by a constructor pattern. Thus, if the $\epsilon$ equations overlapped, so would these two lhss in $prg$. But we know that they don't.
+
+Second, compare any two $\zeta$ equations. By their definition, they can only overlap if the equations they are generated from overlap, which we know they don't.
+
+Third, compare an $\epsilon$ equation with an unchanged equation. The only transformed equations have no destructors on their lhs. The domain of this transformation only has unmixed function definitions. It follows that, if $\epsilon$ overlapped with an unchanged equation, the latter has no destructors, too. Since the extracted constructor is further right than the right-most constructor in the unchanged equation, the unchanged equation and the equation that $\epsilon$ was extracted out of would overlap, which we know they don't.
 
 \end{proof}
 
@@ -465,8 +497,129 @@ TODO
 
 \subsection{Extraction of all constructors from a single-destructor copattern}
 
-...
+\begin{figure}
+\vspace{2.4in}
+\[
+    \langle `` fun(\overline{p}).des(\overline{p'}) = t " \rangle^{extract\_des}_{prg} =\\
+\begin{cases}
+    \big\langle `` fun(\overline{x}).des(\overline{x'}) =  \langle fun(\overline{x}).des(\overline{x'}) \rangle^{\sim}_{prg} ", \big\langle \langle fun, des \rangle^{hsig}_{prg}, `` \langle fun, des \rangle^{hname}_{prg}(\overline{p}, \overline{p'}) = t  " \big\rangle \big\rangle,& \text{if one of the $\overline{p}$ or $\overline{p'}$ is a constructor pattern} \\
+   \big\langle `` fun(\overline{p}).des(\overline{p'}) = t " \big\rangle,& \text{otherwise}
+\end{cases}
+\]
+\caption{Extraction function $extract\_patterns$.}
+\end{figure}
 
+The extraction function that extracts all constructors from a single-destructor copattern is called $extract\_patterns$ and defined in Figure 3-3. The definition uses functions defined in the next paragraph.
+
+For each function $fun$, destructor $des$, and program $prg$, define the helper function name
+\begin{equation*}
+\langle fun, des \rangle^{hname}_{prg} := \langle fun, des, prg \rangle^{autogen}
+\end{equation*}
+and the respective helper function signature
+\begin{equation*}
+\langle fun, des \rangle^{hsig}_{prg} := \langle fun, des \rangle^{hname}_{prg}(\langle fun \rangle^{argtypes}_{prg}, \langle des \rangle^{argtypes}_{prg}): \langle des \rangle^{rtype}_{prg}.
+\end{equation*}
+
+The equivalent function for $extract\_patterns$ is defined as follows:
+\[
+    \langle q \rangle^{\sim}_{prg} :=
+\begin{cases}
+    \langle fun, des \rangle^{hname}_{prg}(\overline{x}, \overline{x'}),& \text{if } q = fun(\overline{x}).des(\overline{x'}) \\
+    q,                                                                                      & \text{otherwise}
+\end{cases}
+\]
+
+\subsubsection{Proofs of extraction function properties}
+
+This extraction function satisfies the extraction function properties. This is proven in the following three lemmas.
+
+\begin{lemma}
+
+$extract\_patterns$ satisfies the first extraction function property.
+
+\begin{proof}
+
+We know that an actual transformation of $r$ to $\epsilon_r, \zeta_r$ has taken place, because $r$ doesn't exist in $\langle prg \rangle$. The desired sequence can be given as follows.
+\begin{alignat*}{3}
+s &\longrightarrow^* &s_{subv} = q_{\epsilon_r}[\sigma_\epsilon]\\
+&\longrightarrow &t_{\epsilon_r}\\
+&\longrightarrow^*  &(t_{\epsilon_r}[\sigma_\epsilon])_{subv} = q_{\zeta_r}[\sigma_\zeta]\\
+&\longrightarrow &t_{\zeta_r}[\sigma_\zeta] =: \widetilde{t}
+\end{alignat*}
+The first multi-step part of the sequence is concerned with reducing the reduction-relevant subterms of $s$ to equivalent values. We have such a sequence by the third extraction function property.
+
+Similarly, the second multi-step part is concerned with reducing the reduction-relevant subterms of $t_{\epsilon_r}$ to equivalent values.
+
+Now, the two one-step parts of the sequence are derived.
+
+\begin{enumerate}
+\item The first step is derived as given below.
+\begin{prooftree}
+\AxiomC{$s_{subv} =^? q_{\epsilon_r} \searrow \sigma_\epsilon$}
+\RightLabel{\scriptsize Subst with $\epsilon_r$}
+\UnaryInfC{$s_{subv} \longrightarrow t_{\epsilon_r}[\sigma_\epsilon]$}
+\end{prooftree}
+$s_{subv}$ matches $q_{\epsilon_r}$ because $s$ matches $q_r$ and $q_{\epsilon_r}$ is simply $q_r$ with all patterns replaced by variables. $s_{subv}$ is equivalent to $t_{\epsilon_r}$, because, by definition, the two sides of $\epsilon_r$ are equivalent.
+
+\item The second step is derived as given below.
+\begin{prooftree}
+\AxiomC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} =^? q_{\zeta_r} \searrow \sigma_\zeta$}
+\RightLabel{\scriptsize Subst with $\zeta_r$}
+\UnaryInfC{$(t_{\epsilon_r}[\sigma_\epsilon])_{subv} \longrightarrow t_{\zeta_r}[\sigma_\zeta]$}
+\end{prooftree}
+$(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\zeta_r}$ is simply $t_{\epsilon_r}$ with all variables replaced by the patterns of $q_r$. $t = t_r[\sigma]$ is equivalent to $t_{\zeta_r}[\sigma_\zeta]$ because $t_{\zeta_r} \sim t_r$ and $q[\sigma] \sim t_{\epsilon_r}[\sigma_\epsilon] = q_{\zeta_r}[\sigma_\epsilon]$ and $q_r \sim q_{\zeta_r}$.
+
+\end{enumerate}
+
+\end{proof}
+
+\end{lemma}
+
+\begin{lemma}
+
+$extract\_patterns$ satisfies the second extraction function property.
+
+\begin{proof}
+
+From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
+
+Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
+\begin{equation*}
+\langle fun, \overline{des}, prg \rangle^{autogen}(\overline{x}, \overline{x'})[\sigma].\overline{des(\overline{p}[\sigma])},
+\end{equation*}
+for some $q_r = fun(\overline{x}.\overline{des(\overline{x'})}$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has no top-level destructor calls.
+
+If it has one or more top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
+
+\end{proof}
+
+\end{lemma}
+
+\begin{lemma}
+
+$extract\_patterns$ satisfies the third extraction function property.
+
+\begin{proof}
+
+
+
+\end{proof}
+
+\end{lemma}
+
+\subsubsection{Proof of ``no overlap" preservation}
+
+Finally, it is proven that this extraction preserves the property that the program has no overlapping lhss. For this, note that $extract\_patterns$ also preserves the ``alignment of patterns'' property that $align\_patterns$ establishes, since patterns are either not touched or uniformly replaced by variables.
+
+\begin{lemma}
+
+If $prg$ has no overlapping lhss, neither has $\langle prg \rangle := \langle prg \rangle^{extract\_helpers(extract\_patterns)}$.
+
+\begin{proof}
+
+\end{proof}
+
+\end{lemma}
 
 \section{Core de- and refunctionalization}
 
@@ -596,7 +749,7 @@ By the induction hypothesis we have $s'' \longrightarrow_{prg} t''$ with $s' = \
 
 \subsubsection{Proof of strong bisimulation}
 
-For the actual refunctionalization, $r''$, strong bisimulation holds. The proof relies on properties of the automatic refunctionalization of Uroboro in the paper of Rendel, Trieflinger, and Ostermann, in here called $r^{core}$. As stated in section 2.3.1, the authors' notion of reducibility is the same than that of this work when restricted to the domain of $r^{core}$, the Data Fragment, and, analogously, when restricted to the domain of their defunctionalization, the Codata Fragment.
+For the actual refunctionalization, $r''$, strong bisimulation holds. The proof relies on properties of the automatic refunctionalization of Uroboro in the paper of Rendel et al., in here called $r^{core}$. As stated in section 2.3.1, the authors' notion of reducibility is the same than that of this work when restricted to the domain of $r^{core}$, the Data Fragment, and, analogously, when restricted to the domain of their defunctionalization, the Codata Fragment.
 
 In section 3 of their paper, they prove Lemma 5, which in terms of this work can be stated as follows (possible since the reducibility notions are identical):
 
