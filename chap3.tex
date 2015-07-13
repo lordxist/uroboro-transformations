@@ -13,16 +13,18 @@
 For a function $e$ that takes (along with the whole program $prg$, which will be omitted for brevity) an equation $eqn$ and returns $\langle eqn, H \rangle^e := \big\langle eqn', H' \big\rangle$, with $eqn'$ the changed equation and $H'$ the helpers set, define $extract\_helpers(e)$ as follows:
 
 \begin{alignat*}{4}
-\langle prg \rangle^{extract\_helpers(e)}_{prg} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+\langle prg \rangle^{extract\_helpers(e, funs)}_{prg} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
 & && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{e}_{prg} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
 & && && \cup && \{ \textrm{\textbf{function }} sig \textrm{\textbf{ where }} \\
 & && && &&\quad \{ heqn ~ | ~ \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
 & && && && | ~  \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
-& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
-& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
+& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg, fun \in funs \} \\
+& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. or def. for a } fun \not\in funs \} \span\span\span\span
 \end{alignat*}
 
-where $H_{eqns} = \{ \big\langle hsig, heqn \big\rangle \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{e}_{prg} ~ | ~ eqn \in eqns \}$
+where $H_{eqns} = \{ \big\langle hsig, heqn \big\rangle \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{e}_{prg, funs} ~ | ~ eqn \in eqns \}$.
+
+Here $funs$ is a set of function names that represents the affected function definitions. Whenever $funs$ is left unspecified, it is assumed that all function definitions are affected. (Which will always be the case with the exception of the $unmix$ transformation.)
 
 \section{Common pretransformations}
 
@@ -81,8 +83,9 @@ Each preprocessing steps can be defined as a recursive composition of one of the
 &elim\_multi\_des_i = condrec(extract\_helpers(extract\_des^{\geq 1}), cond_i), \textrm{ for } i \in \{d, r\}, \textrm{ with } \\
 &\qquad cond_d = \textrm{``the program contains multiple destructors''} \\
 &\qquad cond_r = \textrm{``the program contains a multiple destructor copattern with constructors''} \\
-&unmix = condrec(extract\_helpers(extract\_des), cond), \textrm{ with}\\
-&\qquad cond = \textrm{``the program has mixed function def.s''} \\
+&unmix = condrec(extract\_helpers(extract\_des, funs), cond), \textrm{ with}\\
+&\qquad cond = \textrm{``the program has mixed function def.s'' and} \\
+&\qquad funs = \{ fun \in prg ~ | ~ \textrm{the def. of $fun$ is mixed} \} \\
 &elim\_cons\_from\_des = condrec(extract\_helpers(extract\_patterns), cond), \textrm{ with}\\
 &\qquad cond = \textrm{``the program has destructor copatterns with constructors''} \\
 &elim\_multi\_con = condrec(extract\_helpers(extract\_con), cond), \textrm{ with}\\
@@ -91,7 +94,7 @@ Each preprocessing steps can be defined as a recursive composition of one of the
 
 \end{framed}
 
-As stated above, $r_{core}$ and $d_{core}$ are essentially the transformation of Rendel et al. Their precise definitions are given in section 3.6.
+As stated above, $r_{core}$ and $d_{core}$ are essentially two ways of the transformation of Rendel et al. Their precise definitions are given in section 3.6.
 
 \section{Bisimulation}
 
