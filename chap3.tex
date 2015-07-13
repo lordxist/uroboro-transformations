@@ -10,7 +10,19 @@
 
 \subsection{Helper extraction}
 
-...
+For a function $e$ that takes (along with the whole program $prg$, which will be omitted for brevity) an equation $eqn$ and returns $\langle eqn, H \rangle^e := \big\langle eqn', H' \big\rangle$, with $eqn'$ the changed equation and $H'$ the helpers set, define $extract\_helpers(e)$ as follows:
+
+\begin{alignat*}{4}
+\langle prg \rangle^{extract\_helpers(e)}_{prg} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{e}_{prg} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
+& && && \cup && \{ \textrm{\textbf{function }} sig \textrm{\textbf{ where }} \\
+& && && &&\quad \{ heqn ~ | ~ \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
+& && && && | ~  \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
+& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
+& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
+\end{alignat*}
+
+where $H_{eqns} = \{ \big\langle hsig, heqn \big\rangle \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{e}_{prg} ~ | ~ eqn \in eqns \}$
 
 \section{Common pretransformations}
 
@@ -26,33 +38,60 @@
 
 \section{Overview of transformation steps}
 
-Both de- and refunctionalization are made up of a couple of preprocessing steps, followed by the core de-/refunctionalization, which is essentially the transformation from the paper of Rendel et al.
+Both de- and refunctionalization are made up of a couple of preprocessing steps, followed by the core de-/refunctionalization, which is essentially the two-way transformation from the paper of Rendel et al.
 
 Automatic defunctionalization consists of the following steps:
 \begin{enumerate}
-\item Eliminate multiple destructors.
+\item Eliminate multiple destructors. ($elim\_multi\_des_d$)
 
-\item Unmix function definitions.
+\item Unmix function definitions. ($unmix$)
 
-\item Eliminate constructors from destructor copatterns.
+\item Eliminate constructors from destructor copatterns. ($elim\_cons\_from\_des$)
 
-\item Core defunctionalization.
+\item Core defunctionalization. ($d_{core}$)
 
 \end{enumerate}
 
 Automatic refunctionalization consists of the following steps:
 \begin{enumerate}
-\item Eliminate multiple destructors from copatterns containing constructors.
+\item Eliminate multiple destructors from copatterns containing constructors. ($elim\_multi\_des_r$)
 
-\item Unmix function definitions.
+\item Unmix function definitions. ($unmix$)
 
-\item Eliminate constructors from destructor copatterns.
+\item Eliminate constructors from destructor copatterns. ($elim\_cons\_from\_des$)
 
-\item Eliminate multiple constructors.
+\item Eliminate multiple constructors. ($elim\_multi\_con$)
 
-\item Core refunctionalization.
+\item Core refunctionalization. ($r_{core}$)
 
 \end{enumerate}
+
+Each preprocessing steps can be defined as a recursive composition of one of the basic building blocks described in the next section. One such building block is an extraction function lifted to programs with $extract\_helpers$. The definitions for each step follow below; for them, the following conditional recursion combinator will be used:
+\[
+    condrec(f, cond) :=
+\begin{cases}
+    condrec(f, cond) \circ f,& \text{if $cond$ holds} \\
+   id,& \text{otherwise}
+\end{cases}
+\]
+
+\begin{framed}
+
+\begin{alignat*}{1}
+&elim\_multi\_des_i = condrec(extract\_helpers(extract\_des^{\geq 1}), cond_i), \textrm{ for } i \in \{d, r\}, \textrm{ with } \\
+&\qquad cond_d = \textrm{``the program contains multiple destructors''} \\
+&\qquad cond_r = \textrm{``the program contains a multiple destructor copattern with constructors''} \\
+&unmix = condrec(extract\_helpers(extract\_des), cond), \textrm{ with}\\
+&\qquad cond = \textrm{``the program has mixed function def.s''} \\
+&elim\_cons\_from\_des = condrec(extract\_helpers(extract\_patterns), cond), \textrm{ with}\\
+&\qquad cond = \textrm{``the program has destructor copatterns with constructors''} \\
+&elim\_multi\_con = condrec(extract\_helpers(extract\_con), cond), \textrm{ with}\\
+&\qquad cond = \textrm{``the program has copatterns with multiple constructors''}
+\end{alignat*}
+
+\end{framed}
+
+As stated above, $r_{core}$ and $d_{core}$ are essentially the transformation of Rendel et al. Their precise definitions are given in section 3.6.
 
 \section{Bisimulation}
 
@@ -222,8 +261,10 @@ Each of the extraction functions defined below are lifted to programs with $extr
 \begin{figure}
 \vspace{2.4in}
 \begin{alignat*}{3}
-& \langle `` q.des(\overline{p}) = t " \rangle^{extract\_des}_{prg} &= &\big\langle `` q =  \langle q \rangle^{\sim}_{prg} ", \big\langle \langle q \rangle^{hsig}_{prg}, `` \langle q \rangle^{\sim}_{prg}.des(\overline{p}) = t  " \big\rangle \big\rangle \span\span \\
-& \langle `` fun(\overline{p}) = t " \rangle^{extract\_des}_{prg} &= &\big\langle `` fun(\overline{p}) = t " \big\rangle \span\span
+& \langle `` q = t " \rangle^{extract\_des}_{prg} &= &\big\langle `` q' =  \langle q' \rangle^{\sim}_{prg} ", \big\langle \langle q' \rangle^{hsig}_{prg}, `` \langle q' \rangle^{\sim}_{prg}.des(\overline{p}) = t  " \big\rangle \big\rangle, \span\span \\
+& \qquad \textrm{if $q = q'.des(\overline{p})$ and $q$ has the most destructors in its function definition} \span\span\span \\
+& \langle `` q = t " \rangle^{extract\_des}_{prg} &= &\big\langle `` q = t " \big\rangle, \span\span \\
+& \qquad \textrm{otherwise} \span\span\span
 \end{alignat*}
 \caption{Extraction function $extract\_des$.}
 \end{figure}
@@ -245,6 +286,15 @@ The equivalent function for $extract\_des$ is defined as follows:
 \begin{cases}
     \langle q \rangle^{hname}_{prg}(\langle q \rangle^{vars}),& \text{if $q.des(\overline{p})$ is a lhs in $prg$} \\
     q,                                                                                      & \text{otherwise}
+\end{cases}
+\]
+
+For the transformation step that eliminate multiple destructors, described in section 3.3, a wrapper of $extract\_des$ is needed that stops at the last destructor.
+\[
+    \langle `` q = t " \rangle^{extract\_des^{\geq 1}}_{prg} =\\
+\begin{cases}
+    \big\langle `` q = t " \rangle^{extract\_des},& \text{if $q$ has more than one destructor} \\
+   \big\langle `` q = t " \big\rangle,& \text{otherwise}
 \end{cases}
 \]
 
@@ -301,17 +351,19 @@ $extract\_des$ satisfies the second extraction function property.
 
 \begin{proof}
 
-From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
+By induction on the structure of $s$.
 
-Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
+By the induction hypothesis, we have that for any immediate subterm $s^0$ of $s$ that, if $s^0$ reduces in $prg$, then also any $\widetilde{s^0} \sim s^0$ reduces in $\langle prg \rangle$.
+
+From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$.
+
+Now, consider an $\widetilde{s} \sim s$ which has the same top-level structure as $s$. This means that if $s$ reduces in $prg$, so does $\widetilde{s}$ in $\langle prg \rangle$ unless a reducible subterm prevents it. But then it would still reduce in $\langle prg \rangle$.
+
+Finally, consider an $\widetilde{s} \sim s$ with a top-level structure different from that of $s$. It suffices to show that a prefix of $\widetilde{s}$ matches a lhs of $\langle prg \rangle$, because if a reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst'' rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm. By the definition of the equivalence relation, $\widetilde{s}$ has the form
 \begin{equation*}
 \langle q \rangle^{\sim}_{prg}.\overline{des(\overline{p})}[\sigma],
 \end{equation*}
-for some $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has exactly one top-level destructor call ($des_1$).
-
-If it has more than one top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a  possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
-
-Finally, if $\widetilde{s}$ had no top-level destructor calls, i.e., it is an application of the helper function, then there would exist equations in $prg$ which overlap. To see this, consider the form of $s \sim \widetilde{s}$: It matches a $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, as stated above. But then $q$ and $q.des_1(\overline{p})$ overlap, contrary to assumption.
+for some $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that a prefix of $\widetilde{s}$, with its form as given above, matches it, if it has one ($des_1$) or more top-level destructor calls. If $\widetilde{s}$ had no top-level destructor calls, i.e., it is an application of the helper function, then there would exist equations in $prg$ which overlap. To see this, consider the form of $s \sim \widetilde{s}$: It matches a $q$ such that $q.des_1(\overline{p})$ is a lhs in $prg$, as stated above. But then $q$ and $q.des_1(\overline{p})$ overlap, contrary to assumption.
 
 \end{proof}
 
@@ -364,8 +416,10 @@ Third, compare an $\epsilon$ equation with an unchanged equation. All equations 
 \[
     \langle `` q = t " \rangle^{extract\_des}_{prg} =\\
 \begin{cases}
-    \big\langle `` q^{-con} =  \langle q \rangle^{\sim}_{prg} ", \big\langle \langle q \rangle^{hsig}_{prg}, `` \langle q \rangle^{hname}_{prg}(q^{-con}_{vars^-}) = t  " \big\rangle \big\rangle,& \text{if $q$ contains a constructor other than a left outer-most} \\
-   \big\langle `` fun(\overline{p}) = t " \big\rangle,& \text{otherwise}
+    \big\langle `` q^{-con} =  \langle q \rangle^{\sim}_{prg} ", \big\langle \langle q \rangle^{hsig}_{prg}, `` \langle q \rangle^{hname}_{prg}(q^{-con}_{vars^-}) = t  " \big\rangle \big\rangle,& \\
+   \qquad \text{if $q$ contains a constructor other than a left outer-most} \\
+   \big\langle `` q = t " \big\rangle,& \\
+   \qquad \text{otherwise}
 \end{cases}
 \]
 \caption{Extraction function $extract\_con$.}
@@ -443,15 +497,19 @@ $extract\_con$ satisfies the second extraction function property.
 
 \begin{proof}
 
-From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
+By induction on the structure of $s$.
 
-Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
+By the induction hypothesis, we have that for any immediate subterm $s^0$ of $s$ that, if $s^0$ reduces in $prg$, then also any $\widetilde{s^0} \sim s^0$ reduces in $\langle prg \rangle$.
+
+From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$.
+
+Now, consider an $\widetilde{s} \sim s$ which has the same top-level structure as $s$. This means that if $s$ reduces in $prg$, so does $\widetilde{s}$ in $\langle prg \rangle$ unless a reducible subterm prevents it. But then it would still reduce in $\langle prg \rangle$.
+
+Finally, consider an $\widetilde{s} \sim s$ with a top-level structure different from that of $s$. It suffices to show that a prefix of $\widetilde{s}$ matches a lhs of $\langle prg \rangle$, because if a reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst'' rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm. By the definition of the equivalence relation, $\widetilde{s}$ has the form
 \begin{equation*}
-\langle q \rangle^{\sim}_{prg}.\overline{des(\overline{p})}[\sigma],
+\langle q_r \rangle^{\sim}_{prg}.\overline{des(\overline{p})}[\sigma]
 \end{equation*}
-for some $q_r$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has no top-level destructor calls.
-
-If it has one or more top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
+for some $q_r$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in exactly such a way that $\langle q \rangle^{\sim}_{prg}[\sigma]$ matches it.
 
 \end{proof}
 
@@ -500,10 +558,13 @@ Third, compare an $\epsilon$ equation with an unchanged equation. The only trans
 \begin{figure}
 \vspace{2.4in}
 \[
-    \langle `` fun(\overline{p}).des(\overline{p'}) = t " \rangle^{extract\_des}_{prg} =\\
+    \langle `` fun(\overline{p}).des(\overline{p'}) = t " \rangle^{extract\_des}_{prg} =
 \begin{cases}
-    \big\langle `` fun(\overline{x}).des(\overline{x'}) =  \langle fun(\overline{x}).des(\overline{x'}) \rangle^{\sim}_{prg} ", \big\langle \langle fun, des \rangle^{hsig}_{prg}, `` \langle fun, des \rangle^{hname}_{prg}(\overline{p}, \overline{p'}) = t  " \big\rangle \big\rangle,& \text{if one of the $\overline{p}$ or $\overline{p'}$ is a constructor pattern} \\
-   \big\langle `` fun(\overline{p}).des(\overline{p'}) = t " \big\rangle,& \text{otherwise}
+    \big\langle `` fun(\overline{x}).des(\overline{x'}) =  \langle fun(\overline{x}).des(\overline{x'}) \rangle^{\sim}_{prg} ", \\
+    \quad \big\langle \langle fun, des \rangle^{hsig}_{prg}, `` \langle fun, des \rangle^{hname}_{prg}(\overline{p}, \overline{p'}) = t  " \big\rangle \big\rangle,& \\
+    \qquad \text{if one of the $\overline{p}$ or $\overline{p'}$ is a constructor pattern} \\
+   \big\langle `` fun(\overline{p}).des(\overline{p'}) = t " \big\rangle,& \\
+    \qquad \text{otherwise}
 \end{cases}
 \]
 \caption{Extraction function $extract\_patterns$.}
@@ -579,17 +640,7 @@ $(t_{\epsilon_r}[\sigma_\epsilon])_{subv}$ matches $q_{\zeta_r}$ because $q_{\ze
 
 $extract\_patterns$ satisfies the second extraction function property.
 
-\begin{proof}
-
-From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$. It suffices to shown that the $\widetilde{s}$ match a lhs of $\langle prg \rangle$, because if a reduction-relevant reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst" rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm.
-
-Now, this lhs of $\langle prg \rangle$ that $\widetilde{s}$ matches will be specified. All terms $\widetilde{s} \neq s$ equivalent to $s$ have the following form by the definition of the equivalence relation:
-\begin{equation*}
-\langle fun, \overline{des}, prg \rangle^{autogen}(\overline{x}, \overline{x'})[\sigma].\overline{des(\overline{p}[\sigma])},
-\end{equation*}
-for some $q_r = fun(\overline{x}.\overline{des(\overline{x'})}$ that is a lhs in $prg$, and its equation $r$ is actually transformed to $\langle r \rangle^e$ containing $\epsilon_r, \zeta_r$. $q_{\zeta_r}$ is defined in precisely such a way that $\widetilde{s}$, with its form as given above, matches it, if it has no top-level destructor calls.
-
-If it has one or more top-level destructor calls, a prefix of $\widetilde{s}$ matches $q_{\zeta_r}$. If a possible reduction by the ``Cong" rule were prevented by another possible reduction by the ``Subst" rule, $\widetilde{s}$ would still reduce anyway.
+\begin{proof} The argument here is identical to that for $extract\_con$.
 
 \end{proof}
 
@@ -601,7 +652,11 @@ $extract\_patterns$ satisfies the third extraction function property.
 
 \begin{proof}
 
+First, note that by the definition of extract helper, some equations in $\langle prg \rangle$ result from the application of $e$ to an equation $r$ in $prg$; specifically, they are the two equations $\epsilon_r, \zeta_r$ contained in $\langle r \rangle^e$. The other equations are taken over from $prg$ unchanged. By definition, the lhs of $\epsilon_r$ appears in $prg$ with one variable replaced by a constructor, and the lhs of $\zeta_r$ has a function name undeclared in $prg$.
 
+This means that a term $t$ with all of its names declared in $prg$ can't reduce by a $\zeta_r$ equation. It also can't reduce by an equation that is taken over unchanged from $prg$, because then it would also reduce in $prg$.
+
+The only kind of equation that remains is an $\epsilon_r$. Suppose $t$ reduces by this equation; by definition, the result $\widetilde{t}$ is equivalent to $t$. It can't reduce further. To see this, first note that there is an equation $r$ such that $q_{\epsilon_r}$ is $q_r$ with all patterns replaced by variables. We know $t$ doesn't reduce by $r$ in $prg$. By definition, there thus also cannot be a $\zeta_r$ by which $\widetilde{t}$ reduces. But all equations of kind $\epsilon$ of taken over unchanged from $prg$ have a function name declared in $prg$, unlike $\widetilde{t}$.
 
 \end{proof}
 
@@ -617,6 +672,14 @@ If $prg$ has no overlapping lhss, neither has $\langle prg \rangle := \langle pr
 
 \begin{proof}
 
+An equation of $\langle prg \rangle$ is either taken over unchanged from $prg$, or it is one of $\epsilon_r, \zeta_r$ for an $r$ of $prg$. This means that the $\epsilon$ equations have to be compared with other $\epsilon$ equations, $\zeta$ with other $\zeta$, $\epsilon$ with unchanged. $\zeta$ equations needn't be compared with $\epsilon$ or unchanged equations, since the latter two have lhss with function names declared in $prg$, while the function name of the lhs of the $\zeta$ equation is fresh in $prg$. Any two unchanged equations also needn't be compared, since we already know they don't overlap.
+
+First, compare any two $\epsilon$ equations. In $prg$, there are two lhss that are these equations' lhss with one variable replaced by a constructor pattern. Thus, if the $\epsilon$ equations overlapped, so would these two lhss in $prg$. But we know that they don't.
+
+Second, compare any two $\zeta$ equations. By their definition, they can only overlap if the equations they are generated from overlap, which we know they don't.
+
+Third, compare an $\epsilon$ equation with an unchanged equation. The only transformed equations have exactly one destructor on their lhs. The domain of this transformation only has unmixed function definitions. It follows that, if $\epsilon$ overlapped with an unchanged equation, the latter has one or more destructors. Since $\epsilon$ has only variables as patterns, the unchanged equation and the equation that $\epsilon$ was extracted out of would overlap, which we know they don't.
+
 \end{proof}
 
 \end{lemma}
@@ -625,19 +688,38 @@ If $prg$ has no overlapping lhss, neither has $\langle prg \rangle := \langle pr
 
 \subsection{Core defunctionalization}
 
-...
+After the preprocessing steps, the only thing that remains is to apply the defunctionalization for the Codata Fragment of Uroboro, as developed by Rendel et al., to the not yet defunctionalized parts of the program. It can be applied to these parts because the preprocessing steps guarantee that they are in the Codata Fragment. Call the defunctionalization for the Data Fragment of Uroboro $d^{codata}$; the core defunctionalization for programs is defined as follows below.
+
+\begin{alignat*}{3}
+\langle prg \rangle^{d_{core}} & = ~&& \langle && \{ def \in prg ~ | ~ def \textrm{ is codata def. or} \\ & && &&\quad \textrm{ function def. with equations } eqns \neq \emptyset: \forall e \in eqns: e \textrm{ has destr. pattern } \} \rangle^{d^{codata}} \\
+& \cup && \{ && \textrm{\textbf{data }} ... ~ | ~ `` \textrm{\textbf{data }} ... " \in prg \} \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ p = \langle t \rangle^d ~ | ~ "p = t" \in eqns \} \\
+& && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } \forall e \in eqns: e \textrm{ has hole pattern}\} 
+\end{alignat*}
+
+Technical note on constructor subsumption:
+
+The input of $d^{codata}$ in the definition above is actually not in its domain. This is because it can contain constructor calls. The following technical trick allows to transform such inputs as well: For the sake of $d^{codata}$, subsume constructor names under function names (as if they were from the same syntactic domain). After the transformation, since names aren't changed (or when name changes are desired, the original name can still be retrieved), the subsumed constructor names (or their equivalents after a name change) are once again considered constructor names (from the original syntactic domain).
+
+Defunctionalizing terms: \\
+$\langle x \rangle^d = x$ \\
+$\langle s.des(t_1, ..., t_n) \rangle^d = \langle des \rangle^d (\langle s \rangle^d, \langle t_1 \rangle^d, ..., \langle t_n \rangle^d)$ \\
+$\langle fun(t_1, ..., t_n) \rangle^d = \langle fun \rangle^d (\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)$ \\
+$\langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)$ \\
 
 \subsubsection{Proof of strong bisimulation}
 
-For the actual defunctionalization, $d''$, strong bisimulation holds. The proof relies on properties of the automatic defunctionalization of Uroboro in the paper of Rendel et al., in here called $d^{core}$. As stated in section 2.3.1, the authors' notion of reducibility is the same than that of this work when restricted to the domain of $d^{core}$, the Codata Fragment, and, analogously, when restricted to the domain of their refunctionalization, the Data Fragment.
+For $d_{core}$, strong bisimulation holds. The proof relies on properties of $d^{codata}$. As stated in section 2.3.1, the authors' notion of reducibility is the same than that of this work when restricted to the domain of $d^{codata}$, the Codata Fragment.
 
-In section 3 of their paper, they prove Lemma 5, which in terms of this work can be stated as follows (possible since the reducibility notions are identical):
+In section 3, Rendel et al. prove Lemma 5, which in terms of this work can be stated as follows (possible since the reducibility notions are identical):
 
 $s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ for all input terms $s,t$ of $\langle \cdot \rangle$ (*)
 
-Here, the angular brackets can stand for either of their transformations, refunctionalization and defunctionalization. Statement (*) is exactly the strong bisimulation statement above, thus strong bisimulation holds for $d^{core}$.
+Here, the angular brackets can stand for either of their transformations, the refunctionalization $r^{data}$ and the defunctionalization $d^{codata}$. Statement (*) means that strong bisimulation holds for $d^{codata}$.
 
-\begin{proof}[Proof of strong bisimulation for $d''$] ~
+Using (*), it will now be shown that strong bisimulation holds for $d_{core}$.
+
+\begin{proof}[Proof of strong bisimulation for $d_{core}$] ~
 
 $`` \Rightarrow "$: By induction on the structure of $\mathcal{D}$.
 
@@ -650,13 +732,13 @@ $`` \Rightarrow "$: By induction on the structure of $\mathcal{D}$.
 \UnaryInfC{$s \longrightarrow s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^d$, $\langle t \rangle = \langle t \rangle^d$. $d$ is the defunctionalization of terms defined at the end of section 2. This defunctionalization of terms is also, for all input terms from the fragment, identical to that of the Codata Fragment.
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^d$, $\langle t \rangle = \langle t \rangle^d$. $d$ is the defunctionalization of terms as defined above. This defunctionalization of terms is also, for all input terms from the fragment, identical to that of the Codata Fragment.
 
 \begin{itemize}
 
 \item \underline{Case 1}: $q$ is hole pattern:
 
-Then the function definition that contains $`` q = s' "$ contains only equations where the left-hand side is a hole pattern (other cases are excluded by the relevant input fragment for $d''$). Such equations (and indeed the function definitions) are left unchanged by $d''$ except for defunctionalizing the right-hand term, as can be seen directly in the definition of $d''$ (last set in the highest-level union). Thus Rules($\langle prg \rangle$) contains $(q, \langle s' \rangle)$.
+Then the function definition that contains $`` q = s' "$ contains only equations where the left-hand side is a hole pattern (other cases are excluded by the relevant input fragment for $d_{core}$). Such equations (and indeed the function definitions) are left unchanged by $d_{core}$ except for defunctionalizing the right-hand term, as can be seen directly in the definition of $d_{core}$ (last set in the highest-level union). Thus Rules($\langle prg \rangle$) contains $(q, \langle s' \rangle)$.
 
 By inversion, we have from $s =^? q \searrow \sigma$ that $s$ has the form $fun(v_1, ..., v_n)$ for some values $v_1, ..., v_n$, thus $\langle s \rangle = fun(\langle v_1 \rangle, ..., \langle v_n \rangle)$. By inversion for values, we have that each $v_i$ is either a constructor application or a value of codata type. If it is a value of codata type, by inversion on pattern matching, the relevant subpattern of $q$ can only be a variable, thus it is also matched by $\langle v_i \rangle$. If it is a constructor application, the relevant subpattern of $q$ is either a variable, and the same holds, or it is a constructor pattern, and by recursively descending into its subpatterns we still get that $\langle v_i \rangle = con(\langle v^1_i \rangle, ..., \langle v^m_n \rangle)$ matches against the subpattern of $q$.
 
@@ -664,24 +746,24 @@ By carrying the substitutions returned from the matchings along in the above rec
 
 \item \underline{Case 2}: $q = fun(p_1, ..., p_n).des(p'_1, ..., p'_k)$:
 
-Then the function definition that contains $`` q = s' "$ contains only equations where the left-hand side is a destructor pattern (other cases are excluded by the relevant input fragment for $d''$). Thus $s$ reduces to $t$ already with respect to the part of the program that is passed to $d^{core}$, as specified in the definition of $d''$. Let this part, amended by the ``constructor subsumption" noted for the definition of $d''$, be $prg'$; it is: $s \longrightarrow_{prg'} t$
+Then the function definition that contains $`` q = s' "$ contains only equations where the left-hand side is a destructor pattern (other cases are excluded by the relevant input fragment for $d_{core}$). Thus $s$ reduces to $t$ already with respect to the part of the program that is passed to $d^{codata}$, as specified in the definition of $d_{core}$. Let this part, amended by the ``constructor subsumption" noted for the definition of $d_{core}$, be $prg'$; it is: $s \longrightarrow_{prg'} t$
 
 By (*) we would have
 
 \begin{equation*}
-s \longrightarrow_{prg'} t \iff \langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle,
+s \longrightarrow_{prg'} t \iff \langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{codata}}} \langle t \rangle,
 \end{equation*}
 
 were $prg'$ a well-typed program with copattern coverage for all subterms of $s$. 
 
 For the coverage, bear in mind that the equation $`` q = s' "$ enabling the reduction of $s$ by the ``Subst" rule is part of $prg'$ by the precondition of Case 2. As $s$ matches against $q$, copattern coverage for $s$ is trivially fulfilled in $prg'$. The immediate subterms of $s$ are values with respect to $prg$ and, by inversion, their immediate subterms and so forth, which especially means that there is no rule in $prg$ against which they match. But $prg$ has copattern coverage for such a subterm (TODO: make this a general precondition) and there is already no rule for it in $prg$. It follows that $prg'$ still has copattern coverage for the subterm even though there is no rule for it in $prg'$. This is because, either (1) the subterm is a destructor call, then it can only be covered by destructor copatterns (as it matches against a destructor copattern) and those only occur within $prg'$, or (2) it is a constructor call, which doesn't need to be matched for coverage. It can't be a function call, since these can only be covered by directly matching the call, which isn't the case even in $prg$, for which coverage is assumed. Thus coverage holds for $prg'$.
 
-For well-typedness, simply treat the missing types temporarily, that is, for the sake of (*), as codata types. This is no problem for the restriction to the domain of $d^{core}$, since such types could be introduced inside the Codata Fragment with codata definitions. To be more precise, empty function definitions can be added for missing ones and empty codata definitions for missing types, and removed again after using (*), without adding or removing possible reductions, respectively. All in all, we have by (*):
+For well-typedness, simply treat the missing types temporarily, that is, for the sake of (*), as codata types. This is no problem for the restriction to the domain of $d^{codata}$, since such types could be introduced inside the Codata Fragment with codata definitions. To be more precise, empty function definitions can be added for missing ones and empty codata definitions for missing types, and removed again after using (*), without adding or removing possible reductions, respectively. All in all, we have by (*):
 \begin{equation*}
-s \longrightarrow_{prg'} t \iff \langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle
+s \longrightarrow_{prg'} t \iff \langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{codata}}} \langle t \rangle
 \end{equation*}
 
-But this program $\langle prg' \rangle^{d^{core}}$ is a subset of $\langle prg \rangle$, as can be seen in the definition of $d''$. This implies the desired $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
+But this program $\langle prg' \rangle^{d^{codata}}$ is a subset of $\langle prg \rangle$, as can be seen in the definition of $d_{core}$. This implies the desired $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
 
 \end{itemize}
 
@@ -712,16 +794,16 @@ $`` \Leftarrow "$: By induction on the structure of $\mathcal{D}$.
 \UnaryInfC{$\langle s \rangle \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^d$, $\langle t \rangle = \langle t \rangle^d$. $d$ is the defunctionalization of terms defined at the end of section 2. This defunctionalization of terms is also, for all input terms from the fragment, identical to that of the Codata Fragment.
+with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^d$, $\langle t \rangle = \langle t \rangle^d$. $d$ is the defunctionalization of terms as defined above. This defunctionalization of terms is also, for all input terms from the fragment, identical to that of the Codata Fragment.
 
-The equation $`` q = s' "$ can either be contained in that part of $\langle prg \rangle$ that results from the application of $d^{core}$ to the relevant part of $prg$, as specified in the definition of $d''$, or it can be in the other part of $\langle prg \rangle$. As can be seen in the definition of $d''$, this other part is taken over unchanged from $prg$ except for defunctionalizing the right-hand terms. Thus for an equation $`` q = s' "$ from this part, the equation $`` q = s'' "$ with $s' = \langle s'' \rangle$ is present in $prg$. For such an equation, $q$ has hole pattern. It can then be easily seen that $s =^? q \searrow \sigma'$ for a $\sigma'$ with $s''[\sigma'] = t$ by an argument analogous to that of $`` \Rightarrow "$, ``Subst" case, Case 1.
+The equation $`` q = s' "$ can either be contained in that part of $\langle prg \rangle$ that results from the application of $d^{codata}$ to the relevant part of $prg$, as specified in the definition of $d''$, or it can be in the other part of $\langle prg \rangle$. As can be seen in the definition of $d''$, this other part is taken over unchanged from $prg$ except for defunctionalizing the right-hand terms. Thus for an equation $`` q = s' "$ from this part, the equation $`` q = s'' "$ with $s' = \langle s'' \rangle$ is present in $prg$. For such an equation, $q$ has hole pattern. It can then be easily seen that $s =^? q \searrow \sigma'$ for a $\sigma'$ with $s''[\sigma'] = t$ by an argument analogous to that of $`` \Rightarrow "$, ``Subst" case, Case 1.
 
-Now, suppose that $`` q = s' "$ is contained in the part of $\langle prg \rangle$ that results from the application of $d^{core}$ to the relevant part $prg' \subseteq prg$. Thus $\langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle$.
+Now, suppose that $`` q = s' "$ is contained in the part of $\langle prg \rangle$ that results from the application of $d^{codata}$ to the relevant part $prg' \subseteq prg$. Thus $\langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{codata}}} \langle t \rangle$.
 
 By (*) we would have
 
 \begin{equation*}
-\langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{core}}} \langle t \rangle \iff s \longrightarrow_{prg'} t,
+\langle s \rangle \longrightarrow_{\langle prg' \rangle^{d^{codata}}} \langle t \rangle \iff s \longrightarrow_{prg'} t,
 \end{equation*}
 
 were $prg'$ a well-typed program with copattern coverage for all subterms of $s$. Both of those properties can be shown or simulated similarly to the way they are in the $`` \Rightarrow "$ part.
@@ -745,19 +827,43 @@ By the induction hypothesis we have $s'' \longrightarrow_{prg} t''$ with $s' = \
 
 \subsection{Core refunctionalization}
 
-...
+This is defined analogously to core defunctionalization, by applying the refunctionalization for the Data Fragment of Uroboro to the not yet refunctionalized parts of the program. It can be applied to these parts because the preprocessing steps guarantee that they are in the Data Fragment. Call the refunctionalization for the Data Fragment of Uroboro $r^{data}$; the core refunctionalization for programs is defined as follows below.
+
+First, a technical note: As $r_{core}$ doesn't allow destructor terms in its inputs, they have to be converted beforehand. This conversion is the same as that of $r$ for terms below, restricted to destructor terms. Call this conversion lifted to programs (in the way that all destructor terms on right-hand sides or as subterms of them are converted) $des\_conv$.
+
+\begin{alignat*}{3}
+\langle prg \rangle^{r_{core}} & = ~&& \langle \langle && \{ def \in prg ~ | ~ def \textrm{ is data def. or} \\ & && &&\quad \textrm{ function def. with equations } eqns \neq \emptyset: \forall e \in eqns: e \textrm{ has no destr. pattern}, \\
+& && &&\qquad \textrm{the first argument of the lhs isn't a variable } \} \rangle^{des\_conv} \rangle^{r_{core}} \\
+& \cup && \{ && \textrm{\textbf{codata }} ... ~ | ~ `` \textrm{\textbf{codata }} ... " \in prg \} \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \{ p = \langle t, prg \rangle^r ~ | ~ "p = t" \in eqns \} \\
+& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \textrm{ with } \forall e \in eqns: e \textrm{ has destr. pattern} \\
+& && &&\quad \textrm{or where } n = 0 \textrm{ or where the first argument of the lhs is a variable} \} 
+\end{alignat*}
+
+Along with the transformation for programs, a transformation of terms is necessary, which is a conservative extension of $r^{data}$ for programs. For this, write $r$ short for $r_{core}$ \\
+$\langle x, prg \rangle^r = x$ \\
+$\langle s.des(t_1, ..., t_n), prg \rangle^r = \langle s, prg \rangle^r .des(\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
+$\langle fun(t_1, ..., t_n), prg \rangle^r = fun(\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$, \\
+if ``\textbf{function} $fun(\tau_n, ..., \tau_n): \sigma$ \textbf{where} $eqns$" $\in prg$  with $\forall e \in eqns: e$ has destructor pattern or where $n = 0$ or where the first argument of the lhs is a variable \\
+$\langle fun(t_1, ..., t_n), prg \rangle^r = \langle t_1, prg \rangle^r .\langle fun, prg \rangle^r (\langle t_2, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$, \\
+otherwise \\
+$\langle con(t_1, ..., t_n), prg \rangle^r = \langle con, prg \rangle^r (\langle t_1, prg \rangle^r, ..., \langle t_n, prg \rangle^r)$ \\
+
+Note that the case distinction above is only necessary because of the special syntax for destructors ($q(...).des(...)$ instead of $des(..., ...)$).
 
 \subsubsection{Proof of strong bisimulation}
 
-For the actual refunctionalization, $r''$, strong bisimulation holds. The proof relies on properties of the automatic refunctionalization of Uroboro in the paper of Rendel et al., in here called $r^{core}$. As stated in section 2.3.1, the authors' notion of reducibility is the same than that of this work when restricted to the domain of $r^{core}$, the Data Fragment, and, analogously, when restricted to the domain of their defunctionalization, the Codata Fragment.
+For $r_{core}$, strong bisimulation holds. The proof relies on properties of $r^{data}$. As stated in section 2.3.1, the authors' notion of reducibility is the same than that of this work when restricted to the domain of $r^{data}$, the Data Fragment.
 
-In section 3 of their paper, they prove Lemma 5, which in terms of this work can be stated as follows (possible since the reducibility notions are identical):
+In section 3, Rendel et al. prove Lemma 5, which in terms of this work can be stated as follows (possible since the reducibility notions are identical):
 
 $s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ for all input terms $s,t$ of $\langle \cdot \rangle$ (*)
 
-Here, the angular brackets can stand for either of their transformations, refunctionalization and defunctionalization. Statement (*) is exactly the strong bisimulation statement above, thus strong bisimulation holds for $r^{core}$.
+Here, the angular brackets can stand for either of their transformations, the refunctionalization $r^{data}$ and the defunctionalization $d^{codata}$. Statement (*) means that strong bisimulation holds for $r^{data}$.
 
-\begin{proof}[Proof of strong bisimulation for $r''$] ~
+Using (*), it will now be shown that strong bisimulation holds for $r_{core}$.
+
+\begin{proof}[Proof of strong bisimulation for $r_{core}$] ~
 
 $`` \Rightarrow "$: By induction on the structure of $\mathcal{D}$.
 
@@ -770,37 +876,37 @@ $`` \Rightarrow "$: By induction on the structure of $\mathcal{D}$.
 \UnaryInfC{$s \longrightarrow s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^r$, $\langle t \rangle = \langle t \rangle^r$. $r$ is the refunctionalization of terms defined at the end of section 2 (it is omitted that $prg$ is passed to $r$ as well). This refunctionalization of terms is also, for all input terms from the fragment, identical to that of the Data Fragment.
+with $s'[\sigma] = t$; the immediate subterms of $s$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^r$, $\langle t \rangle = \langle t \rangle^r$. $r$ is the refunctionalization of terms as defined above (it is omitted that $prg$ is passed to $r$ as well). This refunctionalization of terms is also, for all input terms from the fragment, identical to that of the Data Fragment.
 
 \begin{itemize}
 
 \item \underline{Case 1}: $q$ is destructor pattern:
 
-Then the function definition that contains $`` q = s' "$ contains only equations where the left-hand side is a destructor pattern (other cases are excluded by the relevant input fragment for $r''$). Such equations (and indeed the function definitions) are left unchanged by $r''$ except for refunctionalizing the right-hand term, as can be seen directly in the definition of $r''$ (last set in the highest-level union). Thus Rules($\langle prg \rangle$) contains $(q, \langle s' \rangle)$.
+Then the function definition that contains $`` q = s' "$ contains only equations where the left-hand side is a destructor pattern (other cases are excluded by the relevant input fragment for $r_{core}$). Such equations (and indeed the function definitions) are left unchanged by $r_{core}$ except for refunctionalizing the right-hand term, as can be seen directly in the definition of $r_{core}$ (last set in the highest-level union). Thus Rules($\langle prg \rangle$) contains $(q, \langle s' \rangle)$.
 
-From here, the argument proceeds analogously to that of $`` \Rightarrow "$, ``Subst" case, Case 1, in the proof for $d''$.
+From here, the argument proceeds analogously to that of $`` \Rightarrow "$, ``Subst" case, Case 1, in the proof for $d_{core}$.
 
-\item \underline{Case 2}: $q$ is hole pattern without arguments or where the first argument has codata type:
+\item \underline{Case 2}: $q$ is hole pattern without arguments or where the first argument is a variable:
 
-Then the equation is left unchanged by $r''$ except for refunctionalizing the right-hand term, as can be seen directly in the definition of $r''$ (last set in the highest-level union). Proceed as in Case 1.
+Then the equation is left unchanged by $r_{core}$ except for refunctionalizing the right-hand term, as can be seen directly in the definition of $r_{core}$ (last set in the highest-level union). Proceed as in Case 1.
 
-\item \underline{Case 3}: $q$ is hole pattern and has a first argument with data type:
+\item \underline{Case 3}: $q$ is hole pattern and has a first argument which is a constructor pattern:
 
-Then the function definition that contains $`` q = s' "$ contains only equations where the left-hand side is a hole pattern (other cases are excluded by the relevant input fragment for $d''$), and it has a first argument with data type. Thus $s$ reduces to $t$ already with respect to the part of the program that is passed to $des\_conv$, and then the result of this to $r^{core}$, as specified in the definition of $r''$. Let the part passed to $des\_conv$ be $prg'$; it is: $s \longrightarrow_{prg'} t$.
+Then the function definition that contains $`` q = s' "$ contains only equations where the left-hand side is a hole pattern (other cases are excluded by the relevant input fragment for $r_{core}$), and it has a first argument with data type. Thus $s$ reduces to $t$ already with respect to the part of the program that is passed to $des\_conv$, and then the result of this to $r^{data}$, as specified in the definition of $r_{core}$. Let the part passed to $des\_conv$ be $prg'$; it is: $s \longrightarrow_{prg'} t$.
 
 By (*) we have
 
 \begin{equation*}
-s \longrightarrow_{prg'} t \iff \langle s \rangle \longrightarrow_{\langle prg' \rangle^{r^{core}}} \langle t \rangle,
+s \longrightarrow_{prg'} t \iff \langle s \rangle \longrightarrow_{\langle prg' \rangle^{r^{data}}} \langle t \rangle,
 \end{equation*}
 
-But this program $\langle prg' \rangle^{r^{core}}$ is a subset of $\langle prg \rangle$, as can be seen in the definition of $r''$. Thus we have the desired $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
+But this program $\langle prg' \rangle^{r^{data}}$ is a subset of $\langle prg \rangle$, as can be seen in the definition of $r_{core}$. Thus we have the desired $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$.
 
 \end{itemize}
 
 \item \textbf{``Cong" case}:
 
-The argument here is identical to that of this case of this direction in the proof for $d''$.
+The argument here is identical to that of this case of this direction in the proof for $d_{core}$.
 
 \end{enumerate}
 
@@ -815,25 +921,25 @@ $`` \Leftarrow "$: By induction on the structure of $\mathcal{D}$.
 \UnaryInfC{$\langle s \rangle \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
 \end{prooftree}
 
-with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^r$, $\langle t \rangle = \langle t \rangle^r$. $r$ is the refunctionalization of terms defined at the end of section 2. This refunctionalization of terms is also, for all input terms from the fragment, identical to that of the Data Fragment.
+with $s'[\sigma] = \langle t \rangle$; the immediate subterms of $\langle s \rangle$ are values; $\mathcal{D}_{\textrm{PM}}$ is a derivation of the pattern matching. This transformation changes input terms, thus $\langle s \rangle = \langle s \rangle^r$, $\langle t \rangle = \langle t \rangle^r$. $r$ is the refunctionalization of terms defined above. This refunctionalization of terms is also, for all input terms from the fragment, identical to that of the Data Fragment.
 
-The equation $`` q = s' "$ can either be contained in that part of $\langle prg \rangle$ that results from the application of $des\_conv$ and then $r^{core}$ to the relevant part of $prg$, as specified in the definition of $r''$, or it can be in the other part of $\langle prg \rangle$. As can be seen in the definition of $r''$, this other part is taken over unchanged from $prg$ except for refunctionalizing the right-hand terms. Thus for an equation $`` q = s' "$ from this part, the equation $`` q = s'' "$ with $s' = \langle s'' \rangle$ is present in $prg$. For such an equation, $q$ has hole pattern. It can then be easily seen that $s =^? q \searrow \sigma'$ for a $\sigma'$ with $s''[\sigma'] = t$ by an argument analogous to that of $`` \Rightarrow "$, ``Subst" case, Case 1, in the proof for $d''$.
+The equation $`` q = s' "$ can either be contained in that part of $\langle prg \rangle$ that results from the application of $des\_conv$ and then $r^{data}$ to the relevant part of $prg$, as specified in the definition of $r_{core}$, or it can be in the other part of $\langle prg \rangle$. As can be seen in the definition of $r_{core}$, this other part is taken over unchanged from $prg$ except for refunctionalizing the right-hand terms. Thus for an equation $`` q = s' "$ from this part, the equation $`` q = s'' "$ with $s' = \langle s'' \rangle$ is present in $prg$. For such an equation, $q$ has hole pattern. It can then be easily seen that $s =^? q \searrow \sigma'$ for a $\sigma'$ with $s''[\sigma'] = t$ by an argument analogous to that of $`` \Rightarrow "$, ``Subst" case, Case 1, in the proof for $d_{core}$.
 
-Now, suppose that $`` q = s' "$ is contained in the part of $\langle prg \rangle$ that results from the application of $des\_conv$ and then $r^{core}$ to the relevant part $prg' \subseteq prg$. Thus $\langle s \rangle \longrightarrow_{\langle \langle prg' \rangle^{des\_conv} \rangle^{r^{core}}} \langle t \rangle$.
+Now, suppose that $`` q = s' "$ is contained in the part of $\langle prg \rangle$ that results from the application of $des\_conv$ and then $r^{data}$ to the relevant part $prg' \subseteq prg$. Thus $\langle s \rangle \longrightarrow_{\langle \langle prg' \rangle^{des\_conv} \rangle^{r^{data}}} \langle t \rangle$.
 
 By (*) we have
 
 \begin{equation*}
-\langle s \rangle \longrightarrow_{\langle \langle prg' \rangle^{des\_conv} \rangle^{r^{core}}} \langle t \rangle \iff s \longrightarrow_{\langle prg' \rangle^{des\_conv}} t.
+\langle s \rangle \longrightarrow_{\langle \langle prg' \rangle^{des\_conv} \rangle^{r^{data}}} \langle t \rangle \iff s \longrightarrow_{\langle prg' \rangle^{des\_conv}} t.
 \end{equation*}
 
 In the result of $des\_conv$, no new matching left-hand sides are added. That is, $prg'$ contains at least all the matching left-hand sides that $\langle prg' \rangle^{des\_conv}$ has. Thus any reduction that is possible with respect to $\langle prg' \rangle^{des\_conv}$ is already possible with respect to $prg'$.
 
-But it is $prg' \subseteq prg$, as can be seen in the definition of $r''$. This implies the desired $s \longrightarrow_{prg} t$.
+But it is $prg' \subseteq prg$, as can be seen in the definition of $r_{core}$. This implies the desired $s \longrightarrow_{prg} t$.
 \end{enumerate}
 
 \item \textbf{``Cong" case}:
 
-The argument here is identical to that of this case of this direction in the proof for $d''$.
+The argument here is identical to that of this case of this direction in the proof for $d_{core}$.
 
 \end{proof}
