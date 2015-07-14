@@ -1,0 +1,211 @@
+\chapter{The language Uroboro}
+
+...
+
+\section{Syntax}
+
+Domains:\\
+$\sigma, \tau = $ type names\\
+$con = $ constructor names\\
+$des = $ destructor names\\
+$fun = $ function names\\
+$x, y = $ variable names\\
+\\
+EBNF rules:\\
+Programs:\\
+$prg ::= (ddef ~ | ~ coddef ~ | ~  fdef)^*$\\
+\\
+Data definitions:\\
+$ddef ::= \textbf{data } \sigma \textbf{ where } csig^*$\\
+Codata definitions:\\
+$coddef ::= \textbf{codata } \sigma \textbf{ where } dsig^*$\\
+$csig ::= con(\tau^*): \tau$\\
+$dsig ::= \sigma.des(\tau^*): \tau$\\
+Function definitions:\\
+$fdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } eqn^*$\\
+$eqn ::= q = t$\\
+$s, t ::= x ~ | ~ fun(t^*) ~ | ~ con(t^*) ~ | ~ s.des(t^*)$\\
+$q ::= fun(p^*) ~ | ~ q.des(p^*)$\\
+$p ::= x ~ | ~ con(p^*) $\\
+
+\section{Static semantics}
+
+...
+
+\section{Dynamic semantics}
+
+\subsection{Copattern matching}
+
+orients itself on and borrows notations from paper ``Copatterns" (Abel et al.), section 4
+
+$t =^? p \searrow \sigma$ means that term t matches with pattern $p$ under substitution $\sigma$.
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{PM\textsubscript{Var}}
+\UnaryInfC{$t =^? x \searrow t/x$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\RightLabel{PM\textsubscript{Con}}
+\UnaryInfC{$con(t_1, ..., t_n) =^? con(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
+\end{prooftree}
+
+$t =^? q \searrow \sigma$ means that term $t$ matches copattern $q$ returning substitution $\sigma$.
+
+\begin{prooftree}
+\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\RightLabel{PM\textsubscript{App}}
+\UnaryInfC{$fun(t_1, ..., t_n) =^? fun(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t =^? q \searrow \sigma$}
+\AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
+\RightLabel{PM\textsubscript{Des}}
+\BinaryInfC{$t.des(t_1, ...t_n) =^? q.des(p_1, ..., p_n) \searrow \sigma, \sigma_1, ..., \sigma_n$}
+\end{prooftree}
+
+\subsection{Values}
+
+This section formalizes the notion of value for Uroboro. As is the case with the language of Abel et al., whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed.
+
+$\vdash_v t$ means that the closed term $t$ is a value. This notation is borrowed from `Copatterns" (Abel et al.), section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
+
+%%-- under construction
+
+The value judgement makes use of a ``no-match" judgement. This judgement is complementary to the pattern matching judgement of the previous section.
+
+\begin{prooftree}
+\AxiomC{$t_i \neq^? p_i$}
+\RightLabel{NPM\textsubscript{Con/Mism}}
+\UnaryInfC{$con(t_1, , ..., t_i, ..., t_n) \neq^? con(p_1, ..., p_i, ..., p_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$n \neq m$}
+\RightLabel{NPM\textsubscript{Con/Card}}
+\UnaryInfC{$con(t_1, , ..., t_n) \neq^? con(p_1, ..., p_m)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$n \neq m$}
+\RightLabel{NPM\textsubscript{App/Mism}}
+\UnaryInfC{$fun(t_1, ..., t_n) \neq^? fun(p_1, ..., p_m)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t_i \neq^? p_i$}
+\RightLabel{NPM\textsubscript{App/Card}}
+\UnaryInfC{$fun(t_1, ..., t_i, ..., t_n) \neq^? fun(p_1, ..., p_i, ..., p_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t \neq^? q$}
+\RightLabel{NPM\textsubscript{Des/Mism}}
+\UnaryInfC{$t.des(t_1, ..., t_n) \neq^? q.des(p_1, ..., p_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t_i \neq^? p_i$}
+\RightLabel{NPM\textsubscript{Des/MismArgs}}
+\UnaryInfC{$t.des(t_1, ..., t_i, ..., t_n) \neq^? q.des(p_1, ..., p_i, ..., p_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$n \neq m$}
+\RightLabel{NPM\textsubscript{Des/Card}}
+\UnaryInfC{$t.des(t_1, ..., t_n) \neq^? q.des(p_1, ..., p_m)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{NPM\textsubscript{Diff1}}
+\UnaryInfC{$fun(...) \neq^? q.des(...)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{NPM\textsubscript{Diff2}}
+\UnaryInfC{$t.des(...) \neq^? fun(...)$}
+\end{prooftree}
+
+%%--
+
+\begin{prooftree}
+\AxiomC{$fun(t_1, ..., t_n) \neq^? q ~ \forall (q, t) \in \textrm{Rules}(prg)$}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{CodTFun}}
+\QuaternaryInfC{$\vdash_v fun(t_1, ..., t_n)$, if $fun(t_1, ..., t_n)$ has codata type}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t_0.des(t_1, ..., t_n) \neq^? q ~ \forall (q, t) \in \textrm{Rules}(prg)$}
+\AxiomC{$\vdash_v t_0$}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{CodTDes}}
+\QuinaryInfC{$\vdash_v t_0.des(t_1, ..., t_n)$, , if $t_0.des(t_1, ..., t_n)$ has codata type}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{Con}}
+\TrinaryInfC{$\vdash_v con(t_1, ..., t_n)$}
+\end{prooftree}
+
+\subsection{The reduction relation}
+
+$\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction uses the evaluation context $\mathcal{E}$ given below, which in turn requires the syntax of the complete Uroboro.
+
+\begin{alignat*}{2}
+& v  = &&\textrm{value, that is } \vdash_v v \\
+& \mathcal{E} ::= ~&& [] ~ | ~ fun(v^*, \mathcal{E}, t^*) ~ | ~ con(v^*, \mathcal{E}, t^*) ~ | ~ \mathcal{E}.des(t^*) ~ | ~ v.des(v^*, \mathcal{E}, t^*)
+\end{alignat*}
+
+\begin{prooftree}
+\AxiomC{$t \longrightarrow t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[t] \longrightarrow \mathcal{E}[t']$}
+\end{prooftree}
+
+if the immediate subterms of $t$ are values:
+\begin{prooftree}
+\AxiomC{$t =^? q \searrow \sigma$ with $(q, t') \in \textrm{Rules}(prg)$}
+\RightLabel{Subst}
+\UnaryInfC{$t \longrightarrow t'[\sigma]$}
+\end{prooftree}
+
+Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
+
+\subsection{As an extension of (Co)Data Fragment semantics}
+
+The properties of the reductions and the de- and refunctionalization transformations of the paper of Rendel, Trieflinger, and Ostermann are used for the proofs of the next section. The domain of their defunctionalization is what they call the Codata Fragment, and that of refunctionalization the Data Fragment. Their semantic properties can be used in the proofs because, for well-typed programs and limited to terms which have copattern coverage for all of their subterms in the program (TODO: define this more precisely), this work's reducibility notion is a conservative extension of either the Data Fragment's notion or the Codata Fragment's notion. When the well-typedness and coverage conditions are dropped, the reducibility notion is still a conservative extension of the Data Fragment's notion.
+
+\subsubsection{Data Fragment}
+
+The evaluation context $\mathcal{E}$ conservatively extends the context for the Data Fragment (Figure 6b), as explained below. The common congruence rule for both of this and their Codata Fragment is used here, as well. As a result of this and of the pattern matching rules given above, the notion of reduction for Uroboro of this work is a conservative extension of their Data Fragment reduction.
+
+$\mathcal{E}$ uses a different notion of evaluation context than the usual, in that it is not syntactic. Determining whether something is an evaluation context is nonetheless unproblematic, as one can simply use the value judgement from last section.
+
+This work's evaluation context conservatively extends that for the Data Fragment, since the value judgement conservatively extends the syntactic notion of value for the Data Fragment: For this fragment, the Con rule is identical to the syntax rule (Figure 6b)
+\begin{equation*}
+u, v ::= con(v^*),
+\end{equation*}
+while the V\textsubscript{CodTFun} can never be applied. This is because a function in the Data Fragment can only have data type unless it doesn't have a type defined in the program at all, as types can only be added by data definitions.
+
+\subsubsection{Codata Fragment}
+
+The Codata Fragment's evaluation context notion is conservatively extended by this work's, as well. And here again, this is why the notion of reduction for all of Uroboro conservatively extends that for the Codata Fragment.
+
+As with the Data Fragment, this conservation for evaluation context notions follows from that of the value notions. In their value rule for the Codata Fragment, a term is a value if and only if it is a function application with argument values. It will be demonstrated why the two directions of the equivalence hold for this work's value judgement, restricted to terms in the Codata Fragment, as well.
+
+Consider first the ``if" direction. By the rules of the judgement, a function application with argument values is only a value if it has codata type and doesn't match any rule of the program. Assuming well-typedness, the first constraint is always fulfilled in the Codata Fragment, since there, a type can only be added by a codata definition. That the second constraint is always fulfilled because, in the Codata Fragment, there are no left-hand sides of rules which are hole patterns.
+
+Second, consider the ``only if" direction. By the rules of the judgement, a value can also be a destructor application if it has codata type and doesn't match any rule of the program. But this case can be excluded in the Codata Fragment for programs with copattern coverage for all subterms of the input term, since those are the only ones that can be relevant for the value judgement in the one-step reduction.
