@@ -423,7 +423,10 @@ By the induction hypothesis, we have that for any immediate subterm $s^0$ of $s$
 
 From the first extraction function property, it is already clear that $s$ itself reduces in $\langle prg \rangle$ if it does in $prg$.
 
-Now, consider an $\widetilde{s} \sim s$ which has the same top-level structure as $s$. This means that if $s$ reduces in $prg$, so does $\widetilde{s}$ in $\langle prg \rangle$ unless a reducible subterm prevents it. But then it would still reduce in $\langle prg \rangle$.
+Now, consider an $\widetilde{s} \sim s$ which has the same top-level structure as $s$.
+
+%% under construction
+This means that each immediate subterm $s^0$ of $s$ is equivalent to an immediate subterm of $\widetilde{s}$. If $s$ reduced by the ``Subst" rule for some equation, we know that $\widetilde{s}$ also matches that equation's lhs. It follows that it either reduces by that equation, or has a reducible subterm. If $s$ reduced by the ``Cong" rule for $s^0$ and some evaluation context, by the induction hypothesis, we know that $\widetilde{s^0}$ reduces, and we can either find some evaluation context such that $\widetilde{s}$ reduces by the ``Cong" rule, or there is a reducible subterm of $\widetilde{s}$ that prevents such a reduction. But then $\widetilde{s}$ would still be reducible in $\langle prg \rangle$.
 
 Finally, consider an $\widetilde{s} \sim s$ with a top-level structure different from that of $s$. It suffices to show that a prefix of $\widetilde{s}$ matches a lhs of $\langle prg \rangle$, because if a reducible subterm prevents the reduction of $\widetilde{s}$ by the ``Subst'' rule, it is still the case that $\widetilde{s}$ is reducible, because of this subterm. By the definition of the equivalence relation, $\widetilde{s}$ has the form
 \begin{equation*}
