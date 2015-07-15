@@ -3,3 +3,5 @@ cabal.sandbox.config
 .*
 thesis_prelim/*
 !thesis_prelim/*.tex
+!thesis_prelim/*.cls
+!thesis_prelim/*.sty
