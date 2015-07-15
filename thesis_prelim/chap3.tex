@@ -240,6 +240,23 @@ It suffices to (a) by the third extraction function property, reduce the reducti
 
 \end{proof}
 
+\textbf{Alternate, very short sketch of proof:}
+
+(see https://github.com/lordxist/uroboro-transformations/issues/3)
+\begin{proof}[Sketch of proof]
+
+For the nondeterministic variant of the reduction relation, the desired reduction sequence can be given as follows:
+\begin{multline*}
+s(\langle q_r \rangle^f [\sigma_f] [\sigma]) = q_r[\sigma](\langle q_r \rangle^f [\sigma_f] [\sigma])\\
+\longrightarrow q_r[\sigma](\langle \langle q_r \rangle^f \rangle^{\sim} [\sigma_f] [\sigma]) = \langle \langle \langle q_r \rangle^f \rangle^{\sim} \rangle^{f^{-1}_r} [\sigma]\\
+\longrightarrow t_r[\sigma] = t
+\end{multline*}
+The first step uses equation $\epsilon$, the second $\zeta_r$.
+
+Since $\epsilon$ preserves the equivalence and doesn't add new redexes, and, for any changed $r$ of $prg$, $\zeta_r \sim r$, the proposition follows by confluence. 
+
+\end{proof}
+
 \end{proposition}
 
 \begin{proposition}
@@ -313,6 +330,31 @@ Analogously to the previous case.
 Here $\widetilde{t}$ for a term $t$ stands for a term that is equivalent in $t$ but has all of its names declared in $prg$. Such a term can be construed from $t$ analogously to how the evaluation context was constructed. When a term $v$ is a value in $\langle prg \rangle$, so is $\widetilde{v}$ by the second extraction function property. To see this, suppose $\widetilde{v} \sim v$ reduced in $prg$, then, by the property, so would $v$ in $\langle prg \rangle$, contrary to fact.
 
 \end{enumerate}
+
+\end{proof}
+
+\textbf{Alternate, very short sketch of proof:}
+
+For a slightly different proposition: Let $s$ be a term with all names declared in $prg$, and let $s_i$, for $i \in \{1, ..., n\}$, be equivalent to $s$, and $t \not\sim s$. Then it is:
+\begin{equation*}
+s \longrightarrow s_1 \longrightarrow ... \longrightarrow s_n \longrightarrow t \implies s \longrightarrow_{prg} \widetilde{t},
+\end{equation*}
+for a $\widetilde{t} \sim t$, where the reduction of the left side if the implication is meant with regard to $\langle prg \rangle$.
+
+(see https://github.com/lordxist/uroboro-transformations/issues/3)
+\begin{proof}[Sketch of proof]
+
+From confluence, and since the $s_i$ are each equivalent to the previous term in the sequence above, we have the following reduction sequence for the nondeterministic variant of the reduction relation:
+\begin{equation*}
+s \longrightarrow_{\langle prg \rangle} \widetilde{t}
+\end{equation*}
+for a $\widetilde{t} \sim t$.
+
+Because $\widetilde{t} \not\sim s$, this can only use an equation taken over from $prg$ unchanged. It follows that, for the nondeterministic variant of the reduction relation, it is:
+\begin{equation*}
+s \longrightarrow_{prg} \widetilde{t}\tag{*}.
+\end{equation*}
+Because of the reduction sequence of the condition, $s$ can neither reduce by an unchanged equation of $prg$, nor by an equation $\zeta_r$ equivalent to an $r$ of $prg$, before it reduces to $\widetilde{t}$. Consequently, $s$ cannot reduce by any equation of $prg$. It follows that (*) also holds for the deterministic variant of the reduction relation, and this is the desired sequence.
 
 \end{proof}
 
