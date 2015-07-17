@@ -37,20 +37,16 @@ A function $\sigma$ from copatterns to copatterns is called a \textit{co-substit
 for some $\overline{des(\overline{p})}$ possibly depending on the $q$.
 \end{definition}
 
-Finally, well-behaved extraction functions can be defined. More precisely, it is defined what it means for a function $f$ to induce an extraction function, and then when such an extraction function induced by $f$ is well-behaved.
+Finally, well-behaved extraction functions can be defined. More precisely, it is defined what it means for a lens corresponding to a function $f$ to induce an extraction function, and then when such an extraction function induced by such a lens is well-behaved.
 
-\begin{definition}[Lens induced by $f$]
-The \textit{lens induced by $f$} is a pair of functions \texttt{get} and \texttt{putback} defined as follows:
-\begin{itemize}
-\item $\mathtt{get}(q^c) = \langle q^c \rangle^f$
-\item $\mathtt{putback}(q^a, q^c) = \sigma^{q^c}_f(q^a)$
-\end{itemize}
+\begin{definition}[$f$-lens]
+A lens is called an $f$-lens when its \texttt{get} function is $f$.
 \end{definition}
 
-\begin{definition}[Extraction function induced by $f$]
-The extraction function induced by a function $f$, from copatterns to copatterns, is a function $e$ from equations to the union of equations and pairs of equations such that, for all equations $r$:
+\begin{definition}[$q$-extraction induced by an $f$-lens]
+An $f$-lens induces a so called $q$-extraction function $e$, when it is a function from equations to the union of equations and pairs of equations such that, for all equations $r$:
 \begin{itemize}
-\item If $\langle q_r \rangle^f \neq q_r$, then $\langle r \rangle^e = \big\langle \epsilon, \zeta_r \big\rangle$ with:
+\item If $\mathtt{get}(q_r) = \mathtt{get}(q)$, then $\langle r \rangle^e = \big\langle \epsilon, \zeta_r \big\rangle$ with
 \begin{itemize}
 \item $q_\epsilon = \mathtt{get}(q_r)$,
 \item $t_\epsilon = \langle q_\epsilon \rangle^{\sim}$,
@@ -58,17 +54,26 @@ The extraction function induced by a function $f$, from copatterns to copatterns
 \item $t_{\zeta_r} = t_r$.
 \end{itemize}
 
-\item If $\langle q_r \rangle^f \neq q_r$, then $\langle r \rangle^e = r$.
+\item If $\mathtt{get}(q_r) \neq \mathtt{get}(q)$, then $\langle r \rangle^e = r$.
 \end{itemize}
-Here, the pair of \texttt{get} and \texttt{putback} is the lens induced by $f$.
+Here, the pair of \texttt{get} and \texttt{putback} is the $f$-lens.
 \end{definition}
 
 \begin{definition}[Well-behaved extractions]
-The extraction function $e$ induced by a function $f$ is said to be \textit{well-behaved} if, for every copattern $q$, there is a substitution or co-substitution $\sigma^q_f$ such that:
-\[
-\sigma^q_f(\langle q \rangle^f) = q
-\]
+The extraction function $e$ induced by an $f$-lens is said to be \textit{well-behaved} if the $f$-lens is well-behaved.
 \end{definition}
+
+\begin{lemma}
+If for a function $f$ for every copattern $q$ there is a substitution or co-substitution $\sigma^q_f$ such that
+\[
+\sigma^q_f(\langle q \rangle^f) = q,
+\]
+then the $f$-lens with
+\[
+\mathtt{putback}(q^a, q^c) = \sigma^{q^c}_f(q^a)
+\]
+is well-behaved.
+\end{lemma}
 
 \section{Lifting extractions to programs}
 
@@ -76,7 +81,90 @@ An extraction function was defined to have equations as its domain and range. As
 
 ...
 
-\section{Proof of bisimulation}
+\section{Bisimulation}
 
 Every well-behaved extraction function, as induced by some function $f$, preserves the semantics of programs in a kind of weak bisimulation. In this section, the precise kind of the bisimulation will be defined and this statement will be proved.
 
+The weak bisimulation is defined by the two statements for both of its directions, as given below.
+\begin{multline}
+s \longrightarrow_{prg} t \implies s = s_0 \longrightarrow_{\langle prg \rangle} s_1 \longrightarrow_{\langle prg \rangle} ... \longrightarrow_{\langle prg \rangle} s_n \longrightarrow_{\langle prg \rangle} \widetilde{t}\\
+\text{ with } s_0 \sim s_1 \sim ... \sim s_n, \widetilde{t} \sim t
+\end{multline}
+\begin{multline}
+s \longrightarrow_{\langle prg \rangle} t \implies \widetilde{s} \longrightarrow_{prg} \widetilde{t}\\
+\text{ when } s \not\sim t \text{ or } s = t
+\end{multline}
+
+\begin{proposition}
+The weak bisimulation statements (2.1) and (2.2) hold for each well-behaved extraction function lifted to programs.
+
+\begin{proof}
+\textit{ad} (2.1): By induction on the structure of the derivation of $s \longrightarrow_{prg} t$.
+\begin{enumerate}
+\item \textbf{``Subst'' case}: The desired reduction sequence can be given as follows:
+\[
+s = \sigma(q_r) = \sigma(\sigma^{q_r}_f((q_\epsilon)) \longrightarrow \sigma(\sigma^{q_r}_f(t_\epsilon)) = \sigma(q_{\zeta_r}) \longrightarrow \sigma(t_r) = t
+\]
+
+\item \textbf{``Cong'' case}:
+\begin{prooftree}
+\AxiomC{$s' \longrightarrow_{prg} t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[s'] \longrightarrow_{prg} \mathcal{E}[t']$}
+\end{prooftree}
+
+Here, $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$. By the induction hypothesis, we have a reduction sequence
+\[
+s'_0 \longrightarrow_{\langle prg \rangle} s'_1 \longrightarrow_{\langle prg \rangle} ... \longrightarrow_{\langle prg \rangle} s'_n \longrightarrow_{\langle prg \rangle} \widetilde{t'}
+\]
+Wrapping each term in the sequence with $\mathcal{E}$ gives the desired reduction.
+\end{enumerate}
+
+\textit{ad} (2.2): By induction on the structure of the derivation of $s \longrightarrow_{\langle prg \rangle} t$.
+\begin{enumerate}
+\item \textbf{``Subst" case}: The equation used must either be an unchanged $r$ or a $\zeta_r$. The desired reduction sequence can be given as follows:
+\[
+\widetilde{\sigma}(q_r) \longrightarrow \widetilde{\sigma}(t_r)
+\]
+
+\item \textbf{``Cong'' case}:
+\begin{prooftree}
+\AxiomC{$s' \longrightarrow_{\langle prg \rangle} t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$}
+\end{prooftree}
+
+Here, $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$. By the induction hypothesis, we have a reduction
+\[
+\widetilde{s'} \longrightarrow_{prg} \widetilde{t'}
+\]
+Wrapping $\widetilde{s'}$ and $\widetilde{t'}$ with $\widetilde{\mathcal{E}}$ gives the desired reduction.
+\end{enumerate}
+\end{proof}
+\end{proposition}
+
+\section{Absence of overlaps}
+
+Since, in the context of this work, it is always presupposed that a program to be transformed has no overlapping copatterns, a desirable property of the transformed program is that it doesn't have overlapping copatterns, as well.
+
+\begin{proposition}
+For any well-behaved extraction function lifted to programs, $\langle \cdot \rangle$, it is the case that if $prg$ has no overlapping copatterns and its lhss are aligned, then $\langle prg \rangle$ has no copatterns, as well.
+
+\begin{proof}
+First, the equations of the transformed are classified. There are three kinds of them: Those taken over unchanged over from $prg$ (indicated as $r$ in the table below), those which are an $\epsilon$ in a transformation result ($\epsilon$), and those which are, also in such a transformation result, a $\zeta_r$ ($\zeta$). The table below shows all possible combinations; its fields are filled with the number of the proof that lhss of equations of the respective kinds don't overlap.
+
+\begin{tabular}{ l | c | c | r }  & r & $\epsilon$ & $\zeta$ \\ \hline r & (1) &  &  \\ \hline $\epsilon$ & (2) & (3) &  \\ \hline $\zeta$ & (4) & (5) & (6) \\ \hline \end{tabular}
+
+\textit{ad} (1): Both equations are present in $prg$, thus their lhss don't overlap.
+
+\textit{ad} (2): TODO
+
+\textit{ad} (3): By the definition of the $q$-extraction, there is only one $\epsilon$-equation in the transformed program.
+
+\textit{ad} (4): The $\zeta$-equation has a function name not declared in $prg$, unlike the $r$-equation.
+
+\textit{ad} (5): The $\zeta$-equation has a function name not declared in $prg$, unlike the $\epsilon$-equation.
+
+\textit{ad} (6): The lhss of each of the $\zeta$-equations are equivalent to a lhs in $prg$, thus, if they overlapped, so would these lhss in $prg$, contrary to fact.
+\end{proof}
+\end{proposition}
