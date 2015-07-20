@@ -1,6 +1,6 @@
 \chapter{Extraction transformations}
 
-Most of the steps that comprise the transformations of the following chapters are \textit{extractions}. Roughly speaking, this means that they decrease, in some way, the syntactic complexity of the program. It is usually desirable that they also preserve its semantics to some degree. This will be shown to be the case for all \textit{well-behaved} extractions, as defined in the following section.
+Most of the steps that comprise the transformations of the following chapters are \textit{extractions}. Roughly speaking, this means that they decrease, in some way, the syntactic complexity of the program, while preserving its semantics to some degree.
 
 As an example, consider the extraction of a destructor out of the following program fragment:
 \begin{lstlisting}
@@ -11,23 +11,23 @@ fun().des().des() = t
 fun().des() = aux()
 aux().des() = t
 \end{lstlisting}
-The resulting program fragment doesn't contain any copatterns with two destructors, unlike the original, thus the transformation has decreased the syntactic complexity in this way. The transformation is well-behaved because, roughly, in the transformed program there is a way to go from the original equation's lhs to its rhs: $\mathtt{fun().des().des()} \longrightarrow \mathtt{aux().des()} \longrightarrow \mathtt{t}$.
+The resulting program fragment doesn't contain any copatterns with two destructors, unlike the original, thus the transformation has decreased the syntactic complexity in this way. The transformation preserves the semantics because, roughly, in the transformed program there is a way to go from the original equation's lhs to its rhs: $\mathtt{fun().des().des()} \longrightarrow \mathtt{aux().des()} \longrightarrow \mathtt{t}$.
 
 \section{Well-behaved extractions}
 
-Well-behaved extractions are induced by a function $f$ that specifies how to decrease the syntactic complexity. Before defining well-behavedness, an equivalence relation for terms of the transformed program and depending on $f$ needs to be defined, and then a way to uniformly express extractions ``from the outside in'', such as the destructor extraction exemplified above.
+Extractions are induced by a function $\pi$ that specifies how to decrease the syntactic complexity. Before defining extractions, an equivalence relation for terms of the transformed program and depending on $\pi$ needs to be defined, and then a way to uniformly express extractions ``from the outside in'', such as the destructor extraction exemplified above.
 
-In short, well-behaved extraction preserve semantic properties by introducing an equation which leads from a, syntactically, more complex to a less complex term, where both terms are meant to represent, semantically, the same ``object''. This ``sameness'' is expressed by an equivalence relation that underlies the definition of well-behaved extractions.
+In short, extractions preserve semantic properties by introducing an equation which leads from a, syntactically, more complex to a less complex term, where both terms are meant to represent, semantically, the same ``object''. This ``sameness'' is expressed by an equivalence relation that underlies the definition of extractions.
 
-\begin{definition}[$f$-equivalence]
-For a function $f$ from copatterns to copatterns, define the corresponding \textit{$f$-equivalence} $\sim_f$ as the smallest congruence relation between terms, with respect to their syntactic structure, for which it holds:
+\begin{definition}[$\pi$-equivalence]
+For a function $\pi$ from copatterns to copatterns, define the corresponding \textit{$f$-equivalence} $\sim_f$ as the smallest congruence relation between terms, with respect to their syntactic structure, for which it holds:
 \[
 \langle \langle q \rangle^f \rangle^{\sim}[\sigma] \sim \langle q \rangle^f[\sigma]
 \]
-for every copattern $q$ with $\langle q \rangle^f \neq q$, and every substitution $\sigma$.
+for every copattern $q$ with $\langle q \rangle^\pi \neq q$, and every substitution $\sigma$.
 \end{definition}
 
-Changing the ``outer'' form of the copattern, i.e., removing or adding destructors, is dual to changing its ``inner'' form, i.e., replacing patterns with other patterns. For the purpose of defining well-behaved extractions of the latter type, substitutions will be used. For the purpose of defining well-behaved extraction of the former, the notion of \textit{co-substitution} is introduced.
+Changing the ``outer'' form of the copattern, i.e., removing or adding destructors, is dual to changing its ``inner'' form, i.e., replacing patterns with other patterns. For the purpose of defining extractions of the latter type, substitutions will be used. For the purpose of defining extractions of the former, the notion of \textit{co-substitution} is introduced.
 
 \begin{definition}[Co-substitution]
 A function $\sigma$ from copatterns to copatterns is called a \textit{co-substitution}, if, for every copattern $q$, it is defined as follows:
@@ -37,14 +37,25 @@ A function $\sigma$ from copatterns to copatterns is called a \textit{co-substit
 for some $\overline{des(\overline{p})}$ possibly depending on the $q$.
 \end{definition}
 
-Finally, well-behaved extraction functions can be defined. More precisely, it is defined what it means for a lens corresponding to a function $f$ to induce an extraction function, and then when such an extraction function induced by such a lens is well-behaved.
+Finally, extraction functions can be defined. More precisely, it is defined what it means to be an extraction projection, and for such an extraction projection $\pi$, a $\pi$-extraction targeting a copattern $q$.
 
-\begin{definition}[$f$-lens]
-A lens is called an $f$-lens when its \texttt{get} function is $f$.
+\begin{definition}[Extraction projection]
+A function $\pi$ from copatterns to copatterns is called an extraction projection if for every copattern $q$ there exists a (co-)substitution $\sigma^q_\pi$ such that $\sigma^q_\pi(\langle q \rangle^\pi) = q$.
 \end{definition}
 
-\begin{definition}[$q$-extraction induced by an $f$-lens]
-An $f$-lens induces a so called $q$-extraction function $e$, when it is a function from equations to the union of equations and pairs of equations such that, for all equations $r$:
+\begin{definition}[$\pi$-lens]
+The $\pi$-lens, for an extraction projection $\pi$, is the lens defined as follows:
+\[
+\mathtt{get} = \pi
+\]
+\[
+\mathtt{putback}(q^a, q^c) = \sigma^{q^c}_\pi(q^a),
+\]
+where the $\sigma^{q^c}_\pi$ is the (co)-substitution for $q^c$ and $\pi$ as given in the definition of the extraction projection.
+\end{definition}
+
+\begin{definition}[$\pi$-extraction targeting $q$]
+A function $e$ is called a $\pi$-extraction targeting $q$, when it is a function from equations to the union of equations and pairs of equations such that, for all equations $r$:
 \begin{itemize}
 \item If $\mathtt{get}(q_r) = \mathtt{get}(q)$, then $\langle r \rangle^e = \big\langle \epsilon, \zeta_r \big\rangle$ with
 \begin{itemize}
@@ -56,24 +67,8 @@ An $f$-lens induces a so called $q$-extraction function $e$, when it is a functi
 
 \item If $\mathtt{get}(q_r) \neq \mathtt{get}(q)$, then $\langle r \rangle^e = r$.
 \end{itemize}
-Here, the pair of \texttt{get} and \texttt{putback} is the $f$-lens.
+Here, the pair of \texttt{get} and \texttt{putback} is the $\pi$-lens.
 \end{definition}
-
-\begin{definition}[Well-behaved extractions]
-The extraction function $e$ induced by an $f$-lens is said to be \textit{well-behaved} if the $f$-lens is well-behaved.
-\end{definition}
-
-\begin{lemma}
-If for a function $f$ for every copattern $q$ there is a substitution or co-substitution $\sigma^q_f$ such that
-\[
-\sigma^q_f(\langle q \rangle^f) = q,
-\]
-then the $f$-lens with
-\[
-\mathtt{putback}(q^a, q^c) = \sigma^{q^c}_f(q^a)
-\]
-is well-behaved.
-\end{lemma}
 
 \section{Lifting extractions to programs}
 
@@ -83,65 +78,73 @@ An extraction function was defined to have equations as its domain and range. As
 
 \section{Bisimulation}
 
-Every well-behaved extraction function, as induced by some function $f$, preserves the semantics of programs in a kind of weak bisimulation. In this section, the precise kind of the bisimulation will be defined and this statement will be proved.
+Every $\pi$-extraction function targeting a $q$ preserves the semantics of programs in a kind of weak bisimulation. In this section, the precise kind of the bisimulation will be defined and this statement will be proved.
 
-The weak bisimulation is defined by the two statements for both of its directions, as given below.
-\begin{multline}
-s \longrightarrow_{prg} t \implies s = s_0 \longrightarrow_{\langle prg \rangle} s_1 \longrightarrow_{\langle prg \rangle} ... \longrightarrow_{\langle prg \rangle} s_n \longrightarrow_{\langle prg \rangle} \widetilde{t}\\
-\text{ with } s_0 \sim s_1 \sim ... \sim s_n, \widetilde{t} \sim t
-\end{multline}
-\begin{multline}
-s \longrightarrow_{\langle prg \rangle} t \implies \widetilde{s} \longrightarrow_{prg} \widetilde{t}\\
-\text{ when } s \not\sim t \text{ or } s = t
-\end{multline}
+For the definition of the weak bisimulation, a modification of the value judgement needs to be defined. First, note that the value judgement is only ever used to check whether the subterm of some term (or evaluation context) is a value. Thus this term $t^+$ that the to-be-checked term is a subterm of can be considered available to the value judgement. Now, the judgement can be modified as follows: Everything that was judged to be value before the modification still is judged to be a value, with the following exception: Any term that matches $q_\epsilon$, but isn't a subterm, within $t^+$, of a term matching $q_r$.
+
+The unmodified value judgement for $prg$ is the same as the modified one, since, in non-overlapping programs, there is no lhs $q_\epsilon$. When considering only terms with all of their names declared in $prg$, the value judgement for $prg$ is the same as the modified value judgement for $\langle prg \rangle$. This can be easily seen by comparing the equations of $prg$ and $\langle prg \rangle$. From this it follows that the notion of evaluation contexts, with all of their names declared in $prg$, is also the same for both reduction relations. This will be used in the proof of the proposition below.
+
+Write $\longrightarrow'$ for the reduction relation $\longrightarrow$ with its value judgement modified in this way. The weak bisimulation is defined as follows, for every $s,t$ with all of their names declared in $prg$:
+\begin{equation}
+s \longrightarrow_{prg}^* t \iff s {\longrightarrow'}_{\langle prg \rangle}^* t
+\end{equation}
+This statement is now proved using Theorem 4 of ``Unnesting of copatterns'' (Setzer et al.).
 
 \begin{proposition}
-The weak bisimulation statements (2.1) and (2.2) hold for each well-behaved extraction function lifted to programs.
+The weak bisimulation statement (2.1) holds for any transformation defined as $liftp(e)$ for some $\pi$-extraction targeting a $q$.
 
 \begin{proof}
-\textit{ad} (2.1): By induction on the structure of the derivation of $s \longrightarrow_{prg} t$.
+By Theorem 4 of ``Unnesting of copatterns'' (Setzer et al.), it suffices to show the statements (SN1) and (SN2), defined there along with the theorem. For this, set $\textrm{Int} = \langle \cdot \rangle^{\sim^{-1}}$ and $m$ as the number of calls to the function targeted in the transformation, i.e., that of $q_\epsilon$.
+
+(SN1): We know that $s = \mathcal{E}[s'] = \mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]] = t$, for some evaluation context $\mathcal{E}$ of $prg$ and some equation $r$ of $prg$. Because all of the names in $\mathcal{E}$ are declared in $prg$, $\mathcal{E}$ is also a reduction context for the other reduction relation. The desired reduction sequence can be thus given as follows:
+\[
+s = \mathcal{E}[s'] = \mathcal{E}[\sigma^{q_r}_\pi(q_\epsilon)[\sigma]]
+\]
+\[
+\longrightarrow'_{\langle prg \rangle} \mathcal{E}[\sigma^{q_r}_\pi(t_\epsilon)[\sigma]] = \mathcal{E}[q_{\zeta_r}[\sigma]]
+\]
+\[
+\longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_{\zeta_r}[\sigma]] = \mathcal{E}[t_r[\sigma]] = t
+\]
+
+(SN2): Three cases will be distinguished: The reduction in $\langle prg \rangle$ can use either an equation taken over unchanged from $prg$ (1.), it can use a $\zeta_r$ (2.), or it can use $\epsilon$. Each case makes use of an evaluation context $\mathcal{E}$ of the reduction relation for $\langle prg \rangle$. Because all of the names in $\mathcal{E}$ are declared in $prg$, $\mathcal{E}$ is also a reduction context for the other reduction relation.
 \begin{enumerate}
-\item \textbf{``Subst'' case}: The desired reduction sequence can be given as follows:
+\item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_r[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]] = t$. The desired reduction sequence can be given as follows:
 \[
-s = \sigma(q_r) = \sigma(\sigma^{q_r}_f((q_\epsilon)) \longrightarrow \sigma(\sigma^{q_r}_f(t_\epsilon)) = \sigma(q_{\zeta_r}) \longrightarrow \sigma(t_r) = t
+\langle \mathcal{E}[s'] \rangle^{\sim^{-1}} = \langle \mathcal{E} \rangle^{\sim^{-1}}[\langle s' \rangle^{\sim^{-1}}] = \langle \mathcal{E} \rangle^{\sim^{-1}}[\langle q_r \rangle^{\sim^{-1}}[\langle \sigma \rangle^{\sim^{-1}}]]
+\]
+\[
+ \longrightarrow_{prg} \langle \mathcal{E} \rangle^{\sim^{-1}}[t_r[\langle t_r \rangle^{\sim^{-1}}]] = \langle \mathcal{E} \rangle^{\sim^{-1}}[\langle t_r \rangle^{\sim^{-1}}[\langle \sigma \rangle^{\sim^{-1}}]] = \langle \mathcal{E} \rangle^{\sim^{-1}}[\langle t_r[\sigma] \rangle^{\sim^{-1}}]
+\]
+\[
+= \langle \mathcal{E}[t_r[\sigma]] \rangle^{\sim^{-1}} = \langle t \rangle^{\sim^{-1}}.
 \]
 
-\item \textbf{``Cong'' case}:
-\begin{prooftree}
-\AxiomC{$s' \longrightarrow_{prg} t'$}
-\RightLabel{Cong}
-\UnaryInfC{$\mathcal{E}[s'] \longrightarrow_{prg} \mathcal{E}[t']$}
-\end{prooftree}
-
-Here, $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$. By the induction hypothesis, we have a reduction sequence
+\item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_{\zeta_r}[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_{\zeta_r}[\sigma]] = t$. The desired reduction sequence can be given as follows:
 \[
-s'_0 \longrightarrow_{\langle prg \rangle} s'_1 \longrightarrow_{\langle prg \rangle} ... \longrightarrow_{\langle prg \rangle} s'_n \longrightarrow_{\langle prg \rangle} \widetilde{t'}
+\langle \mathcal{E}[s'] \rangle^{\sim^{-1}} = \langle \mathcal{E} \rangle^{\sim^{-1}}[\langle s' \rangle^{\sim^{-1}}] = \langle \mathcal{E} \rangle^{\sim^{-1}}[\langle q_{\zeta_r} \rangle^{\sim^{-1}}[\langle \sigma \rangle^{\sim^{-1}}]] = \langle \mathcal{E} \rangle^{\sim^{-1}}[q_r[\langle \sigma \rangle^{\sim^{-1}}]]
 \]
-Wrapping each term in the sequence with $\mathcal{E}$ gives the desired reduction.
-\end{enumerate}
-
-\textit{ad} (2.2): By induction on the structure of the derivation of $s \longrightarrow_{\langle prg \rangle} t$.
-\begin{enumerate}
-\item \textbf{``Subst" case}: The equation used must either be an unchanged $r$ or a $\zeta_r$. The desired reduction sequence can be given as follows:
 \[
-\widetilde{\sigma}(q_r) \longrightarrow \widetilde{\sigma}(t_r)
+\longrightarrow_{prg} \langle \mathcal{E} \rangle^{\sim^{-1}}[t_r[\langle t_r \rangle^{\sim^{-1}}]] = \langle \mathcal{E} \rangle^{\sim^{-1}}[\langle t_r \rangle^{\sim^{-1}}[\langle \sigma \rangle^{\sim^{-1}}]] = \langle \mathcal{E} \rangle^{\sim^{-1}}[\langle t_r[\sigma] \rangle^{\sim^{-1}}]
+\]
+\[
+= \langle \mathcal{E}[t_r[\sigma]] \rangle^{\sim^{-1}} = \langle t \rangle^{\sim^{-1}}.
 \]
 
-\item \textbf{``Cong'' case}:
-\begin{prooftree}
-\AxiomC{$s' \longrightarrow_{\langle prg \rangle} t'$}
-\RightLabel{Cong}
-\UnaryInfC{$\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$}
-\end{prooftree}
+\item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_\epsilon[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_\epsilon[\sigma]] = t$. In this case, instead of giving a reduction sequence, the other side of the disjunction will be shown to hold.
 
-Here, $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$. By the induction hypothesis, we have a reduction
-\[
-\widetilde{s'} \longrightarrow_{prg} \widetilde{t'}
-\]
-Wrapping $\widetilde{s'}$ and $\widetilde{t'}$ with $\widetilde{\mathcal{E}}$ gives the desired reduction.
+Because $\langle q_\epsilon \rangle^{\sim^{-1}} = \langle t_\epsilon \rangle^{\sim^{-1}}$, it is $\langle s \rangle^{\sim^{-1}} = \langle t \rangle^{\sim^{-1}}$.
+
+And because $q_\epsilon$ is of the function that is targeted in the transformation, and $t_\epsilon$ isn't, it is $m(q_\epsilon) > m(t_\epsilon)$, and consequently $m(s) > m(t)$.
 \end{enumerate}
 \end{proof}
 \end{proposition}
+
+It can also shown to be the case that, for $s,t$ with all names declared in $prg$,
+\begin{equation}
+s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle prg \rangle} \widetilde{t},
+\end{equation}
+for some $\widetilde{t} \sim t$. The proof is left for the appendix.
 
 \section{Absence of overlaps}
 
