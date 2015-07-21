@@ -1,30 +1,11 @@
 \chapter{Automatic de- and refunctionalization}
 
-...
+Both de- and refunctionalization are made up of two major parts:
+\begin{enumerate}
+\item First, destructor and constructor extractions alternate to transform the program into a form which can be used by the second part.
 
-\section{Preliminaries}
-
-\subsection{Notations used}
-
-...
-
-\subsection{Helper extraction}
-
-For a function $e$ that takes (along with the whole program $prg$, which will be omitted for brevity) an equation $eqn$ and returns $\langle eqn, H \rangle^e := \big\langle eqn', H' \big\rangle$, with $eqn'$ the changed equation and $H'$ the helpers set, define $extract\_helpers(e)$ as follows:
-
-\begin{alignat*}{4}
-\langle prg \rangle^{extract\_helpers(e, funs)}_{prg} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ eqn' \textrm{ with } \langle eqn \rangle^{e}_{prg} = \big\langle eqn', H \big\rangle ~ | ~ eqn \in eqns \} \} \\
-& && && \cup && \{ \textrm{\textbf{function }} sig \textrm{\textbf{ where }} \\
-& && && &&\quad \{ heqn ~ | ~ \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
-& && && && | ~  \big\langle sig, heqn \big\rangle \in H_{eqns} \} \\
-& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg, fun \in funs \} \\
-& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. or def. for a } fun \not\in funs \} \span\span\span\span
-\end{alignat*}
-
-where $H_{eqns} = \{ \big\langle hsig, heqn \big\rangle \in H \textrm{ with } \big\langle eqn, H \big\rangle = \langle eqn \rangle^{e}_{prg, funs} ~ | ~ eqn \in eqns \}$.
-
-Here $funs$ is a set of function names that represents the affected function definitions. Whenever $funs$ is left unspecified, it is assumed that all function definitions are affected. (Which will always be the case with the exception of the $unmix$ transformation.)
+\item This second part is the core de-/refunctionalization, which is essentially the two-way transformation from the paper of Rendel et al.
+\end{enumerate}
 
 \section{Common pretransformations}
 
@@ -101,7 +82,60 @@ if $\exists$ lhs in $def$ with a prefix of the generic form $\mathcal{C}[con(\_,
 \end{equation*}
 otherwise.
 
-\section{Overview of transformation steps}
+\section{Simplifying copatterns}
+
+The \textit{simplifying} part of the defunctionalization transformation is made up of destructor and constructor extraction steps and stops when the program is in the input fragment of core defunctionalization, described below. The simplifying part of the refunctionalization transformation is defined like that, with the only difference being that it stops when the program is in the input fragment of core refunctionalization, also described below.
+
+This simplification is done individually for each function definition, the order in which the function definitions are transformed is unimportant. For one function definition $def$, the algorithm is defined below.
+
+\[
+  \langle prg \rangle^{simplify(def)}=\begin{cases}
+               prg, &\text{ if $def$ is in the desired fragment}\\
+               \langle prg \rangle^{simplify\_step(def)} \rangle^{simplify(def)}, &\text{ otherwise}
+            \end{cases}
+\]
+
+\[
+  \langle prg \rangle^{simplify\_step(def)}=\begin{cases}
+               \langle prg \rangle^{liftp(des\_extract(q^{max}_{def}))}, \\
+               \qquad\text{ if } \langle prg \rangle^{liftp(con_{n_{def}}\_extract(q^{max}_{def}))} \text{ has overlaps}\\
+               \langle prg \rangle^{liftp(con_{n_{def}}\_extract(q^{max}_{def}))},\\
+               \qquad\text{ otherwise}
+            \end{cases}
+\]
+
+with
+
+\[
+q^{max}_{def} = \textrm{max}_{\# con.} \textrm{max}_{\# des.} \{q ~ | ~ q \text{ is lhs in $def$ } \}
+\]
+
+and $n_{def}$ the number of the inner-most constructor in $q^{max}_{def}$ which has a variable ``in its place'' in another lhs of $def$. For a pattern $p$ of a copattern $q$ to be ``in the place'' of another pattern $p'$ in another copattern $q'$ means:
+\begin{itemize}
+\item When $p$ is a subterm of the $n$-th pattern immediately under $q$, then $p'$ is a subterm of the $n$-th pattern immediately under $q$,
+
+\item the same for the $m$-th pattern immediately under the $n$-th patterns if $p$ and/or $p'$ aren't the $n$-th patterns themselves,
+
+\item and so on recursively.
+\end{itemize}
+
+As can be seen in the definition of $simplify\_step$, the algorithm switches from destructor to constructor extraction whenever constructor extraction would produce overlapping lhss. This actually prevents overlaps, because, whenever constructor extraction would produce overlaps, destructor extraction doesn't, as will be shown below.
+
+Clearly, this also means that the algorithm eventually arrives at a function definition without any destructors and without any constructors, unless it stops before that, thus ensuring that the desired fragment will be reached in any case.
+
+\subsection{Bisimulation}
+
+Two properties are desired for this algorithm: some kind of bisimulation, and that no overlapping lhss are generated. Since the algorithm is made up only of $des\_extract$ and $con\_extract$ steps, these properties follow from their respective properties.
+
+When overlapping lhss are absent in the transformed program, we have the kind of weak bisimulation as established by Proposition 2.3.1 for both $des\_extract$ and $con\_extract$, irrespective of which lhs is targeted. That overlaps aren't generated by one such step will be shown in the following subsection.
+
+\subsection{Absence of overlaps}
+
+By Proposition 2.4.1, for both $des\_extract$ and $con\_extract$, it suffices to show that $q_\epsilon$ doesn't overlap with unchanged lhss. This doesn't hold for arbitrary targeted lhss; in order to avoid generating overlaps, $simplify\_step$ was defined as above. It is now shown that this definition really prevents overlaps in the resulting program of one such step. As pointed out above, because of the definition of $simplify\_step$, it suffices to show that destructor extraction doesn't produce overlaps whenever constructor extraction does.
+
+When constructor extraction leads to overlaps, ...
+
+\section{Transformation steps}
 
 Both de- and refunctionalization are made up of a couple of preprocessing steps, followed by the core de-/refunctionalization, which is essentially the two-way transformation from the paper of Rendel et al.
 
@@ -158,207 +192,6 @@ Each preprocessing steps can be defined as a recursive composition of one of the
 \end{framed}
 
 As stated above, $r_{core}$ and $d_{core}$ are essentially two ways of the transformation of Rendel et al. Their precise definitions are given in section 3.6.
-
-\section{Bisimulation}
-
-For the core de- and refunctionalization, strong bisimulation holds, which will be proven in the respective section.
-
-Each preprocessing step is defined as a recursive composition of one of the basic building blocks described in the next section. One such building block is an extraction function lifted to programs with $extract\_helpers$. For the lifted extraction function, a weak kind of bisimulation holds. Let angular brackets denote this transformation, and let $prg$ be the program to be transformed. When $prg$ has no overlapping lhss, it holds that:
-
-\begin{itemize}
-\item $s \longrightarrow_{prg} t \implies s  \longrightarrow^*_{\langle prg \rangle} \tilde{t}$ for a $\tilde{t} \sim t$ (1a)
-
-\item for all terms $s'$ in the sequence of (1a), with the exception of the last ($t'$), it is $s \sim s'$ (1b)
-
-\item if $s \not\sim t$: $s \longrightarrow_{\langle prg \rangle} t \implies \tilde{s} \longrightarrow_{prg} \tilde{t}$ for $\tilde{s} \sim s, \tilde{t} \sim t$ (2)
-
-\end{itemize}
-
-Here, $\sim$ is an equivalence relation; $s \sim t$ reads as: ``$s$ and $t$ represent the same `state' ''. The equivalence relation is specific to the respective extraction function: Given a function $\langle \cdot \rangle^{\sim}_{prg}$ returning an equivalent for copatterns, the equivalence relation is defined as the smallest congruence relation, with respect to the syntactic structure,\footnote{I.e., it is
-\begin{itemize}
-
-\item If $t_i \sim \widetilde{t_i}$ for $i \in \{1, ..., n\}$: $con(t_1, ..., t_n) \sim con(\widetilde{t_1}, ..., \widetilde{t_n})$
-
-\item If $t_i \sim \widetilde{t_i}$ for $i \in \{1, ..., n\}$: $fun(t_1, ..., t_n) \sim fun(\widetilde{t_1}, ..., \widetilde{t_n})$
-
-\item If $t_i \sim \widetilde{t_i}$ for $i \in \{0, ..., n\}$: $t_0.des(t_1, ..., t_n) \sim \widetilde{t_0}.des(\widetilde{t_1}, ..., \widetilde{t_n})$ 
-
-\end{itemize}} for which $q[\sigma] \sim \langle q \rangle^{\sim}_{prg}[\sigma]$ holds.
-
-As proven in the propositions that follow, these weak bisimulation statements hold for all extraction functions that satisfy a number of properties defined below, simply called the \textit{extraction function properties}. Therefore, in its respective section, the bisimulation will be shown for an extraction function by showing that it satisfies these properties. For the bisimulation to hold at each step, it must also be the case that the step preserves the property that the program has no overlapping lhss. This will also be shown in the respective section of each building block.
-
-\begin{definition}[Extraction function properties]
-An extraction function $e$ is said to satisfy the extraction function properties iff:
-
-\begin{enumerate}
-\item $\forall r \not\in Rules(\langle prg \rangle): s \longrightarrow^{\textrm{Subst}_r}_{prg} t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \sim t$.
-
-\item If $s$ reduces in $prg$, so does every $\widetilde{s} \sim s$ in $\langle prg \rangle$.
-
-\item If $s$ is irreducible in $prg$, then there is a reduction sequence $s \longrightarrow^*_{\langle prg \rangle} s_v$, where $s \sim s_v$ is irreducible in $prg$.
-
-\end{enumerate}
-
-\end{definition}
-
-\begin{proposition}
-
-Let $e$ be any helper extraction function with the extraction function properties, and let $trans = extract\_helpers(e)$.
-
-If the program $prg$ has no overlapping lhss, statements (1a) and (1b) hold for $trans$.
-
-\begin{proof}
-
-\begin{enumerate}
-\item \textbf{``Subst" case}:
-
-\begin{prooftree}
-\AxiomC{$s =^? q_r \searrow \sigma$}
-\RightLabel{\scriptsize Subst with $r \in \textrm{Rules}(prg)$}
-\UnaryInfC{$s \longrightarrow t_r[\sigma]$}
-\end{prooftree}
-
-with $t_r[\sigma] = t$; the reduction-relevant subterms of $s$ are values.
-
-When $r$ is also an equation of $\langle prg \rangle$, it suffices to (a) by the third extraction function property, reduce the reduction-relevant subterms of $s$ to equivalent values, and then (b) apply the ``Subst" rule for $r$ to get a reduction to a term equivalent to $t$.
-
-When, otherwise, $r$ is not an equation of $\langle prg \rangle$, we have the desired sequence by the first extraction function property.
-
-\item \textbf{``Cong" case}:
-
-\begin{prooftree}
-\AxiomC{$s^0 \longrightarrow t^0$}
-\RightLabel{\scriptsize Cong}
-\UnaryInfC{$\mathcal{E}[s^0] \longrightarrow \mathcal{E}[t^0]$}
-\end{prooftree}
-
-with $\mathcal{E}[s^0] = s$ and $\mathcal{E}[t^0] = t$. By the induction hypothesis, we have a reduction sequence $s^0 \longrightarrow_{\langle prg \rangle} \widetilde{t^0} \sim t^0$.
-
-It suffices to (a) by the third extraction function property, reduce the reduction-relevant subterms of $\mathcal{E}[s^0]$ left of $s^0$ to equivalent values, and then (b) use the ``Cong" rule, with the new context $\widetilde{\mathcal{E}}$ (around $s^0$) yielded by this, on the reduction sequence obtained from the induction hypothesis.
-
-\end{enumerate}
-
-\end{proof}
-
-\textbf{Alternate, very short sketch of proof:}
-
-(see https://github.com/lordxist/uroboro-transformations/issues/3)
-\begin{proof}[Sketch of proof]
-
-For the nondeterministic variant of the reduction relation, the desired reduction sequence can be given as follows:
-\begin{multline*}
-s(\langle q_r \rangle^f [\sigma_f] [\sigma]) = q_r[\sigma](\langle q_r \rangle^f [\sigma_f] [\sigma])\\
-\longrightarrow q_r[\sigma](\langle \langle q_r \rangle^f \rangle^{\sim} [\sigma_f] [\sigma]) = \langle \langle \langle q_r \rangle^f \rangle^{\sim} \rangle^{f^{-1}_r} [\sigma]\\
-\longrightarrow t_r[\sigma] = t
-\end{multline*}
-The first step uses equation $\epsilon$, the second $\zeta_r$.
-
-Since $\epsilon$ preserves the equivalence and doesn't add new redexes, and, for any changed $r$ of $prg$, $\zeta_r \sim r$, the proposition follows by confluence. 
-
-\end{proof}
-
-\end{proposition}
-
-\begin{proposition}
-
-Let $e$ be any helper extraction function with the extraction function properties, and let $trans = extract\_helpers(e)$.
-
-If the program $prg$ has no overlapping lhss, statement (2) holds for $trans$.
-
-\begin{proof} By induction on the derivation $\mathcal{D}$ of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$, with $s \not\sim t$.
-
-\begin{enumerate}
-\item \textbf{``Subst" case}:
-
-\begin{prooftree}
-\AxiomC{$\langle s \rangle =^? q \searrow \sigma$ with $(q, s') \in \textrm{Rules}(\langle prg \rangle)$}
-\UnaryInfC{$s \longrightarrow_{\langle prg \rangle} s'[\sigma]$}
-\end{prooftree}
-
-with $s'[\sigma] = t$; the reduction-relevant subterms of $s$ are values.
-
-By the extraction function properties, since $s \not\sim t$, it can only be the case that $`` q = s' " = \zeta$ for the $\zeta$ in $\langle r \rangle^e$. Choose $\widetilde{s} := q_r[\sigma]$ and $\widetilde{t} := t_r[\sigma]$.
-
-\item \textbf{``Cong" case}:
-
-\begin{prooftree}
-\AxiomC{$s' \longrightarrow_{\langle prg \rangle} t'$}
-\RightLabel{Cong}
-\UnaryInfC{$\mathcal{E}[s'] \longrightarrow_{\langle prg \rangle} \mathcal{E}[t']$}
-\end{prooftree}
-
-with $\mathcal{E}[s'] = s$ and $\mathcal{E}[t'] = t$. Because $\mathcal{E}[s'] \not\sim \mathcal{E}[t']$, it follows that $s' \not\sim t'$.
-
-By the induction hypothesis we have $\widetilde{s'} \longrightarrow_{prg} \widetilde{t'}$, for some $\widetilde{s'} \sim s'$ and $\widetilde{t'} \sim t'$. Apply the congruence rule to get the desired
-\begin{equation*}
-s = \mathcal{E}[s'] \sim \widetilde{\mathcal{E}}[\widetilde{s'}] \longrightarrow_{prg} \widetilde{\mathcal{E}}[\widetilde{t'}] \sim \mathcal{E}[t'] = t,
-\end{equation*}
-for an $\widetilde{\mathcal{E}} \sim \mathcal{E}$, that contains only names declared in $prg$ and which will now be constructed from $\mathcal{E}$ inductively.
-
-\begin{itemize}
-
-\item $\mathcal{E} = []$:
-
-Define $\widetilde{\mathcal{E}} = \mathcal{E}$.
-
-\item $\mathcal{E} = [].\overline{des(\overline{t})}$:
-
-Define $\widetilde{\mathcal{E}} = [].\overline{des(\overline{\widetilde{t}})}$.
-
-\item $\mathcal{E} = fun(\overline{v}, \mathcal{E}', \overline{t}).\overline{des(\overline{t'})}$, with $fun$ declared in $prg$:
-
-We have $\widetilde{\mathcal{E}'}$ inductively, and can define: $\widetilde{\mathcal{E}} = fun(\overline{\widetilde{v}}, \mathcal{E}', \overline{\widetilde{t}}).\overline{des(\overline{\widetilde{t'}})}$.
-
-\item $\mathcal{E} = fun(\overline{v}).\overline{des(\overline{v'})}.des'(\overline{v''}, \mathcal{E}', \overline{t}).\overline{des''(\overline{t'})}$, with $fun$ declared in $prg$:
-
-Analogously to the previous case.
-
-\item $\mathcal{E} = fun(\overline{v}, \mathcal{E}', \overline{t}).\overline{des(\overline{t'})}$, with $fun$ not declared in $prg$:
-
-We have $\widetilde{\mathcal{E}'}$ inductively. Further, we know
-\begin{equation*}
-fun(\overline{v}, \mathcal{E}', \overline{t}) = fun(\overline{p}, \mathcal{E}', \overline{p'})[\sigma] = \langle q_{\mathcal{E}'} \rangle^{\sim}_{prg}[\sigma] \sim q_{\mathcal{E}'}[\widetilde{\sigma}]
-\end{equation*}
-for a $q$ with all names declared in $prg$, where $q_{\mathcal{E}'}$ stands for $q$ with the relevant pattern replaced by the context $\mathcal{E}'$. Thus we can define: $\widetilde{\mathcal{E}} = q[\widetilde{\sigma}].\overline{des(\overline{\widetilde{t'}})}$.
-
-\item $\mathcal{E} = fun(\overline{v}).\overline{des(\overline{v'})}.des'(\overline{v''}, \mathcal{E}', \overline{t}).\overline{des''(\overline{t'})}$, with $fun$ not declared in $prg$:
-
-Analogously to the previous case.
-
-\end{itemize}
-
-Here $\widetilde{t}$ for a term $t$ stands for a term that is equivalent in $t$ but has all of its names declared in $prg$. Such a term can be construed from $t$ analogously to how the evaluation context was constructed. When a term $v$ is a value in $\langle prg \rangle$, so is $\widetilde{v}$ by the second extraction function property. To see this, suppose $\widetilde{v} \sim v$ reduced in $prg$, then, by the property, so would $v$ in $\langle prg \rangle$, contrary to fact.
-
-\end{enumerate}
-
-\end{proof}
-
-\textbf{Alternate, very short sketch of proof:}
-
-For a slightly different proposition: Let $s$ be a term with all names declared in $prg$, and let $s_i$, for $i \in \{1, ..., n\}$, be equivalent to $s$, and $t \not\sim s$. Then it is:
-\begin{equation*}
-s \longrightarrow s_1 \longrightarrow ... \longrightarrow s_n \longrightarrow t \implies s \longrightarrow_{prg} \widetilde{t},
-\end{equation*}
-for a $\widetilde{t} \sim t$, where the reduction of the left side if the implication is meant with regard to $\langle prg \rangle$.
-
-(see https://github.com/lordxist/uroboro-transformations/issues/3)
-\begin{proof}[Sketch of proof]
-
-From confluence, and since the $s_i$ are each equivalent to the previous term in the sequence above, we have the following reduction sequence for the nondeterministic variant of the reduction relation:
-\begin{equation*}
-s \longrightarrow_{\langle prg \rangle} \widetilde{t}
-\end{equation*}
-for a $\widetilde{t} \sim t$.
-
-Because $\widetilde{t} \not\sim s$, this can only use an equation taken over from $prg$ unchanged. It follows that, for the nondeterministic variant of the reduction relation, it is:
-\begin{equation*}
-s \longrightarrow_{prg} \widetilde{t}\tag{*}.
-\end{equation*}
-Because of the reduction sequence of the condition, $s$ can neither reduce by an unchanged equation of $prg$, nor by an equation $\zeta_r$ equivalent to an $r$ of $prg$, before it reduces to $\widetilde{t}$. Consequently, $s$ cannot reduce by any equation of $prg$. It follows that (*) also holds for the deterministic variant of the reduction relation, and this is the desired sequence.
-
-\end{proof}
-
-\end{proposition}
 
 \section{Building blocks}
 
