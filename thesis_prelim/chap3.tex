@@ -214,3 +214,11 @@ Let $x_q$ be a variable different from all in $q$.
 \[
 \pi_n(q) = q \text{ with the $n$-th constructor application } con(...) \text{ replaced by $x_q$ }
 \]
+
+\subsection{Extracting all patterns out of a single-destructor copattern}
+
+This extraction extracts all patterns, that is, all constructor calls, out of a copattern with only a single destructor. Define this extraction $extract\_patterns$ as the $\pi$-extraction targeting $q$ with the extraction projection $\pi$ defined below.
+
+\[
+\pi(`` fun(\overline{p}).des(\overline{p'}) ") = `` fun(\overline{x}, \overline{x'}) "
+\]
