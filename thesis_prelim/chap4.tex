@@ -105,6 +105,8 @@ Automatic refunctionalization consists of the following steps:
 
 \end{enumerate}
 
+Each preprocessing step is applied to each function definition individually. It is thus assumed that the function definition to be transformed is available to the transformation. For the complete step, simply transform all function definitions, in arbitrary order.
+
 Each preprocessing steps can be defined as a recursive composition of one of the basic building blocks described in the next section. One such building block is an extraction function lifted to programs with $extract\_helpers$. The definitions for each step follow below; for them, the following conditional recursion combinator will be used:
 \[
     condrec(f, cond) :=
@@ -114,19 +116,20 @@ Each preprocessing steps can be defined as a recursive composition of one of the
 \end{cases}
 \]
 
+Let $q^{work}$ denote any copattern which isn't yet in the desired form, and let $n$ be the number of constructors in the targeted pattern (i.e., the extracted constructor is the right-most one).
+
 \begin{framed}
 
 \begin{alignat*}{1}
-&elim\_multi\_des_i = condrec(extract\_helpers(extract\_des^{\geq 1}), cond_i), \textrm{ for } i \in \{d, r\}, \textrm{ with } \\
-&\qquad cond_d = \textrm{``the program contains multiple destructors''} \\
-&\qquad cond_r = \textrm{``the program contains a multiple destructor copattern with constructors''} \\
-&unmix = condrec(extract\_helpers(extract\_des, funs), cond), \textrm{ with}\\
-&\qquad cond = \textrm{``the program has mixed function def.s'' and} \\
-&\qquad funs = \{ fun \in prg ~ | ~ \textrm{the def. of $fun$ is mixed} \} \\
-&elim\_cons\_from\_des = condrec(extract\_helpers(extract\_patterns), cond), \textrm{ with}\\
-&\qquad cond = \textrm{``the program has destructor copatterns with constructors''} \\
-&elim\_multi\_con = condrec(extract\_helpers(extract\_con), cond), \textrm{ with}\\
-&\qquad cond = \textrm{``the program has copatterns with multiple constructors''}
+&elim\_multi\_des_i = condrec(liftp(extract\_des(q^{work})), cond_i), \textrm{ for } i \in \{d, r\}, \textrm{ with } \\
+&\qquad cond_d = \textrm{``the function def. contains multiple destructors''} \\
+&\qquad cond_r = \textrm{``the function def. contains a multiple destructor copattern with constructors''} \\
+&unmix = condrec(liftp(extract\_des(q^{work})), cond), \textrm{ with}\\
+&\qquad cond = \textrm{``the function def. is mixed''} \\
+&elim\_cons\_from\_des = condrec(liftp(extract\_patterns(q^{work})), cond), \textrm{ with}\\
+&\qquad cond = \textrm{``the function def. has destructor copatterns with constructors''} \\
+&elim\_multi\_con = condrec(liftp(extract\_con_n(q^{work})), cond), \textrm{ with}\\
+&\qquad cond = \textrm{``the function def. has copatterns with multiple constructors''}
 \end{alignat*}
 
 \end{framed}
