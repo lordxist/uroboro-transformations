@@ -136,6 +136,30 @@ Let $q^{work}$ denote any copattern which isn't yet in the desired form. For $un
 
 As stated above, $r_{core}$ and $d_{core}$ are essentially two ways of the transformation of Rendel et al. Their precise definitions are given in section 3.6.
 
+\subsection{Bisimulation}
+
+All of the preprocessing steps are recursive compositions of lifted extraction functions. Each of those extraction functions preserve the semantics of the program in the kind of weak bisimulation described in the previous chapter, when the program doesn't have overlapping lhss.
+
+For the bisimulation to hold, it is therefore necessary that each application of an extraction function in the preprocessing steps doesn't introduce overlapping lhss. This will be shown in the next subsection.
+
+For core de-/refunctionalization, strong bisimulation holds. This is essentially a corollary of that property for the two-way transformation of Rendel et al., as will be shown in the section on core de- and refunctionalization.
+
+\subsection{Absence of overlaps}
+
+The three extraction functions used, $extract\_des$, $extract\_patterns$, and $extract\_con_n$ are shown to preserve the absence of overlapping lhss wherever they are applied in the preprocessing steps. By Proposition 2.4.1, it suffices to show that $q_\epsilon$ doesn't overlap with any lhs of an equation taken over unchanged from the original program.
+
+\subsubsection{Destructor extraction}
+
+The pre-transformation $align\_patterns$ ensures that, whenever two lhss overlap, one of them is a prefix of the other. $q_\epsilon$ is a prefix of an lhs $q_r$ of the original program; if it overlapped with a $q_{r'}$ taken over unchanged then either (a) $q_{r'}$ would be a prefix of $q_\epsilon$, but then it also would be a prefix of $q_r$, and $q_{r'}$ and $q_r$ overlapped, contrary to assumption, or (b) $q_\epsilon$ would be a prefix of $q_{r'}$, but then, because $q_{r'}$ doesn't have more destructors than $q_r$, either $q_\epsilon = q_{r'}$ or, by the definition of $extract\_des$ and its underlying extraction projection, $extract\_des$ also extracts out of $q_{r'}$, contrary to assumption.
+
+\subsubsection{Pattern extraction}
+
+The extraction $extract\_patterns$ is only ever applied to single-destructor copatterns and transforms them to single-destructor copatterns without any constructors. It is also only ever used in unmixed function definitions. It follows that, if $q_\epsilon$ overlapped with an unchanged equation, the latter has one or more destructors. Since $q_\epsilon$ has only variables as patterns, the unchanged lhs and $q_\epsilon$ would overlap, contrary to assumption.
+
+\subsubsection{Constructor extraction}
+
+The only transformed equations have no destructors on their lhs. Constructor extraction is only ever used with unmixed function definitions. It follows that, if $q_\epsilon$ overlapped with an unchanged lhs, the latter has no destructors, too. Since the extracted constructor is further right than the right-most constructor in the unchanged lhs, the unchanged lhs and $q_\epsilon$ would overlap, contrary to assumption.
+
 \section{Building blocks}
 
 Each of the extraction functions defined below are lifted to programs with $extract\_helpers$ and then recursively composed to build the preprocessing steps of de- and refunctionalization.
