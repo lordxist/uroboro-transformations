@@ -116,7 +116,7 @@ Each preprocessing steps can be defined as a recursive composition of one of the
 \end{cases}
 \]
 
-Let $q^{work}$ denote any copattern which isn't yet in the desired form, and let $n$ be the number of constructors in the targeted pattern (i.e., the extracted constructor is the right-most one).
+Let $q^{work}$ denote any copattern which isn't yet in the desired form. For $unmix$, this means that it has a destructor, for all other steps this means that the condition passed to $condrec$ holds for the individual copattern. Let $n$ be the number of constructors in the targeted pattern (i.e., the extracted constructor is the right-most one).
 
 \begin{framed}
 
