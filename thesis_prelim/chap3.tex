@@ -81,7 +81,7 @@ For the definition of the weak bisimulation, a modification of the value judgeme
 \langle prg \rangle \vdash'_v t :\iff prg \vdash_v \langle t \rangle^{aux^{-1}}.
 \]
 
-From this it immediately follows that $\mathcal{E}$ is an evaluation context with respect to this modified value judgement for $\langle prg \rangle$ if and only if $\langle \mathcal{E} \rangle^{aux^{-1}}$ is an evaluation context with respect to the original value judgement for $prg$. It also means that, for a term $t$ with all names declared in $\langle prg \rangle$, the immediate subterms of $t$ are values with this judgement for $\langle prg \rangle if and only if the immediate subterms of $\langle t \rangle^{aux^{-1}}$ are values with the original judgement for $prg$.
+From this it immediately follows that $\mathcal{E}$ is an evaluation context with respect to this modified value judgement for $\langle prg \rangle$ if and only if $\langle \mathcal{E} \rangle^{aux^{-1}}$ is an evaluation context with respect to the original value judgement for $prg$. It also means that, for a term $t$ with all names declared in $\langle prg \rangle$, the immediate subterms of $t$ are values with this judgement for $\langle prg \rangle$ if and only if the immediate subterms of $\langle t \rangle^{aux^{-1}}$ are values with the original judgement for $prg$.
 
 Write $\longrightarrow'$ for the reduction relation $\longrightarrow$ with its value judgement modified in this way. The weak bisimulation is defined as follows, for every $s,t$ with all of their names declared in $prg$:
 \begin{equation}
