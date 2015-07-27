@@ -198,7 +198,7 @@ replaced by $\langle t' \rangle^{aux}$.
 \end{itemize}
 \end{definition}
 
-\begin{lemma}[Correctness of translation `A']
+\begin{restatable}[Correctness of translation `A']{lemma}{correcta}
 Translation `A' is correct, that is, when
 \[
 s = s_1 {\longrightarrow'}_{\langle prg \rangle} ... {\longrightarrow'}_{\langle prg \rangle} s_n = t
@@ -208,11 +208,10 @@ then
 s^c_1 \longrightarrow_{\langle prg \rangle} ... \longrightarrow_{\langle prg \rangle} s^c_m \sim t
 \]
 for the sequence $(s^c_1, ..., s^c_m) := c((s_1, ..., s_n))$.
-
+\end{restatable}
 \begin{proof}
 Left for the appendix.
 \end{proof}
-\end{lemma}
 
 \begin{definition}[Translation `B']
 Translation `A' is given by a conversion function $uc$ from sequences to sequences. It is defined recursively as follows.
@@ -226,7 +225,7 @@ Translation `A' is given by a conversion function $uc$ from sequences to sequenc
 
 \end{definition}
 
-\begin{lemma}[Correctness of translation `B']
+\begin{restatable}[Correctness of translation `B']{lemma}{correctb}
 Translation `B' is correct, that is, when
 \[
 s = s_1 {\longrightarrow'}_{\langle prg \rangle} ... {\longrightarrow'}_{\langle prg \rangle} s_n \sim t
@@ -236,11 +235,10 @@ then
 s^{uc}_1 \longrightarrow_{prg} ... \longrightarrow_{prg} s^{uc}_m t
 \]
 for the sequence $(s^{uc}_1, ..., s^{uc}_m) := uc((s_1, ..., s_n))$.
-
+\end{restatable}
 \begin{proof}
 Left for the appendix.
 \end{proof}
-\end{lemma}
 
 Finally, the bisimulation statement can be proven.
 \begin{proposition}
