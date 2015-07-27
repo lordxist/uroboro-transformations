@@ -162,18 +162,14 @@ s {\longrightarrow}_{prg}^* t \iff s \longrightarrow^*_{\langle prg \rangle} \wi
 \]
 for some $\widetilde{t} \sim t$. In order to prove it, it suffices to show that this characterization is equivalent to the first characterization:
 \begin{equation}
-s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}
+s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle prg \rangle} \widetilde{t},
 \end{equation}
+for every $s, t$ with names declared in $prg$.
 
-\begin{proposition}
-Statement (2.2) holds, for every $s,t$ with names declared in $prg$.
+To show that the $`` \Rightarrow ''$ direction of (2.2) holds, a translation for sequences on the left-hand side of (2.2) to the corresponding sequences on the right-hand side is given (translation`A'). For the other direction, a translation for sequences $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ to sequences $s \longrightarrow^*_{prg} t$ is given (translation `B'). For both translations, their correctness is verified, i.e., it is proven that each step of the sequences returned by the function is indeed a reduction step of the relevant reduction, and that the desired equality or equivalence between the end points of the original and the translated sequence holds. These correctness proofs are left for the appendix.
 
-\begin{proof}
-The proposition is proven by showing (a) $s {\longrightarrow'}_{\langle prg \rangle}^* t \Rightarrow s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ and (b) $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \Rightarrow s \longrightarrow^*_{prg} t$. (a) is one direction of (2.2), and from (b) and (2.1) follows the other direction of (2.2).
-
-For both (a) and (b), a conversion function is given that translates sequences of the one reduction relation into corresponding sequences of the other. Then, it is proven that each step of the sequences returned by the function is indeed a reduction step of the relevant reduction, and that the desired equality or equivalence between the end points of the original and the translated sequence holds.
-
-``$\Rightarrow$'': The conversion function $c$ can be defined recursively as follows:
+\begin{definition}[Translation `A']
+Translation `A' is given by a conversion function $c$ from sequences to sequences. It is defined recursively as follows.
 \[
   c((s_1, ..., s_n))=\begin{cases}
                (), &\text{ if } n = 0 \\
@@ -200,10 +196,26 @@ For terms, $\langle \cdot \rangle^{aux}$ is defined analogously. Now, $\langle \
 replaced by $\langle t' \rangle^{aux}$.
 
 \end{itemize}
+\end{definition}
 
-TODO: proof of the correctness of the translation (by induction on the length of the sequence)
+\begin{lemma}[Correctness of translation `A']
+Translation `A' is correct, that is, when
+\[
+s = s_1 {\longrightarrow'}_{\langle prg \rangle} ... {\longrightarrow'}_{\langle prg \rangle} s_n = t
+\]
+then
+\[
+s^c_1 \longrightarrow_{\langle prg \rangle} ... \longrightarrow_{\langle prg \rangle} s^c_m \sim t
+\]
+for the sequence $(s^c_1, ..., s^c_m) := c((s_1, ..., s_n))$.
 
-``$\Leftarrow$'': The unconversion function $uc$ can be defined recursively as follows:
+\begin{proof}
+Left for the appendix.
+\end{proof}
+\end{lemma}
+
+\begin{definition}[Translation `B']
+Translation `A' is given by a conversion function $uc$ from sequences to sequences. It is defined recursively as follows.
 \[
   uc((s_0, ..., s_n))=\begin{cases}
                (), &\text{ if } n = 0 \\
@@ -212,13 +224,40 @@ TODO: proof of the correctness of the translation (by induction on the length of
             \end{cases}
 \]
 
-TODO: proof of the correctness of the translation (by induction on the length of the sequence)
+\end{definition}
+
+\begin{lemma}[Correctness of translation `B']
+Translation `B' is correct, that is, when
+\[
+s = s_1 {\longrightarrow'}_{\langle prg \rangle} ... {\longrightarrow'}_{\langle prg \rangle} s_n \sim t
+\]
+then
+\[
+s^{uc}_1 \longrightarrow_{prg} ... \longrightarrow_{prg} s^{uc}_m t
+\]
+for the sequence $(s^{uc}_1, ..., s^{uc}_m) := uc((s_1, ..., s_n))$.
+
+\begin{proof}
+Left for the appendix.
+\end{proof}
+\end{lemma}
+
+Finally, the bisimulation statement can be proven.
+\begin{proposition}
+Statement (2.2), that is
+\[
+s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle prg \rangle} \widetilde{t},
+\]
+for every $s, t$ with names declared in $prg$, holds.
+
+\begin{proof}
+``$\Rightarrow$'': Assume that there is a sequence of the form on the left-hand side. Then by translation `A', there also is a corresponding right-hand side sequence.
+
+``$\Leftarrow$'': Assume that there is a sequence of the form on the left-hand side. By translation `B', there also is a sequence $s \longrightarrow_{prg} t$, and by (2.1) the desired sequence $s {\longrightarrow'}_{\langle prg \rangle} t$ obtains.
 
 \end{proof}
 
 \end{proposition}
-
- The proof is left for the appendix.
 
 \section{Absence of overlaps}
 
