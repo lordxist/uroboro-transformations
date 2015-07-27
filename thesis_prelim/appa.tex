@@ -2,14 +2,38 @@
 
 \correcta*
 \begin{proof}
-By induction on the length of the sequence.
-TODO
+By induction on the length $n$ of the sequence.
+
+For $n = 0$ and $n = 1$, the translation doesn't change anything, thus correctness trivially holds.
+
+Now, suppose $n = n' + 1, n \geq 2$ such that correctness of the translation holds for all sequences of length $n'$ (the induction hypothesis). TODO
 \end{proof}
 
 \correctb*
 \begin{proof}
-By induction on the length of the sequence.
-TODO
+By induction on the length $n$ of the sequence.
+
+For $n = 0$, the translation doesn't change anything, thus correctness trivially holds.
+
+Now, suppose $n = n' + 1$ such that correctness of the translation holds for all sequences of length $n'$ (the induction hypothesis). This means that
+\[
+s^{uc}_1 \longrightarrow_{prg} ... \longrightarrow_{prg} s^{uc}_{m'} = \langle s_{n-1} \rangle^{aux^{-1}}
+\]
+for the sequence $(s^{uc}_1, ..., s^{uc}_m) := uc(s_1, ..., s_{n-1})$. Two cases will be distinguished, according to the definition of $uc$:
+\begin{itemize}
+\item \underline{Case 1:} $s_{n-1} \neq s_n \land s_{n-1} \sim s_n$.
+Then it is $uc((s_1, ..., s_n)) = uc((s_1, ..., s_{n-1})) = (s^{uc}_1, ..., s^{uc}_m)$. By the above, all steps in the sequence are indeed reduction steps of the relevant reduction. Because $s_{n-1} \sim s_n$, it is $\langle s_n \rangle^{aux^{-1}} = \langle s_{n-1} \rangle^{aux^{-1}} = \langle s^{uc}_n \rangle^{aux^{-1}}$.
+
+\item \underline{Case 2:} otherwise.
+Then it is $uc((s_1, ..., s_n)) = uc((s_1, ..., s_{n-1})) \cdot (\langle s_n \rangle^{aux^{-1}})$. By the above, all steps before the last are indeed reduction steps of the relevant reduction. The final term is by definition $\langle s_n \rangle^{aux^{-1}}$.
+
+It remains to be shown why the final step is a reduction step of the relevant reduction. By the induction hypothesis, this step is $(\langle s_{n-1} \rangle^{aux^{-1}}, \langle s_n \rangle^{aux^{-1}})$. By assumption, it is $s_{n-1} \longrightarrow_{\langle prg \rangle} s_n$, and $\langle s_{n-1} \rangle^{aux^{-1}} \longrightarrow_{prg} \langle s_n \rangle^{aux^{-1}}$ follows from the more general $a \longrightarrow_{\langle prg \rangle} b \Rightarrow \langle a \rangle^{aux^{-1}} \longrightarrow_{\langle prg \rangle} \langle b \rangle^{aux^{-1}}$. This can be shown by induction on the derivation of the left-hand side reduction, by using
+\[
+\langle prg \rangle \vdash_v t \Rightarrow prg \vdash_v \langle t \rangle^{aux^{-1}},
+\]
+for all terms $t$, and the compatibility of evaluation contexts and $aux^{-1}$, i.e., $\langle \mathcal{E}[t] \rangle^{aux^{-1}} = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t \rangle^{aux^{-1}}]$.
+
+\end{itemize}
 \end{proof}
 
 \clearpage
