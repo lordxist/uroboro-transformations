@@ -168,14 +168,51 @@ s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle
 \begin{proposition}
 Statement (2.2) holds, for every $s,t$ with names declared in $prg$.
 
-\begin{proof}[Sketch of proof]
-``$\Rightarrow$'': Each ``minimal'' sequence within $s {\longrightarrow'}^*_{\langle prg \rangle} t$ will be considered, that is, a sequence $s' {\longrightarrow'}^*_{\langle prg \rangle} t'$, for $s', t'$ with names declared in $prg$, that is part of the complete sequence from $s$ to $t$ and where there is no $s''$ with names declared in $prg$ such that $s' {\longrightarrow'}^*_{\langle prg \rangle} s'' {\longrightarrow'}^*_{\langle prg \rangle} t'$. The minimal sequences $s' {\longrightarrow'}^*_{\langle prg \rangle} t'$ are converted to sequences $s' {\longrightarrow'}^*_{\langle prg \rangle} \widetilde{t'} \sim t$. Then, these sequences will be put behind one another, in the order of the original reductions, to get a sequence $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \sim t$.
+\begin{proof}
+The proposition is proven by showing (a) $s {\longrightarrow'}_{\langle prg \rangle}^* t \Rightarrow s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ and (b) $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \Rightarrow s \longrightarrow^*_{prg} t$. (a) is one direction of (2.2), and from (b) and (2.1) follows the other direction of (2.2).
 
-Consider the steps of the sequence $s' {\longrightarrow'}^*_{\langle prg \rangle} t'$. Because of how the value judgement was modified, a reduction step is allowed to ``bypass'' some redexes. Those redexes are exactly the ones which reduce by the $\epsilon$ equation. Furthermore, the first reduction step in the sequence that doesn't use the $\epsilon$ equation necessary leads to $t'$, because the result of this reduction is a term with names declared in $prg$ and $t'$ was defined to be the first such term in the sequence from $s'$ to $t'$.
+For both (a) and (b), a conversion function is given that translates sequences of the one reduction relation into corresponding sequences of the other. Then, it is proven that each step of the sequences returned by the function is indeed a reduction step of the relevant reduction, and that the desired equality or equivalence between the end points of the original and the translated sequence holds.
 
-For the unmodified reduction, it is instead necessary to reduce all these bypassed redexes where they have been bypassed. The $\epsilon$ equation is defined as a call to the auxiliary function that doesn't introduce any new redexes. Because of this, inserting the necessary steps to reduce the bypassed redexes still makes it possible to continue the reduction with the originally following equation afterwards. Since the two sides of $\epsilon$ are equivalent, this sequence with the bypassed steps reinserted leads from $s'$ to a $\widetilde{t'} \sim t'$.
+``$\Rightarrow$'': The conversion function $c$ can be defined recursively as follows:
+\[
+  c((s_1, ..., s_n))=\begin{cases}
+               (), &\text{ if } n = 0 \\
+               (s_1), &\text{ if } n = 1 \\
+               \langle \mathcal{E} \rangle^{aux^*}[s'_1] \cdot \langle \mathcal{E} \rangle^{aux^*}[\langle s'_1 \rangle^{aux^*}] \cdot c(\langle (s_2, ..., s_n) \rangle^{aux^{max}_{s_1}}), &\text{ otherwise } \\
+            \end{cases}
+\]
+The definition makes use of $\langle \cdot \rangle^{aux^*}$ and $\langle \cdot \rangle^{aux^{max}_{s_1}}$, defined below.
 
-``$\Leftarrow$'': The result of the reduction sequence, $\widetilde{t}$, is $t$ with some instances of the left side of $\epsilon$ replaced with the corresponding right side instances. The reduction sequence cannot depend upon redexes introduced by $\epsilon$, because $\epsilon$ introduces no new redexes. Thus, the desired sequence obtains by removing any step that uses the $\epsilon$ equation and where the resulting call to the auxiliary function isn't removed in further reduction steps.
+\begin{itemize}
+\item $\langle \cdot \rangle^{aux^*}$ is defined for evaluation contexts and terms. First, define
+\begin{alignat*}{2}
+\langle \mathcal{E} \rangle^{aux} = &\mathcal{E} \text{ with the left-most subterm } t \text{ for which } \langle prg \rangle \vdash'_v t \text{ but not } \langle prg \rangle \vdash_v t \\
+& \text{replaced by } \langle t \rangle^{aux}.
+\end{alignat*}
+For terms, $\langle \cdot \rangle^{aux}$ is defined analogously. Now, $\langle \cdot \rangle^{aux^*}$ can be defined as the sequence that obtains when applying $\langle \cdot \rangle^{aux}$ iteratively until it converges.
+
+\item $\langle \cdot \rangle^{aux^{max}_{-r}}$ is defined for terms. The notation used above for term sequences is shorthand for applying $\langle \cdot \rangle^{aux^{max}_{-r}}$ to each term in the sequence. For a term $t$, $\langle \cdot \rangle^{aux^{max}_{s_1}}$ means $t$ with each subterm $t'$ for which
+\begin{enumerate}
+\item $\langle prg \rangle \vdash'_v t'$, but
+\item $\langle prg \rangle \not\vdash_v t'$, and
+\item $t'$ is already present in $s_1$,
+\end{enumerate}
+replaced by $\langle t' \rangle^{aux}$.
+
+\end{itemize}
+
+TODO: proof of the correctness of the translation (by induction on the length of the sequence)
+
+``$\Leftarrow$'': The unconversion function $uc$ can be defined recursively as follows:
+\[
+  uc((s_0, ..., s_n))=\begin{cases}
+               (), &\text{ if } n = 0 \\
+               uc((s_0, ..., s_{n-1})), &\text{ if } s_{n-1} \neq s_n \land s_{n-1} \sim s_n \\
+               uc((s_0, ..., s_{n-1})) \cdot (\langle s_n \rangle^{aux^{-1}}), &\text{ otherwise} \\
+            \end{cases}
+\]
+
+TODO: proof of the correctness of the translation (by induction on the length of the sequence)
 
 \end{proof}
 
