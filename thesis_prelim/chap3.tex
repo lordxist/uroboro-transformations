@@ -160,7 +160,7 @@ s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle
 \end{equation}
 for every $s, t$ with names declared in $prg$.
 
-First, some lemmas are proven which are used in the proof of the $`` \Rightarrow "$ direction of (2.2). In the following lemmas, all reductions are meant with respect to program $\langle prg \rangle$.
+First, some lemmas are proven which are used in the proof of the $`` \Rightarrow "$ direction of (2.2). In the following lemmas, all reductions are meant with respect to program $\langle prg \rangle$. Define $\longrightarrow^{aux} = \{(a,b) : a \longrightarrow b \land \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\}$.
 
 \begin{lemma}[One-step aux-confluence]
 
