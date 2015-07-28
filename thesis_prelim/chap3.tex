@@ -201,10 +201,10 @@ a {\longrightarrow'}^* b \land a {\longrightarrow^{aux}}^* c \implies \exists d 
 
 \end{lemma}
 
-To show that the $`` \Leftarrow ''$ direction of (2.2) holds, a translation for sequences $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ to sequences $s \longrightarrow^*_{prg} t$ is given (translation `B'). The correctness of the translation is verified, i.e., it is proven that each step of the sequences returned by the function is indeed a reduction step of the relevant reduction, and that the desired equality or equivalence between the end points of the original and the translated sequence holds. This correctness proofs are left for the appendix.
+To show that the $`` \Leftarrow ''$ direction of (2.2) holds, a translation for sequences $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ to sequences $s \longrightarrow^*_{prg} t$ is given (called Back-Translation). The correctness of the translation is verified, i.e., it is proven that each step of the sequences returned by the function is indeed a reduction step of the relevant reduction, and that the desired equality or equivalence between the end points of the original and the translated sequence holds. This correctness proofs are left for the appendix.
 
 \begin{definition}[Back-Translation]
-Translation `A' is given by a conversion function $uc$ from sequences to sequences. It is defined recursively as follows.
+The Back-Translation is given by a conversion function $uc$ from sequences to sequences. It is defined recursively as follows.
 \[
   uc((s_0, ..., s_n))=\begin{cases}
                (), &\text{ if } n = 0 \\
