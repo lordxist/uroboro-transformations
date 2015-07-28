@@ -160,54 +160,50 @@ s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle
 \end{equation}
 for every $s, t$ with names declared in $prg$.
 
-To show that the $`` \Rightarrow ''$ direction of (2.2) holds, a translation for sequences on the left-hand side of (2.2) to the corresponding sequences on the right-hand side is given (translation`A'). For the other direction, a translation for sequences $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ to sequences $s \longrightarrow^*_{prg} t$ is given (translation `B'). For both translations, their correctness is verified, i.e., it is proven that each step of the sequences returned by the function is indeed a reduction step of the relevant reduction, and that the desired equality or equivalence between the end points of the original and the translated sequence holds. These correctness proofs are left for the appendix.
+First, some lemmas are proven which are used in the proof of the $`` \Rightarrow "$ direction of (2.2). In the following lemmas, all reductions are meant with respect to program $\langle prg \rangle$.
 
-\begin{definition}[Translation `A']
-Translation `A' is given by a conversion function $c$ from sequences to sequences. It is defined recursively as follows.
+\begin{lemma}[One-step aux-confluence]
+
+For all terms $a,b,c$ it holds that:
 \[
-  c((s_1, ..., s_n))=\begin{cases}
-               (), &\text{ if } n = 0 \\
-               (s_1), &\text{ if } n = 1 \\
-               \langle \mathcal{E} \rangle^{aux^*}[s'_1] \cdot \langle \mathcal{E} \rangle^{aux^*}[\langle s'_1 \rangle^{aux^*}] \cdot c(\langle (s_2, ..., s_n) \rangle^{aux^{max}_{s_1}}), &\text{ otherwise } \\
-            \end{cases}
+a {\longrightarrow'} b \land a \longrightarrow^{aux} c \implies \exists d . b {\longrightarrow^{aux}}^* d \land c \longrightarrow' d
 \]
-The definition makes use of $\langle \cdot \rangle^{aux^*}$ and $\langle \cdot \rangle^{aux^{max}_{s_1}}$, defined below.
 
-\begin{itemize}
-\item $\langle \cdot \rangle^{aux^*}$ is defined for evaluation contexts and terms. First, define
-\begin{alignat*}{2}
-\langle \mathcal{E} \rangle^{aux} = &\mathcal{E} \text{ with the left-most subterm } t \text{ for which } \langle prg \rangle \vdash'_v t \text{ but not } \langle prg \rangle \vdash_v t \\
-& \text{replaced by } \langle t \rangle^{aux}.
-\end{alignat*}
-For terms, $\langle \cdot \rangle^{aux}$ is defined analogously. Now, $\langle \cdot \rangle^{aux^*}$ can be defined as the sequence that obtains when applying $\langle \cdot \rangle^{aux}$ iteratively until it converges.
+\end{lemma}
 
-\item $\langle \cdot \rangle^{aux^{max}_{-r}}$ is defined for terms. The notation used above for term sequences is shorthand for applying $\langle \cdot \rangle^{aux^{max}_{-r}}$ to each term in the sequence. For a term $t$, $\langle \cdot \rangle^{aux^{max}_{s_1}}$ means $t$ with each subterm $t'$ for which
-\begin{enumerate}
-\item $\langle prg \rangle \vdash'_v t'$, but
-\item $\langle prg \rangle \not\vdash_v t'$, and
-\item $t'$ is already present in $s_1$,
-\end{enumerate}
-replaced by $\langle t' \rangle^{aux}$.
+\begin{lemma}[Many-step aux-confluence]
 
-\end{itemize}
-\end{definition}
-
-\begin{restatable}[Correctness of translation `A']{lemma}{correcta}
-Translation `A' is correct, that is, when
+For all terms $a,b,c$ it holds that:
 \[
-s = s_1 {\longrightarrow'}_{\langle prg \rangle} ... {\longrightarrow'}_{\langle prg \rangle} s_n = t
+a {\longrightarrow'}^* b \land a \longrightarrow^{aux} c \implies \exists d . b {\longrightarrow^{aux}}^* d \land c {\longrightarrow'}^* d
 \]
-then
-\[
-s^c_1 \longrightarrow_{\langle prg \rangle} ... \longrightarrow_{\langle prg \rangle} s^c_m \text{ with } \langle s^c_m \rangle^{aux^{-1}} = t
-\]
-for the sequence $(s^c_1, ..., s^c_m) := c((s_1, ..., s_n))$.
-\end{restatable}
+
 \begin{proof}
-Left for the appendix.
+By induction on the length of $a {\longrightarrow'}^* b$.
+
+When the sequence is empty, that is, $a = b$, simply choose $d = c$.
+
+Otherwise, let $a \longrightarrow' a'$ be the first step of the sequence. Especially, this means that $a' \longrightarrow' b$. By Lemma 2.3.1, there is a $d'$ with $a' {\longrightarrow^{aux}}^* d'$ and $c \longrightarrow' d'$. Now, the proof proceeds by induction on the length of $a' {\longrightarrow^{aux}}^* d'$:
+
+When the sequence is empty, that is, $a' = d'$, simply choose $d = b$. (Note that $\longrightarrow^{aux} \subset \longrightarrow'$.)
+
+Otherwise, let $a' \longrightarrow^{aux} a_{aux}$ be the first step of the sequence. By the outer induction hypothesis, we know that there exists a $d_{ind}$ with $b {\longrightarrow^{aux}}^* d_{ind}$ and $a_{aux} {\longrightarrow'}^* d_{ind}$. By the inner induction hypothesis, we know that there exists a $d_{ind2}$ with $d_{ind} {\longrightarrow^{aux}}^* d_{ind2}$ and $d' {\longrightarrow'}^* d_{ind2}$. Choose $d = d_{ind2}$.
 \end{proof}
 
-\begin{definition}[Translation `B']
+\end{lemma}
+
+\begin{lemma}[Many-step many-aux-confluence]
+
+For all terms $a,b,c$ it holds that:
+\[
+a {\longrightarrow'}^* b \land a {\longrightarrow^{aux}}^* c \implies \exists d . b {\longrightarrow^{aux}}^* d \land c {\longrightarrow'}^* d
+\]
+
+\end{lemma}
+
+To show that the $`` \Leftarrow ''$ direction of (2.2) holds, a translation for sequences $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ to sequences $s \longrightarrow^*_{prg} t$ is given (translation `B'). The correctness of the translation is verified, i.e., it is proven that each step of the sequences returned by the function is indeed a reduction step of the relevant reduction, and that the desired equality or equivalence between the end points of the original and the translated sequence holds. This correctness proofs are left for the appendix.
+
+\begin{definition}[Back-Translation]
 Translation `A' is given by a conversion function $uc$ from sequences to sequences. It is defined recursively as follows.
 \[
   uc((s_0, ..., s_n))=\begin{cases}
@@ -219,8 +215,8 @@ Translation `A' is given by a conversion function $uc$ from sequences to sequenc
 
 \end{definition}
 
-\begin{restatable}[Correctness of translation `B']{lemma}{correctb}
-Translation `B' is correct, that is, when
+\begin{restatable}[Correctness of the Back-Translation]{lemma}{correctb}
+The Back-Translation is correct, that is, when
 \[
 s = s_1 {\longrightarrow}_{\langle prg \rangle} ... {\longrightarrow}_{\langle prg \rangle} s_n \text{ with } \langle s_n \rangle^{aux^{-1}} = t
 \]
@@ -243,9 +239,9 @@ s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle
 for every $s, t$ with names declared in $prg$, holds.
 
 \begin{proof}
-``$\Rightarrow$'': Assume that there is a sequence of the form on the left-hand side. Then by translation `A', there also is a corresponding right-hand side sequence.
+``$\Rightarrow$'': This uses the many-step many-aux-confluence. ...
 
-``$\Leftarrow$'': Assume that there is a sequence of the form on the left-hand side. By translation `B', there also is a sequence $s \longrightarrow_{prg} t$, and by (2.1) the desired sequence $s {\longrightarrow'}_{\langle prg \rangle} t$ obtains.
+``$\Leftarrow$'': Assume that there is a sequence of the form on the left-hand side. By the Back-Translation, there also is a sequence $s \longrightarrow_{prg} t$, and by (2.1) the desired sequence $s {\longrightarrow'}_{\langle prg \rangle} t$ obtains.
 
 \end{proof}
 
