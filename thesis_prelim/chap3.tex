@@ -197,9 +197,15 @@ When $a \longrightarrow' b$ and there is no $a'$ with $a \longrightarrow^{aux} a
 
 \begin{proof}
 
-There is an evaluation context $\mathcal{E}'$, with underlying value judgement $\vdash'_v$, and terms $a^0, b^0$, such that $a = \mathcal{E}'[a^0]$, $b = \mathcal{E}'[b^0]$, and $a^0 \longrightarrow' b^0$. Now the proof proceeds by induction on the structure of $\mathcal{E}'$.
+There is an evaluation context $\mathcal{E}'$, with underlying value judgement $\vdash'_v$, and terms $a^0, b^0$, such that $a = \mathcal{E}'[a^0]$, $b = \mathcal{E}'[b^0]$, and $a^0 \longrightarrow' b^0$. To show that $a \longrightarrow b$, we show (a) that the immediate subterms of $a^0$ are values and (b) $\mathcal{E}'$ is an evaluation context with respect to the value judgement $\vdash_v$ for $\langle prg \rangle$.
 
-...
+ad (a): To show this, it suffices to show that no subterm of $a^0$ can reduce by an lhs of $\langle prg \rangle$. To see that this is the case, consider the equations of $\langle prg \rangle$. All their lhss except $q_\epsilon$ have a back-interpretation that appears as a lhs of $prg$, which means that terms which reduce by such a lhs cannot be values even under the modified value judgement. (Remember that this was defined as the value judgement for $prg$ applied to back-interpretations.) Since no $\longrightarrow^{aux}$-reduction is possible, the subterm cannot reduce by $q_\epsilon$, either.
+
+ad (b): The proof is by induction on the structure of $\mathcal{E}'$.
+
+The hole context $\mathcal{E}' = []$ doesn't depend upon the value judgement, thus it is also an evaluation context with respect to the value judgement $\vdash_v$ for $\langle prg \rangle$. The same goes for contexts of the form $\mathcal{E}'^0.des(\overline{t})$, where $\mathcal{E}'^0$ is another context with respect to $\vdash'_v$, and the $t_i$ are arbitrary terms.
+
+Next, consider contexts of the form $fun(\overline{v}, \mathcal{E}'^0, \overline{t})$, where $\mathcal{E}'^0$ is another context with respect to $\vdash'_v$, the $v_i$ are terms with $\vdash'_v v_i$, and the $t_i$ are arbitrary terms. For the $v_i$ it also holds that $\langle prg \rangle \vdash_v v_i$. The only case where this doesn't hold is when the $v_i$ is when it reduces by an lhs of $\langle prg \rangle$ which doesn't have a back-interpretation present as an lhs in $prg$. The only such lhs is $q_\epsilon$, and $v_i$ cannot reduce by $\epsilon$ since no $\longrightarrow^{aux}$-reduction is possible. The argument is analogous for the two remaining forms of $\mathcal{E}'$ (constructor calls and destructor calls on values).
 
 \end{proof}
 \end{lemma}
