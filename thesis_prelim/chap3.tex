@@ -162,14 +162,17 @@ for every $s, t$ with names declared in $prg$.
 
 First, we prove the $`` \Rightarrow "$ direction of (2.2) and some lemmas used in this proof. In the following lemmas, all reductions are meant with respect to program $\langle prg \rangle$. Define $\longrightarrow^{aux} = \{(a,b) : a \longrightarrow b \land \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\}$.
 
-\begin{lemma}[Commuting-diamond property]
+\begin{restatable}[Commuting-diamond property]{lemma}{cdpaux}
 
 For all terms $a,b,c$ it holds that:
 \[
 a {\longrightarrow'} b \land a \longrightarrow^{aux} c \implies \exists d . b \longrightarrow^{aux} d \land c \longrightarrow' d
 \]
 
-\end{lemma}
+\end{restatable}
+\begin{proof}
+Left for the appendix.
+\end{proof}
 
 \begin{corollary}
 
@@ -177,6 +180,12 @@ For all terms $a,b,c$ and $n \in \mathbb{N}$ it holds that:
 \[
 a {\longrightarrow'}^n b \land a {\longrightarrow^{aux}}^* c \implies \exists d . b {\longrightarrow^{aux}}^* d \land c {\longrightarrow'}^n d
 \]
+
+\begin{proof}
+
+By induction on $n$.
+
+\end{proof}
 
 \end{corollary}
 
@@ -186,6 +195,13 @@ For all terms $a,b$ it holds that:
 
 When $a \longrightarrow' b$ and there is no $a'$ with $a \longrightarrow^{aux} a'$, then $a \longrightarrow b$.
 
+\begin{proof}
+
+There is an evaluation context $\mathcal{E}'$, with underlying value judgement $\vdash'_v$, and terms $a^0, b^0$, such that $a = \mathcal{E}'[a^0]$, $b = \mathcal{E}'[b^0]$, and $a^0 \longrightarrow' b^0$. Now the proof proceeds by induction on the structure of $\mathcal{E}'$.
+
+...
+
+\end{proof}
 \end{lemma}
 
 \begin{lemma}[Left-to-right direction of (2.2)]
