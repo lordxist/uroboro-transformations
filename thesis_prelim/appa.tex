@@ -4,7 +4,9 @@
 \begin{proof}
 There is an evaluation context $\mathcal{E}'$, with underlying value judgement $\vdash'_v$, and terms $a^0, b^0$, such that $a = \mathcal{E}'[a^0]$, $b = \mathcal{E}'[b^0]$, and $a^0 \longrightarrow' b^0$. Now the proof proceeds by induction on the structure of $\mathcal{E}'$.
 
-...
+For the hole context $\mathcal{E}' = []$, it is $a^0 = a$ and $b^0 = b$. Choose $d = b$. since we know that $a$ reduces by $\epsilon$ because $a \longrightarrow^{aux} c$, it follows that $b = c$ and thus the desired property holds.
+
+Next, consider contexts of the form $\mathcal{E}' = fun(\overline{v}, \mathcal{E}'^0, \overline{t})$, where $\mathcal{E}'^0$ is an evaluation context with respect to $\vdash'_v$, the $v_i$ are terms with $\vdash'_v v_i$, and the $t_i$ are arbitrary terms. It can only be the case that $\langle prg \rangle \not\vdash_v v_i$ for one of the $v_i$ when this $v_i$ reduces by $\epsilon$. Let $v_k$ be the first $v_i$ (with the lowest index) for which this is the case, that is, it is $v_k = \mathcal{E}''[q_\epsilon[\sigma]] \longrightarrow^{aux} \mathcal{E}''[t_\epsilon[\sigma]] =: v'_k$. We know that $c$ is $a$ with $v_k$ replaced by $v'_k$, and that $v_k$ appears in $b$ at its original position (of $a$). Thus choose $d$ as $b$ with $v_k$ replaced by $v'_k$. The argument is analogous for the two remaining forms of $\mathcal{E}'$ (constructor calls and destructor calls on values).
 
 \end{proof}
 
