@@ -160,7 +160,7 @@ s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle
 \end{equation}
 for every $s, t$ with names declared in $prg$.
 
-First, some lemmas are proven which are used in the proof of the $`` \Rightarrow "$ direction of (2.2). In the following lemmas, all reductions are meant with respect to program $\langle prg \rangle$. Define $\longrightarrow^{aux} = \{(a,b) : a \longrightarrow b \land \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\}$.
+First, we prove the $`` \Rightarrow "$ direction of (2.2) and some lemmas used in this proof. In the following lemmas, all reductions are meant with respect to program $\langle prg \rangle$. Define $\longrightarrow^{aux} = \{(a,b) : a \longrightarrow b \land \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\}$.
 
 \begin{lemma}[Commuting-diamond property]
 
@@ -185,6 +185,25 @@ a {\longrightarrow'}^n b \land a {\longrightarrow^{aux}}^* c \implies \exists d 
 For all terms $a,b$ it holds that:
 
 When $a \longrightarrow' b$ and there is no $a'$ with $a \longrightarrow^{aux} a'$, then $a \longrightarrow b$.
+
+\end{lemma}
+
+\begin{lemma}[Left-to-right direction of (2.2)]
+\[
+s {\longrightarrow'}_{\langle prg \rangle}^* t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}
+\]
+
+\begin{proof}
+
+By induction on the length of $s {\longrightarrow'}_{\langle prg \rangle}^* t$.
+
+When the sequence is empty, that is $s = t$, then simply choose $\widetilde{t} = t$.
+
+Otherwise, first consider the first step of the sequence $s \longrightarrow' s'$ and a sequence $s {\longrightarrow^{aux}}^* s_{aux}$ with $s_{aux} \not\longrightarrow^{aux} s'_{aux}$ for all terms $s'_{aux}$.  By Corollary 2.3.1, we have a $d$ with $s' {\longrightarrow^{aux}}^* d$ and $s_{aux} \longrightarrow' d$, and by Lemma 2.3.2, it is $s_{aux} \longrightarrow d$, and consequently $s \longrightarrow d$.
+
+Now we show that $d \longrightarrow^* \widetilde{t}$ for a $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$. It is $s {\longrightarrow'}^n t$ for some $n \in \mathbb{N}$, and consequently $s' {\longrightarrow'}^{n-1} t$. Again by Corollary 2.3.1, we have a $d'$ with $t {\longrightarrow^{aux}}^* d'$ and $d {\longrightarrow'}^{n-1} d'$. By the induction hypothesis, we have the desired $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$ and $d \longrightarrow^* \widetilde{t}$.
+
+\end{proof}
 
 \end{lemma}
 
@@ -217,27 +236,26 @@ for the sequence $(s^{uc}_1, ..., s^{uc}_m) := uc((s_1, ..., s_n))$.
 Left for the appendix.
 \end{proof}
 
-Finally, the bisimulation statement can be proven.
+\begin{lemma}[Right-to-left direction of (2.2)]
+\[
+ s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \implies s {\longrightarrow'}_{\langle prg \rangle}^* t
+\]
+
+\begin{proof}
+``$\Rightarrow$'': 
+
+``$\Leftarrow$'': Assume that there is a sequence of the form on the left-hand side. By the Back-Translation, there also is a sequence $s \longrightarrow_{prg} t$, and by (2.1) the desired sequence $s {\longrightarrow'}_{\langle prg \rangle} t$ obtains.
+
+\end{proof}
+\end{lemma}
+
+Combining Lemma 2.3.3 and Lemma 2.3.5, statement (2.2) obtains.
 \begin{proposition}
 Statement (2.2), that is
 \[
 s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle prg \rangle} \widetilde{t},
 \]
 for every $s, t$ with names declared in $prg$, holds.
-
-\begin{proof}
-``$\Rightarrow$'': By induction on the length of $s {\longrightarrow'}_{\langle prg \rangle}^* t$.
-
-When the sequence is empty, that is $s = t$, then simply choose $\widetilde{t} = t$.
-
-Otherwise, first consider the first step of the sequence $s \longrightarrow' s'$ and a sequence $s {\longrightarrow^{aux}}^* s_{aux}$ with $s_{aux} \not\longrightarrow^{aux} s'_{aux}$ for all terms $s'_{aux}$.  By Corollary 2.3.1, we have a $d$ with $s' {\longrightarrow^{aux}}^* d$ and $s_{aux} \longrightarrow' d$, and by Lemma 2.3.2, it is $s_{aux} \longrightarrow d$, and consequently $s \longrightarrow d$.
-
-Now we show that $d \longrightarrow^* \widetilde{t}$ for a $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$. It is $s {\longrightarrow'}^n t$ for some $n \in \mathbb{N}$, and consequently $s' {\longrightarrow'}^{n-1} t$. Again by Corollary 2.3.1, we have a $d'$ with $t {\longrightarrow^{aux}}^* d'$ and $d {\longrightarrow'}^{n-1} d'$. By the induction hypothesis, we have the desired $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$ and $d \longrightarrow^* \widetilde{t}$.
-
-``$\Leftarrow$'': Assume that there is a sequence of the form on the left-hand side. By the Back-Translation, there also is a sequence $s \longrightarrow_{prg} t$, and by (2.1) the desired sequence $s {\longrightarrow'}_{\langle prg \rangle} t$ obtains.
-
-\end{proof}
-
 \end{proposition}
 
 \section{Absence of overlaps}
