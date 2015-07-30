@@ -39,21 +39,21 @@ By induction on the derivation of $a \longrightarrow' b$.
 \begin{enumerate}
 \item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$; it is $r' = r$ because $a$ matches both $q_r$ and $q_{r'}$ and there are no overlapping lhss. It follows that $b = c$, thus we can simply choose $d = b = c$.
 
-\item \textbf{``Cong'' case}: It is $a = \mathcal{E}[a^0], c = \mathcal{E}[c^0]$ for $a^0, c^0$ with $a^0 \longrightarrow^{aux} c^0$ and $a^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for an equation $r'$. Thus we have the desired property by Lemma A.0.1.
+\item \textbf{``Cong'' case}: It is $a = \mathcal{E}[a^0], c = \mathcal{E}[c^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash_v}$ and terms $a^0, c^0$ with $a^0 \longrightarrow^{aux} c^0$ and $a^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for an equation $r'$. Thus we have the desired property by Lemma A.0.1.
 \end{enumerate}
 
-\item \textbf{``Cong'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for $a^0, b^0$ with $a^0 \longrightarrow' b^0$ and $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$.
+\item \textbf{``Cong'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and terms $a^0, b^0$ with $a^0 \longrightarrow' b^0$ and $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$.
 
 \begin{enumerate}
 \item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$. Thus we have the desired property by Lemma A.0.2.
 
-\item \textbf{``Cong'' case}: It is $a = \mathcal{E}'[a'^0], c = \mathcal{E}'[c^0]$ for $a'^0, c^0$ with $a'^0 \longrightarrow^{aux} c^0$ and $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}$ for some equation $r'$. We distinguish three cases:
+\item \textbf{``Cong'' case}: It is $a = \mathcal{E}'[a'^0], c = \mathcal{E}'[c^0]$ for an $\mathcal{E}' \in \textrm{EC}_{\vdash_v}$ and terms $a'^0, c^0$ with $a'^0 \longrightarrow^{aux} c^0$ and $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for some equation $r'$. We distinguish three cases:
 \begin{itemize}
-\item $a'^0$ is a subterm of $a^0$. By Lemma A.0.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow^{aux} d^0$ and $b^0 \longrightarrow' d^0$. Choose $d = \mathcal{E}[d^0]$.
+\item $a'^0$ is a subterm of $a^0$. By Lemma A.0.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow' d^0$ and $b^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}[d^0]$. The property holds since (a) $b = \mathcal{E}[b^0] \longrightarrow^{aux} \mathcal{E}[d^0] = d$ and (b) $c = \mathcal{E}'[c^0] = \mathcal{E}[a^0[a'^0 \mapsto c^0]] \longrightarrow' \mathcal{E}[d^0] = d$. The reduction (a) is possible because $\mathcal{E} \in \textrm{EC}_{\vdash_v}$. This follows from Lemma ??? because the hole of $\mathcal{E}$ subsumes that of $\mathcal{E}'  \in \textrm{EC}_{\vdash_v}$ since $\mathcal{E}'[a'^0] = \mathcal{E}[a^0]$ and $a'^0$ is a subterm of $a^0$.
 
-\item $a^0$ is a subterm of $a'^0$. By Lemma A.0.2, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow' d^0$ and $c^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}'[d^0]$.
+\item $a^0$ is a subterm of $a'^0$. By Lemma A.0.2, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow' d^0$ and $c^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}'[d^0]$. That the property holds can now be shown analogously to the previous case.
 
-\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$.
+\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$. The property holds because $b = \mathcal{E}[b^0] = \mathcal{E}'[a^0 \mapsto b^0][a'^0] \longrightarrow^{aux} \mathcal{E}'[a^0 \mapsto b^0][c^0] = d$ and $c = \mathcal{E}'[c^0] = \mathcal{E}[a'^0 \mapsto c^0][a^0] \longrightarrow' \mathcal{E}[a'^0 \mapsto c^0][b^0] = d$. These reductions are possible because, by Lemma ???, $\mathcal{E}'[a^0 \mapsto b^0] \in \textrm{EC}_{\vdash_v}$ since $\mathcal{E}' \in \textrm{EC}_{\vdash_v}$ and $a^0 \longrightarrow' b^0$, and, by Lemma ???, $\mathcal{E}[a'^0 \mapsto c^0] \in \textrm{EC}_{\vdash'_v}$ since $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and $a'^0 \longrightarrow^{aux} c^0$.
 \end{itemize}
 
 \end{enumerate}
