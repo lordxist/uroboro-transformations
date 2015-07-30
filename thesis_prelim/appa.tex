@@ -20,9 +20,9 @@ By induction on the derivation of $a \longrightarrow' b$.
 
 \item \textbf{``Cong'' case}: It is $a = \mathcal{E}'[a'^0], c = \mathcal{E}'[c^0]$ for $a'^0, c^0$ with $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}$ for some equation $r'$. Thus we know that $a'^0$ is a function or destructor call. We distinguish three cases:
 \begin{itemize}
-\item $a'^0$ is a subterm of $a^0$. By Lemma ???, because $a^0 = q_r[\sigma]$, it follows that $a'^0$ is a subterm of a right-hand side of $\sigma$. Let $\sigma_{mod}$ be $\sigma$ with this subterm of this right-hand side replaced by $c^0$, and choose $d = t_r[\sigma_{mod}]$.
+\item $a'^0$ is a subterm of $a^0$. By Lemma ???, because $a^0 = q_r[\sigma]$, it follows that $a'^0$ is a subterm of a right-hand side of $\sigma$. Let $\sigma_{mod}$ be $\sigma$ with this subterm of this right-hand side replaced by $c^0$, and choose $d = \mathcal{E}[t_r[\sigma_{mod}]]$.
 
-\item $a^0$ is a subterm of $a'^0$. By Lemma ???, because $a'^0 = q_{r'}[\sigma']$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma'$. Let $\sigma'_{mod}$ be $\sigma'$ with this subterm of this right-hand side replaced by $b^0$, and choose $d = t_{r'}[\sigma'_{mod}]$.
+\item $a^0$ is a subterm of $a'^0$. By Lemma ???, because $a'^0 = q_{r'}[\sigma']$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma'$. Let $\sigma'_{mod}$ be $\sigma'$ with this subterm of this right-hand side replaced by $b^0$, and choose $d = \mathcal{E}'[t_{r'}[\sigma'_{mod}]]$.
 
 \item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$.
 \end{itemize}
