@@ -166,7 +166,7 @@ First, we prove the $`` \Rightarrow "$ direction of (2.2) and some lemmas used i
 
 For all terms $a,b,c$ it holds that:
 \[
-a {\longrightarrow'} b \land a \longrightarrow^{aux} c \implies \exists d . b \longrightarrow^{aux} d \land c \longrightarrow' d
+a {\longrightarrow'} b \land a \longrightarrow^{aux} c \implies \exists d . b {\longrightarrow^{aux}}^= d \land c {\longrightarrow'}^= d
 \]
 
 \end{restatable}
@@ -178,7 +178,7 @@ Left for the appendix.
 
 For all terms $a,b,c$ and $n \in \mathbb{N}$ it holds that:
 \[
-a {\longrightarrow'}^n b \land a {\longrightarrow^{aux}}^* c \implies \exists d . b {\longrightarrow^{aux}}^* d \land c {\longrightarrow'}^n d
+a {\longrightarrow'}^n b \land a {\longrightarrow^{aux}}^* c \implies \exists d . b {\longrightarrow^{aux}}^* d \land c {\longrightarrow'}^{\leq n} d
 \]
 
 \begin{proof}
@@ -223,7 +223,7 @@ When the sequence is empty, that is $s = t$, then simply choose $\widetilde{t} =
 
 Otherwise, first consider the first step of the sequence $s \longrightarrow' s'$ and a sequence $s {\longrightarrow^{aux}}^* s_{aux}$ with $s_{aux} \not\longrightarrow^{aux} s'_{aux}$ for all terms $s'_{aux}$.  By Corollary 2.3.1, we have a $d$ with $s' {\longrightarrow^{aux}}^* d$ and $s_{aux} \longrightarrow' d$, and by Lemma 2.3.2, it is $s_{aux} \longrightarrow d$, and consequently $s \longrightarrow^* d$.
 
-Now we show that $d \longrightarrow^* \widetilde{t}$ for a $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$. It is $s {\longrightarrow'}^n t$ for some $n \in \mathbb{N}$, and consequently $s' {\longrightarrow'}^{n-1} t$. Again by Corollary 2.3.1, we have a $d'$ with $t {\longrightarrow^{aux}}^* d'$ and $d {\longrightarrow'}^{n-1} d'$. By the induction hypothesis, we have the desired $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$ and $d \longrightarrow^* \widetilde{t}$.
+Now we show that $d \longrightarrow^* \widetilde{t}$ for a $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$. It is $s {\longrightarrow'}^n t$ for some $n \in \mathbb{N}$, and consequently $s' {\longrightarrow'}^{n-1} t$. Again by Corollary 2.3.1, we have a $d'$ with $t {\longrightarrow^{aux}}^* d'$ and $d {\longrightarrow'}^{\leq(n-1)} d'$. By the induction hypothesis, we have the desired $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$ and $d \longrightarrow^* \widetilde{t}$.
 
 \end{proof}
 
