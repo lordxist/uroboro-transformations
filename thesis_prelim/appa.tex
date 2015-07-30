@@ -2,11 +2,33 @@
 
 \cdpaux*
 \begin{proof}
-There is an evaluation context $\mathcal{E}'$, with underlying value judgement $\vdash'_v$, and terms $a^0, b^0$, such that $a = \mathcal{E}'[a^0]$, $b = \mathcal{E}'[b^0]$, and $a^0 \longrightarrow' b^0$. Now the proof proceeds by induction on the structure of $\mathcal{E}'$.
+By induction on the derivation of $a \longrightarrow' b$.
 
-For the hole context $\mathcal{E}' = []$, it is $a^0 = a$ and $b^0 = b$. Choose $d = b$. since we know that $a$ reduces by $\epsilon$ because $a \longrightarrow^{aux} c$, it follows that $b = c$ and thus the desired property holds.
+\begin{enumerate}
+\item \textbf{``Subst'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = q_r[\sigma], b = t_r[\sigma]$ for some equation $r$.
 
-Next, consider contexts of the form $\mathcal{E}' = fun(\overline{v}, \mathcal{E}'^0, \overline{t})$, where $\mathcal{E}'^0$ is an evaluation context with respect to $\vdash'_v$, the $v_i$ are terms with $\vdash'_v v_i$, and the $t_i$ are arbitrary terms. It can only be the case that $\langle prg \rangle \not\vdash_v v_i$ for one of the $v_i$ when this $v_i$ reduces by $\epsilon$. Let $v_k$ be the first $v_i$ (with the lowest index) for which this is the case, that is, it is $v_k = \mathcal{E}''[q_\epsilon[\sigma]] \longrightarrow^{aux} \mathcal{E}''[t_\epsilon[\sigma]] =: v'_k$. We know that $c$ is $a$ with $v_k$ replaced by $v'_k$, and that $v_k$ appears in $b$ at its original position (of $a$). Thus choose $d$ as $b$ with $v_k$ replaced by $v'_k$. The argument is analogous for the two remaining forms of $\mathcal{E}'$ (constructor calls and destructor calls on values).
+\begin{enumerate}
+\item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$; it is $r' = r$ because $a$ matches both $q_r$ and $q_{r'}$ and there are no overlapping lhss. It follows that $b = c$, thus we can simply choose $d = b = c$.
+
+\item \textbf{``Cong'' case}: It is $a = \mathcal{E}[a^0], c = \mathcal{E}[c^0]$ for $a^0, c^0$ with $a^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for an equation $r'$. Thus we know that $a^0$ is a function or destructor call. By Lemma ???, because $a = q_r[\sigma]$ and $a^0$ is a subterm of $a$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma$. Let $\sigma_{mod}$ be $\sigma$ with this subterm of this right-hand side replaced by $c^0$, and choose $d = t_r[\sigma_{mod}]$.
+\end{enumerate}
+
+\item \textbf{``Cong'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for $a^0, b^0$ with $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$. Thus we know that $a^0$ is a function or destructor call.
+
+\begin{enumerate}
+\item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$. By Lemma ???, because $a = q_{r'}[\sigma]$ and $a^0$ is a subterm of $a$ and a function or destructor call, we have that $a^0$ is a subterm of a right-hand side of $\sigma'$. Let $\sigma'_{mod}$ be $\sigma'$ with this subterm of this right-hand side replaced by $b^0$, and choose $d = t_{r'}[\sigma'_{mod}]$.
+
+\item \textbf{``Cong'' case}: It is $a = \mathcal{E}'[a'^0], c = \mathcal{E}'[c^0]$ for $a'^0, c^0$ with $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}$ for some equation $r'$. Thus we know that $a'^0$ is a function or destructor call. We distinguish three cases:
+\begin{itemize}
+\item $a'^0$ is a subterm of $a^0$. By Lemma ???, because $a^0 = q_r[\sigma]$, it follows that $a'^0$ is a subterm of a right-hand side of $\sigma$. Let $\sigma_{mod}$ be $\sigma$ with this subterm of this right-hand side replaced by $c^0$, and choose $d = t_r[\sigma_{mod}]$.
+
+\item $a^0$ is a subterm of $a'^0$. By Lemma ???, because $a'^0 = q_{r'}[\sigma']$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma'$. Let $\sigma'_{mod}$ be $\sigma'$ with this subterm of this right-hand side replaced by $b^0$, and choose $d = t_{r'}[\sigma'_{mod}]$.
+
+\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$.
+\end{itemize}
+
+\end{enumerate}
+\end{enumerate}
 
 \end{proof}
 
