@@ -1,5 +1,34 @@
 \chapter{Proofs}
 
+\begin{lemma}
+Let $a$ be a term and $a^0$ be a subterm of $a$. When
+\[
+a \longrightarrow' b \land a^0 \longrightarrow^{aux} b^0
+\]
+and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
+\[
+a[a^0 \mapsto b^0] \longrightarrow^{aux} d \land b \longrightarrow' d.
+\]
+
+\begin{proof}
+Since $a^0 = q_{r'}[\sigma']$ for some equation $r'$, we know that $a^0$ is a function or destructor call. By Lemma ???, because $a = q_r[\sigma], b = t_r[\sigma]$ for an equation $r$ and $a^0$ is a subterm of $a$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma$. Let $\sigma_{mod}$ be $\sigma$ with this subterm of this right-hand side replaced by $b^0$, and choose $d = t_r[\sigma_{mod}]$.
+\end{proof}
+\end{lemma}
+
+\begin{lemma}
+Let $a$ be a term and $a^0$ be a subterm of $a$. When
+\[
+a \longrightarrow^{aux} b \land a^0 \longrightarrow' b^0
+\]
+and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
+\[
+a[a^0 \mapsto b^0] \longrightarrow' d \land b \longrightarrow^{aux} d.
+\]
+
+\begin{proof}
+\end{proof}
+\end{lemma}
+
 \cdpaux*
 \begin{proof}
 By induction on the derivation of $a \longrightarrow' b$.
@@ -10,19 +39,19 @@ By induction on the derivation of $a \longrightarrow' b$.
 \begin{enumerate}
 \item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$; it is $r' = r$ because $a$ matches both $q_r$ and $q_{r'}$ and there are no overlapping lhss. It follows that $b = c$, thus we can simply choose $d = b = c$.
 
-\item \textbf{``Cong'' case}: It is $a = \mathcal{E}[a^0], c = \mathcal{E}[c^0]$ for $a^0, c^0$ with $a^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for an equation $r'$. Thus we know that $a^0$ is a function or destructor call. By Lemma ???, because $a = q_r[\sigma]$ and $a^0$ is a subterm of $a$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma$. Let $\sigma_{mod}$ be $\sigma$ with this subterm of this right-hand side replaced by $c^0$, and choose $d = t_r[\sigma_{mod}]$.
+\item \textbf{``Cong'' case}: It is $a = \mathcal{E}[a^0], c = \mathcal{E}[c^0]$ for $a^0, c^0$ with $a^0 \longrightarrow^{aux} c^0$ and $a^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for an equation $r'$. Thus we have the desired property by Lemma A.0.1.
 \end{enumerate}
 
-\item \textbf{``Cong'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for $a^0, b^0$ with $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$. Thus we know that $a^0$ is a function or destructor call.
+\item \textbf{``Cong'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for $a^0, b^0$ with $a^0 \longrightarrow' b^0$ and $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$.
 
 \begin{enumerate}
-\item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$. By Lemma ???, because $a = q_{r'}[\sigma]$ and $a^0$ is a subterm of $a$ and a function or destructor call, we have that $a^0$ is a subterm of a right-hand side of $\sigma'$. Let $\sigma'_{mod}$ be $\sigma'$ with this subterm of this right-hand side replaced by $b^0$, and choose $d = t_{r'}[\sigma'_{mod}]$.
+\item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$. Thus we have the desired property by Lemma A.0.2.
 
-\item \textbf{``Cong'' case}: It is $a = \mathcal{E}'[a'^0], c = \mathcal{E}'[c^0]$ for $a'^0, c^0$ with $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}$ for some equation $r'$. Thus we know that $a'^0$ is a function or destructor call. We distinguish three cases:
+\item \textbf{``Cong'' case}: It is $a = \mathcal{E}'[a'^0], c = \mathcal{E}'[c^0]$ for $a'^0, c^0$ with $a'^0 \longrightarrow^{aux} c^0$ and $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}$ for some equation $r'$. We distinguish three cases:
 \begin{itemize}
-\item $a'^0$ is a subterm of $a^0$. By Lemma ???, because $a^0 = q_r[\sigma]$, it follows that $a'^0$ is a subterm of a right-hand side of $\sigma$. Let $\sigma_{mod}$ be $\sigma$ with this subterm of this right-hand side replaced by $c^0$, and choose $d = \mathcal{E}[t_r[\sigma_{mod}]]$.
+\item $a'^0$ is a subterm of $a^0$. By Lemma A.0.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow^{aux} d^0$ and $b^0 \longrightarrow' d^0$. Choose $d = \mathcal{E}[d^0]$.
 
-\item $a^0$ is a subterm of $a'^0$. By Lemma ???, because $a'^0 = q_{r'}[\sigma']$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma'$. Let $\sigma'_{mod}$ be $\sigma'$ with this subterm of this right-hand side replaced by $b^0$, and choose $d = \mathcal{E}'[t_{r'}[\sigma'_{mod}]]$.
+\item $a^0$ is a subterm of $a'^0$. By Lemma A.0.2, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow' d^0$ and $c^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}'[d^0]$.
 
 \item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$.
 \end{itemize}
