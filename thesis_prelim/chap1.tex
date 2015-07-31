@@ -1,0 +1,40 @@
+\chapter{Introduction and preliminaries}
+
+\section{De- and refunctionalization}
+
+\section{Copatterns}
+
+\section{Uroboro}
+
+\section{Summary of content}
+
+\section{Preliminaries}
+
+\subsection{Generic evaluation contexts}
+
+The reduction relation of the next chapter will be defined relative to a \textit{generic evaluation context}. This concept is introduced in this section.
+
+\begin{definition}[Generic evaluation context]
+A generic evaluation context $\mathcal{GE}$ is a term with
+\begin{itemize}
+\item one subterm replaced by a hole $[]$,
+\item several subterms replaced by placeholders for values from a countably infinite set $P_V$, and
+\item several other subterms replaced by placeholders for terms from a countably infinite set $P_T$.
+\end{itemize}
+\end{definition}
+
+Using this definition, the generic form of the evaluation contexts can be specified without yet knowing the set of terms which are to be considered values. An \textit{instance} of a generic evaluation context $\mathcal{GE}$ \textit{induced by a set of values $\textrm{Val}$} is $\mathcal{GE}$ with all of its value placeholders replaced by some elements of $\textrm{Val}$ and all of its term placeholders replaced by some terms. With this, we define the following.
+
+\begin{definition}
+An \textit{instance} $\textrm{EC}_{\textrm{Val}}$ \textit{of a set} of generic evaluation contexts $\textrm{EC}$ \textit{induced by $\textrm{Val}$} is the set of all instances, induced by $\textrm{Val}$, of all elements of $\textrm{EC}$.
+\end{definition}
+
+Regarding generic evaluation contexts, we show a number of lemmas used further on in this work.
+
+\begin{lemma}
+When $\mathcal{E} \in \textrm{EC}_{\textrm{Val}}$ and it holds that
+\[
+a \in \textrm{Val} \implies b \in \textrm{Val},
+\]
+then $\mathcal{E}[a \mapsto b] \in \textrm{EC}_{\textrm{Val}}$.
+\end{lemma}
