@@ -38,3 +38,7 @@ a \in \textrm{Val} \implies b \in \textrm{Val},
 \]
 then $\mathcal{E}[a \mapsto b] \in \textrm{EC}_{\textrm{Val}}$.
 \end{lemma}
+
+\begin{lemma}
+Let $\mathcal{E}' \in \textrm{EC}_{\textrm{Val}}$ and $\mathcal{E}$ be an arbitrary evaluation context (i.e., an arbitrary instance of an arbitrary generic evaluation context). When there are terms $a, a'$ with $\mathcal{E}'[a'] = \mathcal{E}[a]$ and $a'$ is a subterm of $a$, we say that the hole of $\mathcal{E}$ subsumes that of $\mathcal{E}'$. When this is the case, it is $\mathcal{E} \in \textrm{EC}_{\textrm{Val}}$.
+\end{lemma}
