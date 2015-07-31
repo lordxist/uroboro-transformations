@@ -11,7 +11,19 @@ a[a^0 \mapsto b^0] \longrightarrow' d \land b \longrightarrow^{aux} d.
 \]
 
 \begin{proof}
-Since $a^0 = q_{r'}[\sigma']$ for some equation $r'$, we know that $a^0$ is a function or destructor call. By Lemma ???, because $a = q_r[\sigma], b = t_r[\sigma]$ for an equation $r$ and $a^0$ is a subterm of $a$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma$. Let $\sigma_{mod}$ be $\sigma$ with this subterm of this right-hand side replaced by $b^0$, and choose $d = t_r[\sigma_{mod}]$.
+Since $a^0 = q_{r'}[\sigma']$ for some equation $r'$, we know that $a^0$ is a function or destructor call. By Lemma ???, because $a = q_r[\sigma], b = t_r[\sigma]$ for an equation $r$ and $a^0$ is a subterm of $a$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma$. Put in another way, there is a variable $x$ and a term $t(a^0)$ with subterm $a^0$ such that $\{x \mapsto t\} \subseteq \sigma$. Define a $\sigma_{mod}$ with $dom(\sigma_{mod}) = \sigma$ as $\sigma_{mod}(x) = t(b^0)$ and $\sigma_{mod}(y) = \sigma(y)$ for $y \neq x$, and choose $d = t_r[\sigma_{mod}]$. The two desired reductions can be derived as follows.
+\begin{enumerate}
+\item By the ``Subst'' rule for $r$:
+\[
+a[a^0 \mapsto b^0] = q_r[\sigma_{mod}] \longrightarrow' t_r[\sigma_{mod}] = d
+\]
+This is possible because all subterms of $a$ are values under judgement $\vdash'_v$, and its subterm $a^0$ is replaced by $b^0$ for which $\langle a^0 \rangle^{aux^{-1}} = \langle b^0 \rangle^{aux^{-1}}$ holds, thus it is $\vdash'_v b^0$, as well.
+
+\item
+\[
+b = t_r[\sigma] \longrightarrow^{aux} t_r[\sigma][t(b^0)]_{p^x_1} \longrightarrow^{aux} ... \longrightarrow^{aux} t_r[\sigma][t(b^0)]_{p^x_n} = t_r[\sigma_{mod}] = d
+\]
+\end{enumerate}
 \end{proof}
 \end{lemma}
 
@@ -42,21 +54,15 @@ By induction on the derivation of $a \longrightarrow' b$.
 \item \textbf{``Cong'' case}: It is $a = \mathcal{E}[a^0], c = \mathcal{E}[c^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash_v}$ and terms $a^0, c^0$ with $a^0 \longrightarrow^{aux} c^0$ and $a^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for an equation $r'$. Thus we have the desired property by Lemma A.0.1.
 \end{enumerate}
 
-\item \textbf{``Cong'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and terms $a^0, b^0$ with $a^0 \longrightarrow' b^0$ and $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$.
-
-\begin{enumerate}
-\item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$. Thus we have the desired property by Lemma A.0.2.
-
-\item \textbf{``Cong'' case}: It is $a = \mathcal{E}'[a'^0], c = \mathcal{E}'[c^0]$ for an $\mathcal{E}' \in \textrm{EC}_{\vdash_v}$ and terms $a'^0, c^0$ with $a'^0 \longrightarrow^{aux} c^0$ and $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for some equation $r'$. We distinguish three cases:
+\item \textbf{``Cong'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. It is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and terms $a^0, b^0$ with $a^0 \longrightarrow' b^0$ and $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$. Further, $a(a'^0)$ has a subterm $a'^0$ such that $c = a(c^0)$ for some term $c^0$ with $a'^0 \longrightarrow^{aux} c^0$ and $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for some equation $r'$. We distinguish three cases:
 \begin{itemize}
-\item $a'^0$ is a subterm of $a^0$. By Lemma A.0.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow' d^0$ and $b^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}[d^0]$. The property holds since (a) $b = \mathcal{E}[b^0] \longrightarrow^{aux} \mathcal{E}[d^0] = d$ and (b) $c = \mathcal{E}'[c^0] = \mathcal{E}[a^0[a'^0 \mapsto c^0]] \longrightarrow' \mathcal{E}[d^0] = d$. The reduction (a) is possible because $\mathcal{E} \in \textrm{EC}_{\vdash_v}$. This follows from Lemma 1.5.2 because the hole of $\mathcal{E}$ subsumes that of $\mathcal{E}'  \in \textrm{EC}_{\vdash_v}$ since $\mathcal{E}'[a'^0] = \mathcal{E}[a^0]$ and $a'^0$ is a subterm of $a^0$.
+\item $a'^0$ is a subterm of $a^0$. By Lemma A.0.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow' d^0$ and $b^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}[d^0]$. The property holds since (a) $b = \mathcal{E}[b^0] \longrightarrow^{aux} \mathcal{E}[d^0] = d$ and (b) $c = \mathcal{E}'[c^0] = \mathcal{E}[a^0[a'^0 \mapsto c^0]] \longrightarrow' \mathcal{E}[d^0] = d$.
 
 \item $a^0$ is a subterm of $a'^0$. By Lemma A.0.2, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow' d^0$ and $c^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}'[d^0]$. That the property holds can now be shown analogously to the previous case.
 
-\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$. The property holds because $b = \mathcal{E}[b^0] = \mathcal{E}'[a^0 \mapsto b^0][a'^0] \longrightarrow^{aux} \mathcal{E}'[a^0 \mapsto b^0][c^0] = d$ and $c = \mathcal{E}'[c^0] = \mathcal{E}[a'^0 \mapsto c^0][a^0] \longrightarrow' \mathcal{E}[a'^0 \mapsto c^0][b^0] = d$. These reductions are possible because, by Lemma 1.5.1, $\mathcal{E}'[a^0 \mapsto b^0] \in \textrm{EC}_{\vdash_v}$ since $\mathcal{E}' \in \textrm{EC}_{\vdash_v}$ and $a^0$ is a redex and thus $\not\vdash_v a^0$, and, by Lemma 1.5.1, $\mathcal{E}[a'^0 \mapsto c^0] \in \textrm{EC}_{\vdash'_v}$ since $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and $\langle a'^0 \rangle^{aux^{-1}} = \langle c^0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a'^0$ iff $\vdash'_v c^0$.
+\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$. The property holds because $b = \mathcal{E}[b^0] = \mathcal{E}'[a^0 \mapsto b^0][a'^0] \longrightarrow^{aux} \mathcal{E}'[a^0 \mapsto b^0][c^0] = d$ and $c = \mathcal{E}'[c^0] = \mathcal{E}[a'^0 \mapsto c^0][a^0] \longrightarrow' \mathcal{E}[a'^0 \mapsto c^0][b^0] = d$. This second reduction is possible because, by Lemma 1.5.1, $\mathcal{E}[a'^0 \mapsto c^0] \in \textrm{EC}_{\vdash'_v}$ since $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and $\langle a'^0 \rangle^{aux^{-1}} = \langle c^0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a'^0$ iff $\vdash'_v c^0$.
 \end{itemize}
 
-\end{enumerate}
 \end{enumerate}
 
 \end{proof}

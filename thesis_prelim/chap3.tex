@@ -160,7 +160,7 @@ s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle
 \end{equation}
 for every $s, t$ with names declared in $prg$.
 
-First, we prove the $`` \Rightarrow "$ direction of (2.2) and some lemmas used in this proof. In the following lemmas, all reductions are meant with respect to program $\langle prg \rangle$. Define $\longrightarrow^{aux} = \{(a,b) : a \longrightarrow b \land \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\}$.
+First, we prove the $`` \Rightarrow "$ direction of (2.2) and some lemmas used in this proof. In the following lemmas, all reductions are meant with respect to program $\langle prg \rangle$. Define $\longrightarrow^{aux} = \{(a,b) : a \longrightarrow b \land \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\}$, where $\longrightarrow$ has a strategy which is allowed to choose any redex.
 
 \begin{restatable}[Commuting-diamond property]{lemma}{cdpaux}
 
