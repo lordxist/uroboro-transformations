@@ -32,12 +32,27 @@ Let $a$ be a term and $a^0$ be a subterm of $a$. When
 \[
 a \longrightarrow^{aux} b \land a^0 \longrightarrow' b^0
 \]
-and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
+and $a[a^0 \mapsto []] \in EC[\vdash'_v]$ and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
 \[
 a[a^0 \mapsto b^0] \longrightarrow^{aux} d \land b \longrightarrow' d.
 \]
 
 \begin{proof}
+Since $a^0 = q_{r'}[\sigma']$ for some equation $r'$, we know that $a^0$ is a function or destructor call. By Lemma ???, because $a = q_r[\sigma], b = t_r[\sigma]$ for an equation $r$ and $a^0$ is a subterm of $a$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma$. Put in another way, there is a variable $x$ and a term $t(a^0)$ with subterm $a^0$ such that $\{x \mapsto t\} \subseteq \sigma$. Define a $\sigma_{mod}$ with $dom(\sigma_{mod}) = \sigma$ as $\sigma_{mod}(x) = t(b^0)$ and $\sigma_{mod}(y) = \sigma(y)$ for $y \neq x$, and choose $d = t_r[\sigma_{mod}]$. The two desired reductions can be derived as follows.
+\begin{enumerate}
+\item Because $a \longrightarrow^{aux} b$, it must be $r = \epsilon$, as there is no other equation with unequal sides and its left-hand side interpreted the same as the right-hand side. Thus we have:
+\[
+a[a^0 \mapsto b^0] = q_\epsilon[\sigma_{mod}] \longrightarrow^{aux} t_\epsilon[\sigma_{mod}] = d
+\]
+
+\item
+We know that $x$ only appears once in $t_\epsilon$, at some position $p^x$, thus it is
+\[
+b = t_\epsilon[\sigma] = \mathcal{E}'[a^0] \longrightarrow' \mathcal{E}'[b^0] = t_\epsilon[\sigma_{mod}] = d,
+\]
+with $\mathcal{E}' = b[a^0 \mapsto []]_{p^x}$. It is $\mathcal{E}' \in EC[\vdash'_v]$ because $a[a^0 \mapsto []] \in EC[\vdash'_v]$ and $\epsilon$ doesn't introduce any additional redexes.
+
+\end{enumerate}
 \end{proof}
 \end{lemma}
 
@@ -58,7 +73,7 @@ We make use of the fact that a reduction that can be derived by multiple applica
 \begin{itemize}
 \item $a'^0$ is a subterm of $a^0$. By Lemma A.0.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow' d^0$ and $b^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}[d^0]$. The property holds since (a) $b = \mathcal{E}[b^0] \longrightarrow^{aux} \mathcal{E}[d^0] = d$ and (b) $c = \mathcal{E}'[c^0] = \mathcal{E}[a^0[a'^0 \mapsto c^0]] \longrightarrow' \mathcal{E}[d^0] = d$.
 
-\item $a^0$ is a subterm of $a'^0$. By Lemma A.0.2, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow' d^0$ and $c^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}'[d^0]$. That the property holds can now be shown analogously to the previous case.
+\item $a^0$ is a subterm of $a'^0$. Because $a = \mathcal{E}[a^0]$, $a^0$ is a subterm of $a'^0$, and $\mathcal{E} \in \textrm{EC}[\vdash'_v]$, it is $a'^0[a^0 \mapsto []] \in \textrm{EC}[\vdash'_v]$. By Lemma A.0.2, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow^{aux} d^0$ and $c^0 \longrightarrow' d^0$. Choose $d = \mathcal{E}'[d^0]$. That the property holds can now be shown analogously to the previous case.
 
 \item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$. The property holds because $b = \mathcal{E}[b^0] = \mathcal{E}'[a^0 \mapsto b^0][a'^0] \longrightarrow^{aux} \mathcal{E}'[a^0 \mapsto b^0][c^0] = d$ and $c = \mathcal{E}'[c^0] = \mathcal{E}[a'^0 \mapsto c^0][a^0] \longrightarrow' \mathcal{E}[a'^0 \mapsto c^0][b^0] = d$. This second reduction is possible because, by Lemma 1.5.1, $\mathcal{E}[a'^0 \mapsto c^0] \in \textrm{EC}_{\vdash'_v}$ since $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and $\langle a'^0 \rangle^{aux^{-1}} = \langle c^0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a'^0$ iff $\vdash'_v c^0$.
 \end{itemize}
