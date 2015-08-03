@@ -191,23 +191,61 @@ By induction on $n$.
 
 \begin{lemma}
 
-For all terms $a,b$ it holds that:
-
-When $a \longrightarrow' b$ and there is no $a'$ with $a \longrightarrow^{aux} a'$, then $a \longrightarrow b$.
+For a term $t$ with $\vdash'_v t$ and $\not\vdash_v t$, there is a term $t'$ and reductions
+\[
+t \longrightarrow t'
+\]
+and
+\[
+t \longrightarrow^{aux} t'.
+\]
 
 \begin{proof}
 
-There is an evaluation context $\mathcal{E}'$, with underlying value judgement $\vdash'_v$, and terms $a^0, b^0$, such that $a = \mathcal{E}'[a^0]$, $b = \mathcal{E}'[b^0]$, and $a^0 \longrightarrow' b^0$. To show that $a \longrightarrow b$, we show (a) that the immediate subterms of $a^0$ are values and (b) $\mathcal{E}'$ is an evaluation context with respect to the value judgement $\vdash_v$ for $\langle prg \rangle$.
+By induction on the structure of $t$. We distinguish two cases.
+\begin{enumerate}
+\item All immediate subterms of $t$ are values under judgement $\vdash_v$. Then, because $\not\vdash_v t$ and $q_\epsilon$ is the only lhs in $\langle prg \rangle$ which doesn't have a lhs $q$ of $prg$ with $\langle q_\epsilon \rangle^{aux^{-1}} = q$, $t$ itself has to match $q_\epsilon$. Consequently, for some $\sigma$, we have the desired reduction
+\[
+t = q_\epsilon[\sigma]] \longrightarrow t_\epsilon[\sigma].
+\]
 
-ad (a): To show this, it suffices to show that no subterm of $a^0$ can reduce by an lhs of $\langle prg \rangle$. To see that this is the case, consider the equations of $\langle prg \rangle$. All their lhss except $q_\epsilon$ have a back-interpretation that appears as a lhs of $prg$, which means that terms which reduce by such a lhs cannot be values even under the modified value judgement. (Remember that this was defined as the value judgement for $prg$ applied to back-interpretations.) Since no $\longrightarrow^{aux}$-reduction is possible, the subterm cannot reduce by $q_\epsilon$, either.
-
-ad (b): The proof is by induction on the structure of $\mathcal{E}'$.
-
-The hole context $\mathcal{E}' = []$ doesn't depend upon the value judgement, thus it is also an evaluation context with respect to the value judgement $\vdash_v$ for $\langle prg \rangle$. The same goes for contexts of the form $\mathcal{E}'^0.des(\overline{t})$, where $\mathcal{E}'^0$ is another context with respect to $\vdash'_v$, and the $t_i$ are arbitrary terms.
-
-Next, consider contexts of the form $fun(\overline{v}, \mathcal{E}'^0, \overline{t})$, where $\mathcal{E}'^0$ is another context with respect to $\vdash'_v$, the $v_i$ are terms with $\vdash'_v v_i$, and the $t_i$ are arbitrary terms. For the $v_i$ it also holds that $\langle prg \rangle \vdash_v v_i$. The only case where this doesn't hold is when the $v_i$ is when it reduces by an lhs of $\langle prg \rangle$ which doesn't have a back-interpretation present as an lhs in $prg$. The only such lhs is $q_\epsilon$, and $v_i$ cannot reduce by $\epsilon$ since no $\longrightarrow^{aux}$-reduction is possible. The argument is analogous for the two remaining forms of $\mathcal{E}'$ (constructor calls and destructor calls on values).
+\item There are immediate subterms of $t$ which aren't values under judgement $\vdash_v$. Obtain a generic evaluation context $\mathcal{GE} \in \textrm{EC}$ by replacing all immediate subterms $t_i$ of $t$ with placeholders $p_i$, with $p_1, ..., p_n$ ordered according to the order $<$ of $\textrm{EC}$. Let $k$ be the smallest index for which $\not\vdash_v t_k$, and define $\mathcal{E} \in \textrm{EC}_{\vdash_v}$ as the instance of $\mathcal{GE}$ which assigns, for all $i \neq k$, $t_i$ to placeholder $p_i$, and the hole $[]$ to placeholder $p_k$. By the induction hypothesis, we have a term $t^1$ and reductions
+\[
+t^0 \longrightarrow t^1, t^0 \longrightarrow^{aux} t^1
+\]
+and consequently
+\[
+\mathcal{E}[t^0] \longrightarrow \mathcal{E}[t^1]
+\]
+and
+\[
+\mathcal{E}[t^0] \longrightarrow^{aux} \mathcal{E}[t^1].
+\]
+\end{enumerate}
 
 \end{proof}
+
+\end{lemma}
+
+\begin{lemma}
+
+For all terms $a,b$ it holds that:
+
+When $a \longrightarrow' b$ but $a \not\longrightarrow b$, then there is a $c$ with $a \longrightarrow c$ and $a \longrightarrow^{aux} c$.
+
+\begin{proof}
+
+There is an evaluation context $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$, with $\mathcal{E} \not\in \textrm{EC}_{\vdash_v}$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}_{\vdash_v}$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Consider the generic evaluation context $\mathcal{GE} \in \textrm{EC}$ that $\mathcal{E}$ is an instance of, and the order $<$ on its placeholders. Construct an evaluation context $\mathcal{E}' \in \textrm{EC}_{\vdash_v}$ from $\mathcal{E}$ by replacing the smallest placeholder of $\mathcal{GE}$, that $\mathcal{E}$ replaced with a term $t$ with $\not\vdash_v t$, by the hole $[]$. By Lemma 3.3.2, we a term $t_{aux}$ and reductions
+\[
+t \longrightarrow t_{aux}, t \longrightarrow^{aux} t_{aux},
+\]
+and consequently
+\[
+\mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], \mathcal{E}'[t] \longrightarrow^{aux} \mathcal{E}'[t_{aux}].
+\]
+
+\end{proof}
+
 \end{lemma}
 
 \begin{lemma}[Left-to-right direction of (2.2)]
@@ -217,13 +255,23 @@ s {\longrightarrow'}_{\langle prg \rangle}^* t \implies s \longrightarrow^*_{\la
 
 \begin{proof}
 
-By induction on the length of $s {\longrightarrow'}_{\langle prg \rangle}^* t$.
+By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$.
 
-When the sequence is empty, that is $s = t$, then simply choose $\widetilde{t} = t$.
+\begin{itemize}
+\item $n = 0$. Then it is $s = t$, thus simply choose $\widetilde{t} = t$.
 
-Otherwise, first consider the first step of the sequence $s \longrightarrow' s'$ and a sequence $s {\longrightarrow^{aux}}^* s_{aux}$ with $s_{aux} \not\longrightarrow^{aux} s'_{aux}$ for all terms $s'_{aux}$.  By Corollary 2.3.1, we have a $d$ with $s' {\longrightarrow^{aux}}^* d$ and $s_{aux} \longrightarrow' d$, and by Lemma 2.3.2, it is $s_{aux} \longrightarrow d$, and consequently $s \longrightarrow^* d$.
+\item $n = n' + 1$. By induction on the number $k$ of calls in $s$ to the function targeted in the transformation, i.e., that of $q_\epsilon$.
+\begin{itemize}
+\item $k = 0$. Consider the first step $s {\longrightarrow'}_{\langle prg \rangle} s_1$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$. Because there are no calls to the function of $q_\epsilon$ in $s$, for all subterms $s^0$ of $s$ it is $\vdash'_v s^0$ iff $\vdash_v s^0$. Consequently, the reduction step from $s$ to $s_1$ is also possible with reduction relation $\longrightarrow_{\langle prg \rangle}$, that is, $s \longrightarrow_{\langle prg \rangle} s_1$. By the outer induction hypothesis, we have the rest of the desired reduction sequence $s_1 \longrightarrow_{\langle prg \rangle} \widetilde{t}$.
 
-Now we show that $d \longrightarrow^* \widetilde{t}$ for a $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$. It is $s {\longrightarrow'}^n t$ for some $n \in \mathbb{N}$, and consequently $s' {\longrightarrow'}^{n-1} t$. Again by Corollary 2.3.1, we have a $d'$ with $t {\longrightarrow^{aux}}^* d'$ and $d {\longrightarrow'}^{\leq(n-1)} d'$. By the induction hypothesis, we have the desired $\widetilde{t}$ with $\langle \widetilde{t} \rangle^{aux^{-1}} = t$ and $d \longrightarrow^* \widetilde{t}$.
+\item $k = k' + 1$. Again, consider the first step $s {\longrightarrow'}_{\langle prg \rangle} s_1$ of the original sequence. We distinguish two cases.
+\begin{enumerate}
+\item $s \longrightarrow_{\langle prg \rangle} s_1$. With this, we have the first step of the desired reduction sequence. By the outer induction hypothesis, we have the rest of the desired reduction sequence $s_1 \longrightarrow_{\langle prg \rangle} \widetilde{t}$.
+
+\item $s \not\longrightarrow_{\langle prg \rangle} s_1$. By Lemma 3.3.3, we have an $s_{aux}$ with $s \longrightarrow^{aux} s_{aux}$ and $s \longrightarrow_{\langle prg \rangle} s_{aux}$. By Corollary 3.3.1, we have a $\widetilde{t}'$ with (a) $s_{aux} \longrightarrow^{\leq n} \widetilde{t}'$ and (b) $t {\longrightarrow^{aux}}^* \widetilde{t}'$ and thus $\langle \widetilde{t}' \rangle^{aux^{-1}} = t$. Apply the inner induction hypothesis to $s_{aux} \longrightarrow^{\leq n} \widetilde{t}'$ to obtain the desired sequence.
+\end{enumerate}
+\end{itemize}
+\end{itemize}
 
 \end{proof}
 
