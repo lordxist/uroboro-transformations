@@ -14,8 +14,8 @@
 
 The reduction relation of the next chapter will be defined relative to a \textit{generic evaluation context}. This concept is introduced in this section.
 
-\begin{definition}[Generic evaluation context]
-A generic evaluation context (g.e.c.) $\mathcal{GE}$ is a term with all of its $n$ immediate subterms replaced by placeholders from the placeholder set $P_n = \{p_1, ..., p_n\}$ such that the $i-th$ immediate subterm, numbered from left to right, is replaced by $p_i$.
+\begin{definition}[Generic evaluation context for a term]
+A generic evaluation context (g.e.c.) $\mathcal{GE}$ for a term $t$ is either the hole $[]$ or $t$ with all of its $n$ immediate subterms replaced by placeholders from the placeholder set $P = \{p_1, ..., p_n, ...\}$ such that the $i-th$ immediate subterm, numbered from left to right, is replaced by $p_i$.
 \end{definition}
 
 \begin{definition}[Set of g.e.c.s for a placeholder order]
@@ -27,19 +27,19 @@ Using these definitions, the generic form of the evaluation contexts can be spec
 \begin{definition}[Instance of a g.e.c.]
 An instance of a g.e.c. $\mathcal{GE}$ induced by a set of values $\textrm{Val}$ with respect to  a placeholder order $<$ is a term $\mathcal{GE}[p_1 \mapsto t_1, ..., p_n \mapsto t_n]$, where the $p_i$ are the placeholders of $\mathcal{GE}$ and where the following holds for the $t_i$:
 \[
-t_{i_1} \in \textrm{Val}, ..., t_{i_{k-1}} \in \textrm{Val}, t_{i_k} = [],
+t_{i_1} \in \textrm{Val}, ..., t_{i_{k-1}} \in \textrm{Val}, t_{i_k} \textrm{is a g.e.c. induced by Val with respect to } <,
 \]
 for some $k \in \{1, ..., n\}$, and where $p_{i_1} < p_{i_2} < ... < p_{i_n}$.
 \end{definition}
 
 \begin{definition}[Instance of a set of g.e.c.s]
-An \textit{instance} $\textrm{EC}_{\textrm{Val}}$ \textit{of a set} of g.e.c.s $\textrm{EC}_<$, for a placeholder order $<$, \textit{induced by $\textrm{Val}$} is the set of all instances, induced by $\textrm{Val}$ with respect to $<$, of all elements of $\textrm{EC}$.
+An \textit{instance} $\textrm{EC}_<[\textrm{Val}]$ \textit{of a set} of g.e.c.s $\textrm{EC}_<$, for a placeholder order $<$, \textit{induced by $\textrm{Val}$} is the set of all instances, induced by $\textrm{Val}$ with respect to $<$, of all elements of $\textrm{EC}$.
 \end{definition}
 
 Regarding generic evaluation contexts, we show a number of lemmas used further on in this work.
 
 \begin{lemma}
-When $\mathcal{E} \in \textrm{EC}_{\textrm{Val}}$ and it holds that
+When $\mathcal{E} \in \textrm{EC}_<[{\textrm{Val}}]$, for some instance of a set of g.e.c.s $\textrm{EC}_<[\textrm{Val}]$ and it holds that
 \[
 a \in \textrm{Val} \implies b \in \textrm{Val},
 \]
