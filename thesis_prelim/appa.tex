@@ -43,10 +43,10 @@ a[a^0 \mapsto b^0] \longrightarrow^{aux} d \land b \longrightarrow' d.
 
 \cdpaux*
 \begin{proof}
-By induction on the derivation of $a \longrightarrow' b$.
+We make use of the fact that a reduction that can be derived by multiple applications of the ``Cong" rule can also be derived by just one application of the ``Cong" rule. Thus we distinguish two cases for the derivation of $a \longrightarrow' b$, one for the ``Subst" rule and one for the ``Cong" rule.
 
 \begin{enumerate}
-\item \textbf{``Subst'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = q_r[\sigma], b = t_r[\sigma]$ for some equation $r$.
+\item \textbf{``Subst'' case}: Again using the fact that only one ``Cong" derivation step is necessary, the two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = q_r[\sigma], b = t_r[\sigma]$ for some equation $r$.
 
 \begin{enumerate}
 \item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$; it is $r' = r$ because $a$ matches both $q_r$ and $q_{r'}$ and there are no overlapping lhss. It follows that $b = c$, thus we can simply choose $d = b = c$.
@@ -54,7 +54,7 @@ By induction on the derivation of $a \longrightarrow' b$.
 \item \textbf{``Cong'' case}: It is $a = \mathcal{E}[a^0], c = \mathcal{E}[c^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash_v}$ and terms $a^0, c^0$ with $a^0 \longrightarrow^{aux} c^0$ and $a^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for an equation $r'$. Thus we have the desired property by Lemma A.0.1.
 \end{enumerate}
 
-\item \textbf{``Cong'' case}: Two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. It is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and terms $a^0, b^0$ with $a^0 \longrightarrow' b^0$ and $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$. Further, $a(a'^0)$ has a subterm $a'^0$ such that $c = a(c^0)$ for some term $c^0$ with $a'^0 \longrightarrow^{aux} c^0$ and $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for some equation $r'$. We distinguish three cases:
+\item \textbf{``Cong'' case}: Again, the two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. It is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and terms $a^0, b^0$ with $a^0 \longrightarrow' b^0$ and $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$. Further, $a(a'^0)$ has a subterm $a'^0$ such that $c = a(c^0)$ for some term $c^0$ with $a'^0 \longrightarrow^{aux} c^0$ and $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for some equation $r'$. We distinguish three cases:
 \begin{itemize}
 \item $a'^0$ is a subterm of $a^0$. By Lemma A.0.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow' d^0$ and $b^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}[d^0]$. The property holds since (a) $b = \mathcal{E}[b^0] \longrightarrow^{aux} \mathcal{E}[d^0] = d$ and (b) $c = \mathcal{E}'[c^0] = \mathcal{E}[a^0[a'^0 \mapsto c^0]] \longrightarrow' \mathcal{E}[d^0] = d$.
 
