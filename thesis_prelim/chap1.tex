@@ -15,18 +15,25 @@
 The reduction relation of the next chapter will be defined relative to a \textit{generic evaluation context}. This concept is introduced in this section.
 
 \begin{definition}[Generic evaluation context]
-A generic evaluation context $\mathcal{GE}$ is a term with
-\begin{itemize}
-\item one subterm replaced by a hole $[]$,
-\item several subterms replaced by placeholders for values from a countably infinite set $P_V$, and
-\item several other subterms replaced by placeholders for terms from a countably infinite set $P_T$.
-\end{itemize}
+A generic evaluation context (g.e.c.) $\mathcal{GE}$ is a term with all of its $n$ immediate subterms replaced by placeholders from the placeholder set $P_n = \{p_1, ..., p_n\}$ such that the $i-th$ immediate subterm, numbered from left to right, is replaced by $p_i$.
 \end{definition}
 
-Using this definition, the generic form of the evaluation contexts can be specified without yet knowing the set of terms which are to be considered values. An \textit{instance} of a generic evaluation context $\mathcal{GE}$ \textit{induced by a set of values $\textrm{Val}$} is $\mathcal{GE}$ with all of its value placeholders replaced by some elements of $\textrm{Val}$ and all of its term placeholders replaced by some terms. With this, we define the following.
+\begin{definition}[Set of g.e.c.s for a placeholder order]
+The set of g.e.c.s for a placeholder order $<$, in symbols $\textrm{EC}_<$ is the set of all g.e.c.s for the placeholder set $P$ ordered by $<$.
+\end{definition}
 
-\begin{definition}
-An \textit{instance} $\textrm{EC}_{\textrm{Val}}$ \textit{of a set} of generic evaluation contexts $\textrm{EC}$ \textit{induced by $\textrm{Val}$} is the set of all instances, induced by $\textrm{Val}$, of all elements of $\textrm{EC}$.
+Using these definitions, the generic form of the evaluation contexts can be specified without yet knowing the set of terms which are to be considered values. Next, we define what it means to be an instance of a g.e.c., or of a set of g.e.c.s, induced by such a value set.
+
+\begin{definition}[Instance of a g.e.c.]
+An instance of a g.e.c. $\mathcal{GE}$ induced by a set of values $\textrm{Val}$ with respect to  a placeholder order $<$ is a term $\mathcal{GE}[p_1 \mapsto t_1, ..., p_n \mapsto t_n]$, where the $p_i$ are the placeholders of $\mathcal{GE}$ and where the following holds for the $t_i$:
+\[
+t_{i_1} \in \textrm{Val}, ..., t_{i_{k-1}} \in \textrm{Val}, t_{i_k} = [],
+\]
+for some $k \in \{1, ..., n\}$, and where $p_{i_1} < p_{i_2} < ... < p_{i_n}$.
+\end{definition}
+
+\begin{definition}[Instance of a set of g.e.c.s]
+An \textit{instance} $\textrm{EC}_{\textrm{Val}}$ \textit{of a set} of g.e.c.s $\textrm{EC}_<$, for a placeholder order $<$, \textit{induced by $\textrm{Val}$} is the set of all instances, induced by $\textrm{Val}$ with respect to $<$, of all elements of $\textrm{EC}$.
 \end{definition}
 
 Regarding generic evaluation contexts, we show a number of lemmas used further on in this work.
@@ -37,8 +44,4 @@ When $\mathcal{E} \in \textrm{EC}_{\textrm{Val}}$ and it holds that
 a \in \textrm{Val} \implies b \in \textrm{Val},
 \]
 then $\mathcal{E}[a \mapsto b] \in \textrm{EC}_{\textrm{Val}}$.
-\end{lemma}
-
-\begin{lemma}
-Let $\mathcal{E}' \in \textrm{EC}_{\textrm{Val}}$ and $\mathcal{E}$ be an arbitrary evaluation context (i.e., an arbitrary instance of an arbitrary generic evaluation context). When there are terms $a, a'$ with $\mathcal{E}'[a'] = \mathcal{E}[a]$ and $a'$ is a subterm of $a$, we say that the hole of $\mathcal{E}$ subsumes that of $\mathcal{E}'$. When this is the case, it is $\mathcal{E} \in \textrm{EC}_{\textrm{Val}}$.
 \end{lemma}
