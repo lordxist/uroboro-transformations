@@ -180,7 +180,7 @@ The pre-transformation $align\_patterns$ ensures that, whenever two lhss overlap
 
 \subsubsection{Pattern extraction}
 
-The extraction $extract\_patterns$ is only ever applied to single-destructor copatterns and transforms them to single-destructor copatterns without any constructors. It is also only ever used in unmixed function definitions. It follows that, if $q_\epsilon$ overlapped with an unchanged equation, the latter has one or more destructors. Since $q_\epsilon$ has only variables as patterns, the unchanged lhs and $q_\epsilon$ would overlap, contrary to assumption.
+The extraction $extract\_patterns$ is only ever applied to single-destructor copatterns and transforms them to single-destructor copatterns without any constructors. It is also only ever used in unmixed function definitions where all lhss have exactly one destructor. If the destructor of such an lhs $q$ is different from that of $q_\epsilon$, they cannot overlap. But if the destructor of $q$ is the same as that of $q_\epsilon$, and thus the same as that of $q_r$, the extraction result is the same for both $q_r$ and $q$. Thus, by the definition of extraction functions, the equations of $q_r$ and $q$ are the same.
 
 \subsubsection{Constructor extraction}
 
