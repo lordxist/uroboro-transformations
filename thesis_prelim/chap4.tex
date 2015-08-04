@@ -101,6 +101,12 @@ Aligning of patterns is then lifted to programs in the following, straightforwar
 & \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
 \end{alignat*}
 
+Aligning patterns of a program before applying destructor extraction guarantees that the destructor extraction doesn't introduce overlaps. As shown in subsection 4.2.2, this follows from the following lemma.
+
+\begin{lemma}
+For any program $prg$ without overlapping lhss, no two prefixes of lhss of $\langle prg \rangle^{align\_patterns}$ overlap.
+\end{lemma}
+
 \section{Transformation steps}
 
 Both de- and refunctionalization are made up of a couple of preprocessing steps, followed by the core de-/refunctionalization, which is essentially the two-way transformation from the paper of Rendel et al.
@@ -176,7 +182,7 @@ The three extraction functions used, $extract\_des$, $extract\_patterns$, and $e
 
 \subsubsection{Destructor extraction}
 
-The pre-transformation $align\_patterns$ ensures that, whenever two lhss overlap, one of them is a prefix of the other. $q_\epsilon$ is a prefix of an lhs $q_r$ of the original program; if it overlapped with a $q_{r'}$ taken over unchanged then either (a) $q_{r'}$ would be a prefix of $q_\epsilon$, but then it also would be a prefix of $q_r$, and $q_{r'}$ and $q_r$ overlapped, contrary to assumption, or (b) $q_\epsilon$ would be a prefix of $q_{r'}$, but then, because $q_{r'}$ doesn't have more destructors than $q_r$, either $q_\epsilon = q_{r'}$ or, by the definition of $extract\_des$ and its underlying extraction projection, $extract\_des$ also extracts out of $q_{r'}$, contrary to assumption.
+By Lemma 4.1.1, the pre-transformation $align\_patterns$ ensures that no two prefixes of lhss of the original program overlap. $q_\epsilon$ is a prefix of an lhs $q_r$ of the original program; if it overlapped with a $q_{r'}$ taken over unchanged then $q_{r'}$ (a prefix of itself) and the prefix $q_\epsilon$ of $q_r$ overlapped, contrary to Lemma 4.1.1.
 
 \subsubsection{Pattern extraction}
 
