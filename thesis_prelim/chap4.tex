@@ -33,47 +33,73 @@ fun().d1(c2()).d2() = t_3
 
 \end{lstlisting}
 
-For programs, $align\_patterns$ is defined as follows.
+First, we formally define what it means for a copattern to be \textit{aligned} with another copattern.
+
+\begin{definition}[Aligning patterns]
+Two patterns $p_1, p_2$ of the same type align if they are (a) both variables, (b) both constructor calls of different constructors, or (c) constructor calls of the same constructor $con$ such that
+\[
+p_1 = con(p'_1, ..., p'_n), p_2 = con(p''_1, ..., p''_n),
+\]
+where, for all $i \in \{1, ..., n\}$, $p'_i$ and $p''_i$ align.
+\end{definition}
+
+\begin{definition}[Aligning copatterns]
+Two copatterns $q_1, q_2$ of the same function definition, for a function $fun$, align if the respective arguments of their largest common destructor call chains align.
+\end{definition}
+
+The algorithm $align\_patterns$ first searches for the most specific pattern at each position; the meaning of being more specific has been illustrated in the above example, below, we give a formal definition.
+
+\begin{definition}
+A pattern $p_1$ is more or equally specific than another pattern $p_2$ if (a) they are both variables, (b) both constructor calls of different constructors, or (c) constructor calls of the same constructor $con$ such that
+\[
+p_1 = con(p'_1, ..., p'_n), p_2 = con(p''_1, ..., p''_2),
+\]
+where, for all $i \in \{1, ..., n\}$, $p'_i$ is more or equally specific than $p''_i$.
+\end{definition}
+
+For two patterns, being equally specific is defined to mean the same as aligning.
+
+Now, we define the algorithm that aligns patterns. We start with an algorithm \textsf{AlignPatterns} that, for a given copattern $q$ and a set of copatterns $Q$, produces a set of copatterns $Q'$ that is
+\begin{itemize}
+\item equivalent to $q$, i.e., the terms matched by $q$ are exactly the same as all terms matched by any copattern in $Q'$ together
+\item non-overlapping, i.e., no copattern of $Q'$ overlaps with another copatterns of this set
+\item aligned with all copatterns of $Q$.
+\end{itemize}
+
+\begin{flalign*}
+&\textsf{Align}(x, P^T) &\\
+&\quad= \bigcup \{ con(\overline{\textsf{Align}(\textsf{MapToArg}_i(x_i, P^T))}) ~ | ~ con \in \textrm{Cons}_T \} &&, \text{ if } \exists con . con(\overline{p}) \in P^T &\\
+&\quad= \{x^{\mathit{new}}\}, x^{\mathit{new}} \text{ fresh}, && \text{ otherwise} &\\
+&\textsf{Align}(con(\overline{p}), P^T) &\\
+&\quad= con(\overline{\textsf{Align}(\textsf{MapToArg}_i(p, P^T))}) \span\span
+\end{flalign*}
+\begin{flalign*}
+&\textsf{HaveSameDess}(q.des(\overline{p}), q'.des'(\overline{p'})) &\\
+&\quad = \textsf{HaveSameDess}(q, q') \land des = des' &\\
+&\textsf{HaveSameDess}(fun(\overline{p}), fun(\overline{p'})) &\\
+&\quad = \top &
+\end{flalign*}
+\begin{flalign*}
+&\textsf{GetPatterns}(q.des(\overline{p}), Q) &\\
+&\quad = \textsf{GetPatterns}(q, Q) \cdot \overline{(p_i, \{ p'_i ~ | ~ q'.des(p'_1, ..., p'_k) \in Q \land \textsf{HaveSameDess}(q, q') \})} &
+\end{flalign*}
+\begin{flalign*}
+&\textsf{ReplacePatterns}(q.des(p_1, ..., p_k), (p'_1, ..., p'_n)) &\\
+&\quad = \textsf{ReplacePatterns}(q, (p'_1, ..., p'_{n-k})).des(p'_{n-k+1}, ..., p'_n) &\\
+&\textsf{ReplacePatterns}(fun(p_1, ..., p_n), (p'_1, ..., p'_n)) &\\
+&\quad = fun(p'_1, ..., p'_n) &
+\end{flalign*}
+\begin{flalign*}
+&\textsf{AlignPatterns}(q, Q) = \{ \textsf{ReplacePatterns}(q, \overrightarrow{p}) ~ | ~  \overrightarrow{p} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q, Q)) \} &
+\end{flalign*}
+
+Aligning of patterns is then lifted to programs in the following, straightforward way; for this, let $Q_{def}$ denote the lhss of function definition $def$.
 \begin{alignat*}{4}
-\langle prg \rangle^{align\_patterns} & = &&\bigcup &&\{ ~&&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& && && &&\quad \{ `` q' = t " ~ | ~ q' \in Q_q, `` q = t " \in eqns \} \} \\
-& && && | && `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
+\langle prg \rangle^{align\_patterns} & = &&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
+& &&\quad \{ `` q' = t " ~ | ~ q' \in \textsf{AlignPatterns}(q, Q_def), `` q = t " \in eqns \} \\
+& && | ~ def = `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
 & \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
 \end{alignat*}
-with
-\begin{equation*}
-Q_{fun(p_1, ..., p_n)} = \{fun(p_1, ..., p_n)\}
-\end{equation*}
-and
-\begin{equation*}
-Q_{q^0.des(p_1, ..., p_k)} = \langle \underline{q^0} \rangle^{align_patterns}.des(p_1, ..., p_k)
-\end{equation*}
-with
-\begin{equation*}
-\underline{fun(p_1, ..., p_n)} = fun(\_, ..., \_)
-\end{equation*}
-and
-\begin{equation*}
-\underline{q^0.des(p_1, ..., p_k)} = \underline{q^0}.des(\_, ..., \_)
-\end{equation*}
-Here, the $\_$ represent holes which are used to describe generic forms of copatterns. For instance, one generic form of $fun(p_1, ..., p_n).des(p_1, ..., p_k)$ is $fun(\_, ..., \_).des(\_, ..., \_)$. The generic forms for a given copattern can be simply defined inductively, starting with setting $\_$ as being a generic form for any pattern.
-
-For generic forms of copatterns, $align\_patterns$ is defined as follows. Let $q_\_ = fun(\_, ..., \_).des_1(\_, ..., \_)...des_k(\_, ..., \_)$, and $q^i_\_$ be the context that obtains by replacing the $i$-th hole in $q_\_$ with another kind of hole $[]$ used for plugging other contexts into it.
-\begin{multline*}
-\langle q_\_ \rangle^{align\_patterns} = \\
-fun(\langle q^1_\_ \rangle^{a\_p}, ..., \langle q^{n_0}_\_ \rangle^{a\_p}).des_1(\langle q^{n_0 + 1}_\_ \rangle^{a\_p}, ..., \langle q^{n_1}_\_ \rangle^{a\_p})...des_k(\langle q^{n_{k-1} + 1}_\_ \rangle^{a\_p}, ..., \langle q^{n_k}_\_ \rangle^{a\_p})
-\end{multline*}
-
-Finally, $a\_p$ for such contexts is defined as follows.
-
-\begin{equation*}
-\langle \mathcal{C} \rangle^{a\_p} = \bigcup_{con} \{con(t_1, ..., t_n) ~ | ~ t_i \in \langle \mathcal{C}[con(\_, ..., \_, [], \_, ..., \_)] \rangle^{a\_p} \},
-\end{equation*}
-if $\exists$ lhs in $def$ with a prefix of the generic form $\mathcal{C}[con(\_, ..., \_)]$,
-\begin{equation*}
-\langle \mathcal{C} \rangle^{a\_p} = \{x\},
-\end{equation*}
-otherwise.
 
 \section{Transformation steps}
 
