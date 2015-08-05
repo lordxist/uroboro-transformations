@@ -33,7 +33,7 @@ fun().d1(c2()).d2() = t_3
 
 \end{lstlisting}
 
-First, we formally define what it means for a copattern to be \textit{aligned} with another copattern.
+First, we formally define what it means for a (co-)pattern to be \textit{aligned} with another (co-)pattern.
 
 \begin{definition}[Aligning patterns]
 Two patterns $p_1, p_2$ of the same type align if they are (a) both variables, (b) both constructor calls of different constructors, or (c) constructor calls of the same constructor $con$ such that
@@ -46,18 +46,6 @@ where, for all $i \in \{1, ..., n\}$, $p'_i$ and $p''_i$ align.
 \begin{definition}[Aligning copatterns]
 Two copatterns $q_1, q_2$ of the same function definition, for a function $fun$, align if the respective arguments of their largest common destructor call chains align.
 \end{definition}
-
-The algorithm $align\_patterns$ first searches for the most specific pattern at each position; the meaning of being more specific has been illustrated in the above example, below, we give a formal definition.
-
-\begin{definition}
-A pattern $p_1$ is more or equally specific than another pattern $p_2$ if (a) they are both variables, (b) both constructor calls of different constructors, or (c) constructor calls of the same constructor $con$ such that
-\[
-p_1 = con(p'_1, ..., p'_n), p_2 = con(p''_1, ..., p''_2),
-\]
-where, for all $i \in \{1, ..., n\}$, $p'_i$ is more or equally specific than $p''_i$.
-\end{definition}
-
-For two patterns, being equally specific is defined to mean the same as aligning.
 
 Now, we define the algorithm that aligns patterns; we present a calculus for it. We write $q \rhd Q \searrow \Sigma$ when the algorithm produces a result $\Sigma$ for a copattern $q$ and a copattern set $Q$ that $q$ is to be aligned with. This $\Sigma$ is a set of substitutions $\sigma$ such that $q[\sigma]$ is aligned with all elements of $Q$ and such that $\bigcup_{\sigma \in \Sigma} q[\sigma]$ is equivalent to $q$. Similarly, we write $q \rhd q' \searrow \Sigma$ for the sub-algorithm used for aligning $q$ with an individual copattern $q'$.
 
@@ -115,112 +103,37 @@ $p \rhd p' \searrow \Sigma$ means that the sub-algorithm for pattern alignment, 
 The following lemma captures that this algorithm can actually be used for its intended purpose.
 
 \begin{lemma}
-For any copattern $q$ and set of copatterns $Q$ with $q \rhd Q \searrow \Sigma$ for some $\Sigma$, all elements of $\Sigma(q)$ align with all elements of $Q$.
+For any set of copatterns $Q$ and any two of its elements $q_1, q_2$ with $q_1 \rhd Q \searrow \Sigma_1, q_2 \rhd Q \searrow \Sigma_2$ for some $\Sigma_1, \Sigma_2$, all elements of $\Sigma_1(q_1)$ align with all elements of $\Sigma_1(q_2)$.
 \end{lemma}
 
 To prove this, we first show a lemma for the sub-algorithm for pattern alignment.
 
 \begin{lemma}
-For any two patterns $p_1, p_2$ with $p_1 \rhd p_2 \searrow \Sigma$ for some $\Sigma$, all elements of $\Sigma(p_1)$ align with $p_2$.
+For any two patterns $p_1, p_2$ with $p_1 \rhd p_2 \searrow \Sigma_1, p_2 \rhd p_1 \searrow \Sigma_2$ for some $\Sigma_1, \Sigma_2$, all elements of $\Sigma_1(p_1)$ align with all elements of $\Sigma_2(p_2)$.
 
 \begin{proof}
 By induction on the derivation of $p_1 \rhd p_2 \searrow \Sigma$.
+
+\textbf{PA\textsubscript{VarVar}}: The only element of $\Sigma$ is the identity substitution, thus the only element of $\Sigma(p_1)$ is $p_1 = x$ itself, and it is $p_2 = y$. Because $p_1$ and $p_2$ are both variables, $p_2 \rhd p_1 \searrow \Sigma$ can only be derived by the rule PA\textsubscript{VarVar}. Like with the other derivation, we can conclude that the only element of $\Sigma(p_2)$ is $p_2 = y$ itself; it follows that elements of $\Sigma(p_1)$ align with all elements of $\Sigma(p_2)$ since both $p_1$ and $p_2$ are variables.
+
+\textbf{PA\textsubscript{ConVar}}: The only element of $\Sigma$ is the identity substitution thus the only element of $\Sigma(p_1)$ is $p_1 = con(\overline{p})$ itself, and it is $p_2 = y$.
+
+TODO: rest
 \end{proof}
 \end{lemma} 
 
-%Now, we define the algorithm that aligns patterns. We start with an algorithm \textsf{AlignPatterns} that, for a given copattern $q$ and a set of copatterns $Q$, produces a set of copatterns $Q'$ that is
-%\begin{itemize}
-%\item equivalent to $q$, i.e., the terms matched by $q$ are exactly the same as all terms matched by any copattern in $Q'$ together
-%\item non-overlapping, i.e., no copattern of $Q'$ overlaps with another copatterns of this set
-%\item aligned with all copatterns of $Q$.
-%\end{itemize}
-%
-%\begin{flalign*}
-%&\textsf{Align}(x, P^T) &\\
-%&\quad= \bigcup \{ con(\overline{\textsf{Align}(\textsf{MapToArg}_i(x_i, P^T))}) ~ | ~ con \in \textrm{Cons}_T \} &&, \text{ if } \exists con . con(\overline{p}) \in P^T &\\
-%&\quad= \{x^{\mathit{new}}\}, x^{\mathit{new}} \text{ fresh}, && \text{ otherwise} &\\
-%&\textsf{Align}(con(\overline{p}), P^T) &\\
-%&\quad= con(\overline{\textsf{Align}(\textsf{MapToArg}_i(p, P^T))}) \span\span
-%\end{flalign*}
-%\begin{flalign*}
-%&\textsf{HaveSameDess}(q.des(\overline{p}), q'.des'(\overline{p'})) &\\
-%&\quad = \textsf{HaveSameDess}(q, q') \land des = des' &\\
-%&\textsf{HaveSameDess}(fun(\overline{p}), fun(\overline{p'})) &\\
-%&\quad = \top &
-%\end{flalign*}
-%\begin{flalign*}
-%&\textsf{GetPatterns}(q.des(\overline{p}), Q) &\\
-%&\quad = \textsf{GetPatterns}(q, Q) \cdot \overline{(p_i, \{ p'_i ~ | ~ q'.des(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \land \textsf{HaveSameDess}(q, q') \})} & \\
-%&\textsf{GetPatterns}(fun(\overline{p}), Q) &\\
-%&\quad = \overline{(p_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \})}
-%\end{flalign*}
-%\begin{flalign*}
-%&\textsf{ReplacePatterns}(q.des(p_1, ..., p_k), (p'_1, ..., p'_n)) &\\
-%&\quad = \textsf{ReplacePatterns}(q, (p'_1, ..., p'_{n-k})).des(p'_{n-k+1}, ..., p'_n) &\\
-%&\textsf{ReplacePatterns}(fun(p_1, ..., p_n), (p'_1, ..., p'_n)) &\\
-%&\quad = fun(p'_1, ..., p'_n) &
-%\end{flalign*}
-%\begin{flalign*}
-%&\textsf{AlignPatterns}(q, Q) = \{ \textsf{ReplacePatterns}(q, \overrightarrow{p}) ~ | ~  \overrightarrow{p} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q, Q)) \} &
-%\end{flalign*}
-%
-%We show a property of \textsf{Align} upon which the intended consequences of $align\_patterns$ depend.
-%
-%\begin{lemma}
-%When $p^1$ and $p^2$ are both contained in a set $P$, $\textsf{Align}(p^1, P)$ and $\textsf{Align}(p^2, P)$ align.
-%
-%\begin{proof}
-%By induction on the structure of $p^1$.
-%\end{proof}
-%\end{lemma}
-%
-%The following lemma captures that this transformation actually has its intended consequences.
-%
-%\begin{lemma}
-%For any program $prg$ without overlapping lhss, the following holds for any function definition $def$ of $\langle prg \rangle^{align\_patterns}$: All lhss of $def$ align with all other lhss of $def$.
-%
-%\begin{proof}
-%To show this, it will be shown that, for any set of copatterns $Q$ of the same function $fun$ and any $q_1, q_2 \in Q$, each ${q_1}^a \in \textsf{AlignPatterns}(q_1, Q)$ aligns with each ${q_2}^a \in \textsf{AlignPatterns}(q_2, Q)$. This is done by induction on the structure of $q_1$. In any case it is, for $q \in \{q_1, q_2\}$,
-%\[
-%\textsf{AlignPatterns}(q, Q) = \{ \textsf{ReplacePatterns}(q, \overrightarrow{p}) ~ | ~  \overrightarrow{p} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q, Q)) \}.
-%\]
-%
-%If $q_1 = fun(\overline{p^1})$, it is, for some $\overrightarrow{{p^1}^a} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q, Q))$,
-%\[
-%{q_1}^a = \textsf{ReplacePatterns}(q_1, \overrightarrow{{p^1}^a}) = fun(\overline{{p^1}^a}).
-%\]
-%And it is
-%\[
-%\textsf{GetPatterns}(q_1, Q) = \overline{(p^1_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \})}
-%\]
-%We proceed by induction on the structure of $q_2$.
-%
-%If $q_2 = fun(\overline{p^2})$, it is, for some $\overrightarrow{{p^2}^a} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q_2, Q))$,
-%\[
-%{q_2}^a = \textsf{ReplacePatterns}(q_2, \overrightarrow{{p^2}^a}) = fun(\overline{{p^2}^a}).
-%\]
-%And it is
-%\[
-%\textsf{GetPatterns}(q_2, Q) = \overline{(p^2_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \})}
-%\]
-%By definition, ${q_1}^a$ and ${q_2}^a$ align when ${{p^1}^a}_i$ and  ${{p^2}^a}_i$ align, for every $i \in \{1, ..., n\}$, with $n$ the number of arguments of $fun$. We know that
-%\[
-%{{p^1}^a}_i = \textsf{Align}(p^1_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \})
-%\]
-%and
-%\[
-%{{p^2}^a}_i = \textsf{Align}(p^2_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \}).
-%\]
-%Thus we have that ${{p^1}^a}_i = \textsf{Align}(p^1_i, P)$ and ${{p^2}^a}_i = \textsf{Align}(p^2_i, P)$ for the same set $P$ and, since both $q_1$ and $q_2$ are elements of $Q$, $p^1_i \in P$ and $p^2_i \in P$. By Lemma 4.1.1, it follows that ${{p^1}^a}_i$ and  ${{p^2}^a}_i$ align.
-%
-%TODO: destructor case for $q_2$ and destructor case for $q_1$
-%\end{proof}
-%\end{lemma}
+Now, we get back to the proof of Lemma 4.1.1.
+
+\begin{proof}[Proof of Lemma 4.1.1]
+By induction on the derivation of $q_1 \rhd Q \searrow \Sigma_1$.
+
+TODO
+\end{proof}
 
 Aligning of patterns is lifted to programs in the following, straightforward way; for this, let $Q_{def}$ denote the lhss of function definition $def$.
 \begin{alignat*}{4}
 \langle prg \rangle^{align\_patterns} & = &&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& &&\quad \{ `` q' = t " ~ | ~ q' \in \textsf{AlignPatterns}(q, Q_def), `` q = t " \in eqns \} \\
+& &&\quad \{ `` q' = t " ~ | ~ q' \in \Sigma(q), q \rhd Q_{def} \searrow \Sigma, `` q = t " \in eqns \} \\
 & && | ~ def = `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
 & \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
 \end{alignat*}
@@ -231,7 +144,7 @@ Aligning patterns of a program before applying destructor extraction guarantees 
 For any program $prg$ without overlapping lhss, whenever two prefixes of lhss of $\langle prg \rangle^{align\_patterns}$ overlap, one of them is a prefix of the other.
 
 \begin{proof}
-Consider any function definition of $prg$. After transformation of $prg$ to $\langle prg \rangle^{align\_patterns}$, the function definition for the same function in the transformed program contains only lhss that align with all other lhss in the function definition.
+Consider any function definition of $prg$. After transformation of $prg$ to $\langle prg \rangle^{align\_patterns}$, the function definition for the same function in the transformed program contains only lhss that align with all other lhss in the function definition. This follows directly from Lemma 4.1.1.
 
 Now, suppose there are two lhss $q_1, q_2$ with prefixes $q^{\mathit{pref}}_1$ and $q^{\mathit{pref}}_2$, respectively, such that these prefixes overlap. Especially, this means that one of them -- w.l.o.g., $q^{\mathit{pref}}_1$ -- has an initial destructor chain $C$ that is identical to the entire destructor chain of the other, $q^{\mathit{pref}}_2$. Thus the entire destructor chain of $q^{\mathit{pref}}_2$ is a part of the largest common destructor chain of $q_1$ and $q_2$. It follows that all of the pattern arguments of the initial destructor chain $C$ of $q^{\mathit{pref}}_1$ align with the respective arguments of the destructor chain of $q^{\mathit{pref}}_2$. For the associated instances of these two destructor chains to overlap, it also needs to be the case that their respective pattern arguments overlap. Whenever two patterns overlap and align they are the same, thus $q^{\mathit{pref}}_2$ is a prefix of $q^{\mathit{pref}}_1$.
 \end{proof}
