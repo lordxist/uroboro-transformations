@@ -104,7 +104,7 @@ Aligning of patterns is then lifted to programs in the following, straightforwar
 Aligning patterns of a program before applying destructor extraction guarantees that the destructor extraction doesn't introduce overlaps. As shown in subsection 4.2.2, this follows from the following lemma.
 
 \begin{lemma}
-For any program $prg$ without overlapping lhss, no two prefixes of lhss of $\langle prg \rangle^{align\_patterns}$ overlap.
+For any program $prg$ without overlapping lhss, whenever two prefixes of lhss of $\langle prg \rangle^{align\_patterns}$ overlap, one of them is a prefix of the other.
 \end{lemma}
 
 \section{Transformation steps}
@@ -182,7 +182,7 @@ The three extraction functions used, $extract\_des$, $extract\_patterns$, and $e
 
 \subsubsection{Destructor extraction}
 
-By Lemma 4.1.1, the pre-transformation $align\_patterns$ ensures that no two prefixes of lhss of the original program overlap. $q_\epsilon$ is a prefix of an lhs $q_r$ of the original program; if it overlapped with a $q_{r'}$ taken over unchanged then $q_{r'}$ (a prefix of itself) and the prefix $q_\epsilon$ of $q_r$ overlapped, contrary to Lemma 4.1.1.
+By Lemma 4.1.1, the pre-transformation $align\_patterns$ ensures that, whenever two prefixes of lhss of the original program overlap, one of them is a prefix of the other. $q_\epsilon$ is a prefix of an lhs $q_r$ of the original program; if it overlapped with a $q_{r'}$ taken over unchanged then $q_{r'}$ (a prefix of itself) and the prefix $q_\epsilon$ of $q_r$ overlapped. But then, by Lemma 4.1.1, either (a) $q_\epsilon$ is a prefix of $q_{r'}$ or (b) $q_{r'}$ is a prefix of $q_\epsilon$. In case (a) it is either $q_\epsilon = q_{r'}$, but then $q_{r'}$ and $q_r$ overlapped contrary to assumption, or, since $q_{r'}$ doesn't have more destructors than $q_r$, $q_{r'}$ is identical to $q_r$ except for the last destructor call, but then $q_{r'}$ would also be targeted by the destructor extraction, contrary to assumption. In case (b) $q_{r'}$ is a prefix of $q_r$ and thus they overlap, again contrary to assumption.
 
 \subsubsection{Pattern extraction}
 
