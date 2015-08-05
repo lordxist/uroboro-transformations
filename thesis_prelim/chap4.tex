@@ -105,6 +105,12 @@ Aligning patterns of a program before applying destructor extraction guarantees 
 
 \begin{lemma}
 For any program $prg$ without overlapping lhss, whenever two prefixes of lhss of $\langle prg \rangle^{align\_patterns}$ overlap, one of them is a prefix of the other.
+
+\begin{proof}
+Consider any function definition of $prg$. After transformation of $prg$ to $\langle prg \rangle^{align\_patterns}$, the function definition for the same function in the transformed program contains only lhss that align with all other lhss in the function definition.
+
+Now, suppose there are two lhss $q_1, q_2$ with prefixes $q^{\mathit{pref}}_1$ and $q^{\mathit{pref}}_2$, respectively, such that these prefixes overlap. Especially, this means that one of them -- w.l.o.g., $q^{\mathit{pref}}_1$ -- has an initial destructor chain $C$ that is identical to the entire destructor chain of the other, $q^{\mathit{pref}}_2$. Thus the entire destructor chain of $q^{\mathit{pref}}_2$ is a part of the largest common destructor chain of $q_1$ and $q_2$. It follows that all of the pattern arguments of the initial destructor chain $C$ of $q^{\mathit{pref}}_1$ align with the respective arguments of the destructor chain of $q^{\mathit{pref}}_2$. For the associated instances of these two destructor chains to overlap, it also needs to be the case that their respective pattern arguments overlap. Whenever two patterns overlap and align they are the same, thus $q^{\mathit{pref}}_2$ is a prefix of $q^{\mathit{pref}}_1$.
+\end{proof}
 \end{lemma}
 
 \section{Transformation steps}
