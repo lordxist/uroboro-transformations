@@ -59,41 +59,165 @@ where, for all $i \in \{1, ..., n\}$, $p'_i$ is more or equally specific than $p
 
 For two patterns, being equally specific is defined to mean the same as aligning.
 
-Now, we define the algorithm that aligns patterns. We start with an algorithm \textsf{AlignPatterns} that, for a given copattern $q$ and a set of copatterns $Q$, produces a set of copatterns $Q'$ that is
-\begin{itemize}
-\item equivalent to $q$, i.e., the terms matched by $q$ are exactly the same as all terms matched by any copattern in $Q'$ together
-\item non-overlapping, i.e., no copattern of $Q'$ overlaps with another copatterns of this set
-\item aligned with all copatterns of $Q$.
-\end{itemize}
+Now, we define the algorithm that aligns patterns; we present a calculus for it. We write $q \rhd Q \searrow \Sigma$ when the algorithm produces a result $\Sigma$ for a copattern $q$ and a copattern set $Q$ that $q$ is to be aligned with. This $\Sigma$ is a set of substitutions $\sigma$ such that $q[\sigma]$ is aligned with all elements of $Q$ and such that $\bigcup_{\sigma \in \Sigma} q[\sigma]$ is equivalent to $q$. Similarly, we write $q \rhd q' \searrow \Sigma$ for the sub-algorithm used for aligning $q$ with an individual copattern $q'$.
 
-\begin{flalign*}
-&\textsf{Align}(x, P^T) &\\
-&\quad= \bigcup \{ con(\overline{\textsf{Align}(\textsf{MapToArg}_i(x_i, P^T))}) ~ | ~ con \in \textrm{Cons}_T \} &&, \text{ if } \exists con . con(\overline{p}) \in P^T &\\
-&\quad= \{x^{\mathit{new}}\}, x^{\mathit{new}} \text{ fresh}, && \text{ otherwise} &\\
-&\textsf{Align}(con(\overline{p}), P^T) &\\
-&\quad= con(\overline{\textsf{Align}(\textsf{MapToArg}_i(p, P^T))}) \span\span
-\end{flalign*}
-\begin{flalign*}
-&\textsf{HaveSameDess}(q.des(\overline{p}), q'.des'(\overline{p'})) &\\
-&\quad = \textsf{HaveSameDess}(q, q') \land des = des' &\\
-&\textsf{HaveSameDess}(fun(\overline{p}), fun(\overline{p'})) &\\
-&\quad = \top &
-\end{flalign*}
-\begin{flalign*}
-&\textsf{GetPatterns}(q.des(\overline{p}), Q) &\\
-&\quad = \textsf{GetPatterns}(q, Q) \cdot \overline{(p_i, \{ p'_i ~ | ~ q'.des(p'_1, ..., p'_k) \in Q \land \textsf{HaveSameDess}(q, q') \})} &
-\end{flalign*}
-\begin{flalign*}
-&\textsf{ReplacePatterns}(q.des(p_1, ..., p_k), (p'_1, ..., p'_n)) &\\
-&\quad = \textsf{ReplacePatterns}(q, (p'_1, ..., p'_{n-k})).des(p'_{n-k+1}, ..., p'_n) &\\
-&\textsf{ReplacePatterns}(fun(p_1, ..., p_n), (p'_1, ..., p'_n)) &\\
-&\quad = fun(p'_1, ..., p'_n) &
-\end{flalign*}
-\begin{flalign*}
-&\textsf{AlignPatterns}(q, Q) = \{ \textsf{ReplacePatterns}(q, \overrightarrow{p}) ~ | ~  \overrightarrow{p} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q, Q)) \} &
-\end{flalign*}
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{QA\textsubscript{Empty}}
+\UnaryInfC{$q \rhd \emptyset \searrow \mathbf{1}$}
+\end{prooftree}
 
-Aligning of patterns is then lifted to programs in the following, straightforward way; for this, let $Q_{def}$ denote the lhss of function definition $def$.
+\begin{prooftree}
+\AxiomC{$q \rhd Q \searrow \Sigma$}
+\AxiomC{$q \rhd q' \searrow \Sigma'$}
+\RightLabel{QA\textsubscript{Head}}
+\BinaryInfC{$q \rhd q' : Q \searrow \Sigma' \circ \Sigma$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\overline{p \rhd p' \searrow \Sigma}$}
+\RightLabel{qA}
+\UnaryInfC{$fun(\overline{p}) \rhd fun(\overline{p'}) \searrow \prod_i \Sigma_i$}
+\end{prooftree}
+
+$p \rhd p' \searrow \Sigma$ means that the sub-algorithm for pattern alignment, presented below, produces the set of substitutions $\Sigma$.
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{PA\textsubscript{VarVar}}
+\UnaryInfC{$x \rhd y \searrow \mathbf{1}$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\overline{y^{\mathit{fresh}} \rhd p \searrow \Sigma}$}
+\RightLabel{PA\textsubscript{VarCon}}
+\UnaryInfC{$x \rhd con^\tau(\overline{p}) \searrow \bigoplus_{con' \in \textrm{Cons}_\tau} x \mapsto con'(\overline{\Sigma(y^{\mathit{fresh}})})$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{PA\textsubscript{ConVar}}
+\UnaryInfC{$con(\overline{p}) \rhd x \searrow \mathbf{1}$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\overline{p \rhd p' \searrow \Sigma}$}
+\RightLabel{PA\textsubscript{ConCon\textsubscript{$=$}}}
+\UnaryInfC{$con(\overline{p}) \rhd con(\overline{p'}) \searrow \prod_i \Sigma_i$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$con \neq con'$}
+\RightLabel{PA\textsubscript{ConCon\textsubscript{$\neq$}}}
+\UnaryInfC{$con(\overline{p}) \rhd con'(\overline{p'}) \searrow \mathbf{1}$}
+\end{prooftree}
+
+The following lemma captures that this algorithm can actually be used for its intended purpose.
+
+\begin{lemma}
+For any copattern $q$ and set of copatterns $Q$ with $q \rhd Q \searrow \Sigma$ for some $\Sigma$, all elements of $\Sigma(q)$ align with all elements of $Q$.
+\end{lemma}
+
+To prove this, we first show a lemma for the sub-algorithm for pattern alignment.
+
+\begin{lemma}
+For any two patterns $p_1, p_2$ with $p_1 \rhd p_2 \searrow \Sigma$ for some $\Sigma$, all elements of $\Sigma(p_1)$ align with $p_2$.
+
+\begin{proof}
+By induction on the derivation of $p_1 \rhd p_2 \searrow \Sigma$.
+\end{proof}
+\end{lemma} 
+
+%Now, we define the algorithm that aligns patterns. We start with an algorithm \textsf{AlignPatterns} that, for a given copattern $q$ and a set of copatterns $Q$, produces a set of copatterns $Q'$ that is
+%\begin{itemize}
+%\item equivalent to $q$, i.e., the terms matched by $q$ are exactly the same as all terms matched by any copattern in $Q'$ together
+%\item non-overlapping, i.e., no copattern of $Q'$ overlaps with another copatterns of this set
+%\item aligned with all copatterns of $Q$.
+%\end{itemize}
+%
+%\begin{flalign*}
+%&\textsf{Align}(x, P^T) &\\
+%&\quad= \bigcup \{ con(\overline{\textsf{Align}(\textsf{MapToArg}_i(x_i, P^T))}) ~ | ~ con \in \textrm{Cons}_T \} &&, \text{ if } \exists con . con(\overline{p}) \in P^T &\\
+%&\quad= \{x^{\mathit{new}}\}, x^{\mathit{new}} \text{ fresh}, && \text{ otherwise} &\\
+%&\textsf{Align}(con(\overline{p}), P^T) &\\
+%&\quad= con(\overline{\textsf{Align}(\textsf{MapToArg}_i(p, P^T))}) \span\span
+%\end{flalign*}
+%\begin{flalign*}
+%&\textsf{HaveSameDess}(q.des(\overline{p}), q'.des'(\overline{p'})) &\\
+%&\quad = \textsf{HaveSameDess}(q, q') \land des = des' &\\
+%&\textsf{HaveSameDess}(fun(\overline{p}), fun(\overline{p'})) &\\
+%&\quad = \top &
+%\end{flalign*}
+%\begin{flalign*}
+%&\textsf{GetPatterns}(q.des(\overline{p}), Q) &\\
+%&\quad = \textsf{GetPatterns}(q, Q) \cdot \overline{(p_i, \{ p'_i ~ | ~ q'.des(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \land \textsf{HaveSameDess}(q, q') \})} & \\
+%&\textsf{GetPatterns}(fun(\overline{p}), Q) &\\
+%&\quad = \overline{(p_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \})}
+%\end{flalign*}
+%\begin{flalign*}
+%&\textsf{ReplacePatterns}(q.des(p_1, ..., p_k), (p'_1, ..., p'_n)) &\\
+%&\quad = \textsf{ReplacePatterns}(q, (p'_1, ..., p'_{n-k})).des(p'_{n-k+1}, ..., p'_n) &\\
+%&\textsf{ReplacePatterns}(fun(p_1, ..., p_n), (p'_1, ..., p'_n)) &\\
+%&\quad = fun(p'_1, ..., p'_n) &
+%\end{flalign*}
+%\begin{flalign*}
+%&\textsf{AlignPatterns}(q, Q) = \{ \textsf{ReplacePatterns}(q, \overrightarrow{p}) ~ | ~  \overrightarrow{p} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q, Q)) \} &
+%\end{flalign*}
+%
+%We show a property of \textsf{Align} upon which the intended consequences of $align\_patterns$ depend.
+%
+%\begin{lemma}
+%When $p^1$ and $p^2$ are both contained in a set $P$, $\textsf{Align}(p^1, P)$ and $\textsf{Align}(p^2, P)$ align.
+%
+%\begin{proof}
+%By induction on the structure of $p^1$.
+%\end{proof}
+%\end{lemma}
+%
+%The following lemma captures that this transformation actually has its intended consequences.
+%
+%\begin{lemma}
+%For any program $prg$ without overlapping lhss, the following holds for any function definition $def$ of $\langle prg \rangle^{align\_patterns}$: All lhss of $def$ align with all other lhss of $def$.
+%
+%\begin{proof}
+%To show this, it will be shown that, for any set of copatterns $Q$ of the same function $fun$ and any $q_1, q_2 \in Q$, each ${q_1}^a \in \textsf{AlignPatterns}(q_1, Q)$ aligns with each ${q_2}^a \in \textsf{AlignPatterns}(q_2, Q)$. This is done by induction on the structure of $q_1$. In any case it is, for $q \in \{q_1, q_2\}$,
+%\[
+%\textsf{AlignPatterns}(q, Q) = \{ \textsf{ReplacePatterns}(q, \overrightarrow{p}) ~ | ~  \overrightarrow{p} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q, Q)) \}.
+%\]
+%
+%If $q_1 = fun(\overline{p^1})$, it is, for some $\overrightarrow{{p^1}^a} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q, Q))$,
+%\[
+%{q_1}^a = \textsf{ReplacePatterns}(q_1, \overrightarrow{{p^1}^a}) = fun(\overline{{p^1}^a}).
+%\]
+%And it is
+%\[
+%\textsf{GetPatterns}(q_1, Q) = \overline{(p^1_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \})}
+%\]
+%We proceed by induction on the structure of $q_2$.
+%
+%If $q_2 = fun(\overline{p^2})$, it is, for some $\overrightarrow{{p^2}^a} \in \overrightarrow{\textsf{Align}}(\textsf{GetPatterns}(q_2, Q))$,
+%\[
+%{q_2}^a = \textsf{ReplacePatterns}(q_2, \overrightarrow{{p^2}^a}) = fun(\overline{{p^2}^a}).
+%\]
+%And it is
+%\[
+%\textsf{GetPatterns}(q_2, Q) = \overline{(p^2_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \})}
+%\]
+%By definition, ${q_1}^a$ and ${q_2}^a$ align when ${{p^1}^a}_i$ and  ${{p^2}^a}_i$ align, for every $i \in \{1, ..., n\}$, with $n$ the number of arguments of $fun$. We know that
+%\[
+%{{p^1}^a}_i = \textsf{Align}(p^1_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \})
+%\]
+%and
+%\[
+%{{p^2}^a}_i = \textsf{Align}(p^2_i, \{ p'_i ~ | ~ fun(p'_1, ..., p'_k).\overline{des(\overline{p''})} \in Q \}).
+%\]
+%Thus we have that ${{p^1}^a}_i = \textsf{Align}(p^1_i, P)$ and ${{p^2}^a}_i = \textsf{Align}(p^2_i, P)$ for the same set $P$ and, since both $q_1$ and $q_2$ are elements of $Q$, $p^1_i \in P$ and $p^2_i \in P$. By Lemma 4.1.1, it follows that ${{p^1}^a}_i$ and  ${{p^2}^a}_i$ align.
+%
+%TODO: destructor case for $q_2$ and destructor case for $q_1$
+%\end{proof}
+%\end{lemma}
+
+Aligning of patterns is lifted to programs in the following, straightforward way; for this, let $Q_{def}$ denote the lhss of function definition $def$.
 \begin{alignat*}{4}
 \langle prg \rangle^{align\_patterns} & = &&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
 & &&\quad \{ `` q' = t " ~ | ~ q' \in \textsf{AlignPatterns}(q, Q_def), `` q = t " \in eqns \} \\
