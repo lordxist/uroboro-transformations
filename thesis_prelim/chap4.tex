@@ -10,9 +10,9 @@
 
 \subsection{Aligning patterns}
 
-For destructor extraction to work correctly, it is necessary that, for all function definitions of the program, all lhss of the function definition \textit{align}. In short, for two copatterns $q_1, q_2$ to align means that any pattern directly under $q_1$ has the same specificity as its respective counterpart under $q_2$, if any. In this section, we first illustrate why the correctness of destructor extraction depends upon the alignment of the lhss. Then we formally define alignment and prove a lemma which formally expresses the connection between these two concepts. In appendix B, we give an algorithm for aligning copatterns.
+To prevent destructor extraction from introducing overlaps, it is necessary that, for all function definitions of the program, all lhss of the function definition \textit{align} -- and in fact, this property is already sufficient for this purpose. In short, for two copatterns $q_1, q_2$ to align means that any pattern directly under $q_1$ has the same specificity as its respective counterpart under $q_2$, if any. In this section, we first illustrate why the correctness of destructor extraction depends upon the alignment of the lhss. Then we formally define alignment and prove that alignment suffices to prevent the introduction of overlaps via destructor extraction. In appendix B, we give an algorithm for aligning copatterns.
 
-For two patterns inside a copattern to align means that they have the same specificity. Consider the following example:
+When extracting destructors out of a program which has non-aligning lhss, the resulting program can have overlapping lhss even though the original program didn't. Consider the following example where the first and the third equations don't align (as well as the second and the third equation).
 
 \begin{lstlisting}
 
@@ -22,7 +22,19 @@ fun().d1(x).d2() = t_3
 
 \end{lstlisting}
 
-Here, the third equation's left-hand side has a catch-all pattern (variable) in its first destructor call $d1$. The first destructor in the first and second equations' left-hand sides is also $d1$, but the patterns there are the constructors $c1()$ and $c2()$, respectively; they are more specific than the catch-all pattern. For destructor extraction to work correctly, the catch-all pattern therefore must be split. Such splitting steps are what $align\_patterns$ is doing. The result of $align\_patterns$ applied to the above function definition is:
+Why don't these equations align? The third equation's left-hand side has a catch-all pattern (variable) in its first destructor call $d1$. The first destructor in the first and second equations' left-hand sides is also $d1$, but the patterns there are the constructors $c1()$ and $c2()$, respectively; they are more specific than the catch-all pattern.
+
+If we target the first lhs for destructor extraction, its final destructor is extracted; the result of this is shown below (we omit the generated auxiliary function definition).
+
+\begin{lstlisting}
+
+fun().d1(c1()) = aux()
+fun().d1(c2()).d1() = t_2
+fun().d1(x).d2() = t_3
+
+\end{lstlisting}
+
+Now, the first and the third lhs overlap. For destructor extraction to work correctly, the catch-all pattern must be split before the extraction. The program fragment after this split is shown below.
 
 \begin{lstlisting}
 
@@ -32,6 +44,19 @@ fun().d1(c1()).d2() = t_3
 fun().d1(c2()).d2() = t_3
 
 \end{lstlisting}
+
+When we now target the first lhs for destructor extraction, this transformation also affects the third lhs because they have the same remains. Thus the extraction results in the equations shown below.
+
+\begin{lstlisting}
+
+fun().d1(c1()) = aux()
+fun().d1(c2()).d1() = t_2
+fun().d1(c1()) = aux()
+fun().d1(c2()).d2() = t_3
+
+\end{lstlisting}
+
+The first and the third equation are identical and are thus present only once in the program, thus the program doesn't have overlapping lhss. The program that was transformed has only aligned lhss. In fact, to prevent destructor extraction from introducing overlaps it suffices that the transformed program has this property, as we will show further on.
 
 Now, we formally define what it means for a (co-)pattern to be \textit{aligned} with another (co-)pattern.
 
