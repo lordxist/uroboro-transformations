@@ -125,6 +125,8 @@ We define the following conditional recursion combinator:
 
 Each preprocessing step is applied to each function definition individually. It is thus assumed that the function $fun$ of the function definition to be transformed is available to the transformation. For the complete step, simply transform all function definitions, in arbitrary order.
 
+TODO: prove that each preprocessing terminates -- roughly, this is because (a) no auxiliary function definitions are transformed (they already have the desired form) and (b) each extraction strictly decreases, for at least one lhs, while leaving the others untouched, the following measure: the distance from the desired form (in number of destructors or constructors)
+
 Roughly, each preprocessing step is defined as a recursive composition of one of three example extractions defined at the end of chapter 3 lifted to programs with $liftp$. More precisely, they all have definitions of the form
 \[
 condrec(liftp(extract \circ selector), cond),
