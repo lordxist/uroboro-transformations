@@ -112,13 +112,29 @@ To prove this, we first show a lemma for the sub-algorithm for pattern alignment
 For any two patterns $p_1, p_2$ with $p_1 \rhd p_2 \searrow \Sigma_1, p_2 \rhd p_1 \searrow \Sigma_2$ for some $\Sigma_1, \Sigma_2$, all elements of $\Sigma_1(p_1)$ align with all elements of $\Sigma_2(p_2)$.
 
 \begin{proof}
-By induction on the derivation of $p_1 \rhd p_2 \searrow \Sigma$.
+By induction on the structure of $p_1$.
 
-\textbf{PA\textsubscript{VarVar}}: The only element of $\Sigma$ is the identity substitution, thus the only element of $\Sigma(p_1)$ is $p_1 = x$ itself, and it is $p_2 = y$. Because $p_1$ and $p_2$ are both variables, $p_2 \rhd p_1 \searrow \Sigma$ can only be derived by the rule PA\textsubscript{VarVar}. Like with the other derivation, we can conclude that the only element of $\Sigma(p_2)$ is $p_2 = y$ itself; it follows that elements of $\Sigma(p_1)$ align with all elements of $\Sigma(p_2)$ since both $p_1$ and $p_2$ are variables.
+\underline{$p_1$ is a variable:} By induction on the structure of $p_2$.
+\begin{itemize}
+\item \underline{$p_2$ is a variable:} Then we know that the last steps in the derivations of both $p_1 \rhd p_2 \searrow \Sigma_1$ and $p_2 \rhd p_1 \searrow \Sigma_2$ use PA\textsubscript{VarVar}. It follows that the identity substitution is the only element of $\Sigma_1$ and the only element of $\Sigma_2$. Thus the only element of $\Sigma_1(p_1)$ is $p_1$ itself, and the only element of $\Sigma_2(p_2)$ is $p_2$ itself, and these two align since they are both variables.
 
-\textbf{PA\textsubscript{ConVar}}: The only element of $\Sigma$ is the identity substitution thus the only element of $\Sigma(p_1)$ is $p_1 = con(\overline{p})$ itself, and it is $p_2 = y$.
+\item \underline{$p_2 = con(\overline{p'})$:} Then we know that the last step in the derivation of $p_1 \rhd p_2 \searrow \Sigma_1$ uses PA\textsubscript{VarCon}, and that it is $\overline{y^{fresh} \rhd p' \searrow \Sigma'}$ such that $\Sigma_2 = \bigoplus_{con' \in \textrm{Cons}_\tau} x \mapsto con'(\overline{\Sigma'(y^{\mathit{fresh}})})$. By the induction hypothesis we have that all elements of $\Sigma'_i(y^{fresh}_i)$ align with all elements of $\Sigma''_i(p'_i)$, with $p'_i \rhd y^{fresh}_i \searrow \Sigma''$. The only element of $\Sigma''_i(p'_i)$ is $p'_i$ itself, since the last step in the derivation of $p'_i \rhd y^{fresh}_i \searrow \Sigma''$ uses PA\textsubscript{ConVar} or \textsubscript{VarVar}. Thus $p'_i$ aligns with all elements of $\Sigma'_i(y^{fresh}_i)$.
 
-TODO: rest
+We also know that the last step in the derivation of $p_2 \rhd p_1 \searrow \Sigma_2$ uses PA\textsubscript{ConVar}, thus the only element of $\Sigma_2$ is the identity substitution, and therefore the only element of $\Sigma_2(p_2)$ is $p_2$ itself. All elements of $\Sigma_1(p_1)$ align with $p_2$, because they are either calls to constructors different from that of $p_2$, or calls to the constructor $con$ of $p_2$ and the respective arguments of the constructor calls of $p_1$ and $p_2$ align. This is because, as shown above, each $p'_i$ aligns with all elements of $\Sigma'_i(y^{fresh}_i)$.
+\end{itemize}
+
+\underline{$p_1 = con(\overline{p'})$:} By induction on the structure of $p_2$.
+\begin{itemize}
+\item \underline{$p_2$ is a variable:} The argument is the same as when $p_1$ was a variable and $p_2$ a constructor call, only with the roles of $p_1$ and $p_2$ reversed.
+
+\item \underline{$p_2 = con'(\overline{p''})$:} We distinguish two cases.
+\begin{itemize}
+\item $con \neq con'$. Then we know that the last steps in the derivations of both $p_1 \rhd p_2 \searrow \Sigma_1$ and $p_2 \rhd p_1 \searrow \Sigma_2$ use PA\textsubscript{ConCon\textsubscript{$\neq$}}. It follows that the identity substitution is the only element of $\Sigma_1$ and the only element of $\Sigma_2$. Thus the only element of $\Sigma_1(p_1)$ is $p_1$ itself, and the only element of $\Sigma_2(p_2)$ is $p_2$ itself, and these two align since they are constructor calls of different constructors.
+
+\item $con = con'$. Then we know that the last steps in the derivations of both $p_1 \rhd p_2 \searrow \Sigma_1$ and $p_2 \rhd p_1 \searrow \Sigma_2$ use PA\textsubscript{ConCon\textsubscript{$=$}}, and that it is $\overline{p' \rhd p'' \searrow \Sigma'}$ such that $\Sigma_1 = \prod_i \Sigma'_i$ and $\overline{p'' \rhd p' \searrow \Sigma''}$ such that $\Sigma_2 = \prod_i \Sigma''_i$. By the induction hypothesis we know that each element of $\Sigma'(p'_i)$ aligns with each element of $\Sigma''(p''_i)$. It follows that each element of $\Sigma_1(p_1)$ aligns with each element of $\Sigma_2(p_2)$.
+\end{itemize}
+\end{itemize}
+
 \end{proof}
 \end{lemma} 
 
