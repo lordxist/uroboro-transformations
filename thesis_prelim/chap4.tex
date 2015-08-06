@@ -1,5 +1,39 @@
 \chapter{Automatic de- and refunctionalization}
 
+...
+
+Both de- and refunctionalization are made up of a couple of preprocessing steps, followed by the core de-/refunctionalization, which is essentially the two-way transformation from the paper of Rendel et al. Here, we give an overview of these steps for both transformations. In brackets, we name the step; this name will be used throughout the chapter. What can already be seen here is that steps $unmix$ and $elim\_cons\_from\_des$ are used for both transformations.
+
+Automatic defunctionalization consists of the following steps:
+\begin{enumerate}
+\item Eliminate multiple destructors. ($elim\_multi\_des_d$)
+
+\item Unmix function definitions. ($unmix$)
+
+\item Eliminate constructors from destructor copatterns. ($elim\_cons\_from\_des$)
+
+\item Core defunctionalization. ($d_{core}$)
+
+\end{enumerate}
+
+Automatic refunctionalization consists of the following steps:
+\begin{enumerate}
+\item Eliminate multiple destructors from copatterns containing constructors. ($elim\_multi\_des_r$)
+
+\item Unmix function definitions. ($unmix$)
+
+\item Eliminate constructors from destructor copatterns. ($elim\_cons\_from\_des$)
+
+\item Eliminate multiple constructors. ($elim\_multi\_con$)
+
+\item Core refunctionalization. ($r_{core}$)
+
+\end{enumerate}
+
+Both de- and refunctionalization require that all lhss of the program that is to be transformed are \textit{aligned}. We introduce this notion in the following section; an algorithm to achieve alignment can be found in appendix B.
+
+The rest of the chapter is organized as follows. The first section introduces alignment and some notations used. In section 2, we define the preprocessing steps and show that they preserve the semantics of the program in a weak bisimulation; we also give their domains and ranges to show that they can be applied one after the other as laid out above. In section 3, we define the core de- and refunctionalization and prove strong bisimulation for them. Section 4 discusses related work.
+
 \section{Preliminaries}
 
 \subsection{Aligning patterns}
@@ -76,39 +110,9 @@ Suppose there are two lhss $q_1, q_2$ with prefixes $q^{\mathit{pref}}_1$ and $q
 \end{proof}
 \end{lemma}
 
-\section{Transformation steps}
+\subsection{Notation}
 
-Both de- and refunctionalization are made up of a couple of preprocessing steps, followed by the core de-/refunctionalization, which is essentially the two-way transformation from the paper of Rendel et al.
-
-Automatic defunctionalization consists of the following steps:
-\begin{enumerate}
-\item Eliminate multiple destructors. ($elim\_multi\_des_d$)
-
-\item Unmix function definitions. ($unmix$)
-
-\item Eliminate constructors from destructor copatterns. ($elim\_cons\_from\_des$)
-
-\item Core defunctionalization. ($d_{core}$)
-
-\end{enumerate}
-
-Automatic refunctionalization consists of the following steps:
-\begin{enumerate}
-\item Eliminate multiple destructors from copatterns containing constructors. ($elim\_multi\_des_r$)
-
-\item Unmix function definitions. ($unmix$)
-
-\item Eliminate constructors from destructor copatterns. ($elim\_cons\_from\_des$)
-
-\item Eliminate multiple constructors. ($elim\_multi\_con$)
-
-\item Core refunctionalization. ($r_{core}$)
-
-\end{enumerate}
-
-Each preprocessing step is applied to each function definition individually. It is thus assumed that the function definition to be transformed is available to the transformation. For the complete step, simply transform all function definitions, in arbitrary order.
-
-Each preprocessing steps can be defined as a recursive composition of one of the basic building blocks described in the next section. One such building block is an extraction function lifted to programs with $extract\_helpers$. The definitions for each step follow below; for them, the following conditional recursion combinator will be used:
+We define the following conditional recursion combinator:
 \[
     condrec(f, cond) :=
 \begin{cases}
@@ -117,49 +121,77 @@ Each preprocessing steps can be defined as a recursive composition of one of the
 \end{cases}
 \]
 
-Let $q^{work}$ denote any copattern which isn't yet in the desired form. For $unmix$, this means that it has a destructor, for all other steps this means that the condition passed to $condrec$ holds for the individual copattern. Let $n$ be the number of constructors in the targeted pattern (i.e., the extracted constructor is the right-most one).
+\section{Preprocessing steps}
 
-\begin{framed}
+Each preprocessing step is applied to each function definition individually. It is thus assumed that the function $fun$ of the function definition to be transformed is available to the transformation. For the complete step, simply transform all function definitions, in arbitrary order.
 
-\begin{alignat*}{1}
-&elim\_multi\_des_i = condrec(liftp(extract\_des(q^{work})), cond_i), \textrm{ for } i \in \{d, r\}, \textrm{ with } \\
-&\qquad cond_d = \textrm{``the function def. contains multiple destructors''} \\
-&\qquad cond_r = \textrm{``the function def. contains a multiple destructor copattern with constructors''} \\
-&unmix = condrec(liftp(extract\_des(q^{work})), cond), \textrm{ with}\\
-&\qquad cond = \textrm{``the function def. is mixed''} \\
-&elim\_cons\_from\_des = condrec(liftp(extract\_patterns(q^{work})), cond), \textrm{ with}\\
-&\qquad cond = \textrm{``the function def. has destructor copatterns with constructors''} \\
-&elim\_multi\_con = condrec(liftp(extract\_con_n(q^{work})), cond), \textrm{ with}\\
-&\qquad cond = \textrm{``the function def. has copatterns with multiple constructors''}
-\end{alignat*}
+Roughly, each preprocessing step is defined as a recursive composition of one of three example extractions defined at the end of chapter 3 lifted to programs with $liftp$. More precisely, they all have definitions of the form
+\[
+condrec(liftp(extract \circ q\_selector), cond),
+\]
+for some continue condition $cond$, some extraction transformation (as defined in chapter 3) $extract$ with the targeted copattern left as an argument, and some function $q\_selector$ selecting the lhs (of the function definition of $fun$) that is to be targeted. The three parameters $cond$, $extract$, and $q\_selector$ uniquely determine the desired preprocessing step, thus all of those steps will be defined by only defining them. In any case $extract$ is chosen to be one of the example extractions from section 3.5, that is, either $extract\_des$, $extract\_con$, or $extract\_patterns$.
 
-\end{framed}
+For each preprocessing, to show that a kind of weak bisimulation holds it suffices to show that, at no point in the recursive extraction, overlapping lhss are generated. From chapter 3, we know that the in there described kind of weak bisimulation holds for any extraction transformation as defined in chapter 3, as long as the transformed program doesn't have overlapping lhss. Both steps are defined as recursive compositions of $extract\_des$, thus we can combine the bisimulation statements for $extract\_des$ to obtain a kind of weak bisimulation for the entire preprocessing step, provided that overlapping lhss are never generated in the recursive process.
 
-As stated above, $r_{core}$ and $d_{core}$ are essentially two ways of the transformation of Rendel et al. Their precise definitions are given in section 3.6.
+\subsection{Eliminate multiple destructors}
 
-\subsection{Bisimulation}
+In this section, we define both $elim\_multi\_des_d$ and $elim\_multi\_des_r$, by defining their common parameters $q\_selector$ and $extract$ and their respective continue conditions $cond_d$ and $cond_r$.
 
-All of the preprocessing steps are recursive compositions of lifted extraction functions. Each of those extraction functions preserve the semantics of the program in the kind of weak bisimulation described in the previous chapter, when the program doesn't have overlapping lhss.
+\begin{itemize}
+\item $q\_selector$: Selects an lhs with a maximal number of lhss (but is otherwise arbitrary).
 
-For the bisimulation to hold, it is therefore necessary that each application of an extraction function in the preprocessing steps doesn't introduce overlapping lhss. This will be shown in the next subsection.
+\item $extract := extract\_des$ (as defined in chapter 3).
 
-For core de-/refunctionalization, strong bisimulation holds. This is essentially a corollary of that property for the two-way transformation of Rendel et al., as will be shown in the section on core de- and refunctionalization.
+\item $cond_d$: Continue when the function definition still contains multiple destructor lhss.
 
-\subsection{Absence of overlaps}
+\item $cond_r$: Continue when the function definition still contains multiple destructor lhss with constructors.
+\end{itemize}
 
-The three extraction functions used, $extract\_des$, $extract\_patterns$, and $extract\_con_n$ are shown to preserve the absence of overlapping lhss wherever they are applied in the preprocessing steps. By Proposition 2.4.1, it suffices to show that $q_\epsilon$ doesn't overlap with any lhs of an equation taken over unchanged from the original program.
+Now, we show that, at no point in the recursive extraction, overlapping lhss are generated.
 
-\subsubsection{Destructor extraction}
+Now, consider a singular destructor extraction. By Proposition 3.4.1, we need only compare equations taken over unchanged and the equation $\epsilon$ generated by the extraction. By Lemma 4.1.1, since all lhss of the input program align, whenever two prefixes of lhss of the original program overlap, one of them is a prefix of the other. $q_\epsilon$ is a prefix of an lhs $q_r$ of the original program; if it overlapped with a $q_{r'}$ taken over unchanged then $q_{r'}$ (a prefix of itself) and the prefix $q_\epsilon$ of $q_r$ overlapped. But then, by Lemma 4.1.1, either (a) $q_\epsilon$ is a prefix of $q_{r'}$ or (b) $q_{r'}$ is a prefix of $q_\epsilon$. In case (a) it is either $q_\epsilon = q_{r'}$, but then $q_{r'}$ and $q_r$ overlapped contrary to assumption, or, since $q_{r'}$ doesn't have more destructors than $q_r$, $q_{r'}$ is identical to $q_r$ except for the last destructor call, but then $q_{r'}$ would also be targeted by the destructor extraction, contrary to assumption. In case (b) $q_{r'}$ is a prefix of $q_r$ and thus they overlap, again contrary to assumption.
 
-By Lemma 4.1.1, the pre-transformation $align\_patterns$ ensures that, whenever two prefixes of lhss of the original program overlap, one of them is a prefix of the other. $q_\epsilon$ is a prefix of an lhs $q_r$ of the original program; if it overlapped with a $q_{r'}$ taken over unchanged then $q_{r'}$ (a prefix of itself) and the prefix $q_\epsilon$ of $q_r$ overlapped. But then, by Lemma 4.1.1, either (a) $q_\epsilon$ is a prefix of $q_{r'}$ or (b) $q_{r'}$ is a prefix of $q_\epsilon$. In case (a) it is either $q_\epsilon = q_{r'}$, but then $q_{r'}$ and $q_r$ overlapped contrary to assumption, or, since $q_{r'}$ doesn't have more destructors than $q_r$, $q_{r'}$ is identical to $q_r$ except for the last destructor call, but then $q_{r'}$ would also be targeted by the destructor extraction, contrary to assumption. In case (b) $q_{r'}$ is a prefix of $q_r$ and thus they overlap, again contrary to assumption.
+\subsection{Unmix}
 
-\subsubsection{Pattern extraction}
+In this section, we define $unmix$, by defining its parameters $q\_selector$, $extract$, and $cond$.
 
-The extraction $extract\_patterns$ is only ever applied to single-destructor copatterns and transforms them to single-destructor copatterns without any constructors. It is also only ever used in unmixed function definitions where all lhss have exactly one destructor. If the destructor of such an lhs $q$ is different from that of $q_\epsilon$, they cannot overlap. But if the destructor of $q$ is the same as that of $q_\epsilon$, and thus the same as that of $q_r$, the extraction result is the same for both $q_r$ and $q$. Thus, by the definition of extraction functions, the equations of $q_r$ and $q$ are the same.
+\begin{itemize}
+\item $q\_selector$: Selects an lhs with a maximal number of lhss (but is otherwise arbitrary).
 
-\subsubsection{Constructor extraction}
+\item $extract := extract\_des$ (as defined in section 3.5.1).
 
-The only transformed equations have no destructors on their lhs. Constructor extraction is only ever used with unmixed function definitions. It follows that, if $q_\epsilon$ overlapped with an unchanged lhs, the latter has no destructors, too. Since the extracted constructor is further right than the right-most constructor in the unchanged lhs, the unchanged lhs and $q_\epsilon$ would overlap, contrary to assumption.
+\item $cond$: Continue when the function definition still is mixed.
+\end{itemize}
+
+Overlapping lhss are never generated, for the same reasons we gave for $elim\_multi\_des_d$ and $elim\_multi\_des_r$ in section 4.2.1.
+
+\subsection{Eliminate constructors from destructor copatterns}
+
+In this section, we define $elim\_cons\_from\_des$, by defining its parameters $q\_selector$, $extract$, and $cond$.
+
+\begin{itemize}
+\item $q\_selector$: Selects an arbitrary lhs.
+
+\item $extract := extract\_patterns$ (as defined in section 3.5.3).
+
+\item $cond$: Continue when the function definition still has lhss with constructors.
+\end{itemize}
+
+Now, we show that, at no point in the recursive extraction, overlapping lhss are generated. We consider a singular extraction with $extract\_patterns$. By Proposition 3.4.1, we need only compare equations taken over unchanged and the equation $\epsilon$ generated by the extraction. The extraction $extract\_patterns$ is only ever applied to single-destructor copatterns and transforms them to single-destructor copatterns without any constructors. It is also only ever used in unmixed function definitions where all lhss have exactly one destructor. If the destructor of such an lhs $q$ is different from that of $q_\epsilon$, they cannot overlap. But if the destructor of $q$ is the same as that of $q_\epsilon$, and thus the same as that of $q_r$, the extraction result is the same for both $q_r$ and $q$. Thus, by the definition of extraction functions, the equations of $q_r$ and $q$ are the same.
+
+\subsection{Eliminate multiple constructors}
+
+In this section, we define $elim\_multi\_con$, by defining its parameters $q\_selector$, $extract$, and $cond$.
+
+\begin{itemize}
+\item $q\_selector$: Selects an arbitrary lhs.
+
+\item $extract := extract\_con$ (as defined in section 3.5.3).
+
+\item $cond$: Continue when there still is an lhs that doesn't have the form $fun(con(\overline{x}), \overline{y})$ or $fun(\overline{x})$.
+\end{itemize}
+
+Now, we show that, at no point in the recursive extraction, overlapping lhss are generated. We consider a singular extraction with $extract\_con$. TODO
 
 \section{Core de- and refunctionalization}
 
