@@ -79,7 +79,7 @@ $p \rhd p' \searrow \Sigma$ means that the sub-algorithm for pattern alignment, 
 \begin{prooftree}
 \AxiomC{$\overline{y^{\mathit{fresh}} \rhd p \searrow \Sigma}$}
 \RightLabel{PA\textsubscript{VarCon}}
-\UnaryInfC{$x \rhd con^\tau(\overline{p}) \searrow \bigoplus_{con' \in \textrm{Cons}_\tau} x \mapsto con'(\overline{\Sigma(y^{\mathit{fresh}})})$}
+\UnaryInfC{$x \rhd con^\tau(\overline{p}) \searrow \{ x \mapsto con(\overline{\Sigma(y^{\mathit{fresh}})}) \} \oplus \bigoplus\limits_{\substack{con' \in \textrm{Cons}_\tau \\ con' \neq con}} x \mapsto con'(\overline{z^{\mathit{fresh}}_{con'}})$}
 \end{prooftree}
 
 \begin{prooftree}
