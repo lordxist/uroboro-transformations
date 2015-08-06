@@ -10,9 +10,9 @@
 
 \subsection{Aligning patterns}
 
-This step is necessary for destructor extraction to work correctly.
+For destructor extraction to work correctly, it is necessary that, for all function definitions of the program, all lhss of the function definition \textit{align}. In short, for two copatterns $q_1, q_2$ to align means that any pattern directly under $q_1$ has the same specificity as its respective counterpart under $q_2$, if any. In this section, we first illustrate why the correctness of destructor extraction depends upon the alignment of the lhss. Then we formally define alignment and prove a lemma which formally expresses the connection between these two concepts. In appendix B, we give an algorithm for aligning copatterns.
 
-The purpose of $align\_patterns$ is to bring the patterns inside the copatterns within one function definition to the same level of specification. Consider the following example:
+For two patterns inside a copattern to align means that they have the same specificity. Consider the following example:
 
 \begin{lstlisting}
 
@@ -22,7 +22,7 @@ fun().d1(x).d2() = t_3
 
 \end{lstlisting}
 
-Here, the third equation's left-hand side has a catch-all pattern (variable) in its first destructor call $d1$. The first destructor in the first and second equations' left-hand sides is also $d1$, but the patterns there are the constructors $c1()$ and $c2()$, respectively; they have a higher level of specification than the catch-all pattern. For destructor extraction to work correctly, the catch-all pattern therefore must be split. Such splitting steps are what $align\_patterns$ is doing. The result of $align\_patterns$ applied to the above function definition is:
+Here, the third equation's left-hand side has a catch-all pattern (variable) in its first destructor call $d1$. The first destructor in the first and second equations' left-hand sides is also $d1$, but the patterns there are the constructors $c1()$ and $c2()$, respectively; they are more specific than the catch-all pattern. For destructor extraction to work correctly, the catch-all pattern therefore must be split. Such splitting steps are what $align\_patterns$ is doing. The result of $align\_patterns$ applied to the above function definition is:
 
 \begin{lstlisting}
 
@@ -33,7 +33,7 @@ fun().d1(c2()).d2() = t_3
 
 \end{lstlisting}
 
-First, we formally define what it means for a (co-)pattern to be \textit{aligned} with another (co-)pattern.
+Now, we formally define what it means for a (co-)pattern to be \textit{aligned} with another (co-)pattern.
 
 \begin{definition}[Aligning patterns]
 Two patterns $p_1, p_2$ of the same type align if they are (a) both variables, (b) both constructor calls of different constructors, or (c) constructor calls of the same constructor $con$ such that
@@ -47,122 +47,13 @@ where, for all $i \in \{1, ..., n\}$, $p'_i$ and $p''_i$ align.
 Two copatterns $q_1, q_2$ of the same function definition, for a function $fun$, align if the respective arguments of their largest common destructor call chains align.
 \end{definition}
 
-Now, we define the algorithm that aligns patterns; we present a calculus for it. We write $q \rhd Q \searrow \Sigma$ when the algorithm produces a result $\Sigma$ for a copattern $q$ and a copattern set $Q$ that $q$ is to be aligned with. This $\Sigma$ is a set of substitutions $\sigma$ such that $q[\sigma]$ is aligned with all elements of $Q$ and such that $\bigcup_{\sigma \in \Sigma} q[\sigma]$ is equivalent to $q$. Similarly, we write $q \rhd q' \searrow \Sigma$ for the sub-algorithm used for aligning $q$ with an individual copattern $q'$.
-
-\begin{prooftree}
-\AxiomC{}
-\RightLabel{QA\textsubscript{Empty}}
-\UnaryInfC{$q \rhd \emptyset \searrow \mathbf{1}$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$q \rhd Q \searrow \Sigma$}
-\AxiomC{$q \rhd q' \searrow \Sigma'$}
-\RightLabel{QA\textsubscript{Head}}
-\BinaryInfC{$q \rhd q' : Q \searrow \Sigma' \circ \Sigma$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$\overline{p \rhd p' \searrow \Sigma}$}
-\RightLabel{qA}
-\UnaryInfC{$fun(\overline{p}) \rhd fun(\overline{p'}) \searrow \prod_i \Sigma_i$}
-\end{prooftree}
-
-$p \rhd p' \searrow \Sigma$ means that the sub-algorithm for pattern alignment, presented below, produces the set of substitutions $\Sigma$.
-
-\begin{prooftree}
-\AxiomC{}
-\RightLabel{PA\textsubscript{VarVar}}
-\UnaryInfC{$x \rhd y \searrow \mathbf{1}$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$\overline{y^{\mathit{fresh}} \rhd p \searrow \Sigma}$}
-\RightLabel{PA\textsubscript{VarCon}}
-\UnaryInfC{$x \rhd con^\tau(\overline{p}) \searrow \{ x \mapsto con(\overline{\Sigma(y^{\mathit{fresh}})}) \} \oplus \bigoplus\limits_{\substack{con' \in \textrm{Cons}_\tau \\ con' \neq con}} x \mapsto con'(\overline{z^{\mathit{fresh}}_{con'}})$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{}
-\RightLabel{PA\textsubscript{ConVar}}
-\UnaryInfC{$con(\overline{p}) \rhd x \searrow \mathbf{1}$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$\overline{p \rhd p' \searrow \Sigma}$}
-\RightLabel{PA\textsubscript{ConCon\textsubscript{$=$}}}
-\UnaryInfC{$con(\overline{p}) \rhd con(\overline{p'}) \searrow \prod_i \Sigma_i$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$con \neq con'$}
-\RightLabel{PA\textsubscript{ConCon\textsubscript{$\neq$}}}
-\UnaryInfC{$con(\overline{p}) \rhd con'(\overline{p'}) \searrow \mathbf{1}$}
-\end{prooftree}
-
-The following lemma captures that this algorithm can actually be used for its intended purpose.
-
-\begin{lemma}
-For any set of copatterns $Q$ and any two of its elements $q_1, q_2$ with $q_1 \rhd Q \searrow \Sigma_1, q_2 \rhd Q \searrow \Sigma_2$ for some $\Sigma_1, \Sigma_2$, all elements of $\Sigma_1(q_1)$ align with all elements of $\Sigma_1(q_2)$.
-\end{lemma}
-
-To prove this, we first show a lemma for the sub-algorithm for pattern alignment.
-
-\begin{lemma}
-For any two patterns $p_1, p_2$ with $p_1 \rhd p_2 \searrow \Sigma_1, p_2 \rhd p_1 \searrow \Sigma_2$ for some $\Sigma_1, \Sigma_2$, all elements of $\Sigma_1(p_1)$ align with all elements of $\Sigma_2(p_2)$.
-
-\begin{proof}
-By induction on the structure of $p_1$.
-
-\underline{$p_1$ is a variable:} By induction on the structure of $p_2$.
-\begin{itemize}
-\item \underline{$p_2$ is a variable:} Then we know that the last steps in the derivations of both $p_1 \rhd p_2 \searrow \Sigma_1$ and $p_2 \rhd p_1 \searrow \Sigma_2$ use PA\textsubscript{VarVar}. It follows that the identity substitution is the only element of $\Sigma_1$ and the only element of $\Sigma_2$. Thus the only element of $\Sigma_1(p_1)$ is $p_1$ itself, and the only element of $\Sigma_2(p_2)$ is $p_2$ itself, and these two align since they are both variables.
-
-\item \underline{$p_2 = con(\overline{p'})$:} Then we know that the last step in the derivation of $p_1 \rhd p_2 \searrow \Sigma_1$ uses PA\textsubscript{VarCon}, and that it is $\overline{y^{fresh} \rhd p' \searrow \Sigma'}$ such that $\Sigma_2 = \bigoplus_{con' \in \textrm{Cons}_\tau} x \mapsto con'(\overline{\Sigma'(y^{\mathit{fresh}})})$. By the induction hypothesis we have that all elements of $\Sigma'_i(y^{fresh}_i)$ align with all elements of $\Sigma''_i(p'_i)$, with $p'_i \rhd y^{fresh}_i \searrow \Sigma''$. The only element of $\Sigma''_i(p'_i)$ is $p'_i$ itself, since the last step in the derivation of $p'_i \rhd y^{fresh}_i \searrow \Sigma''$ uses PA\textsubscript{ConVar} or \textsubscript{VarVar}. Thus $p'_i$ aligns with all elements of $\Sigma'_i(y^{fresh}_i)$.
-
-We also know that the last step in the derivation of $p_2 \rhd p_1 \searrow \Sigma_2$ uses PA\textsubscript{ConVar}, thus the only element of $\Sigma_2$ is the identity substitution, and therefore the only element of $\Sigma_2(p_2)$ is $p_2$ itself. All elements of $\Sigma_1(p_1)$ align with $p_2$, because they are either calls to constructors different from that of $p_2$, or calls to the constructor $con$ of $p_2$ and the respective arguments of the constructor calls of $p_1$ and $p_2$ align. This is because, as shown above, each $p'_i$ aligns with all elements of $\Sigma'_i(y^{fresh}_i)$.
-\end{itemize}
-
-\underline{$p_1 = con(\overline{p'})$:} By induction on the structure of $p_2$.
-\begin{itemize}
-\item \underline{$p_2$ is a variable:} The argument is the same as when $p_1$ was a variable and $p_2$ a constructor call, only with the roles of $p_1$ and $p_2$ reversed.
-
-\item \underline{$p_2 = con'(\overline{p''})$:} We distinguish two cases.
-\begin{itemize}
-\item $con \neq con'$. Then we know that the last steps in the derivations of both $p_1 \rhd p_2 \searrow \Sigma_1$ and $p_2 \rhd p_1 \searrow \Sigma_2$ use PA\textsubscript{ConCon\textsubscript{$\neq$}}. It follows that the identity substitution is the only element of $\Sigma_1$ and the only element of $\Sigma_2$. Thus the only element of $\Sigma_1(p_1)$ is $p_1$ itself, and the only element of $\Sigma_2(p_2)$ is $p_2$ itself, and these two align since they are constructor calls of different constructors.
-
-\item $con = con'$. Then we know that the last steps in the derivations of both $p_1 \rhd p_2 \searrow \Sigma_1$ and $p_2 \rhd p_1 \searrow \Sigma_2$ use PA\textsubscript{ConCon\textsubscript{$=$}}, and that it is $\overline{p' \rhd p'' \searrow \Sigma'}$ such that $\Sigma_1 = \prod_i \Sigma'_i$ and $\overline{p'' \rhd p' \searrow \Sigma''}$ such that $\Sigma_2 = \prod_i \Sigma''_i$. By the induction hypothesis we know that each element of $\Sigma'(p'_i)$ aligns with each element of $\Sigma''(p''_i)$. It follows that each element of $\Sigma_1(p_1)$ aligns with each element of $\Sigma_2(p_2)$.
-\end{itemize}
-\end{itemize}
-
-\end{proof}
-\end{lemma} 
-
-Now, we get back to the proof of Lemma 4.1.1.
-
-\begin{proof}[Proof of Lemma 4.1.1]
-By induction on the derivation of $q_1 \rhd Q \searrow \Sigma_1$.
-
-TODO
-\end{proof}
-
-Aligning of patterns is lifted to programs in the following, straightforward way; for this, let $Q_{def}$ denote the lhss of function definition $def$.
-\begin{alignat*}{4}
-\langle prg \rangle^{align\_patterns} & = &&\{ \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \\
-& &&\quad \{ `` q' = t " ~ | ~ q' \in \Sigma(q), q \rhd Q_{def} \searrow \Sigma, `` q = t " \in eqns \} \\
-& && | ~ def = `` fun (\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in prg \} \\
-& \cup && \{ def ~ | ~ def \in prg, def \textrm{ is (co)data def. } \} \span\span\span\span
-\end{alignat*}
-
 Aligning patterns of a program before applying destructor extraction guarantees that the destructor extraction doesn't introduce overlaps. As shown in subsection 4.2.2, this follows from the following lemma.
 
 \begin{lemma}
-For any program $prg$ without overlapping lhss, whenever two prefixes of lhss of $\langle prg \rangle^{align\_patterns}$ overlap, one of them is a prefix of the other.
+For any program $prg$ without overlapping lhss and where, for all of its function definitions $def$, all lhss of $def$ align with each other, the following holds: Whenever two prefixes of $prg$ overlap, one of them is a prefix of the other.
 
 \begin{proof}
-Consider any function definition of $prg$. After transformation of $prg$ to $\langle prg \rangle^{align\_patterns}$, the function definition for the same function in the transformed program contains only lhss that align with all other lhss in the function definition. This follows directly from Lemma 4.1.1.
-
-Now, suppose there are two lhss $q_1, q_2$ with prefixes $q^{\mathit{pref}}_1$ and $q^{\mathit{pref}}_2$, respectively, such that these prefixes overlap. Especially, this means that one of them -- w.l.o.g., $q^{\mathit{pref}}_1$ -- has an initial destructor chain $C$ that is identical to the entire destructor chain of the other, $q^{\mathit{pref}}_2$. Thus the entire destructor chain of $q^{\mathit{pref}}_2$ is a part of the largest common destructor chain of $q_1$ and $q_2$. It follows that all of the pattern arguments of the initial destructor chain $C$ of $q^{\mathit{pref}}_1$ align with the respective arguments of the destructor chain of $q^{\mathit{pref}}_2$. For the associated instances of these two destructor chains to overlap, it also needs to be the case that their respective pattern arguments overlap. Whenever two patterns overlap and align they are the same, thus $q^{\mathit{pref}}_2$ is a prefix of $q^{\mathit{pref}}_1$.
+Suppose there are two lhss $q_1, q_2$ with prefixes $q^{\mathit{pref}}_1$ and $q^{\mathit{pref}}_2$, respectively, such that these prefixes overlap. Especially, this means that one of them -- w.l.o.g., $q^{\mathit{pref}}_1$ -- has an initial destructor chain $C$ that is identical to the entire destructor chain of the other, $q^{\mathit{pref}}_2$. Thus the entire destructor chain of $q^{\mathit{pref}}_2$ is a part of the largest common destructor chain of $q_1$ and $q_2$. It follows that all of the pattern arguments of the initial destructor chain $C$ of $q^{\mathit{pref}}_1$ align with the respective arguments of the destructor chain of $q^{\mathit{pref}}_2$. For the associated instances of these two destructor chains to overlap, it also needs to be the case that their respective pattern arguments overlap. Whenever two patterns overlap and align they are the same, thus $q^{\mathit{pref}}_2$ is a prefix of $q^{\mathit{pref}}_1$.
 \end{proof}
 \end{lemma}
 
