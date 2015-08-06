@@ -4,10 +4,6 @@
 
 ...
 
-\subsection{From order-dependent to order-independent}
-
-...
-
 \subsection{Aligning patterns}
 
 To prevent destructor extraction from introducing overlaps, it is necessary that, for all function definitions of the program, all lhss of the function definition \textit{align} -- and in fact, this property is already sufficient for this purpose. In short, for two copatterns $q_1, q_2$ to align means that any pattern directly under $q_1$ has the same specificity as its respective counterpart under $q_2$, if any. In this section, we first illustrate why the correctness of destructor extraction depends upon the alignment of the lhss. Then we formally define alignment and prove that alignment suffices to prevent the introduction of overlaps via destructor extraction. In appendix B, we give an algorithm for aligning copatterns.
