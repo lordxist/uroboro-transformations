@@ -28,7 +28,7 @@ A generic evaluation context (g.e.c.) $\mathcal{GE}$ for a term $t$ is either th
 The set of g.e.c.s for a placeholder order $<$, in symbols $\textrm{EC}_<$ is the set of all g.e.c.s for the placeholder set $P$ ordered by $<$.
 \end{definition}
 
-Using these definitions, the generic form of the evaluation contexts can be specified without yet knowing the set of terms which are to be considered values. Next, we define what it means to be an instance of a g.e.c., or of a set of g.e.c.s, induced by such a value set.
+Using these definitions, the generic form of the evaluation contexts can be specified without yet knowing the set of terms which are to be considered values. Next, we define what it means to be an instance of a g.e.c., or of a set of g.e.c.s, induced by such a value set. Almost any set of terms can be a value set, we only require that it is closed under substitution of subterms, i.e.: Let $\textrm{Val}$ be a set of values, and $a, b, c \in \textrm{Val}$ with $a$ a subterm of $c$. Then $c[a \mapsto b] \in \textrm{Val}$.
 
 \begin{definition}[Instance of a g.e.c.]
 An instance of a g.e.c. $\mathcal{GE}$ induced by a set of values $\textrm{Val}$ with respect to  a placeholder order $<$ is a term $\mathcal{GE}[p_1 \mapsto t_1, ..., p_n \mapsto t_n]$, where the $p_i$ are the placeholders of $\mathcal{GE}$ and where the following holds for the $t_i$:
@@ -49,5 +49,9 @@ When $\mathcal{E} \in \textrm{EC}_<[{\textrm{Val}}]$, for some instance of a set
 \[
 a \in \textrm{Val} \implies b \in \textrm{Val},
 \]
-then $\mathcal{E}[a \mapsto b] \in \textrm{EC}_{\textrm{Val}}$.
+then $\mathcal{E}[a \mapsto b] \in \textrm{EC}_<[\textrm{Val}]$.
+
+\begin{proof}
+We know that $\mathcal{E}$ is an instance $\mathcal{GE}[p_1 \mapsto t_1, ..., p_n \mapsto t_n]$ of a generic evaluation context $\mathcal{GE}$, and that $a$ is a subterm of $t_k$ for a $k \in \{1, ..., n\}$. On one hand, suppose $a \in \textrm{Val}$. Then it is $b \in \textrm{Val}$ and thus $t_k[a \mapsto b] \in \textrm{Val}$. On the other hand, suppose $a \not\in \textrm{Val}$. Either way, the membership in $\textrm{Val}$ of the $t_i$ preceding (under $<$) the hole, as required by Definition 1.5.3, is still fulfilled when replacing $t_k$ with $t_k[a \mapsto b]$. Thus $\mathcal{E}[a \mapsto b] = \mathcal{GE}[p_1 \mapsto t_1, ..., p_{k-1} \mapsto t_{k-1}, p_k \mapsto t_k[a \mapsto b], p_{k+1} \mapsto p_{k+1}, ..., p_n \mapsto t_n] \in \textrm{EC}_<[\textrm{Val}]$.
+\end{proof}
 \end{lemma}
