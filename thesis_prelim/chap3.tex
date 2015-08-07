@@ -204,22 +204,18 @@ t \longrightarrow^{aux} t'.
 
 By induction on the structure of $t$. We distinguish two cases.
 \begin{enumerate}
-\item All immediate subterms of $t$ are values under judgement $\vdash_v$. Then, because $\not\vdash_v t$ and $q_\epsilon$ is the only lhs in $\langle prg \rangle$ which doesn't have a lhs $q$ of $prg$ with $\langle q_\epsilon \rangle^{aux^{-1}} = q$, $t$ itself has to match $q_\epsilon$. Consequently, for some $\sigma$, we have the desired reduction
+\item All immediate subterms of $t$ are values under judgement $\vdash_v$. We will show that $t$ matches $q_\epsilon$, and from this the desired reductions immediately follow. Because $\not\vdash_v t$, by the definition of the value judgement $t$ itself has to match some lhs $q$ of $\langle prg \rangle$. Since $\vdash'_v t$, there cannot be an equation $q'$ of $prg$ with $\langle q \rangle^{aux^{-1}} = q$. By the definition of extractions, the only equation of $\langle prg \rangle$ for which this can be the case is $q = q_\epsilon$. Consequently, we have some $\sigma$ that substitutes only with terms which are values under judgement $\vdash_v$ and the desired reductions
 \[
-t = q_\epsilon[\sigma]] \longrightarrow t_\epsilon[\sigma].
+t = q_\epsilon[\sigma] \longrightarrow t_\epsilon[\sigma], t = q_\epsilon[\sigma] \longrightarrow^{aux} t_\epsilon[\sigma].
 \]
 
-\item There are immediate subterms of $t$ which aren't values under judgement $\vdash_v$. Obtain a generic evaluation context $\mathcal{GE} \in \textrm{EC}$ by replacing all immediate subterms $t_i$ of $t$ with placeholders $p_i$, with $p_1, ..., p_n$ ordered according to the order $<$ of $\textrm{EC}$. Let $k$ be the smallest index for which $\not\vdash_v t_k$, and define $\mathcal{E} \in \textrm{EC}_{\vdash_v}$ as the instance of $\mathcal{GE}$ which assigns, for all $i \neq k$, $t_i$ to placeholder $p_i$, and the hole $[]$ to placeholder $p_k$. By the induction hypothesis, we have a term $t^1$ and reductions
+\item There are immediate subterms of $t$ which aren't values under judgement $\vdash_v$. Obtain a generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ by replacing all immediate subterms $t_i$ of $t$ with placeholders $p_i$, with $p_1, ..., p_n$ ordered according to the order $<$ of $\textrm{EC}_<$. Let $k$ be the smallest index for which $\not\vdash_v t_k$. We define $\mathcal{E} \in \textrm{EC}_<[\vdash_v]$ as the instance of $\mathcal{GE}$ which assigns, for all $i \neq k$, $t_i$ to placeholder $p_i$, and the hole $[]$ to placeholder $p_k$. By the induction hypothesis, we have a term $t'_k$ and reductions
 \[
-t^0 \longrightarrow t^1, t^0 \longrightarrow^{aux} t^1
+t_k \longrightarrow t'_k, t_k \longrightarrow^{aux} t'_k.
 \]
-and consequently
+Consequently, we have the desired term as $t' = \mathcal{E}[t'_k]$ and reductions
 \[
-\mathcal{E}[t^0] \longrightarrow \mathcal{E}[t^1]
-\]
-and
-\[
-\mathcal{E}[t^0] \longrightarrow^{aux} \mathcal{E}[t^1].
+t = \mathcal{E}[t_k] \longrightarrow \mathcal{E}[t'_k] = t', t = \mathcal{E}[t_k] \longrightarrow^{aux} \mathcal{E}[t'_k] = t'.
 \]
 \end{enumerate}
 
