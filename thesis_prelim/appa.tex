@@ -58,27 +58,21 @@ with $\mathcal{E}' = b[a^0 \mapsto []]_{p^x}$. It is $\mathcal{E}' \in EC[\vdash
 
 \cdpaux*
 \begin{proof}
-We make use of the fact that a reduction that can be derived by multiple applications of the ``Cong" rule can also be derived by just one application of the ``Cong" rule. Thus we distinguish two cases for the derivation of $a \longrightarrow' b$, one for the ``Subst" rule and one for the ``Cong" rule.
-
-\begin{enumerate}
-\item \textbf{``Subst'' case}: Again using the fact that only one ``Cong" derivation step is necessary, the two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. In both cases, it is $a = q_r[\sigma], b = t_r[\sigma]$ for some equation $r$.
-
-\begin{enumerate}
-\item \textbf{``Subst'' case}: It is $a = q_{r'}[\sigma'], c = t_{r'}[\sigma']$ for some equation $r'$; it is $r' = r$ because $a$ matches both $q_r$ and $q_{r'}$ and there are no overlapping lhss. It follows that $b = c$, thus we can simply choose $d = b = c$.
-
-\item \textbf{``Cong'' case}: It is $a = \mathcal{E}[a^0], c = \mathcal{E}[c^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash_v}$ and terms $a^0, c^0$ with $a^0 \longrightarrow^{aux} c^0$ and $a^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for an equation $r'$. Thus we have the desired property by Lemma A.0.1.
-\end{enumerate}
-
-\item \textbf{``Cong'' case}: Again, the two cases for the derivation of $a \longrightarrow^{aux} c$ will be distinguished. It is $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for an $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and terms $a^0, b^0$ with $a^0 \longrightarrow' b^0$ and $a^0 = q_r[\sigma], c^0 = t_r[\sigma]$ for an equation $r$. Further, $a(a'^0)$ has a subterm $a'^0$ such that $c = a(c^0)$ for some term $c^0$ with $a'^0 \longrightarrow^{aux} c^0$ and $a'^0 = q_{r'}[\sigma'], c^0 = t_{r'}[\sigma']$ for some equation $r'$. We distinguish three cases:
+We make use of the fact that a reduction that can be derived by multiple applications of the ``Cong" rule can also be derived by just one application of the ``Cong" rule. When a reduction is derived by the ``Subst'' rule, it can also be derived by applying the ``Cong'' rule for the empty evaluation context on top of that. Thus, we have the following:
 \begin{itemize}
-\item $a'^0$ is a subterm of $a^0$. By Lemma A.0.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow' d^0$ and $b^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}[d^0]$. The property holds since (a) $b = \mathcal{E}[b^0] \longrightarrow^{aux} \mathcal{E}[d^0] = d$ and (b) $c = \mathcal{E}'[c^0] = \mathcal{E}[a^0[a'^0 \mapsto c^0]] \longrightarrow' \mathcal{E}[d^0] = d$.
+\item From $a \longrightarrow' b$: $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$ for an $\mathcal{E} \in \textrm{EC}_<[\vdash'_v]$ and terms $a^0, b^0$ with $a^0 \longrightarrow' b^0$ and $a^0 = q_r[\sigma], b^0 = t_r[\sigma]$ for some equation $r$.
 
-\item $a^0$ is a subterm of $a'^0$. Because $a = \mathcal{E}[a^0]$, $a^0$ is a subterm of $a'^0$, and $\mathcal{E} \in \textrm{EC}[\vdash'_v]$, it is $a'^0[a^0 \mapsto []] \in \textrm{EC}[\vdash'_v]$. By Lemma A.0.2, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow^{aux} d^0$ and $c^0 \longrightarrow' d^0$. Choose $d = \mathcal{E}'[d^0]$. That the property holds can now be shown analogously to the previous case.
-
-\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$. The property holds because $b = \mathcal{E}[b^0] = \mathcal{E}'[a^0 \mapsto b^0][a'^0] \longrightarrow^{aux} \mathcal{E}'[a^0 \mapsto b^0][c^0] = d$ and $c = \mathcal{E}'[c^0] = \mathcal{E}[a'^0 \mapsto c^0][a^0] \longrightarrow' \mathcal{E}[a'^0 \mapsto c^0][b^0] = d$. This second reduction is possible because, by Lemma 1.5.1, $\mathcal{E}[a'^0 \mapsto c^0] \in \textrm{EC}_{\vdash'_v}$ since $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$ and $\langle a'^0 \rangle^{aux^{-1}} = \langle c^0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a'^0$ iff $\vdash'_v c^0$.
+\item From $a \longrightarrow^{aux} c$: $a = \mathcal{E}^{aux}[a'^0], c = \mathcal{E}^{aux}[c^0]$ for some term with hole $\mathcal{E}^{aux}$ and terms $a'^0, c^0$ with $a'^0 \longrightarrow^{aux} c^0$ and $a'^0 = q_\epsilon[\sigma'], c^0 = t_\epsilon[\sigma']$.
 \end{itemize}
 
-\end{enumerate}
+We compare $a^0$ and $a'^0$ and distinguish three cases.
+\begin{itemize}
+\item $a'^0$ is a subterm of $a^0$. By Lemma A.0.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow' d^0$ and $b^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}[d^0]$. The property holds since (a) $b = \mathcal{E}[b^0] \longrightarrow^{aux} \mathcal{E}[d^0] = d$ and (b) $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a^0[a'^0 \mapsto c^0]] \longrightarrow' \mathcal{E}[d^0] = d$.
+
+\item $a^0$ is a subterm of $a'^0$. Because $a = \mathcal{E}[a^0]$, $a^0$ is a subterm of $a'^0$, and $\mathcal{E} \in \textrm{EC}[\vdash'_v]$, it is $a'^0[a^0 \mapsto []] \in \textrm{EC}[\vdash'_v]$. By Lemma A.0.2, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow^{aux} d^0$ and $c^0 \longrightarrow' d^0$. Choose $d = \mathcal{E}^{aux}[d^0]$. The property holds since (a) $b = \mathcal{E}^{aux}[a'^0[a^0 \mapsto b^0]] \longrightarrow^{aux} \mathcal{E}^{aux}[d^0]$ and (b) $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a'^0[a^0 \mapsto []] \mapsto []][c^0] \longrightarrow' \mathcal{E}[a'^0[a^0 \mapsto []] \mapsto []][d^0] = \mathcal{E}^{aux}[d^0] = d$.
+
+\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$. The property holds because $b = \mathcal{E}[b^0] = \mathcal{E}^{aux}[a^0 \mapsto b^0][a'^0] \longrightarrow^{aux} \mathcal{E}^{aux}[a^0 \mapsto b^0][c^0] = d$ and $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a'^0 \mapsto c^0][a^0] \longrightarrow' \mathcal{E}[a'^0 \mapsto c^0][b^0] = d$. This second reduction is possible because, by Lemma 1.5.1, $\mathcal{E}[a'^0 \mapsto c^0] \in \textrm{EC}[\vdash'_v]$ since $\mathcal{E} \in \textrm{EC}[\vdash'_v]$ and $\langle a'^0 \rangle^{aux^{-1}} = \langle c^0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a'^0$ iff $\vdash'_v c^0$.
+\end{itemize}
 
 \end{proof}
 
