@@ -64,6 +64,8 @@ Here, the pair of \texttt{get} and \texttt{putback} is the $\pi$-lens. $\langle 
 where $aux$ is a fresh function name.\footnote{In practice this means that is in undeclared in the program that is transformed by the extraction lifted to programs (see next section).}
 \end{definition}
 
+Note/TODO: $\langle q \rangle^{vars}$ needs to be defined such that variables introduced by \texttt{get} are placed in front of the others. In chapter 4, this is necessary for constructor extraction to be able to bring lhss to the form $fun(con(x^*), y^*)$, which is needed for refunctionalization, and not just $fun(x^*, con(y^*), z^*)$.
+
 \section{Lifting extractions to programs}
 
 An extraction function was defined to have equations as its domain and range. As it will be used to transform programs into programs, however, it is necessary to define how it should be lifted to that domain. The definition of the lifting function is straightforward; all it does is apply the extraction to each equation $r$ of the program, replacing it with $\epsilon$ if it exists and otherwise leaving $r$ unchanged, and collecting the $\zeta_r$ for each changed equation $r$ in an auxiliary function definition.
