@@ -231,11 +231,11 @@ When $a \longrightarrow' b$ but $a \not\longrightarrow b$, then there is a $c$ w
 
 \begin{proof}
 
-There is an evaluation context $\mathcal{E} \in \textrm{EC}_{\vdash'_v}$, with $\mathcal{E} \not\in \textrm{EC}_{\vdash_v}$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}_{\vdash_v}$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Consider the generic evaluation context $\mathcal{GE} \in \textrm{EC}$ that $\mathcal{E}$ is an instance of, and the order $<$ on its placeholders. Construct an evaluation context $\mathcal{E}' \in \textrm{EC}_{\vdash_v}$ from $\mathcal{E}$ by replacing the smallest placeholder of $\mathcal{GE}$, that $\mathcal{E}$ replaced with a term $t$ with $\not\vdash_v t$, by the hole $[]$. By Lemma 3.3.2, we a term $t_{aux}$ and reductions
+There is an evaluation context $\mathcal{E} \in \textrm{EC}_<[\vdash'_v]$, with $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Consider the generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ that $\mathcal{E}$ is an instance of, and the order $<$ on its placeholders. Construct an evaluation context $\mathcal{E}' \in \textrm{EC}_<[\vdash_v]$ from $\mathcal{E}$ by replacing the smallest placeholder of $\mathcal{GE}$, that $\mathcal{E}$ replaced with a term $t$ with $\not\vdash_v t$, by the hole $[]$. By Lemma 3.3.2, we have a term $t_{aux}$ and reductions
 \[
 t \longrightarrow t_{aux}, t \longrightarrow^{aux} t_{aux},
 \]
-and consequently
+and consequently there is a $c = \mathcal{E}'[t_{aux}]$ with
 \[
 \mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], \mathcal{E}'[t] \longrightarrow^{aux} \mathcal{E}'[t_{aux}].
 \]
