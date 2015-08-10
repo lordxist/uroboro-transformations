@@ -1,5 +1,136 @@
 \chapter{Automatic de- and refunctionalization}
 
+%%-- under construction
+
+...
+
+We present an algorithm that defunctionalizes arbitrary Uroboro programs with copattern coverage, and an algorithm that refunctionalizes such programs. Both algorithms are made up of two phases, in order:
+\begin{enumerate}
+\item Unnesting, and
+\item core de-/refunctionalization.
+\end{enumerate}
+We name the algorithms \textsf{Unnest}, \textsf{CoreDefunc}, and \textsf{CoreRefunc}, respectively. The algorithm called \textsf{Unnest} is essentially the copattern unnesting algorithm of Setzer et al., adapted to Uroboro, and the core de-/refunctionalization is essentially the two-way transformation of Rendel et al. In short, the entire process can be described as follows. By unnesting them as far as necessary, the preprocessing phases brings the lhss of the program to the form accepted by the core de-/refunctionalization.
+
+We give the intended domain and range for each of the phases, all of which are specific fragments of Uroboro.
+\begin{align*}
+& \textsf{Unnest}: \mathbf{U}_{cc} \to \mathbf{U}_{cc}[fdef_{un}] \\
+& \textsf{CoreDefunc}: \mathbf{U}_{cc}[fdef_{un}] \to \mathbf{U}^{defunc}_{cc} \\
+& \textsf{CoreRefunc}: \mathbf{U}_{cc}[fdef_{un}] \to \mathbf{U}^{refunc}_{cc}
+\end{align*}
+
+The fragment $\mathbf{U}_{cc}[fdef_{un}]$, for unnested lhss in function definitions, is induced by the function definition fragment $fdef_{un}$ defined below using EBNF rules. For these, the basic EBNF rules from the definition of the syntax of Uroboro are reused.
+\begin{align*}
+fdef_{um} &::= eqn_d^* ~ | ~ eqn_c^* ~ | ~ eqn_n \\
+eqn_d &::= fun(x^*).des(y^*) = t \\
+eqn_c &::= fun(con(x^*), y^*) = t \\
+eqn_n &::= fun(x^*) = t
+\end{align*}
+
+That it actually has the range specified above will be shown for each phase in its respective section. In total, three important properties will be shown for each phase: Termination, correct range, and preservation of semantics in a (weak) bisimulation.
+
+The rest of the section is organized as follows. The first section describes the unnesting algorithm, shows why the three properties hold, and gives applies it to an example. Section 2 and 3 do the same for the unmixing algorithm, and core de-/refunctionalization, respectively.
+
+\section{Unnesting}
+
+We adapt the translation algorithm from section 3.3 of the paper of Setzer et al. to Uroboro. Their algorithm translates equations step-by-step depending upon the derivation of the copattern coverage of their lhss. Our adaptation only has steps which concern patterns that have a counterpart in Uroboro\footnote{I.e., not those for applications, units, and pairs. In the adapted algorithm for Uroboro, the last one is merged into the steps for destructors and constructors, while the others are irrelevant because Uroboro doesn't have the corresponding higher-order constructs.}. Each such translation step can be considered an extraction as defined in chapter 3.
+
+\subsection{Simple patterns}
+
+We adapt the definition of a \textit{simple pattern}, as given by Setzer et al., to Uroboro. Call a copattern simple if it is of one of the three forms $fun(\overline{x})$, $fun(\overline{x}).des(\overline{y})$, or $fun(con(\overline{x}), \overline{y})$.
+
+\subsection{Translation algorithm}
+
+Like Setzer et al., we consider the last step in the derivation of the copattern coverage for the lhss of a function definition. Just like them, we are not interested in the case where the last step is C\textsubscript{Head}, since that means the lhs is already simple, and we terminate. When the last step isn't C\textsubscript{Head}, but the lhss are all simple nonetheless, we also terminate.
+
+\begin{prooftree}
+\AxiomC{$fun \lhd | ~ Q ~ (q)$}
+\RightLabel{\textbf{C}}
+\UnaryInfC{$fun \lhd | ~ Q ~ (q_i)_{i \in I}$}
+\end{prooftree}
+
+Also like Setzer et al., we then introduce a fresh auxiliary function and translate the program depending on \textbf{C}. As stated before, these translations are slightly adapted to fit the framework of Uroboro, such that two remain, one for destructors and one for constructors. More importantly, both of those are in fact extractions as defined in chapter 3, namely destructor and constructor extraction. 
+
+\begin{enumerate}
+\item \textbf{C} is C\textsubscript{Des}, and the last derivation step looks as follows.
+
+\begin{prooftree}
+\AxiomC{$fun \lhd | ~ Q ~ (q^\tau)$}
+\RightLabel{C\textsubscript{Des}}
+\UnaryInfC{$fun \lhd | ~ Q ~ (q.des(\overline{x^{des}}))_{des \in Dess_\tau}$}
+\end{prooftree}
+
+We obtain the changed function definition $def'_{fun}$ for $fun$ and the auxiliary function definition in the translated program by applying extraction \textsf{ExtractDes} targeting $q.des(\overline{x^{des}})$, for each $des \in Dess_\tau$, to the original function definition for $fun$. The lhss of $def'_{fun}$ are
+\[
+Q \cup \{ \texttt{get}(q.des(\overline{x^{des}})) ~ | ~ des \in Dess_\tau \} = Q \cup \{q\},
+\]
+where \texttt{get} is the retrieving part of the lens underlying \textsf{ExtractDes}. This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q^\tau)$ from the derivation step above.
+
+\item \textbf{C} is C\textsubscript{Con}, and the last derivation step looks as follows. 
+
+\begin{prooftree}
+\AxiomC{$fun \lhd | ~ Q ~ (q(x^\tau))$}
+\RightLabel{C\textsubscript{Con}}
+\UnaryInfC{$fun \lhd | ~ Q ~ (q[x := con(\overline{y^{con}})])_{con \in Cons_\tau}$}
+\end{prooftree}
+
+Let $p$ be the position of $x$ in $q$. We obtain the function definition $def'_{fun}$ for $fun$ in the translated program and the auxiliary function definition by applying extraction \textsf{ExtractCon}(p) targeting $q[x := con(\overline{y^{con}})]$ to the original function definition for $fun$. The lhss of $def'_{fun}$ are
+\[
+Q \cup \{ \texttt{get}(q[x := con(\overline{y^{con}})]) ~ | ~ con \in Cons_\tau \} = Q \cup \{q\},
+\]
+where \texttt{get} is the retrieving part of the lens underlying \textsf{ExtractCon}(p). This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q^\tau)$ from the derivation step above.
+\end{enumerate}
+
+Next, we consider important properties of the translation algorithm.
+
+\textbf{Range.} The algorithm only stops when all lhss are simple and works on the coverage derivation trees, thus we have the desired range $\mathbf{U}_{cc}[fdef_{un}]$ if it terminates in all cases, which is shown next.
+
+\textbf{Termination.} To show that the algorithm terminates, we can basically repeat the argument of Setzer et al. Each translation results in a changed function definition $def'_{fun}$ for $fun$ and a new function definition $def_{aux}$ for the auxiliary function. The lhss of $def'_{fun}$ are $Q \cup \{q\}$, which means that they cover $fun$ in the same way $fun$ is covered via $fun \lhd | ~ Q ~ (q)$ in the derivation step above. This means that the translation reduces the depth of the derivation tree for the coverage of $fun$, thus eventually arriving at simple patterns. The added auxiliary function definitions already have simple lhss, thus they are not translated, and eventually the algorithm terminates.
+
+\textbf{Bisimulation.} Because copattern coverage holds for the translated program, the translated program has no overlapping lhss. Therefore, by the propositions 3.3.1 and 3.3.2, we know that the translation preserves the semantics of the program in the kind of weak bisimulation described in section 3.3.
+
+\subsection{Example}
+
+As an example application of the algorithm, consider the following program fragment.
+
+\begin{lstlisting}
+
+fun(x).des().des1(con1()) = t1
+fun(x).des().des1(con2()) = t2
+fun(x).des().des2() = t3
+
+\end{lstlisting}
+
+The final step in the coverage derivation for $fun$ is splitting \texttt{fun(x).des().des1(y)} into \texttt{fun(x).des().des1(con1())} and \texttt{fun(x).des().des1(con2())} by splitting variable $y$. Therefore we first target these two lhss for constructor extraction at the common position of \texttt{con1()} and \texttt{con2()} in the two lhss; the result of the extraction can be seen below.
+
+\begin{lstlisting}
+
+fun(x).des().des1(y) = aux(y, x)
+fun(x).des().des2() = t3
+
+aux(con1(), x) = t1
+aux(con2(), x) = t2
+
+\end{lstlisting}
+
+For this program, the final step in the coverage derivation for $fun$ is splitting \texttt{fun(x).des()} into \texttt{fun(x).des().des1(y)} and \texttt{fun(x).des().des2()} by result splitting. Therefore we target these two lhss for destructor extraction; the result of the extraction can be seen below. Note that \texttt{fun(x).des() = aux2(x)} is generated twice but only present once in the function definition, as these are sets.
+
+\begin{lstlisting}
+
+fun(x).des() = aux2(x)
+
+aux2(x).des1(y) = aux(y, x)
+aux2(x).des2() = t3
+
+\end{lstlisting}
+
+The \texttt{aux} function definition remains unchanged and is omitted. This program is in the desired fragment; the algorithm terminates here because all lhss of the program are simple.
+
+\section{Core de-/refunctionalization}
+
+...
+
+%%-- end under construction
+
 ...
 
 Both de- and refunctionalization are made up of a couple of preprocessing steps, followed by the core de-/refunctionalization, which is essentially the two-way transformation from the paper of Rendel et al. Here, we give an overview of these steps for both transformations. In brackets, we name the step; this name will be used throughout the chapter. What can already be seen here is that steps $unmix$ and $elim\_cons\_from\_des$ are used for both transformations.
