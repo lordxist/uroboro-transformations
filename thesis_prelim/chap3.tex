@@ -371,6 +371,20 @@ Since copatterns without destructors aren't affected, this extraction is only me
 
 \subsection{Constructor extraction}
 
+%%-- under construction
+
+We define a family $\textsf{ExtractCon}(p)$ of extractions of single constructors. The parameter $p$ stands for the position of the constructor call to be extracted in the targeted copatterns. For such a position $p$, $\textsf{ExtractCon}(p)$ is defined as the $\pi$-extraction targeting $Q$ for the extraction projection $\pi$ defined below.
+
+For a copattern $q$, let $x_q$ be a variable different from all in $q$.
+\[
+\pi(q) = \begin{cases}
+             q[con(\overline{p}) \mapsto x_q]_p &\text{ if } q \text{ has a constructor call at position } p \\
+             q &\text{ otherwise}
+             \end{cases}
+\]
+
+%%--
+
 In this section, the extraction of a single constructor is defined. Unlike the extraction of a single destructor from the previous section, for constructor extraction it needs to be specified which constructor should be extracted. Define the extraction $con_n\_extract(q)$ of the $n$-th constructor in $q$ (from left to right) as the $\pi_n$-extraction targeting $q$ with the extraction projection $\pi_n$ defined below.
 
 Let $x_q$ be a variable different from all in $q$.
