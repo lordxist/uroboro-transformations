@@ -18,13 +18,15 @@ We give the intended domain and range for each of the phases, all of which are s
 & \textsf{CoreRefunc}: \mathbf{U}_{cc}[fdef_{un}] \to \mathbf{U}^{refunc}_{cc}
 \end{align*}
 
+\begin{definition}[Unnested Fragment]
 The fragment $\mathbf{U}_{cc}[fdef_{un}]$, for unnested lhss in function definitions, is induced by the function definition fragment $fdef_{un}$ defined below using EBNF rules. For these, the basic EBNF rules from the definition of the syntax of Uroboro are reused.
 \begin{align*}
-fdef_{um} &::= eqn_d^* ~ | ~ eqn_c^* ~ | ~ eqn_n \\
+fdef_{un} &::= eqn_d^* ~ | ~ eqn_c^* ~ | ~ eqn_n \\
 eqn_d &::= fun(x^*).des(y^*) = t \\
 eqn_c &::= fun(con(x^*), y^*) = t \\
 eqn_n &::= fun(x^*) = t
 \end{align*}
+\end{definition}
 
 That it actually has the range specified above will be shown for each phase in its respective section. In total, three important properties will be shown for each phase: Termination, correct range, and preservation of semantics in a (weak) bisimulation.
 
@@ -39,6 +41,10 @@ We adapt the translation algorithm from section 3.3 of the paper of Setzer et al
 We adapt the definition of a \textit{simple pattern}, as given by Setzer et al., to Uroboro. Call a copattern simple if it is of one of the three forms $fun(\overline{x})$, $fun(\overline{x}).des(\overline{y})$, or $fun(con(\overline{x}), \overline{y})$.
 
 \subsection{Translation algorithm}
+
+We describe the algorithm for \textsf{Unnest}, adapted from section 3.3 of the paper of Setzer et al. to Uroboro, as lined out above.
+
+\begin{algorithm}[\textsf{Unnest}]
 
 Like Setzer et al., we consider the last step in the derivation of the copattern coverage for the lhss of a function definition. Just like them, we are not interested in the case where the last step is C\textsubscript{Head}, since that means the lhs is already simple, and we terminate. When the last step isn't C\textsubscript{Head}, but the lhss are all simple nonetheless, we also terminate.
 
@@ -59,7 +65,7 @@ Also like Setzer et al., we then introduce a fresh auxiliary function and transl
 \UnaryInfC{$fun \lhd | ~ Q ~ (q.des(\overline{x^{des}}))_{des \in Dess_\tau}$}
 \end{prooftree}
 
-We obtain the changed function definition $def'_{fun}$ for $fun$ and the auxiliary function definition in the translated program by applying extraction \textsf{ExtractDes} targeting $q.des(\overline{x^{des}})$, for each $des \in Dess_\tau$, to the original function definition for $fun$. The lhss of $def'_{fun}$ are
+Apply extraction \textsf{ExtractDes} targeting the equations with lhss $q.des(\overline{x^{des}})$, for all $des \in Dess_\tau$, to the function definition for $fun$. From this we obtain the changed function definition $def'_{fun}$ for $fun$ and the auxiliary function definition. The lhss of $def'_{fun}$ are
 \[
 Q \cup \{ \texttt{get}(q.des(\overline{x^{des}})) ~ | ~ des \in Dess_\tau \} = Q \cup \{q\},
 \]
@@ -73,12 +79,14 @@ where \texttt{get} is the retrieving part of the lens underlying \textsf{Extract
 \UnaryInfC{$fun \lhd | ~ Q ~ (q[x := con(\overline{y^{con}})])_{con \in Cons_\tau}$}
 \end{prooftree}
 
-Let $p$ be the position of $x$ in $q$. We obtain the function definition $def'_{fun}$ for $fun$ in the translated program and the auxiliary function definition by applying extraction \textsf{ExtractCon}(p) targeting $q[x := con(\overline{y^{con}})]$ to the original function definition for $fun$. The lhss of $def'_{fun}$ are
+Let $p$ be the position of $x$ in $q$. Apply extraction \textsf{ExtractCon}(p) targeting the equations with lhss $q[x := con(\overline{y^{con}})]$, for all $con \in Cons_\tau$ to the original function definition for $fun$. From this we obtain the changed function definition $def'_{fun}$ for $fun$ and the auxiliary function definition. The lhss of $def'_{fun}$ are
 \[
 Q \cup \{ \texttt{get}(q[x := con(\overline{y^{con}})]) ~ | ~ con \in Cons_\tau \} = Q \cup \{q\},
 \]
-where \texttt{get} is the retrieving part of the lens underlying \textsf{ExtractCon}(p). This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q^\tau)$ from the derivation step above.
+where \texttt{get} is the retrieving part of the lens underlying \textsf{ExtractCon}(p). This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q)$ from the derivation step above. \qedhere
 \end{enumerate}
+
+\end{algorithm}
 
 Next, we consider important properties of the translation algorithm.
 
@@ -128,6 +136,129 @@ The \texttt{aux} function definition remains unchanged and is omitted. This prog
 \section{Core de-/refunctionalization}
 
 ...
+
+\textsf{CoreDefunc} and \textsf{CoreRefunc} use -- and in fact essentially are -- the respective sides of the two-way transformation of Rendel et al. One side of this is the defunctionalization for the Codata Fragment, which we call $d^{codata}$ in here, and the other side is the refunctionalization for the Data Fragment, which we call $r^{data}$. Their definitions are repeated below for the convenience of the reader.
+
+...
+
+\subsection{Core defunctionalization}
+
+The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of Rendel et al. for the Codata Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a defunctionalized form after \textsf{Unnest}, virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the syntactic differences between function and destructor calls.\footnote{I.e., the difference between $fun(...)$ and $t.des(...)$. This difference vanishes when changing the syntax of destructor calls to $des(t, ...)$.} The respective transformation for terms is $d$, defined below with the algorithm.
+
+\begin{algorithm}[\textsf{CoreDefunc}]
+
+First, we define the class $FDEF^{prg}_d$ of function definitions of a program $prg$ which are already defunctionalized. A function definition is already defunctionalized when all of its equations have lhss without destructors. We define the class of already defunctionalized functions $F^{prg}_d$ as those which have already defunctionalized function definitions.
+
+Next, we give the definition for \textsf{CoreDefunc}. This needs further explanation due to technical difficulties, as follows below.
+
+\begin{alignat*}{3}
+\langle prg \rangle^{\textsf{CoreDefunc}} & = ~&& \langle && \{ def \in prg ~ | ~ def = ``\textbf{codata } ..." \text{ or } def = ``\textbf{function } ..." \not\in F^{prg}_d \} \rangle^{d^{codata}} \\
+& \cup && \{ && \textrm{\textbf{data }} ... ~ | ~ `` \textrm{\textbf{data }} ... " \in prg \} \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ q = \langle t \rangle^d ~ | ~ "q = t" \in eqns \} \\
+& && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \in F^{prg}_d \} 
+\end{alignat*}
+
+This definition is not quite legal, because the argument of $d^{codata}$ possibly has equations with right-hand sides which cannot be correctly transformed by $d^{codata}$. There are two different problems which can possibly arise, but which are also easily circumvented, as follows.
+\begin{enumerate}
+\item There are function calls to functions which are already defunctionalized (those in $F_d$); $d^{codata}$ wants to transform them into constructor calls, which is neither possible nor necessary. To circumvent this, replace each function name $fun \in F_d$ (in a right-hand side term) with a destructor name $des_{fun}$ unique to $fun$, and set $\langle des_{fun} \rangle^d = fun$. Then $d^{codata}$ will transform them back into the original function calls, which means that they ultimately are left unchanged, as desired.
+
+\item There are constructor calls; the domain of $d^{codata}$, the Codata Fragment, doesn't allow them. To circumvent this, replace such calls to a constructor $con$ with function calls with a function name $fun_{con}$ unique to $con$, and set $\langle fun_{con} \rangle^d = con$. Then $d^{codata}$ will transform them back into the original constructor calls, which means that they ultimately are left unchanged, as desired.
+\end{enumerate}
+
+Below, we define the transformation for terms $d$, which is only necessary due to the syntactic differences between function and destructor calls.
+
+\begin{align*}
+\langle x \rangle^d = x \\
+\langle s.des(t_1, ..., t_n) \rangle^d = \langle des \rangle^d (\langle s \rangle^d, \langle t_1 \rangle^d, ..., \langle t_n \rangle^d) \\
+\langle fun(t_1, ..., t_n) \rangle^d = fun(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \in F_d \\
+\langle fun(t_1, ..., t_n) \rangle^d = \langle fun \rangle^d (\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \not\in F_d \\
+\langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)
+\end{align*}
+
+\end{algorithm}
+
+We consider important properties of the transformation.
+
+\textbf{Bisimulation.} For \textsf{CoreDefunc}, strong bisimulation holds. The proof relies on properties of $d^{codata}$. Note that the domain of $d^{codata}$ is Rendel et al.'s Codata Fragment. As stated in section 2.3.1, the reduction relation of the Codata Fragment in the work of Rendel et al. and our work's standard reduction relation, restricted to this fragment, are the same, as long as programs are required to have copattern coverage. Analogously, the domain of $r^{data}$ is the Data Fragment, and Rendel et al.'s reduction relation for this fragment is the same as ours restricted to this fragment. In section 3 of their paper, Rendel et al. prove Lemma 5, which in terms of our work can be stated as follows.
+
+\begin{lemma}[Strong bisimulation for $d^{codata}, r^{data}$]
+\[
+s \longrightarrow_{prg} t \iff \langle s \rangle^d \longrightarrow_{\langle prg \rangle^{d^{codata}}} \langle t \rangle^d
+\]
+and
+\[
+s \longrightarrow_{prg} t \iff \langle s \rangle^r \longrightarrow_{\langle prg \rangle^{r^{codata}}} \langle t \rangle^r.
+\]
+\end{lemma}
+
+Using this, we prove strong bisimulation for \textsf{CoreDefunc}.
+
+\begin{lemma}[Strong bisimulation for \textsf{CoreDefunc}]
+\[
+s \longrightarrow_{prg} t \iff \langle s \rangle^d \longrightarrow_{\langle prg \rangle^{\textsf{CoreDefunc}}} \langle t \rangle^d
+\]
+
+\begin{proof}
+For the sake of this proof, we will neglect the syntactic differences between destructor and function calls. By the definition of \textsf{CoreDefunc}, it is
+\[
+\langle prg \rangle^{\textsf{CoreDefunc}} = \langle prg' \rangle^{d^{codata}} \cup prg''
+\]
+such that $prg' \cup prg'' = prg$. By Lemma 4.2.1, the reduction relations pertaining to the programs $prg'$ and $\langle prg' \rangle^{d^{codata}}$ are one and the same. The reduction relation pertaining to $prg$ is that of $prg'$ changed according to the equations of $prg''$, and the reduction relation pertaining to $\langle prg \rangle^{\textsf{CoreDefunc}}$ is also that of $prg'$ changed according to the equations of $prg''$. Thus these reduction relations are the same, which is equivalent to the statement of this lemma.
+\end{proof}
+\end{lemma}
+
+\subsection{Core refunctionalization}
+
+Core refunctionalization is defined analogously to core defunctionalization. It applies the refunctionalization of Rendel et al. for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. 
+
+\begin{algorithm}[\textsf{CoreRefunc}]
+
+First, we define the class $FDEF^{prg}_r$ of function definitions of a program $prg$ which are already refunctionalized. A function definition is already refunctionalized when (a) all of its equations have destructor patterns, or (b) the function has no arguments, or (c) the first argument of every lhs is a variable. We define the class of already refunctionalized functions $F^{prg}_r$ as those which have already defunctionalized function definitions.
+
+Next, we give the definition for \textsf{CoreRefunc}. This needs further explanation due to technical difficulties, as follows below.
+
+\begin{alignat*}{3}
+\langle prg \rangle^{\textsf{CoreRefunc}} & = ~&& \langle && \{ def \in prg ~ | ~ def \textrm{ is data def. or function def. } \not\in FDEF^{prg}_r \rangle^{r^{data}} \\
+& \cup && \{ && \textrm{\textbf{codata }} ... ~ | ~ `` \textrm{\textbf{codata }} ... " \in prg \} \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \{ p = \langle t \rangle^r ~ | ~ ``p = t" \in eqns \} \\
+& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in FDEF^{prg}_r \} 
+\end{alignat*}
+
+This definition is not quite legal, because the argument of $r^{data}$ possibly has equations with right-hand sides which cannot be correctly transformed by $r^{data}$. There a two different problems which can possibly arise, but which are also easily circumvented, as follows. Note that these points mirror those for \textsf{CoreDefunc}.
+\begin{enumerate}
+\item There are function calls to functions which are already refunctionalized (those in $F_r$); $r^{data}$ wants to transform them into destructor calls, which is neither possible nor necessary. The following technical trick circumvents this problem: For the sake of this usage of $r^{data}$, replace each function name $fun \in F_r$ (in a right-hand side term) with a constructor name $con_{fun}$ unique to $fun$, and set $\langle con_{fun} \rangle^r = fun$. Then $r^{data}$ will transform them back into the original function calls, which means that they ultimately are left unchanged, as desired.
+\item There are destructor calls; the domain of $r^{data}$, the Data Fragment, doesn't allow them. To circumvent this problem, for the sake of this usage of $r^{data}$, replace such calls to a destructor named $des$ with function calls with a function name $fun_{des}$ unique to $des$, and set $\langle fun_{des} \rangle^d = des$. Then $r^{data}$ will transform them back into the original destructor calls, which means that they ultimately are left unchanged, as desired.
+\end{enumerate}
+
+Below, we define the transformation for terms $r$, which is only necessary due to the syntactic differences between function and destructor calls.
+
+\begin{align*}
+\langle x \rangle^r = x \\
+\langle s.des(t_1, ..., t_n) \rangle^r = \langle s \rangle^r .des(\langle t_1 \rangle^r, ..., \langle t_n \rangle^r) \\
+\langle fun(t_1, ..., t_n) \rangle^r = fun(\langle t_1 \rangle^r, ..., \langle t_n \rangle^r), \text{ if } fun \in F_r \\
+\langle fun(t_1, ..., t_n) \rangle^r = \langle t_1 \rangle^r .\langle fun \rangle^r (\langle t_2 \rangle^r, ..., \langle t_n \rangle^r), \text{ if } fun \not\in F_r \\
+\langle con(t_1, ..., t_n) \rangle^r = \langle con \rangle^r (\langle t_1 \rangle^r, ..., \langle t_n \rangle^r)
+\end{align*}
+
+\end{algorithm}
+
+We consider important properties of the transformation.
+
+\textbf{Bisimulation.} For \textsf{CoreRefunc}, strong bisimulation holds. The proof relies on properties of $r^{data}$. In the ``Bisimulation'' part of the previous subsection, we already outlined the main points: The domain of $r^{data}$ is the Data Fragment, and Rendel et al.s reduction relation for this fragment is the same as ours restricted to this fragment. In section 3 of their paper, Rendel et al. prove Lemma 5, which we have restated as Lemma 4.2.1. Using this, we prove strong bisimulation for \textsf{CoreRefunc}.
+
+\begin{lemma}[Strong bisimulation for \textsf{CoreRefunc}]
+\[
+s \longrightarrow_{prg} t \iff \langle s \rangle^r \longrightarrow_{\langle prg \rangle^{\textsf{CoreRefunc}}} \langle t \rangle^r
+\]
+
+\begin{proof}
+For the sake of this proof, we will neglect the syntactic differences between destructor and function calls. By the definition of \textsf{CoreRefunc}, it is
+\[
+\langle prg \rangle^{\textsf{CoreRefunc}} = \langle prg' \rangle^{r^{data}} \cup prg''
+\]
+such that $prg' \cup prg'' = prg$. By Lemma 4.2.1, the reduction relations pertaining to the programs $prg'$ and $\langle prg' \rangle^{r^{data}}$ are one and the same. The reduction relation pertaining to $prg$ is that of $prg'$ changed according to the equations of $prg''$, and the reduction relation pertaining to $\langle prg \rangle^{\textsf{CoreRefunc}}$ is also that of $prg'$ changed according to the equations of $prg''$. Thus these reduction relations are the same, which is equivalent to the statement of this lemma.
+\end{proof}
+\end{lemma}
 
 %%-- end under construction
 
