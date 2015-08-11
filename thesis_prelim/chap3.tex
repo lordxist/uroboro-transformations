@@ -44,19 +44,18 @@ The $\pi$-lens, for an extraction projection $\pi$, is the lens defined as follo
 where the $\sigma^{q^c}_\pi$ is the (co)-substitution for $q^c$ and $\pi$ as given in the definition of the extraction projection.
 \end{definition}
 
-\begin{definition}[$\pi$-extraction targeting $q$]
-A function $e$ is called a $\pi$-extraction targeting $q$, when it is a function from equations to the union of equations and pairs of equations such that, for all equations $r$:
+\begin{definition}[$\pi$-extraction target]
+A $\pi$-extraction target $T$ is a set of equations such that $\pi(q) = \pi(q')$ for any two lhss $q, q'$ of equations in $T$.
+\end{definition}
+
+\begin{definition}[$\pi$-extraction targeting $T$]
+A $\pi$-extraction targeting an extraction target $T$ is a triple consisting of
 \begin{itemize}
-\item If $\mathtt{get}(q_r) = \mathtt{get}(q)$, then $\langle r \rangle^e = \big\langle \epsilon, \zeta_r \big\rangle$ with
-\begin{itemize}
-\item $q_\epsilon = \mathtt{get}(q_r)$,
-\item $t_\epsilon = \langle q_\epsilon \rangle^{aux}$,
-\item $q_{\zeta_r} = \mathtt{putback}(t_\epsilon, q_r)$,
-\item $t_{\zeta_r} = t_r$.
+\item an equation $\epsilon$ with lhs $q_\epsilon = \mathtt{get}(q)$ and rhs $t_\epsilon = \langle q_\epsilon \rangle^{aux}$, for some lhs $q$ of an equation in $T$,
+\item a function $\zeta: T \to \mathbf{Eqn}, \zeta_r = ``\mathtt{putback}(t_\epsilon, q_r) = t_r  "$, and
+\item a signature $sig$ for the range of $\zeta$
 \end{itemize}
 
-\item If $\mathtt{get}(q_r) \neq \mathtt{get}(q)$, then $\langle r \rangle^e = r$.
-\end{itemize}
 Here, the pair of \texttt{get} and \texttt{putback} is the $\pi$-lens. $\langle \cdot \rangle^{aux}$ is the call to the auxiliary function that corresponds to the given copattern, defined as follows for copatterns $q$:
 \[
 \langle q \rangle^{aux} = aux(\langle q \rangle^{vars}),
