@@ -44,9 +44,10 @@
 \usepackage{hyperref}
 
 \newtheorem{proposition}{Proposition}[section]
-\newtheorem{definition}{Definition}[section]
 \newtheorem{lemma}{Lemma}[section]
 \newtheorem{corollary}{Corollary}[section]
+\declaretheorem[style=definition,name=Definition,numberwithin=section,qed=$\Diamond$]{definition}
+\declaretheorem[style=definition,name=Algorithm,qed=$\Diamond$]{algorithm}
 
 %% This bit allows you to either specify only the files which you wish to
 %% process, or `all' to process all files which you \include.
