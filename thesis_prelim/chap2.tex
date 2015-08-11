@@ -160,6 +160,26 @@ The value judgement makes use of a ``no-match" judgement. This judgement is comp
 \TrinaryInfC{$\vdash_v con(t_1, ..., t_n)$}
 \end{prooftree}
 
+\subsection{Copattern coverage}
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{C\textsubscript{Head}}
+\UnaryInfC{$fun \lhd | (fun(\overline{x}))$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$fun \lhd | ~ Q ~ (q^\tau)$}
+\RightLabel{C\textsubscript{Des}}
+\UnaryInfC{$fun \lhd | ~ Q ~ (q.des(\overline{x^{des}}))_{des \in Dess_\tau}$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$fun \lhd | ~ Q ~ (q(x^\tau))$}
+\RightLabel{C\textsubscript{Con}}
+\UnaryInfC{$fun \lhd | ~ Q ~ (q[x := con(\overline{y^{con}})])_{con \in Cons_\tau}$}
+\end{prooftree}
+
 \subsection{The reduction relation}
 
 $\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction depends upon a set of terms $\textrm{Val}$ which are considered to be values and a set of generic evaluation contexts $\textrm{EC}_<$. When left unspecified, $\textrm{Val}$ will be assumed to be the set of terms $t$ which are standardly judged to be values in Uroboro, i.e., for which it is $\vdash_v t$. Let $\mathcal{E}$ be an element of $\textrm{EC}_<[\textrm{Val}]$.
