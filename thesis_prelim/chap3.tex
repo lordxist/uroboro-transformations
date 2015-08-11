@@ -162,7 +162,19 @@ s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle
 \end{equation}
 for every $s, t$ with names declared in $prg$.
 
-First, we prove the $`` \Rightarrow "$ direction of (2.2) and some lemmas used in this proof. In the following lemmas, all reductions are meant with respect to program $\langle prg \rangle$. Define $\longrightarrow^{aux} = \{(a,b) : a \longrightarrow b \land \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\}$, where $\longrightarrow$ has a strategy which is allowed to choose any redex.
+First, we show that the $`` \Rightarrow "$ direction of (2.2), as expressed in the following lemma, holds. In the following, all reductions are meant with respect to program $\langle prg \rangle$.
+
+\begin{lemma}[$`` \Rightarrow "$ direction of (2.2)]
+\[
+s {\longrightarrow'}_{\langle prg \rangle}^* t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}
+\]
+\end{lemma}
+
+In order to prove this, we define a counterpart to the $\longrightarrow'$ reduction relation: Let
+\[
+\longrightarrow^{aux} = \{(a,b) : a \longrightarrow^{all} b \land \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\},
+\]
+where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle$ whose underlying value set is the set of all terms, i.e., the reduction is allowed to choose any redex. Where $\longrightarrow'$ can ``sidestep'' reductions which don't change the back-interpretation of a term, $\longrightarrow^{aux}$ is purely ``interpretative'', that is, it only allows reductions to terms with equal back-interpretation. This is expressed formally in the following lemmas relating $\longrightarrow'$ and $\longrightarrow^{aux}$, one concerning their commutation, the other what we call their complementarity. The $`` \Rightarrow "$ direction of (2.2) follows from these, as shown below.
 
 \begin{restatable}[Commuting-diamond property]{lemma}{cdpaux}
 
@@ -191,74 +203,22 @@ By induction on $n$.
 
 \end{corollary}
 
-\begin{lemma}
-
-For a term $t$ with $\vdash'_v t$ and $\not\vdash_v t$, there is a term $t'$ and reductions
-\[
-t \longrightarrow t'
-\]
-and
-\[
-t \longrightarrow^{aux} t'.
-\]
-
-\begin{proof}
-
-By induction on the structure of $t$. We distinguish two cases.
-\begin{enumerate}
-\item All immediate subterms of $t$ are values under judgement $\vdash_v$. We will show that $t$ matches $q_\epsilon$, and from this the desired reductions immediately follow. Because $\not\vdash_v t$, by the definition of the value judgement $t$ itself has to match some lhs $q$ of $\langle prg \rangle$. Since $\vdash'_v t$, there cannot be an equation $q'$ of $prg$ with $\langle q \rangle^{aux^{-1}} = q$. By the definition of extractions, the only equation of $\langle prg \rangle$ for which this can be the case is $q = q_\epsilon$. Consequently, we have some $\sigma$ that substitutes only with terms which are values under judgement $\vdash_v$ and the desired reductions
-\[
-t = q_\epsilon[\sigma] \longrightarrow t_\epsilon[\sigma], t = q_\epsilon[\sigma] \longrightarrow^{aux} t_\epsilon[\sigma].
-\]
-
-\item There are immediate subterms of $t$ which aren't values under judgement $\vdash_v$. Obtain a generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ by replacing all immediate subterms $t_i$ of $t$ with placeholders $p_i$, with $p_1, ..., p_n$ ordered according to the order $<$ of $\textrm{EC}_<$. Let $k$ be the smallest index for which $\not\vdash_v t_k$. We define $\mathcal{E} \in \textrm{EC}_<[\vdash_v]$ as the instance of $\mathcal{GE}$ which assigns, for all $i \neq k$, $t_i$ to placeholder $p_i$, and the hole $[]$ to placeholder $p_k$. By the induction hypothesis, we have a term $t'_k$ and reductions
-\[
-t_k \longrightarrow t'_k, t_k \longrightarrow^{aux} t'_k.
-\]
-Consequently, we have the desired term as $t' = \mathcal{E}[t'_k]$ and reductions
-\[
-t = \mathcal{E}[t_k] \longrightarrow \mathcal{E}[t'_k] = t', t = \mathcal{E}[t_k] \longrightarrow^{aux} \mathcal{E}[t'_k] = t'.
-\]
-\end{enumerate}
-
-\end{proof}
-
-\end{lemma}
-
-\begin{lemma}
+\begin{restatable}[Complementarity]{lemma}{compl}
 
 For all terms $a,b$ it holds that:
 
 When $a \longrightarrow' b$ but $a \not\longrightarrow b$, then there is a $c$ with $a \longrightarrow c$ and $a \longrightarrow^{aux} c$.
 
+\end{restatable}
+
 \begin{proof}
-
-There is an evaluation context $\mathcal{E} \in \textrm{EC}_<[\vdash'_v]$, with $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Consider the generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ that $\mathcal{E}$ is an instance of, and the order $<$ on its placeholders. Construct an evaluation context $\mathcal{E}' \in \textrm{EC}_<[\vdash_v]$ from $\mathcal{E}$ by replacing the smallest placeholder of $\mathcal{GE}$, that $\mathcal{E}$ replaced with a term $t$ with $\not\vdash_v t$, by the hole $[]$. By Lemma 3.3.2, we have a term $t_{aux}$ and reductions
-\[
-t \longrightarrow t_{aux}, t \longrightarrow^{aux} t_{aux},
-\]
-and consequently there is a $c = \mathcal{E}'[t_{aux}]$ with
-\[
-\mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], \mathcal{E}'[t] \longrightarrow^{aux} \mathcal{E}'[t_{aux}].
-\]
-
+Left for the appendix.
 \end{proof}
 
-\end{lemma}
+\begin{proof}[Proof of Lemma 3.3.1]
 
-\begin{lemma}[Left-to-right direction of (2.2)]
-\[
-s {\longrightarrow'}_{\langle prg \rangle}^* t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}
-\]
+By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$. For $n = 0$ it is $s = t$, thus simply choose $\widetilde{t} = t$. Now, consider the case that $n = n'+1$ for some $n' \geq 0$. We proceed by induction on the number $k$ of calls in $s$ to the function targeted in the transformation, i.e., that of $q_\epsilon$.
 
-\begin{proof}
-
-By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$.
-
-\begin{itemize}
-\item $n = 0$. Then it is $s = t$, thus simply choose $\widetilde{t} = t$.
-
-\item $n = n' + 1$. By induction on the number $k$ of calls in $s$ to the function targeted in the transformation, i.e., that of $q_\epsilon$.
 \begin{itemize}
 \item $k = 0$. Consider the first step $s {\longrightarrow'}_{\langle prg \rangle} s_1$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$. Because there are no calls to the function of $q_\epsilon$ in $s$, for all subterms $s^0$ of $s$ it is $\vdash'_v s^0$ iff $\vdash_v s^0$. Consequently, the reduction step from $s$ to $s_1$ is also possible with reduction relation $\longrightarrow_{\langle prg \rangle}$, that is, $s \longrightarrow_{\langle prg \rangle} s_1$. By the outer induction hypothesis, we have the rest of the desired reduction sequence $s_1 \longrightarrow_{\langle prg \rangle} \widetilde{t}$.
 
@@ -269,11 +229,8 @@ By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* 
 \item $s \not\longrightarrow_{\langle prg \rangle} s_1$. By Lemma 3.3.3, we have an $s_{aux}$ with $s \longrightarrow^{aux} s_{aux}$ and $s \longrightarrow_{\langle prg \rangle} s_{aux}$. By Corollary 3.3.1, we have a $\widetilde{t}'$ with (a) $s_{aux} \longrightarrow^{\leq n} \widetilde{t}'$ and (b) $t {\longrightarrow^{aux}}^* \widetilde{t}'$ and thus $\langle \widetilde{t}' \rangle^{aux^{-1}} = t$. Apply the inner induction hypothesis to $s_{aux} \longrightarrow^{\leq n} \widetilde{t}'$ to obtain the desired sequence.
 \end{enumerate}
 \end{itemize}
-\end{itemize}
 
 \end{proof}
-
-\end{lemma}
 
 To show that the $`` \Leftarrow ''$ direction of (2.2) holds, a translation for sequences $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ to sequences $s \longrightarrow^*_{prg} t$ is given (called Back-Translation). The correctness of the translation is verified, i.e., it is proven that each step of the sequences returned by the function is indeed a reduction step of the relevant reduction, and that the desired equality or equivalence between the end points of the original and the translated sequence holds. This correctness proofs are left for the appendix.
 

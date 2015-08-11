@@ -78,6 +78,54 @@ We compare $a^0$ and $a'^0$ and distinguish four cases.
 
 \end{proof}
 
+\begin{lemma}
+
+For a term $t$ with $\vdash'_v t$ and $\not\vdash_v t$, there is a term $t'$ and reductions
+\[
+t \longrightarrow t'
+\]
+and
+\[
+t \longrightarrow^{aux} t'.
+\]
+
+\begin{proof}
+
+By induction on the structure of $t$. We distinguish two cases.
+\begin{enumerate}
+\item All immediate subterms of $t$ are values under judgement $\vdash_v$. We will show that $t$ matches $q_\epsilon$, and from this the desired reductions immediately follow. Because $\not\vdash_v t$, by the definition of the value judgement $t$ itself has to match some lhs $q$ of $\langle prg \rangle$. Since $\vdash'_v t$, there cannot be an equation $q'$ of $prg$ with $\langle q \rangle^{aux^{-1}} = q$. By the definition of extractions, the only equation of $\langle prg \rangle$ for which this can be the case is $q = q_\epsilon$. Consequently, we have some $\sigma$ that substitutes only with terms which are values under judgement $\vdash_v$ and the desired reductions
+\[
+t = q_\epsilon[\sigma] \longrightarrow t_\epsilon[\sigma], t = q_\epsilon[\sigma] \longrightarrow^{aux} t_\epsilon[\sigma].
+\]
+
+\item There are immediate subterms of $t$ which aren't values under judgement $\vdash_v$. Obtain a generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ by replacing all immediate subterms $t_i$ of $t$ with placeholders $p_i$, with $p_1, ..., p_n$ ordered according to the order $<$ of $\textrm{EC}_<$. Let $k$ be the smallest index for which $\not\vdash_v t_k$. We define $\mathcal{E} \in \textrm{EC}_<[\vdash_v]$ as the instance of $\mathcal{GE}$ which assigns, for all $i \neq k$, $t_i$ to placeholder $p_i$, and the hole $[]$ to placeholder $p_k$. By the induction hypothesis, we have a term $t'_k$ and reductions
+\[
+t_k \longrightarrow t'_k, t_k \longrightarrow^{aux} t'_k.
+\]
+Consequently, we have the desired term as $t' = \mathcal{E}[t'_k]$ and reductions
+\[
+t = \mathcal{E}[t_k] \longrightarrow \mathcal{E}[t'_k] = t', t = \mathcal{E}[t_k] \longrightarrow^{aux} \mathcal{E}[t'_k] = t'.
+\]
+\end{enumerate}
+
+\end{proof}
+
+\end{lemma}
+
+\compl*
+\begin{proof}
+
+There is an evaluation context $\mathcal{E} \in \textrm{EC}_<[\vdash'_v]$, with $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Consider the generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ that $\mathcal{E}$ is an instance of, and the order $<$ on its placeholders. Construct an evaluation context $\mathcal{E}' \in \textrm{EC}_<[\vdash_v]$ from $\mathcal{E}$ by replacing the smallest placeholder of $\mathcal{GE}$, that $\mathcal{E}$ replaced with a term $t$ with $\not\vdash_v t$, by the hole $[]$. By Lemma A.0.3, we have a term $t_{aux}$ and reductions
+\[
+t \longrightarrow t_{aux}, t \longrightarrow^{aux} t_{aux},
+\]
+and consequently there is a $c = \mathcal{E}'[t_{aux}]$ with
+\[
+\mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], \mathcal{E}'[t] \longrightarrow^{aux} \mathcal{E}'[t_{aux}].
+\]
+
+\end{proof}
+
 \correctb*
 \begin{proof}
 By induction on the length $n$ of the sequence.
