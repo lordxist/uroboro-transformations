@@ -65,11 +65,21 @@ where $aux$ is a fresh function name.\footnote{In practice this means that is in
 
 Note/TODO: $\langle q \rangle^{vars}$ needs to be defined such that variables introduced by \texttt{get} are placed in front of the others. In chapter 4, this is necessary for constructor extraction to be able to bring lhss to the form $fun(con(x^*), y^*)$, which is needed for refunctionalization, and not just $fun(x^*, con(y^*), z^*)$.
 
-\section{Lifting extractions to programs}
+\subsection{Applying extractions to programs}
 
-An extraction function was defined to have equations as its domain and range. As it will be used to transform programs into programs, however, it is necessary to define how it should be lifted to that domain. The definition of the lifting function is straightforward; all it does is apply the extraction to each equation $r$ of the program, replacing it with $\epsilon$ if it exists and otherwise leaving $r$ unchanged, and collecting the $\zeta_r$ for each changed equation $r$ in an auxiliary function definition.
+An extraction function was defined as a triple. As it will be used to transform programs into programs, however, it is necessary to define how it should be applied to programs. The definition of the apply function is straightforward; all it does is replace each targeted lhs in the program with $\epsilon$, leaving all other lhss unchanged, and collecting the $\zeta_r$ for each targeted equation $r$ in an auxiliary function definition.
 
-...
+Let $e = (\epsilon, \zeta, sig)$ be an extraction targeting $T$, with
+\[
+def_T = `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns "
+\]
+the function definition that contains the lhss of $T$.
+
+\begin{alignat*}{4}
+\langle prg \rangle^{apply(e)} & = &&\{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \{ r ~ | ~ r \in eqns, r \not\in T \} \cup \{ \epsilon \}, \\
+& && && \textrm{\textbf{function }} sig \textrm{\textbf{ where }} \{ \zeta_r ~ | ~ r \in T \} \} \\
+& \cup && \{ def \in prg ~ | ~ def \neq def_T \} \span\span\span\span
+\end{alignat*}
 
 \section{Bisimulation}
 
