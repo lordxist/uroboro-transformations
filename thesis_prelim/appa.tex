@@ -93,7 +93,7 @@ t \longrightarrow^{aux} t'.
 
 By induction on the structure of $t$. We distinguish two cases.
 \begin{enumerate}
-\item All immediate subterms of $t$ are values under judgement $\vdash_v$. We will show that $t$ matches $q_\epsilon$, and from this the desired reductions immediately follow. Because $\not\vdash_v t$, by the definition of the value judgement $t$ itself has to match some lhs $q$ of $\langle prg \rangle$. Since $\vdash'_v t$, there cannot be an equation $q'$ of $prg$ with $\langle q \rangle^{aux^{-1}} = q$. By the definition of extractions, the only equation of $\langle prg \rangle$ for which this can be the case is $q = q_\epsilon$. Consequently, we have some $\sigma$ that substitutes only with terms which are values under judgement $\vdash_v$ and the desired reductions
+\item All immediate subterms of $t$ are values under judgement $\vdash_v$. We will show that $t$ matches $q_\epsilon$, and from this the desired reductions immediately follow. Because $\not\vdash_v t$, by the definition of the value judgement $t$ itself has to match some lhs $q$ of $\langle prg \rangle$. Since $\vdash'_v t$, there cannot be an equation $q'$ of $prg$ with $\langle q \rangle^{aux^{-1}} = q'$. By the definition of extractions, the only equation of $\langle prg \rangle$ for which this can be the case is $q = q_\epsilon$. Consequently, we have some $\sigma$ that substitutes only with terms which are values under judgement $\vdash_v$ and the desired reductions
 \[
 t = q_\epsilon[\sigma] \longrightarrow t_\epsilon[\sigma], t = q_\epsilon[\sigma] \longrightarrow^{aux} t_\epsilon[\sigma].
 \]
