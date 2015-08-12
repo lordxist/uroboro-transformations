@@ -287,6 +287,94 @@ such that $prg' \cup prg'' = prg$. By Lemma 4.2.1, the reduction relations perta
 \end{proof}
 \end{lemma}
 
+\subsection{Example}
+
+We continue with the example fragment of section 4.1.3, augmented with (co)data definitions and signatures.
+
+\begin{lstlisting}
+
+data P where
+  con1(): P
+  con2(): P
+
+codata N1 where
+  N1.des(): N2
+
+codata N2 where
+  N2.des1(P): P
+  N2.des2(): P
+
+function fun(N1): N1 where
+  fun(x).des() = aux2(x)
+
+function aux(P, N1): P where
+  aux(con1(), x) = t1
+  aux(con2(), x) = t2
+
+function aux2(N1): N2 where
+  aux2(x).des1(y) = aux(y, x)
+  aux2(x).des2() = t3
+
+\end{lstlisting}
+
+Using the \textsf{CoreDefunc} algorithm on this yields the following program, by leaving the function definition for \texttt{aux} and the data definition unchanged, and applying the defunctionalization of Rendel et al. to the other definitions.
+
+\begin{lstlisting}
+
+data P where
+  con1(): P
+  con2(): P
+
+data N1 where
+  fun(N1): N1
+
+data N2 where
+  aux2(N1): N2
+
+function aux(P, N1): P where
+  aux(con1(), x) = t1
+  aux(con2(), x) = t2
+
+function des(N1): N2 where
+  des(fun(x)) = aux2(x)
+
+function des1(N2, P): P where
+  des1(aux2(x), y) = aux(y, x)
+
+function des2(N2): P where
+  des2(aux2(x)) = t3
+
+\end{lstlisting}
+
+Using the \textsf{CoreRefunc} algorithm on the original program yields the following program, by leaving the function definitions for \texttt{fun} and \texttt{aux2} and the codata definitions unchanged, and applying the refunctionalization of Rendel et al. to the other definitions.
+
+\begin{lstlisting}
+
+codata P where
+  P.aux(N1): P
+
+codata N1 where
+  N1.des(): N2
+
+codata N2 where
+  N2.des1(P): P
+  N2.des2(): P
+
+function fun(N1): N1 where
+  fun(x).des() = aux2(x)
+
+function aux2(N1): N2 where
+  aux2(x).des1(y) = aux(y, x)
+  aux2(x).des2() = t3
+
+function con1() where
+  con1().aux(x) = t1
+
+function con2() where
+  con2().aux(x) = t2
+
+\end{lstlisting}
+
 %%-- end under construction
 
 ...
