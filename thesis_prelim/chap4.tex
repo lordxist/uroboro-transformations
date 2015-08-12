@@ -35,7 +35,13 @@ eqn_{nr} &::= fun(con(x^*), y^*) = t \\
 \end{align*}
 \end{definition}
 
-For each algorithm it will be shown, in its respective section, that it actually has the range specified above. In total, three important properties will be shown for each algorithm: Termination, correct range, and preservation of semantics in a (weak) bisimulation.
+\begin{definition}[Defunctionalized fragment]
+A well-typed Uroboro program is in the defunctionalized fragment $\mathbf{U}^{defunc}_{cc}$ if and only if it contains no codata type definitions.
+\end{definition}
+
+\begin{definition}[Refunctionalized fragment]
+A well-typed Uroboro program is in the refunctionalized fragment $\mathbf{U}^{refunc}_{cc}$ if and only if it contains no data type definitions.
+\end{definition}
 
 The rest of the section is organized as follows. The first section describes the unnesting algorithm, shows why the three properties hold, and gives applies it to an example. Section 2 and 3 do the same for the unmixing algorithm, and core de-/refunctionalization, respectively.
 
