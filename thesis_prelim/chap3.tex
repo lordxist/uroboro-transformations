@@ -326,7 +326,7 @@ The two following extractions will be used in the next chapter.
 
 \subsection{Destructor extraction}
 
-The extraction $des\_extract(q)$ of a single destructor targeting some copattern $q$ can be defined as follows: It is the $\pi$-extraction targeting $q$ for the extraction projection $\pi$ defined below.
+The extraction $des\_extract(q)$ of a single destructor targeting some copattern $q$ can be defined as follows: It is the $\pi$-extraction (targeting some $T$) for the extraction projection $\pi$ defined below.
 
 \[
 \pi(`` fun(\overline{p}) ") = `` fun(\overline{p}) "
@@ -335,13 +335,17 @@ The extraction $des\_extract(q)$ of a single destructor targeting some copattern
 \pi(`` q.des(\overline{p}) ") = `` q "
 \]
 
-Since copatterns without destructors aren't affected, this extraction is only meant to be used for copatterns with at least one destructor. 
+Since copatterns without destructors aren't affected, this extraction is only meant to be used for copatterns with at least one destructor. We now show that $\pi$ is an extraction projection, by giving a cosubstitution $\sigma^q_\pi$ for each $q$ such that $\sigma^q_\pi(\pi(q)) = q$: Set
+\[
+\sigma^q_\pi(q') = \begin{cases}
+                              q'.des(\overline{p}) &,\text{ if } q = q''.des(\overline{p}) \\
+                              q' &,\text{ otherwise}
+                              \end{cases}
+\]
 
 \subsection{Constructor extraction}
 
-%%-- under construction
-
-We define a family $\textsf{ExtractCon}(p)$ of extractions of single constructors. The parameter $p$ stands for the position of the constructor call to be extracted in the targeted copatterns. For such a position $p$, $\textsf{ExtractCon}(p)$ is defined as the $\pi$-extraction targeting $Q$ for the extraction projection $\pi$ defined below.
+We define a family $\textsf{ExtractCon}(p)$ of extractions of single constructors. The parameter $p$ stands for the position of the constructor call to be extracted in the targeted copatterns. For such a position $p$, $\textsf{ExtractCon}(p)$ is defined as the $\pi$-extraction (targeting some $T$) for the extraction projection $\pi$ defined below.
 
 For a copattern $q$, let $x_q$ be a variable different from all in $q$.
 \[
@@ -351,14 +355,7 @@ For a copattern $q$, let $x_q$ be a variable different from all in $q$.
              \end{cases}
 \]
 
-%%--
-
-In this section, the extraction of a single constructor is defined. Unlike the extraction of a single destructor from the previous section, for constructor extraction it needs to be specified which constructor should be extracted. Define the extraction $con_n\_extract(q)$ of the $n$-th constructor in $q$ (from left to right) as the $\pi_n$-extraction targeting $q$ with the extraction projection $\pi_n$ defined below.
-
-Let $x_q$ be a variable different from all in $q$.
-\[
-\pi_n(q) = q \text{ with the $n$-th constructor application } con(...) \text{ replaced by $x_q$ }
-\]
+We now show why $\pi$ is an extraction projection, that is, we give, for each $q$, a substitution $\sigma^q_\pi$ such that $\sigma^q_\pi(\pi(q)) = q$: Set $\sigma^q_\pi := \{x_q \mapsto \overline{p}\}$.
 
 \subsection{Extracting all patterns out of a single-destructor copattern}
 
