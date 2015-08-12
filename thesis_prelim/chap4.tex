@@ -14,7 +14,7 @@ In short, the entire process can be described as follows. By unnesting them as f
 
 The unnesting is done by a parameterized algorithm $\textsf{Unnest}_i$, where the parameter $i$ can be either $d$ or $r$, standing for defunctionalization and refunctionalization, respectively. The parameter determines when the algorithm may stop, such that its results are legal inputs for de- or refunctionalization. The unnesting algorithm is essentially the copattern unnesting algorithm of Setzer et al., adapted to Uroboro.
 
-We give the intended domain and range for each of the algorithms, all of which are specific fragments of Uroboro.
+We give the intended domain and range for each of the algorithms, all of which are specific fragments of Uroboro. Call the set of all well-typed Uroboro programs with copattern coverage $\mathbf{U}_{cc}$; the other fragments are defined below.
 \begin{align*}
 & \textsf{Unnest}_i: \mathbf{U}_{cc} \to \mathbf{U}_{cc}[fdef_{un,i}] \text{ for } i \in \{d,r\} \\
 & \textsf{CoreDefunc}: \mathbf{U}_{cc}[fdef_{un,d}] \to \mathbf{U}^{defunc}_{cc} \\
@@ -42,6 +42,8 @@ A well-typed Uroboro program is in the defunctionalized fragment $\mathbf{U}^{de
 \begin{definition}[Refunctionalized fragment]
 A well-typed Uroboro program is in the refunctionalized fragment $\mathbf{U}^{refunc}_{cc}$ if and only if it contains no data type definitions.
 \end{definition}
+
+For each algorithm it will be shown, in its respective section, that it actually has the range specified above. In total, four important properties will be shown for each algorithm: Termination, correct range, preservation of well-typedness, and preservation of semantics in a (weak) bisimulation.
 
 The rest of the section is organized as follows. The first section describes the unnesting algorithm, shows why the three properties hold, and gives applies it to an example. Section 2 and 3 do the same for the unmixing algorithm, and core de-/refunctionalization, respectively.
 
