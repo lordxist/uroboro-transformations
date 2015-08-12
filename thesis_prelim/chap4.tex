@@ -69,7 +69,20 @@ Apply extraction \textsf{ExtractDes} targeting the equations with lhss $q.des(\o
 \[
 Q \cup \{ \texttt{get}(q.des(\overline{x^{des}})) ~ | ~ des \in Dess_\tau \} = Q \cup \{q\},
 \]
-where \texttt{get} is the retrieving part of the lens underlying \textsf{ExtractDes}. This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q^\tau)$ from the derivation step above.
+where \texttt{get} is the retrieving part of the lens underlying \textsf{ExtractDes}. This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q^\tau)$ from the derivation step above. The lhss of the auxiliary function definition are
+\begin{multline*}
+\{ q_{\zeta_r} ~ | ~ r \in T \} = \{ \texttt{putback}(\langle \texttt{get}(q_r) \rangle^{aux}, q_r) ~ | ~ r \in T \} \\
+= \{ \sigma^{q_r}_\pi(aux(\langle q \rangle^{vars})) ~ | ~ r \in T \} = \{ aux(\langle q \rangle^{vars}).des(\overline{x^{des}}) ~ | ~ des \in Dess_\tau \} \\
+= \{ aux(\langle q \rangle^{vars}).des(\overline{x^{des}}) ~ | ~ des \in Dess_\tau \},
+\end{multline*}
+where $\zeta$ is the function in the triple that is \textsf{ExtractCon}(p). It is clear that each $q_{\zeta_r}$ is simple and that $\{ q_{\zeta_r} ~ | ~ r \in T \}$ covers $aux$:
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{C\textsubscript{Head}}
+\UnaryInfC{$aux \lhd | ~ aux(x, \overline{y})$}
+\RightLabel{C\textsubscript{ResSplit}}
+\UnaryInfC{$aux \lhd | ~ (q_{\zeta_r})_{r \in T}$}
+\end{prooftree}
 
 \item \textbf{C} is C\textsubscript{Con}, and the last derivation step looks as follows. 
 
@@ -83,7 +96,20 @@ Let $p$ be the position of $x$ in $q$. Apply extraction \textsf{ExtractCon}(p) t
 \[
 Q \cup \{ \texttt{get}(q[x := con(\overline{y^{con}})]) ~ | ~ con \in Cons_\tau \} = Q \cup \{q\},
 \]
-where \texttt{get} is the retrieving part of the lens underlying \textsf{ExtractCon}(p). This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q)$ from the derivation step above. \qedhere
+where the pair of \texttt{get} and \texttt{putback} is the lens underlying \textsf{ExtractCon}(p). This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q)$ from the derivation step above. The lhss of the auxiliary function definition are
+\begin{multline*}
+\{ q_{\zeta_r} ~ | ~ r \in T \} = \{ \texttt{putback}(\langle \texttt{get}(q_r) \rangle^{aux}, q_r) ~ | ~ r \in T \} \\
+= \{ \sigma^{q_r}_\pi(aux(\langle q \rangle^{vars})) ~ | ~ r \in T \} = \{ aux(\langle q \rangle^{vars})[x := con(\overline{y^{con}})] ~ | ~ con \in Cons_\tau \} \\
+= \{ aux(x, \langle q_r \rangle^{vars})[x := con(\overline{y^{con}})] \text{ for some } r \in T ~ | ~ con \in Cons_\tau \},
+\end{multline*}
+where $\zeta$ is the function in the triple that is \textsf{ExtractCon}(p). It is clear that each $q_{\zeta_r}$ is simple and that $\{ q_{\zeta_r} ~ | ~ r \in T \}$ covers $aux$:
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{C\textsubscript{Head}}
+\UnaryInfC{$aux \lhd | ~ aux(x, \overline{y})$}
+\RightLabel{C\textsubscript{VarSplit}}
+\UnaryInfC{$aux \lhd | ~ (q_{\zeta_r})_{r \in T}$}
+\end{prooftree}
 \end{enumerate}
 
 \end{algorithm}
