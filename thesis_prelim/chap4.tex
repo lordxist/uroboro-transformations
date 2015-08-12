@@ -45,11 +45,11 @@ We adapt the translation algorithm from section 3.3 of the paper of Setzer et al
 
 \subsection{Simple patterns}
 
-We adapt the definition of a \textit{simple pattern}, as given by Setzer et al., to Uroboro. Call a copattern simple if it is of one of the three forms $fun(\overline{x})$, $fun(\overline{x}).des(\overline{y})$, or $fun(con(\overline{x}), \overline{y})$.
+Before we start with the translation algorithm, we adapt and introduce, respectively, two notions of simplicity for patterns, the second of which corresponds to the intended range of the translation algorithm. We first adapt the definition of a \textit{simple pattern}, as given by Setzer et al., to Uroboro. Call a copattern simple if it is of one of the three forms $fun(\overline{x})$, $fun(\overline{x}).des(\overline{y})$, or $fun(con(\overline{x}), \overline{y})$.
 
 Next, we generalize this definition to define \textit{sufficiently simple patterns} for a purpose, which is either de- or refunctionalization. Call a copattern \textit{sufficiently simple for defunctionalization} if it one of the two forms $fun(\overline{x}).des(\overline{y})$, $fun(\overline{p})$, and \textit{sufficiently simple for refunctionalization} if it one of the two forms $fun(\overline{x}).\overline{des(\overline{y})}$, $fun(con(\overline{x}), \overline{y})$. We will also say that a copattern is sufficiently simple for $i$, for $i \in \{d,r\}$, and mean that it is sufficiently simple for defunctionalization or refunctionalization, respectively.
 
-It is clear that each simple copattern is also sufficiently simple for both de- and refunctionalization.
+Those notions correspond directly to the forms of lhss allowed in the unnested fragments for \textsf{CoreDefunc} and \textsf{CoreRefunc}, respectively. It is clear that each simple copattern is also sufficiently simple for both de- and refunctionalization.
 
 \subsection{Translation algorithm}
 
