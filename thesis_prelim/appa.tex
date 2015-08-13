@@ -3,6 +3,7 @@
 \section{Proofs for section 3.3.2}
 
 \begin{lemma}
+\label{lem:app1}
 Let $a$ be a term and $a^0$ be a proper subterm of $a$. When
 \[
 a \longrightarrow' b \land a^0 \longrightarrow^{aux} b^0
@@ -30,6 +31,7 @@ b = t_r[\sigma] \longrightarrow^{aux} t_r[\sigma][t(b^0)]_{p^x_1} \longrightarro
 \end{lemma}
 
 \begin{lemma}
+\label{lem:app2}
 Let $a$ be a term and $a^0$ be a proper subterm of $a$. When
 \[
 a \longrightarrow^{aux} b \land a^0 \longrightarrow' b^0
@@ -74,16 +76,17 @@ We compare $a^0$ and $a'^0$ and distinguish four cases.
 \begin{itemize}
 \item $a^0 = a'^0$. Then simply choose $d = b$. Since $\langle prg \rangle$ has no overlapping lhss, it must be $b^0 = c^0$. Thus it is $b = c$ and the property holds.
 
-\item $a'^0$ is a proper subterm of $a^0$. By Lemma A.1.1, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow' d^0$ and $b^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}[d^0]$. The property holds since (a) $b = \mathcal{E}[b^0] \longrightarrow^{aux} \mathcal{E}[d^0] = d$ and (b) $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a^0[a'^0 \mapsto c^0]] \longrightarrow' \mathcal{E}[d^0] = d$.
+\item $a'^0$ is a proper subterm of $a^0$. By \autoref{lem:app1}, we have a $d^0$ with $a^0[a'^0 \mapsto c^0] \longrightarrow' d^0$ and $b^0 \longrightarrow^{aux} d^0$. Choose $d = \mathcal{E}[d^0]$. The property holds since (a) $b = \mathcal{E}[b^0] \longrightarrow^{aux} \mathcal{E}[d^0] = d$ and (b) $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a^0[a'^0 \mapsto c^0]] \longrightarrow' \mathcal{E}[d^0] = d$.
 
-\item $a^0$ is a proper subterm of $a'^0$. Because $a = \mathcal{E}[a^0]$, $a^0$ is a subterm of $a'^0$, and $\mathcal{E} \in \textrm{EC}[\vdash'_v]$, it is $a'^0[a^0 \mapsto []] \in \textrm{EC}[\vdash'_v]$. By Lemma A.1.2, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow^{aux} d^0$ and $c^0 \longrightarrow' d^0$. Choose $d = \mathcal{E}^{aux}[d^0]$. The property holds since (a) $b = \mathcal{E}^{aux}[a'^0[a^0 \mapsto b^0]] \longrightarrow^{aux} \mathcal{E}^{aux}[d^0]$ and (b) $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a'^0[a^0 \mapsto []] \mapsto []][c^0] \longrightarrow' \mathcal{E}[a'^0[a^0 \mapsto []] \mapsto []][d^0] = \mathcal{E}^{aux}[d^0] = d$.
+\item $a^0$ is a proper subterm of $a'^0$. Because $a = \mathcal{E}[a^0]$, $a^0$ is a subterm of $a'^0$, and $\mathcal{E} \in \textrm{EC}[\vdash'_v]$, it is $a'^0[a^0 \mapsto []] \in \textrm{EC}[\vdash'_v]$. By \autoref{lem:app2}, we have a $d^0$ with $a'^0[a^0 \mapsto b^0] \longrightarrow^{aux} d^0$ and $c^0 \longrightarrow' d^0$. Choose $d = \mathcal{E}^{aux}[d^0]$. The property holds since (a) $b = \mathcal{E}^{aux}[a'^0[a^0 \mapsto b^0]] \longrightarrow^{aux} \mathcal{E}^{aux}[d^0]$ and (b) $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a'^0[a^0 \mapsto []] \mapsto []][c^0] \longrightarrow' \mathcal{E}[a'^0[a^0 \mapsto []] \mapsto []][d^0] = \mathcal{E}^{aux}[d^0] = d$.
 
-\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$. The property holds because $b = \mathcal{E}[b^0] = \mathcal{E}^{aux}[a^0 \mapsto b^0][a'^0] \longrightarrow^{aux} \mathcal{E}^{aux}[a^0 \mapsto b^0][c^0] = d$ and $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a'^0 \mapsto c^0][a^0] \longrightarrow' \mathcal{E}[a'^0 \mapsto c^0][b^0] = d$. This second reduction is possible because, by Lemma 1.5.1, $\mathcal{E}[a'^0 \mapsto c^0] \in \textrm{EC}[\vdash'_v]$ since $\mathcal{E} \in \textrm{EC}[\vdash'_v]$ and $\langle a'^0 \rangle^{aux^{-1}} = \langle c^0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a'^0$ iff $\vdash'_v c^0$.
+\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$. The property holds because $b = \mathcal{E}[b^0] = \mathcal{E}^{aux}[a^0 \mapsto b^0][a'^0] \longrightarrow^{aux} \mathcal{E}^{aux}[a^0 \mapsto b^0][c^0] = d$ and $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a'^0 \mapsto c^0][a^0] \longrightarrow' \mathcal{E}[a'^0 \mapsto c^0][b^0] = d$. This second reduction is possible because, by \autoref{lem:gec1}, $\mathcal{E}[a'^0 \mapsto c^0] \in \textrm{EC}[\vdash'_v]$ since $\mathcal{E} \in \textrm{EC}[\vdash'_v]$ and $\langle a'^0 \rangle^{aux^{-1}} = \langle c^0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a'^0$ iff $\vdash'_v c^0$.
 \end{itemize}
 
 \end{proof}
 
 \begin{lemma}
+\label{lem:app3}
 
 For a term $t$ with $\vdash'_v t$ and $\not\vdash_v t$, there is a term $t'$ and reductions
 \[
@@ -120,7 +123,7 @@ t = \mathcal{E}[t_k] \longrightarrow \mathcal{E}[t'_k] = t', t = \mathcal{E}[t_k
 \compl*
 \begin{proof}
 
-There is an evaluation context $\mathcal{E} \in \textrm{EC}_<[\vdash'_v]$, with $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Consider the generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ that $\mathcal{E}$ is an instance of, and the order $<$ on its placeholders. Construct an evaluation context $\mathcal{E}' \in \textrm{EC}_<[\vdash_v]$ from $\mathcal{E}$ by replacing the smallest placeholder of $\mathcal{GE}$, that $\mathcal{E}$ replaced with a term $t$ with $\not\vdash_v t$, by the hole $[]$. By Lemma A.1.3, we have a term $t_{aux}$ and reductions
+There is an evaluation context $\mathcal{E} \in \textrm{EC}_<[\vdash'_v]$, with $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Consider the generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ that $\mathcal{E}$ is an instance of, and the order $<$ on its placeholders. Construct an evaluation context $\mathcal{E}' \in \textrm{EC}_<[\vdash_v]$ from $\mathcal{E}$ by replacing the smallest placeholder of $\mathcal{GE}$, that $\mathcal{E}$ replaced with a term $t$ with $\not\vdash_v t$, by the hole $[]$. By \autoref{lem:app3}, we have a term $t_{aux}$ and reductions
 \[
 t \longrightarrow t_{aux}, t \longrightarrow^{aux} t_{aux},
 \]

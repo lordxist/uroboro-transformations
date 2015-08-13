@@ -101,6 +101,7 @@ s \longrightarrow_{prg}^* t \iff s {\longrightarrow'}_{\langle prg \rangle}^* t
 This statement is now proved using Theorem 4 of ``Unnesting of copatterns'' (Setzer et al.).
 
 \begin{proposition}
+\label{prop:bisim1}
 The weak bisimulation statement (2.1) holds for any transformation defined as $liftp(e)$ for some $\pi$-extraction targeting a $q$.
 
 \begin{proof}
@@ -172,6 +173,7 @@ for every $s, t$ with names declared in $prg$.
 First, we show that the $`` \Rightarrow "$ direction of (2.2), as expressed in the following lemma, holds. In the following, all reductions are meant with respect to program $\langle prg \rangle$.
 
 \begin{lemma}[$`` \Rightarrow "$ direction of (2.2)]
+\label{lem:prop2lr}
 \[
 s {\longrightarrow'}_{\langle prg \rangle}^* t \implies s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}
 \]
@@ -184,6 +186,7 @@ In order to prove this, we define a counterpart to the $\longrightarrow'$ reduct
 where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle$ whose underlying value set is the set of all terms, i.e., the reduction is allowed to choose any redex. Where $\longrightarrow'$ can ``sidestep'' reductions which don't change the back-interpretation of a term, $\longrightarrow^{aux}$ is purely ``interpretative'', that is, it only allows reductions to terms with equal back-interpretation. This is expressed formally in the following lemmas relating $\longrightarrow'$ and $\longrightarrow^{aux}$, one concerning their commutation, the other what we call their complementarity. The $`` \Rightarrow "$ direction of (2.2) follows from these, as shown below.
 
 \begin{restatable}[Commuting-diamond property]{lemma}{cdpaux}
+\label{lem:cdpaux}
 
 For all terms $a,b,c$ it holds that:
 \[
@@ -196,6 +199,7 @@ Left for the appendix.
 \end{proof}
 
 \begin{corollary}
+\label{cor:cdpauxcor}
 
 For all terms $a,b,c$ and $n \in \mathbb{N}$ it holds that:
 \[
@@ -211,6 +215,7 @@ By induction on $n$ and on the length of $a {\longrightarrow^{aux}}^* c$.
 \end{corollary}
 
 \begin{restatable}[Complementarity]{lemma}{compl}
+\label{lem:compl}
 
 For all terms $a,b$ it holds that:
 
@@ -222,7 +227,7 @@ When $a \longrightarrow' b$ but $a \not\longrightarrow b$, then there is a $c$ w
 Left for the appendix.
 \end{proof}
 
-\begin{proof}[Proof of Lemma 3.3.1]
+\begin{proof}[Proof of \autoref{lem:cdpaux}]
 
 By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$. For $n = 0$ it is $s = t$, thus simply choose $\widetilde{t} = t$. Now, consider the case that $n = n'+1$ for some $n' \geq 0$. We proceed by induction on the number $k$ of calls in $s$ to the function targeted in the transformation, i.e., that of $q_\epsilon$.
 
@@ -233,7 +238,7 @@ By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* 
 \begin{enumerate}
 \item $s \longrightarrow_{\langle prg \rangle} s_1$. With this, we have the first step of the desired reduction sequence. By the outer induction hypothesis, we have the rest of the desired reduction sequence $s_1 \longrightarrow_{\langle prg \rangle} \widetilde{t}$.
 
-\item $s \not\longrightarrow_{\langle prg \rangle} s_1$. By Lemma 3.3.3, we have an $s_{aux}$ with $s \longrightarrow^{aux} s_{aux}$ and $s \longrightarrow_{\langle prg \rangle} s_{aux}$. By Corollary 3.3.1, we have a $\widetilde{t}'$ with (a) $s_{aux} \longrightarrow^{\leq n} \widetilde{t}'$ and (b) $t {\longrightarrow^{aux}}^* \widetilde{t}'$ and thus $\langle \widetilde{t}' \rangle^{aux^{-1}} = t$. Apply the inner induction hypothesis to $s_{aux} \longrightarrow^{\leq n} \widetilde{t}'$ to obtain the desired sequence.
+\item $s \not\longrightarrow_{\langle prg \rangle} s_1$. By \autoref{lem:compl}, we have an $s_{aux}$ with $s \longrightarrow^{aux} s_{aux}$ and $s \longrightarrow_{\langle prg \rangle} s_{aux}$. By \autoref{cor:cdpauxcor}, we have a $\widetilde{t}'$ with (a) $s_{aux} \longrightarrow^{\leq n} \widetilde{t}'$ and (b) $t {\longrightarrow^{aux}}^* \widetilde{t}'$ and thus $\langle \widetilde{t}' \rangle^{aux^{-1}} = t$. Apply the inner induction hypothesis to $s_{aux} \longrightarrow^{\leq n} \widetilde{t}'$ to obtain the desired sequence.
 \end{enumerate}
 \end{itemize}
 
@@ -269,6 +274,7 @@ Left for the appendix.
 \end{proof}
 
 \begin{lemma}[Right-to-left direction of (2.2)]
+\label{lem:prop2rl}
 \[
  s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \implies s {\longrightarrow'}_{\langle prg \rangle}^* t
 \]
@@ -281,8 +287,9 @@ Left for the appendix.
 \end{proof}
 \end{lemma}
 
-Combining Lemma 2.3.3 and Lemma 2.3.5, statement (2.2) obtains.
+Combining \autoref{lem:prop2lr} and \autoref{lem:prop2rl}, statement (2.2) obtains.
 \begin{proposition}
+\label{prop:bisim2}
 Statement (2.2), that is
 \[
 s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle prg \rangle} \widetilde{t},
