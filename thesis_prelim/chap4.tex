@@ -31,7 +31,7 @@ eqn_d &::= fun(p^*) = t \\
 \begin{align*}
 fdef_{un,r} &::= eqn_{nr}^* ~ | ~ eqn_r^* \\
 eqn_r &::= fun(x^*).des(y^*)^* = t \\
-eqn_{nr} &::= fun(con(x^*), y^*) = t \\
+eqn_{nr} &::= fun(x^*, con(y^*), z^*) = t \\
 \end{align*}
 \end{definition}
 
@@ -53,9 +53,9 @@ We adapt the translation algorithm from section 3.3 of the paper of Setzer et al
 
 \subsection{Simple patterns}
 
-Before we start with the translation algorithm, we adapt and introduce, respectively, two notions of simplicity for patterns, the second of which corresponds to the intended range of the translation algorithm. We first adapt the definition of a \textit{simple pattern}, as given by Setzer et al., to Uroboro. Call a copattern simple if it is of one of the three forms $fun(\overline{x})$, $fun(\overline{x}).des(\overline{y})$, or $fun(con(\overline{x}), \overline{y})$.
+Before we start with the translation algorithm, we adapt and introduce, respectively, two notions of simplicity for patterns, the second of which corresponds to the intended range of the translation algorithm. We first adapt the definition of a \textit{simple pattern}, as given by Setzer et al., to Uroboro. Call a copattern simple if it is of one of the three forms $fun(\overline{x})$, $fun(\overline{x}).des(\overline{y})$, or $fun(\overline{x}, con(\overline{y}), \overline{z})$.
 
-Next, we generalize this definition to define \textit{sufficiently simple patterns} for a purpose, which is either de- or refunctionalization. Call a copattern \textit{sufficiently simple for defunctionalization} if it is of one of the two forms $fun(\overline{x}).des(\overline{y})$, $fun(\overline{p})$, and \textit{sufficiently simple for refunctionalization} if it is of one of the two forms $fun(\overline{x}).\overline{des(\overline{y})}$, $fun(con(\overline{x}), \overline{y})$. We will also say that a copattern is sufficiently simple for $i$, for $i \in \{d,r\}$, and mean that it is sufficiently simple for defunctionalization or refunctionalization, respectively.
+Next, we generalize this definition to define \textit{sufficiently simple patterns} for a purpose, which is either de- or refunctionalization. Call a copattern \textit{sufficiently simple for defunctionalization} if it is of one of the two forms $fun(\overline{x}).des(\overline{y})$, $fun(\overline{p})$, and \textit{sufficiently simple for refunctionalization} if it is of one of the two forms $fun(\overline{x}).\overline{des(\overline{y})}$, $fun(\overline{x}, con(\overline{y}), \overline{z})$. We will also say that a copattern is sufficiently simple for $i$, for $i \in \{d,r\}$, and mean that it is sufficiently simple for defunctionalization or refunctionalization, respectively.
 
 Those notions correspond directly to the forms of lhss allowed in the unnested fragments for \textsf{CoreDefunc} and \textsf{CoreRefunc}, respectively. It is clear that each simple copattern is also sufficiently simple for both de- and refunctionalization.
 
@@ -255,7 +255,44 @@ such that $prg' \cup prg'' = prg$. By Lemma 4.2.1, the reduction relations perta
 
 \subsection{Core refunctionalization}
 
-Core refunctionalization is defined analogously to core defunctionalization. It applies the refunctionalization of Rendel et al. for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. 
+Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of Rendel et al. for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. 
+
+\textbf{Preprocessing } Before we give the actual algorithm, as stated above, one more preprocessing is necessary. We first explain the reason for it. The actual algorithm given below has a domain slightly different from that given in the introduction. The difference is that it doesn't suffice that at most one constructor appears in lhss, this constructor also needs to be at the correct place, that is, at the leftmost position. In symbols, the lhss need to have one of the two forms $fun(\overline{x}).des(\overline{y})$ and $fun(con(\overline{x}), \overline{y})$, it doesn't suffice to be of the form $fun(\overline{x}, con(\overline{y}), \overline{z})$. The fragment $\mathbf{U}_cc[fdef_{un,r'}]$ of Uroboro that is the domain for the actual \textsf{CoreRefunc} is induced by the following syntax for function definitions:
+\begin{align*}
+fdef_{un,r} &::= eqn_{nr}^* ~ | ~ eqn_r^* \\
+eqn_r &::= fun(x^*).des(y^*)^* = t \\
+eqn_{nr} &::= fun(con(x^*), z^*) = t \\
+\end{align*}
+Now, we briefly outline the preprocessing. To get from the original input fragment for refunctionalization, $\mathbf{U}_cc[fdef_{un,r}]$, to $\mathbf{U}_cc[fdef_{un,r'}]$, simply
+\begin{itemize}
+\item reorder the arguments in the signature and in the lhss of the function definitions which don't have the desired form yet, bringing the constructors in front, and
+\item change calls to the function accordingly.
+\end{itemize}
+As an example, consider the program fragment below.
+\begin{lstlisting}
+
+function f(T, T) where
+  f(x, c1()) = t1
+  f(x, c2()) = t2
+
+function g() where
+  g() = f(c1(), c2())
+
+\end{lstlisting}
+By the preprocessing, the arguments of \texttt{f} are reordered such that the constructors are in front, resulting in the program fragment below.
+\begin{lstlisting}
+
+function f(T, T) where
+  f(c1(), x) = t1
+  f(c2(), x) = t2
+
+function g() where
+  g() = f(c2(), c1())
+
+\end{lstlisting}
+It is clear that this preprocessing doesn't affect the semantics of the program in a disruptive way, i.e., reductions might be carried out in a different order.
+
+Now, we give the actual algorithm, with domain $\mathbf{U}_cc[fdef_{un,r'}]$.
 
 \begin{algorithm}[\textsf{CoreRefunc}]
 

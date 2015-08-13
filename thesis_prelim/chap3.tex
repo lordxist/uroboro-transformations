@@ -60,12 +60,8 @@ Here, the pair of \texttt{get} and \texttt{putback} is the $\pi$-lens. $\langle 
 \[
 \langle q \rangle^{aux} = aux(\langle q \rangle^{vars}),
 \]
-where $aux$ is a fresh function name\footnote{In practice this means that is in undeclared in the program that is transformed by the extraction lifted to programs (see next section).} and $\langle q \rangle^{vars}$ denotes the list of all variables of $q$ in some order (see below).
+where $aux$ is a fresh function name\footnote{In practice this means that is in undeclared in the program that is transformed by the extraction lifted to programs (see next section).} and $\langle q \rangle^{vars}$ denotes the list of all variables of $q$ in the order that they appear in in $q$.
 \end{definition}
-
-\begin{remark}[Order of variables in $\langle q \rangle^{vars}$]
-There is some degree of freedom in the definition of $\langle \cdot \rangle^{vars}$ above, namely the order of variables. This order is chosen as needed. For the purpose of constructor extraction in the unnesting preprocessing for the automatic refunctionalization, the newly introduced variable that replaces the constructors needs to be in front of the others. This is necessary for constructor extraction to be able to bring lhss to the form $fun(con(x^*), y^*)$, which is needed for refunctionalization, and not just $fun(x^*, con(y^*), z^*)$.
-\end{remark}
 
 \subsection{Applying extractions to programs}
 

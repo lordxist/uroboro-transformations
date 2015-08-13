@@ -47,12 +47,15 @@ Since $a^0 = q_{r'}[\sigma']$ for some equation $r'$, we know that $a^0$ is a fu
 a[a^0 \mapsto b^0] = q_\epsilon[\sigma_{mod}] \longrightarrow^{aux} t_\epsilon[\sigma_{mod}] = d
 \]
 
-\item
-We know that $x$ only appears once in $t_\epsilon$, at some position $p^x$, thus it is
+\item By its definition, $t_\epsilon$ is syntactically a copattern, and it is linear like all copatterns considered in this work. It follows that $x$ only appears once in $t_\epsilon$, at some position $p^x$. Define $\mathcal{E}' = b[a^0 \mapsto []]_{p^x}$ and we have the desired reduction
 \[
 b = t_\epsilon[\sigma] = \mathcal{E}'[a^0] \longrightarrow' \mathcal{E}'[b^0] = t_\epsilon[\sigma_{mod}] = d,
 \]
-with $\mathcal{E}' = b[a^0 \mapsto []]_{p^x}$. It is $\mathcal{E}' \in EC[\vdash'_v]$ because $a[a^0 \mapsto []] \in EC[\vdash'_v]$ and $\epsilon$ doesn't introduce any additional redexes.
+since $\mathcal{E}' \in EC_<[\vdash'_v]$, as shown in the following. It is $a[a^0 \mapsto []] \in EC_<[\vdash'_v]$ and
+\[
+a[a^0 \mapsto []] = q_\epsilon[\sigma_{[]}], \mathcal{E}' = b[a^0 \mapsto []]_{p^x} = t_\epsilon[\sigma_{[]}] = aux(\langle q_\epsilon \rangle^{vars})[\sigma_{[]}]
+\]
+with $\sigma_{[]} = (\sigma \setminus \{x \mapsto t(a^0)\}) \cup \{x \mapsto t([])\}$. Because $a[a^0 \mapsto []] \in EC_<[\vdash'_v]$, we know that all terms that $\sigma_{[]}$ assigns to variables to the left (with respect to $<$) of the hole in $q_\epsilon[\sigma_{[]}]$ are values under judgement $\vdash'_v$. Since $\langle q_\epsilon \rangle^{vars}$ doesn't change the order of the variables, it follows that all terms that $\sigma_{[]}$ assigns to variables to the left (w.r.t. $<$) of the hole in $aux(\langle q_\epsilon \rangle^{vars})[\sigma_{[]}]$ are such values, as well.
 
 \end{enumerate}
 \end{proof}
