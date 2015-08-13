@@ -263,7 +263,7 @@ fdef_{un,r} &::= eqn_{nr}^* ~ | ~ eqn_r^* \\
 eqn_r &::= fun(x^*).des(y^*)^* = t \\
 eqn_{nr} &::= fun(con(x^*), z^*) = t \\
 \end{align*}
-Now, we briefly outline the preprocessing. To get from the original input fragment for refunctionalization, $\mathbf{U}_cc[fdef_{un,r}]$, to $\mathbf{U}_cc[fdef_{un,r'}]$, simply
+Now, we briefly outline the preprocessing. To get from the original input fragment for refunctionalization, $\mathbf{U}_{cc}[fdef_{un,r}]$, to $\mathbf{U}_{cc}[fdef_{un,r'}]$, simply
 \begin{itemize}
 \item reorder the arguments in the signature and in the lhss of the function definitions which don't have the desired form yet, bringing the constructors in front, and
 \item change calls to the function accordingly.
@@ -292,7 +292,7 @@ function g() where
 \end{lstlisting}
 It is clear that this preprocessing doesn't affect the semantics of the program in a disruptive way, i.e., reductions might be carried out in a different order.
 
-Now, we give the actual algorithm, with domain $\mathbf{U}_cc[fdef_{un,r'}]$.
+Now, we give the actual algorithm, with domain $\mathbf{U}_{cc}[fdef_{un,r'}]$.
 
 \begin{algorithm}[\textsf{CoreRefunc}]
 
