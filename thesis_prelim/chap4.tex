@@ -195,21 +195,19 @@ The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization
 
 First, we define the class $FDEF^{prg}_d$ of function definitions of a program $prg$ which are already defunctionalized. A function definition is already defunctionalized when all of its equations have lhss without destructors. We define the class of already defunctionalized functions $F^{prg}_d$ as those which have already defunctionalized function definitions.
 
-Next, we give the definition for \textsf{CoreDefunc}. This needs further explanation due to technical difficulties, as follows below.
+Next, we give the definition for \textsf{CoreDefunc}.
 
-\begin{alignat*}{3}
-\langle prg \rangle^{\textsf{CoreDefunc}} & = ~&& \langle && \{ def \in prg ~ | ~ def = ``\textbf{codata } ..." \text{ or } def = ``\textbf{function } ..." \not\in F^{prg}_d \} \rangle^{d^{codata}} \\
-& \cup && \{ && \textrm{\textbf{data }} ... ~ | ~ `` \textrm{\textbf{data }} ... " \in prg \} \\
-& \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ q = \langle t \rangle^d ~ | ~ "q = t" \in eqns \} \\
-& && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \in F^{prg}_d \} 
-\end{alignat*}
-
-This definition is not quite legal, because the argument of $d^{codata}$ possibly has equations with right-hand sides which cannot be correctly transformed by $d^{codata}$. There are two different problems which can possibly arise, but which are also easily circumvented, as follows.
-\begin{enumerate}
-\item There are function calls to functions which are already defunctionalized (those in $F_d$); $d^{codata}$ wants to transform them into constructor calls, which is neither possible nor necessary. To circumvent this, replace each function name $fun \in F_d$ (in a right-hand side term) with a destructor name $des_{fun}$ unique to $fun$, and set $\langle des_{fun} \rangle^d = fun$. Then $d^{codata}$ will transform them back into the original function calls, which means that they ultimately are left unchanged, as desired.
-
-\item There are constructor calls; the domain of $d^{codata}$, the Codata Fragment, doesn't allow them. To circumvent this, replace such calls to a constructor $con$ with function calls with a function name $fun_{con}$ unique to $con$, and set $\langle fun_{con} \rangle^d = con$. Then $d^{codata}$ will transform them back into the original constructor calls, which means that they ultimately are left unchanged, as desired.
-\end{enumerate}
+\begin{align*}
+\langle prg \rangle^{\textsf{CoreDefunc}} & = ~&& \{ && \textrm{\textbf{data }} \sigma \textrm{\textbf{ where }} \span\span\span\span \\
+& && && && \{ \langle fun \rangle^d (\tau_1, ..., \tau_n): \sigma ~ | ~ `` fun(\tau_1, ..., \tau_n): \tau " \in prg \text{ s.t. } fun \not\in F^{prg}_d \} \\
+& && | && `` \textrm{\textbf{codata }} \sigma ... " \in prg \} \span\span\span\span \\
+& \cup && \{ && \textrm{\textbf{function }} \langle des \rangle^d (\sigma, \tau_1, ..., \tau_n) \textrm{\textbf{ where}} \span\span\span\span \\
+& && && && \{ \langle des \rangle^d (\langle fun \rangle^d (\overline{x}), \overline{y}) = \langle t \rangle^d ~ | ~ `` fun(\overline{x}).des(\overline{y}) = t " \in prg \} \\
+& && | && `` \sigma.des(\tau_1, ..., \tau_n) " \in prg \} \span\span\span\span \\
+& \cup && \{ && \textrm{\textbf{data }} ... ~ | ~ `` \textrm{\textbf{data }} ... " \in prg \} \span\span\span\span \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ q = \langle t \rangle^d ~ | ~ "q = t" \in eqns \} \span\span\span\span \\
+& && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \text{ s.t. } fun \in F^{prg}_d \} \span\span\span\span
+\end{align*}
 
 Below, we define the transformation for terms $d$, which is only necessary due to the syntactic differences between function and destructor calls.
 
@@ -225,31 +223,42 @@ Below, we define the transformation for terms $d$, which is only necessary due t
 
 We consider important properties of the transformation.
 
-\textbf{Bisimulation.} For \textsf{CoreDefunc}, strong bisimulation holds. The proof relies on properties of $d^{codata}$. Note that the domain of $d^{codata}$ is Rendel et al.'s Codata Fragment. As stated in section 2.3.1, the reduction relation of the Codata Fragment in the work of Rendel et al. and our work's standard reduction relation, restricted to this fragment, are the same, as long as programs are required to have copattern coverage. Analogously, the domain of $r^{data}$ is the Data Fragment, and Rendel et al.'s reduction relation for this fragment is the same as ours restricted to this fragment. In section 3 of their paper, Rendel et al. prove Lemma 5, which in terms of our work can be stated as follows.
+\textbf{Bisimulation.} For \textsf{CoreDefunc}, strong bisimulation holds. To show this, we first define the inverse $\langle \cdot \rangle^{d^{-1}}$ of $\langle \cdot \rangle^d$, then we show properties of these two maps, and, using these properties, finally we prove the strong bisimulation by a categorical argument.
 
-\begin{lemma}[Strong bisimulation for $d^{codata}, r^{data}$]
-\[
-s \longrightarrow_{prg} t \iff \langle s \rangle^d \longrightarrow_{\langle prg \rangle^{d^{codata}}} \langle t \rangle^d
-\]
-and
-\[
-s \longrightarrow_{prg} t \iff \langle s \rangle^r \longrightarrow_{\langle prg \rangle^{r^{codata}}} \langle t \rangle^r.
-\]
-\end{lemma}
+We start by defining a map $d^{-1}: \textrm{Term}_{\langle prg \rangle} \to \textrm{Term}_{prg}$; this is clearly the inverse of $d$, as it is straightforwardly defined to be so.
+\begin{align*}
+\langle x \rangle^{d^{-1}} = x \\
+\langle \langle des \rangle^d (s, t_1, ..., t_n) \rangle^{d^{-1}} = \langle s \rangle^{d^{-1}}.des(\langle t_1 \rangle^{d^{-1}}, ..., \langle t_n \rangle^{d^{-1}}) \\
+\langle fun(t_1, ..., t_n) \rangle^{d^{-1}} = fun(\langle t_1 \rangle^{d^{-1}}, ..., \langle t_n \rangle^{d^{-1}}), \text{ if } fun \in F_d \\
+\langle \langle fun \rangle^d (t_1, ..., t_n) \rangle^{d^{-1}} = fun(\langle t_1 \rangle^{d^{-1}}, ..., \langle t_n \rangle^{d^{-1}}), \text{ if } fun \not\in F_d \\
+\langle con(t_1, ..., t_n) \rangle^{d^{-1}} = con(\langle t_1 \rangle^{d^{-1}}, ..., \langle t_n \rangle^{d^{-1}})
+\end{align*}
 
-Using this, we prove strong bisimulation for \textsf{CoreDefunc}.
+\begin{lemma}[Isomorphism $d$]\label{lem:iso} It is
+\begin{enumerate}
+\item $\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}({prg}) \iff (\langle s \rangle^d, \langle t \rangle^d) \in \textrm{Rules}({\langle prg \rangle})$, and
 
-\begin{lemma}[Strong bisimulation for \textsf{CoreDefunc}]
-\[
-s \longrightarrow_{prg} t \iff \langle s \rangle^d \longrightarrow_{\langle prg \rangle^{\textsf{CoreDefunc}}} \langle t \rangle^d
-\]
+\item $\forall s,t \in \textrm{Term}_{\langle prg \rangle}. (s, t) \in \textrm{Rules}({\langle prg \rangle}) \iff (\langle s \rangle^{d^{-1}}, \langle t \rangle^{d^{-1}}) \in \textrm{Rules}({prg})$.
+\end{enumerate}
 
 \begin{proof}
-For the sake of this proof, we will neglect the syntactic differences between destructor and function calls. By the definition of \textsf{CoreDefunc}, it is
+\begin{enumerate}
+\item By inspecting the definition of \textsf{CoreDefunc}, it can be easily seen that for each rule $(s, t) \in \textrm{Rules}(prg)$, there is a rule $(\langle s \rangle^d, \langle t \rangle^d) \in \textrm{Rules}(\langle prg \rangle)$, and that there are no other rules in $\textrm{Rules}(\langle prg \rangle)$.
+
+\item Since $\langle \cdot \rangle^{d^{-1}}$ is the inverse of $\langle \cdot \rangle^d$, this statement is equivalent to the first.
+\end{enumerate}
+\end{proof}
+\end{lemma}
+
+\begin{lemma}[Bisimulation]
 \[
-\langle prg \rangle^{\textsf{CoreDefunc}} = \langle prg' \rangle^{d^{codata}} \cup prg''
+\forall s,t \in \textrm{Term}_{prg}. s \longrightarrow_{prg} t \iff \langle s \rangle^d \longrightarrow_{\langle prg \rangle} \langle t \rangle^d.
 \]
-such that $prg' \cup prg'' = prg$. By Lemma 4.2.1, the reduction relations pertaining to the programs $prg'$ and $\langle prg' \rangle^{d^{codata}}$ are one and the same. The reduction relation pertaining to $prg$ is that of $prg'$ changed according to the equations of $prg''$, and the reduction relation pertaining to $\langle prg \rangle^{\textsf{CoreDefunc}}$ is also that of $prg'$ changed according to the equations of $prg''$. Thus these reduction relations are the same, which is equivalent to the statement of this lemma.
+\begin{proof}
+We consider the category $\mathbf{Bin}$ of binary relations over sets. $(\textrm{Term}_{prg}, \textrm{Rules}({prg}))$ and $(\textrm{Term}_{\langle prg \rangle}, \textrm{Rules}({\langle prg \rangle}))$ are objects of this category. \autoref{lem:iso} is equivalent to $\langle \cdot \rangle^d$ being an isomorphism between these two objects, and thus an isomorphism of $\mathbf{Bin}$. Now, we consider the map from rules of a program to reduction relations defined in chapter 2. Call this map $\mathbf{Red}$; both domain and range of $\mathbf{Red}$ are subsets of binary relations. $\mathbf{Red}$ can be trivially extended to binary relations over sets by leaving the sets unchanged. Then this resulting map can be arbitrarily extended to the whole domain of binary relations over sets. Finally, equip this map from objects to objects of the category $\mathbf{Bin}$ with the identity map over its morphism to obtain a map from $\mathbf{Bin}$ to itself, which we again call $\mathbf{Red}$. By its definition, it is $\mathbf{Red}((\textrm{Term}_{prg}, \textrm{Rules}({prg}))) = (\textrm{Term}_{prg}, \longrightarrow_{prg})$, and analogously for $\langle prg \rangle$. For any two objects of $\mathbf{Bin}$ with the same underlying set, the identity morphism is the same, namely the identity map on the set. It follows that $\mathbf{Red}$ is an endofunctor on $\mathbf{Bin}$. Since all functors preserve isomorphisms, especially it is
+\[
+\forall s,t \in \textrm{Term}_{prg}. s \longrightarrow_{prg} t \iff \langle s \rangle^d \longrightarrow_{\langle prg \rangle} \langle t \rangle^d. \qedhere
+\]
 \end{proof}
 \end{lemma}
 
