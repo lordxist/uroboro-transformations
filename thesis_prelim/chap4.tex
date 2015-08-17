@@ -394,21 +394,26 @@ Next, we give the definition for \textsf{CoreRefunc}.
 
 We consider important properties of the transformation.
 
-\textbf{Bisimulation.} For \textsf{CoreRefunc}, strong bisimulation holds. The proof relies on properties of $r^{data}$. In the ``Bisimulation'' part of the previous subsection, we already outlined the main points: The domain of $r^{data}$ is the Data Fragment, and Rendel et al.s reduction relation for this fragment is the same as ours restricted to this fragment. In section 3 of their paper, Rendel et al. prove Lemma 5, which we have restated as Lemma 4.2.1. Using this, we prove strong bisimulation for \textsf{CoreRefunc}.
+\textbf{Bisimulation.} For \textsf{CoreRefunc}, strong bisimulation holds.
 
-\begin{lemma}[Strong bisimulation for \textsf{CoreRefunc}]
+\begin{lemma}[Strong bisimulation of the rule relations]
+\label{lem:sbrulr}
 \[
-s \longrightarrow_{prg} t \iff \langle s \rangle^r \longrightarrow_{\langle prg \rangle^{\textsf{CoreRefunc}}} \langle t \rangle^r
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle^r, \langle t \rangle^r) \in \textrm{Rules}(\langle prg \rangle^{\textsf{CoreRefunc}}).
 \]
-
 \begin{proof}
-For the sake of this proof, we will neglect the syntactic differences between destructor and function calls. By the definition of \textsf{CoreRefunc}, it is
-\[
-\langle prg \rangle^{\textsf{CoreRefunc}} = \langle prg' \rangle^{r^{data}} \cup prg''
-\]
-such that $prg' \cup prg'' = prg$. By Lemma 4.2.1, the reduction relations pertaining to the programs $prg'$ and $\langle prg' \rangle^{r^{data}}$ are one and the same. The reduction relation pertaining to $prg$ is that of $prg'$ changed according to the equations of $prg''$, and the reduction relation pertaining to $\langle prg \rangle^{\textsf{CoreRefunc}}$ is also that of $prg'$ changed according to the equations of $prg''$. Thus these reduction relations are the same, which is equivalent to the statement of this lemma.
+By inspecting the definition of \textsf{CoreRefunc}, it can be easily seen that for each rule $(s, t) \in \textrm{Rules}(prg)$, there is a rule $(\langle s \rangle^r, \langle t \rangle^r) \in \textrm{Rules}(\langle prg \rangle^{\textsf{CoreRefunc}})$, and that there are no other rules in $\textrm{Rules}(\langle prg \rangle^{\textsf{CoreRefunc}})$.
 \end{proof}
 \end{lemma}
+
+\begin{corollary}[Strong bisimulation of \textsf{CoreRefunc}]
+\[
+\forall s,t \in \textrm{Term}_{prg}. s \longrightarrow_{prg} t \iff \langle s \rangle^r \longrightarrow_{\langle prg \rangle^{\textsf{CoreRefunc}}} \langle t \rangle^r.
+\]
+\begin{proof}
+By combining \autoref{lem:sbrulr} and \autoref{lem:iso}.
+\end{proof}
+\end{corollary}
 
 \subsection{Example}
 
