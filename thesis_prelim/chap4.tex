@@ -360,28 +360,11 @@ function g() where
 \end{lstlisting}
 It is clear that this preprocessing doesn't affect the semantics of the program in a disruptive way, i.e., reductions might be carried out in a different order.
 
-Now, we give the actual algorithm, with domain $\mathbf{U}_{cc}[fdef_{un,r'}]$.
+Now, we turn to the actual algorithm, with domain $\mathbf{U}_{cc}[fdef_{un,r'}]$.
 
-\begin{algorithm}[\textsf{CoreRefunc}]
+First, we define the class of function definitions of a program $prg$ which are already refunctionalized. A function definition is already refunctionalized when (a) all of its equations have destructor patterns, or (b) the function has no arguments, or (c) the first argument of every lhs is a variable. We define the class of already refunctionalized functions $F^{prg}_r$ as those which have already defunctionalized function definitions.
 
-First, we define the class $FDEF^{prg}_r$ of function definitions of a program $prg$ which are already refunctionalized. A function definition is already refunctionalized when (a) all of its equations have destructor patterns, or (b) the function has no arguments, or (c) the first argument of every lhs is a variable. We define the class of already refunctionalized functions $F^{prg}_r$ as those which have already defunctionalized function definitions.
-
-Next, we give the definition for \textsf{CoreRefunc}. This needs further explanation due to technical difficulties, as follows below.
-
-\begin{alignat*}{3}
-\langle prg \rangle^{\textsf{CoreRefunc}} & = ~&& \langle && \{ def \in prg ~ | ~ def \textrm{ is data def. or function def. } \not\in FDEF^{prg}_r \rangle^{r^{data}} \\
-& \cup && \{ && \textrm{\textbf{codata }} ... ~ | ~ `` \textrm{\textbf{codata }} ... " \in prg \} \\
-& \cup && \{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} \{ p = \langle t \rangle^r ~ | ~ ``p = t" \in eqns \} \\
-& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_n): \sigma \textrm{\textbf{ where }} eqns " \in FDEF^{prg}_r \} 
-\end{alignat*}
-
-This definition is not quite legal, because the argument of $r^{data}$ possibly has equations with right-hand sides which cannot be correctly transformed by $r^{data}$. There a two different problems which can possibly arise, but which are also easily circumvented, as follows. Note that these points mirror those for \textsf{CoreDefunc}.
-\begin{enumerate}
-\item There are function calls to functions which are already refunctionalized (those in $F_r$); $r^{data}$ wants to transform them into destructor calls, which is neither possible nor necessary. The following technical trick circumvents this problem: For the sake of this usage of $r^{data}$, replace each function name $fun \in F_r$ (in a right-hand side term) with a constructor name $con_{fun}$ unique to $fun$, and set $\langle con_{fun} \rangle^r = fun$. Then $r^{data}$ will transform them back into the original function calls, which means that they ultimately are left unchanged, as desired.
-\item There are destructor calls; the domain of $r^{data}$, the Data Fragment, doesn't allow them. To circumvent this problem, for the sake of this usage of $r^{data}$, replace such calls to a destructor named $des$ with function calls with a function name $fun_{des}$ unique to $des$, and set $\langle fun_{des} \rangle^d = des$. Then $r^{data}$ will transform them back into the original destructor calls, which means that they ultimately are left unchanged, as desired.
-\end{enumerate}
-
-Below, we define the transformation for terms $r$, which is only necessary due to the syntactic differences between function and destructor calls.
+Using this definition, we define refunctionalization of terms.
 
 \begin{align*}
 \langle x \rangle^r = x \\
@@ -389,6 +372,22 @@ Below, we define the transformation for terms $r$, which is only necessary due t
 \langle fun(t_1, ..., t_n) \rangle^r = fun(\langle t_1 \rangle^r, ..., \langle t_n \rangle^r), \text{ if } fun \in F_r \\
 \langle fun(t_1, ..., t_n) \rangle^r = \langle t_1 \rangle^r .\langle fun \rangle^r (\langle t_2 \rangle^r, ..., \langle t_n \rangle^r), \text{ if } fun \not\in F_r \\
 \langle con(t_1, ..., t_n) \rangle^r = \langle con \rangle^r (\langle t_1 \rangle^r, ..., \langle t_n \rangle^r)
+\end{align*}
+
+Next, we give the definition for \textsf{CoreRefunc}.
+
+\begin{algorithm}[\textsf{CoreRefunc}]
+
+\begin{align*}
+\langle prg \rangle^{\textsf{CoreDefunc}} & = ~&& \{ && \textrm{\textbf{codata }} \sigma \textrm{\textbf{ where }} \span\span\span\span \\
+& && && && \{ \sigma.\langle fun \rangle^d (\tau_1, ..., \tau_n): \tau ~ | ~ `` fun(\sigma, \tau_1, ..., \tau_n): \tau " \in prg \text{ s.t. } fun \not\in F^{prg}_d \} \\
+& && | && `` \textrm{\textbf{data }} \sigma ... " \in prg \} \span\span\span\span \\
+& \cup && \{ && \textrm{\textbf{function }} \langle con \rangle^r (\tau_1, ..., \tau_n): \tau \textrm{\textbf{ where}} \span\span\span\span \\
+& && && && \{ \langle con \rangle^r (\langle fun \rangle^d (\overline{x}), \overline{y}) = \langle t \rangle^d ~ | ~ `` fun(con(\overline{x}), \overline{y}) = t " \in prg \} \\
+& && | && `` con(\tau_1, ..., \tau_n): \tau " \in prg \} \span\span\span\span \\
+& \cup && \{ && \textrm{\textbf{codata }} ... ~ | ~ `` \textrm{\textbf{codata }} ... " \in prg \} \span\span\span\span \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ q = \langle t \rangle^r ~ | ~ "q = t" \in eqns \} \span\span\span\span \\
+& && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \text{ s.t. } fun \in F^{prg}_r \} \span\span\span\span
 \end{align*}
 
 \end{algorithm}
