@@ -4,27 +4,26 @@
 
 \begin{lemma}
 \label{lem:app1}
-Let $a$ be a term and $a^0$ be a proper subterm of $a$. When
+Let $a, b, c$ be terms and $\mathcal{E}^{aux}$ be an evaluation context. When
 \[
-a \longrightarrow' b \land a^0 \longrightarrow^{aux} b^0
+\mathcal{E}^{aux}[a] \longrightarrow' b \land a \longrightarrow^{aux} c
 \]
 and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
 \[
-a[a^0 \mapsto b^0] \longrightarrow' d \land b {\longrightarrow^{aux}}^* d.
+\mathcal{E}^{aux}[c] \longrightarrow' d \land b {\longrightarrow^{aux}}^* d
 \]
-
 \begin{proof}
-Since $a^0 = q_{r'}[\sigma']$ for some equation $r'$, we know that $a^0$ is a function or destructor call, and not a constructor call. Because $a = q_r[\sigma], b = t_r[\sigma]$ for an equation $r$, $r$ and $r'$ don't overlap, and $a^0$ is a proper subterm of $a$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma$. Put in another way, there is a variable $x$ and a term $t(a^0)$ with subterm $a^0$ such that $\{x \mapsto t\} \subseteq \sigma$. Define a $\sigma_{mod}$ with $dom(\sigma_{mod}) = \sigma$ as $\sigma_{mod}(x) = t(b^0)$ and $\sigma_{mod}(y) = \sigma(y)$ for $y \neq x$, and choose $d = t_r[\sigma_{mod}]$. The two desired reductions can be derived as follows.
+Since $a$ matches $q_\epsilon$, we know that $a$ is a function or destructor call, and not a constructor call. Because $\mathcal{E}^{aux}[a] = q_r[\sigma], b = t_r[\sigma]$ for an equation $r$, and $q_r$ and $q_{r'}$ don't overlap, it follows that $a$ is a subterm of a right-hand side of $\sigma$. Put in another way, there is a variable $x$ and a term $t(a)$ with subterm $a$ such that $\{x \mapsto t\} \subseteq \sigma$. Define a $\sigma_{mod}$ with $dom(\sigma_{mod}) = \sigma$ as $\sigma_{mod}(x) = t(c)$ and $\sigma_{mod}(y) = \sigma(y)$ for $y \neq x$, and choose $d = t_r[\sigma_{mod}]$. The two desired reductions can be derived as follows.
 \begin{enumerate}
 \item By the ``Subst'' rule for $r$:
 \[
-a[a^0 \mapsto b^0] = q_r[\sigma_{mod}] \longrightarrow' t_r[\sigma_{mod}] = d
+\mathcal{E}^{aux}[c] = q_r[\sigma_{mod}] \longrightarrow' t_r[\sigma_{mod}] = d
 \]
-This is possible because all subterms of $a$ are values under judgement $\vdash'_v$, and its subterm $a^0$ is replaced by $b^0$ for which $\langle a^0 \rangle^{aux^{-1}} = \langle b^0 \rangle^{aux^{-1}}$ holds, thus it is $\vdash'_v b^0$, as well.
+This is possible because each immediate subterm $s$ of $\mathcal{E}^{aux}[a]$ is a value under judgement $\vdash'_v$, and it is $\langle \mathcal{E}^{aux}[a] \rangle^{aux^{-1}} = \langle \mathcal{E}^{aux}[c] \rangle^{aux^{-1}}$ since $\langle a \rangle^{aux^{-1}} = \langle c \rangle^{aux^{-1}}$, thus it is $\langle s \rangle^{aux^{-1}} = \langle s' \rangle^{aux^{-1}}$ for the subterm $s'$ of $\mathcal{E}^{aux}[c]$ corresponding to $s$ and consequently it is $\vdash'_v s'$, as well.
 
-\item Let $p^x_1, ..., p^x_n$ denote the positions of $b^0$ in $b$.
+\item Define a $\sigma_{[]}$ with $dom(\sigma_{[]}) = \sigma$ as $\sigma_{[]}(x) = []$ and $\sigma_{[]}(y) = \sigma(y)$ for $y \neq x$. This way, $t_r[\sigma_{[]}]$ is a multi-hole context, such that $b = t_r[\sigma] = t_r[\sigma_{[]}][t(a), ..., t(a)]$ and $t_r[\sigma_{[]}][t(c), ..., t(c)] = t_r[\sigma_{mod}] = d$. By consecutive applications of the ``Cong'' rule on top of the ``Subst'' rule for $\epsilon$ we have the desired reduction sequence:
 \[
-b = t_r[\sigma] \longrightarrow^{aux} t_r[\sigma][t(b^0)]_{p^x_1} \longrightarrow^{aux} ... \longrightarrow^{aux} t_r[\sigma][t(b^0)]_{p^x_1}...[t(b^0)]_{p^x_n} = t_r[\sigma_{mod}] = d
+b = t_r[\sigma_{[]}][t(a), ..., t(a)] \longrightarrow^{aux} t_r[\sigma_{[]}][t(c), t(a), ..., t(a)] \longrightarrow^{aux} t_r[\sigma_{[]}][t(c), ..., t(c)] = t_r[\sigma_{mod}] = d.
 \]
 \end{enumerate}
 \end{proof}
@@ -32,33 +31,26 @@ b = t_r[\sigma] \longrightarrow^{aux} t_r[\sigma][t(b^0)]_{p^x_1} \longrightarro
 
 \begin{lemma}
 \label{lem:app2}
-Let $a$ be a term and $a^0$ be a proper subterm of $a$. When
+Let $a, b, c$ be terms and $\mathcal{E}' \in \textrm{EC}[\vdash'_v]$ an evaluation context. When
 \[
-a \longrightarrow^{aux} b \land a^0 \longrightarrow' b^0
+a \longrightarrow' b \land \mathcal{E}'[a] \longrightarrow^{aux} c
 \]
-and $a[a^0 \mapsto []] \in EC[\vdash'_v]$ and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
+and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
 \[
-a[a^0 \mapsto b^0] \longrightarrow^{aux} d \land b \longrightarrow' d.
+c \longrightarrow' d \land \mathcal{E}'[b] \longrightarrow^{aux} d
 \]
-
 \begin{proof}
-Since $a^0 = q_{r'}[\sigma']$ for some equation $r'$, we know that $a^0$ is a function or destructor call, and not a constructor call. Because $a = q_r[\sigma], b = t_r[\sigma]$ for an equation $r$, $r$ and $r'$ don't overlap, and $a^0$ is a proper subterm of $a$, it follows that $a^0$ is a subterm of a right-hand side of $\sigma$. Put in another way, there is a variable $x$ and a term $t(a^0)$ with subterm $a^0$ such that $\{x \mapsto t\} \subseteq \sigma$. Define a $\sigma_{mod}$ with $dom(\sigma_{mod}) = \sigma$ as $\sigma_{mod}(x) = t(b^0)$ and $\sigma_{mod}(y) = \sigma(y)$ for $y \neq x$, and choose $d = t_r[\sigma_{mod}]$. The two desired reductions can be derived as follows.
+Since $a$ matches $q_r$ for some equation $r$, we know that $a$ is a function or destructor call, and not a constructor call. Because $a = q_\epsilon[\sigma], c = t_\epsilon[\sigma]$ and $r$ and $r'$ don't overlap, it follows that $a$ is a subterm of a right-hand side of $\sigma$. Put in another way, there is a variable $x$ and a term $t(a)$ with subterm $a$ such that $\{x \mapsto t\} \subseteq \sigma$. Define a $\sigma_{mod}$ with $dom(\sigma_{mod}) = \sigma$ as $\sigma_{mod}(x) = t(b)$ and $\sigma_{mod}(y) = \sigma(y)$ for $y \neq x$, and choose $d = t_\epsilon[\sigma_{mod}]$. The two desired reductions can be derived as follows.
 \begin{enumerate}
-\item Because $a \longrightarrow^{aux} b$, it must be $r = \epsilon$, as there is no other equation with unequal sides and its left-hand side interpreted the same as the right-hand side. Thus we have:
+\item By the definition of extractions, it is $t_\epsilon = aux(x_1, ..., x_n)$, for some variables $x_1, ..., x_n$ in the domain of $\sigma$, with these variables appearing in the same order as they do in $q_\epsilon$. One of these variables is $x$. Construct an evaluation context $\mathcal{E}'_1 \in \textrm{EC}_<[\vdash'_v]$ as follows: Begin with $t_\epsilon$, consider its variables as placeholders, replace the variables $x_i \neq x$ with $\sigma(x_i)$ and replace $x$ with $\sigma_{t([])}$. The variables left of $x$ (w.r.t. $<$) are replaced by values w.r.t. $\vdash'_v$, because $\mathcal{E}' = q_\epsilon[\sigma_{t([])}] \in \textrm{EC}_<[\vdash'_v]$, in which they appear in the same order, and thus those variables must be values w.r.t. to this judgement; by a similar argument we have $t([]) \in \textrm{EC}_<[\vdash'_v]$. By its construction, it is $\mathcal{E}'_1 = t_\epsilon[\sigma_{t([])}]$. By the ``Cong'' rule for evaluation context $\mathcal{E}'_1$, on top of the ``Subst'' rule for $r$, we have the desired reduction:
 \[
-a[a^0 \mapsto b^0] = q_\epsilon[\sigma_{mod}] \longrightarrow^{aux} t_\epsilon[\sigma_{mod}] = d
+c = t_\epsilon[\sigma] = t_\epsilon[\sigma_{t([])}][a] = \mathcal{E}'_1[a] \longrightarrow' \mathcal{E}'_1[b] = t_\epsilon[\sigma_{t([])}][b] = t_\epsilon[\sigma_{mod}] = d
 \]
 
-\item By its definition, $t_\epsilon$ is syntactically a copattern, and it is linear like all copatterns considered in this work. It follows that $x$ only appears once in $t_\epsilon$, at some position $p^x$. Define $\mathcal{E}' = b[a^0 \mapsto []]_{p^x}$ and we have the desired reduction
+\item Define a $\sigma_{[]}$ with $dom(\sigma_{t([])}) = \sigma$ as $\sigma_{t([])}(x) = t([])$ and $\sigma_{t([])}(y) = \sigma(y)$ for $y \neq x$. This way, $t_\epsilon[\sigma_{t([])}]$ is a context with one hole, since $x$ only appears once in $t_\epsilon$ because it is a linear copattern by definition, and with $\mathcal{E'} = q_\epsilon[\sigma_{t([])}]$, since $\mathcal{E'}[a] = q_\epsilon[\sigma] = q_\epsilon[\sigma_{t([])}][a]$. By the ``Subst'' rule for $\epsilon$, we have
 \[
-b = t_\epsilon[\sigma] = \mathcal{E}'[a^0] \longrightarrow' \mathcal{E}'[b^0] = t_\epsilon[\sigma_{mod}] = d,
+\mathcal{E}'[b] = q_\epsilon[\sigma_{t([])}][b] = q_\epsilon[\sigma_{mod}] \longrightarrow^{aux}  t_\epsilon[\sigma_{mod}] = d.
 \]
-since $\mathcal{E}' \in EC_<[\vdash'_v]$, as shown in the following. It is $a[a^0 \mapsto []] \in EC_<[\vdash'_v]$ and
-\[
-a[a^0 \mapsto []] = q_\epsilon[\sigma_{[]}], \mathcal{E}' = b[a^0 \mapsto []]_{p^x} = t_\epsilon[\sigma_{[]}] = aux(\langle q_\epsilon \rangle^{vars})[\sigma_{[]}]
-\]
-with $\sigma_{[]} = (\sigma \setminus \{x \mapsto t(a^0)\}) \cup \{x \mapsto t([])\}$. Because $a[a^0 \mapsto []] \in EC_<[\vdash'_v]$, we know that all terms that $\sigma_{[]}$ assigns to variables to the left (with respect to $<$) of the hole in $q_\epsilon[\sigma_{[]}]$ are values under judgement $\vdash'_v$. Since $\langle q_\epsilon \rangle^{vars}$ doesn't change the order of the variables, it follows that all terms that $\sigma_{[]}$ assigns to variables to the left (w.r.t. $<$) of the hole in $aux(\langle q_\epsilon \rangle^{vars})[\sigma_{[]}]$ are such values, as well.
-
 \end{enumerate}
 \end{proof}
 \end{lemma}
@@ -78,13 +70,9 @@ We compare $\mathcal{E}'$ and $\mathcal{E}^{aux}$ and distinguish four cases.
 
 \item The hole of $\mathcal{E}'$ properly contains that of $\mathcal{E}^{aux}$, i.e., there is a context $\mathcal{E}^{aux}_0 \neq []$ such that $\mathcal{E}^{aux} = \mathcal{E}'[\mathcal{E}^{aux}_0]$. It follows that $\mathcal{E}^{aux}_0[a^{aux}_0] = a'_0$. By \autoref{lem:app1} we have a $d_0$ with $\mathcal{E}^{aux}_0[c_0] \longrightarrow' d_0$ and $b_0 {\longrightarrow^{aux}}^* d_0$. That second reduction means that there are terms $t_1, ..., t_n$ with $b_0 \longrightarrow^{aux} t_1 \longrightarrow^{aux} ... \longrightarrow^{aux} t_n \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}'[d_0]$; the property holds since $b = \mathcal{E}'[b_0] \longrightarrow^{aux} \mathcal{E}'[t_1] \longrightarrow^{aux} ... \longrightarrow^{aux} \mathcal{E}'[t_n] \longrightarrow^{aux} \mathcal{E}'[d_0] = d$ and $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0][c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0[c^0]] \longrightarrow' \mathcal{E}'[d_0] = d$.
 
-\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{E}'_0 \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{E}'_0]$. It follows that $\mathcal{E}^{aux} \in \textrm{EC}_<[\vdash'_v]$. TODO: why? Further, it follows that $\mathcal{E}'_0[a'_0] = a^{aux}_0$. By \autoref{lem:app2} we have a $d_0$ with $c_0 \longrightarrow' d_0$ and $\mathcal{E}'_0[b_0] {\longrightarrow^{aux}}^* d_0$. That second reduction means that there are terms $t_1, ..., t_n$ with $\mathcal{E}'_0[b_0] \longrightarrow^{aux} t_1 \longrightarrow^{aux} ... \longrightarrow^{aux} t_n \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}^{aux}[d_0]$; the property holds since $b = \mathcal{E}'[b_0] = \mathcal{E}^{aux}[\mathcal{E}'_0][b_0] = \mathcal{E}^{aux}[\mathcal{E}'_0[b_0]] \longrightarrow^{aux} \mathcal{E}^{aux}[t_1] \longrightarrow^{aux} ... \longrightarrow^{aux} \mathcal{E}^{aux}[t_n] \longrightarrow^{aux} \mathcal{E}^{aux}[d_0] = d$ and $c = \mathcal{E}^{aux}[c_0] \longrightarrow' \mathcal{E}^{aux}[d_0] = d$.
+\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{E}'_0 \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{E}'_0]$. It follows that $\mathcal{E}^{aux} \in \textrm{EC}_<[\vdash'_v]$. TODO: why? Further, it follows that $\mathcal{E}'_0[a'_0] = a^{aux}_0$. By \autoref{lem:app2} we have a $d_0$ with $c_0 \longrightarrow' d_0$ and $\mathcal{E}'_0[b_0] \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}^{aux}[d_0]$; the property holds since $b = \mathcal{E}'[b_0] = \mathcal{E}^{aux}[\mathcal{E}'_0][b_0] = \mathcal{E}^{aux}[\mathcal{E}'_0[b_0]] \longrightarrow^{aux} \mathcal{E}^{aux}[d_0] = d$ and $c = \mathcal{E}^{aux}[c_0] \longrightarrow' \mathcal{E}^{aux}[d_0] = d$.
 
-TODO: adapt the lemmas
-
-\item Neither the hole of $\mathcal{E}'$ contains that of $\mathcal{E}^{aux}$, nor the other way around. TODO: rework from the old item below
-
-%\item Neither $a'^0$ is a subterm of $a^0$, nor the other way around. Then choose $d$ as $a$ with $a'^0$ replaced by $c^0$ and $a^0$ replaced by $b^0$. The property holds because $b = \mathcal{E}[b^0] = \mathcal{E}^{aux}[a^0 \mapsto b^0][a'^0] \longrightarrow^{aux} \mathcal{E}^{aux}[a^0 \mapsto b^0][c^0] = d$ and $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}[a'^0 \mapsto c^0][a^0] \longrightarrow' \mathcal{E}[a'^0 \mapsto c^0][b^0] = d$. This second reduction is possible because, by \autoref{lem:gec1}, $\mathcal{E}[a'^0 \mapsto c^0] \in \textrm{EC}[\vdash'_v]$ since $\mathcal{E} \in \textrm{EC}[\vdash'_v]$ and $\langle a'^0 \rangle^{aux^{-1}} = \langle c^0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a'^0$ iff $\vdash'_v c^0$.
+\item Neither the hole of $\mathcal{E}'$ contains that of $\mathcal{E}^{aux}$, nor the other way around. Then we have a two-hole context $\mathcal{E}^{merge}$ such that $\mathcal{E}^{merge}[[], a^{aux}_0] = \mathcal{E}'$ and $\mathcal{E}^{merge}[a'_0, []] = \mathcal{E}^{aux}$. Choose $d$ as $\mathcal{E}^{merge}[b_0, c_0]$. The property holds because $b = \mathcal{E}'[b_0] = \mathcal{E}^{merge}[[], a^{aux}_0][b_0] = \mathcal{E}^{merge}[b_0, a^{aux}_0] = \mathcal{E}^{merge}[b_0, []][a^{aux}_0] \longrightarrow^{aux} \mathcal{E}^{merge}[b_0, []][c_0] = \mathcal{E}^{merge}[b_0, c_0] = d$ and $c = \mathcal{E}^{aux}[c_0] = \mathcal{E}^{merge}[a'_0, []][c_0] = \mathcal{E}^{merge}[a'_0, c_0] = \mathcal{E}^{merge}[[], c_0][a'_0] \longrightarrow' \mathcal{E}^{merge}[[], c_0][b_0] = d$. This second reduction is possible because, by \autoref{lem:gec1}, $\mathcal{E}^{merge}[[], c_0] \in \textrm{EC}[\vdash'_v]$ since $\mathcal{E}' = \mathcal{E}^{merge}[[], a^{aux}_0] \in \textrm{EC}[\vdash'_v]$ and $\langle a^{aux}_0 \rangle^{aux^{-1}} = \langle c_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a^{aux}_0$ iff $\vdash'_v c_0$.
 \end{itemize}
 
 \end{proof}
