@@ -191,11 +191,23 @@ The \texttt{aux} function definition remains unchanged and is omitted. This prog
 
 The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of Rendel et al. for the Codata Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a defunctionalized form after \textsf{Unnest}, virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the syntactic differences between function and destructor calls.\footnote{I.e., the difference between $fun(...)$ and $t.des(...)$. This difference vanishes when changing the syntax of destructor calls to $des(t, ...)$.} The respective transformation for terms is $d$, defined below with the algorithm.
 
+First, we define the class of function definitions of a program $prg$ which are already defunctionalized. A function definition is already defunctionalized when all of its equations have lhss without destructors. We define the class of already defunctionalized functions $F^{prg}_d$ as those which have already defunctionalized function definitions.
+
+Using this definition, we define defunctionalization of terms.
+
+\begin{align*}
+\langle x \rangle^d = x \\
+\langle s.des(t_1, ..., t_n) \rangle^d = \langle des \rangle^d (\langle s \rangle^d, \langle t_1 \rangle^d, ..., \langle t_n \rangle^d) \\
+\langle fun(t_1, ..., t_n) \rangle^d = fun(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \in F_d \\
+\langle fun(t_1, ..., t_n) \rangle^d = \langle fun \rangle^d (\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \not\in F_d \\
+\langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)
+\end{align*}
+
+This transformation only changes symbols, but leaves the structure of the terms unchanged (disregarding the syntactic sugar for destructor calls). Especially, this means that $\langle q[\sigma] \rangle^d = \langle q \rangle^d [\langle \cdot \rangle^d \circ \sigma]$ for any copattern $q$ and substitution $\sigma$. A property that is important for the definition of \textsf{CoreRefunc} below is that, for any copattern $q$ that is allowed as a lhs in the domain of \textsf{CoreRefunc}, $\langle q \rangle^d$ is also a copattern. This can be easily shown by induction on the structure of $q$.
+
+Next, we give the definition for \textsf{CoreDefunc}. Like Rendel et al. do for their de- and refunctionalization, we use set-builder notation.
+
 \begin{algorithm}[\textsf{CoreDefunc}]
-
-First, we define the class $FDEF^{prg}_d$ of function definitions of a program $prg$ which are already defunctionalized. A function definition is already defunctionalized when all of its equations have lhss without destructors. We define the class of already defunctionalized functions $F^{prg}_d$ as those which have already defunctionalized function definitions.
-
-Next, we give the definition for \textsf{CoreDefunc}.
 
 \begin{align*}
 \langle prg \rangle^{\textsf{CoreDefunc}} & = ~&& \{ && \textrm{\textbf{data }} \sigma \textrm{\textbf{ where }} \span\span\span\span \\
@@ -209,58 +221,105 @@ Next, we give the definition for \textsf{CoreDefunc}.
 & && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \text{ s.t. } fun \in F^{prg}_d \} \span\span\span\span
 \end{align*}
 
-Below, we define the transformation for terms $d$, which is only necessary due to the syntactic differences between function and destructor calls.
-
-\begin{align*}
-\langle x \rangle^d = x \\
-\langle s.des(t_1, ..., t_n) \rangle^d = \langle des \rangle^d (\langle s \rangle^d, \langle t_1 \rangle^d, ..., \langle t_n \rangle^d) \\
-\langle fun(t_1, ..., t_n) \rangle^d = fun(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \in F_d \\
-\langle fun(t_1, ..., t_n) \rangle^d = \langle fun \rangle^d (\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \not\in F_d \\
-\langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)
-\end{align*}
-
 \end{algorithm}
 
 We consider important properties of the transformation.
 
-\textbf{Bisimulation.} For \textsf{CoreDefunc}, strong bisimulation holds. To show this, we first define the inverse $\langle \cdot \rangle^{d^{-1}}$ of $\langle \cdot \rangle^d$, then we show properties of these two maps, and, using these properties, finally we prove the strong bisimulation by a categorical argument.
+\textbf{Bisimulation.} For \textsf{CoreDefunc}, strong bisimulation holds. To show this, we first show a general result that an isomorphism between rule sets of two programs is also an isomorphism between the respective reduction relations of the programs. In the following, $\langle \cdot \rangle$ is some program transformation when applied to programs. When applied to terms it stands for some transformation of terms that only changes symbols, but leaves the structure of the terms unchanged.
 
-We start by defining a map $d^{-1}: \textrm{Term}_{\langle prg \rangle} \to \textrm{Term}_{prg}$; this is clearly the inverse of $d$, as it is straightforwardly defined to be so.
-\begin{align*}
-\langle x \rangle^{d^{-1}} = x \\
-\langle \langle des \rangle^d (s, t_1, ..., t_n) \rangle^{d^{-1}} = \langle s \rangle^{d^{-1}}.des(\langle t_1 \rangle^{d^{-1}}, ..., \langle t_n \rangle^{d^{-1}}) \\
-\langle fun(t_1, ..., t_n) \rangle^{d^{-1}} = fun(\langle t_1 \rangle^{d^{-1}}, ..., \langle t_n \rangle^{d^{-1}}), \text{ if } fun \in F_d \\
-\langle \langle fun \rangle^d (t_1, ..., t_n) \rangle^{d^{-1}} = fun(\langle t_1 \rangle^{d^{-1}}, ..., \langle t_n \rangle^{d^{-1}}), \text{ if } fun \not\in F_d \\
-\langle con(t_1, ..., t_n) \rangle^{d^{-1}} = con(\langle t_1 \rangle^{d^{-1}}, ..., \langle t_n \rangle^{d^{-1}})
-\end{align*}
+\begin{lemma}[Rules isomorphism is reduction isomorphism]
+\label{lem:iso}
+For any program $prg$, when it is
+\[
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(prg).
+\]
+, then it also holds that
+\[
+\forall s,t \in \textrm{Term}_{prg}. s \longrightarrow_{prg} t \iff \langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle.
+\]
+\end{lemma}
 
-\begin{lemma}[Isomorphism $d$]\label{lem:iso} It is
-\begin{enumerate}
-\item $\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}({prg}) \iff (\langle s \rangle^d, \langle t \rangle^d) \in \textrm{Rules}({\langle prg \rangle})$, and
+In order to prove this, we first show some auxiliary lemmas concerning the value judgement and evaluation contexts.
 
-\item $\forall s,t \in \textrm{Term}_{\langle prg \rangle}. (s, t) \in \textrm{Rules}({\langle prg \rangle}) \iff (\langle s \rangle^{d^{-1}}, \langle t \rangle^{d^{-1}}) \in \textrm{Rules}({prg})$.
-\end{enumerate}
-
+\begin{lemma}[Isomorphic value judgements]
+For any program $prg$, when it is
+\[
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(prg).
+\]
+, then it also holds that
+\label{lem:ivj}
+\[
+\forall t \in \textrm{Term}_{prg}. \vdash_{v_{prg}} t \iff \vdash_{v_{\langle prg \rangle}} \langle t \rangle
+\]
 \begin{proof}
-\begin{enumerate}
-\item By inspecting the definition of \textsf{CoreDefunc}, it can be easily seen that for each rule $(s, t) \in \textrm{Rules}(prg)$, there is a rule $(\langle s \rangle^d, \langle t \rangle^d) \in \textrm{Rules}(\langle prg \rangle)$, and that there are no other rules in $\textrm{Rules}(\langle prg \rangle)$.
+$``\Rightarrow"$: By induction on the structure of $t$. By the derivation of $\vdash_{v_{prg}} t$ it is (a) $\vdash_{v_{prg}} t_i$ for all immediate subterms $t_i$ of $t$ and (b) $t \neq^? q$ for all lhss $q$ of rules of $prg$. By the premiss we know that for all lhss $q'$ of rules of $\langle prg \rangle$, there is a lhs $q$ of $prg$ such that $q' = \langle q \rangle$; thus it is $\langle t \rangle \neq^? q'$ for all lhss $q'$ of rules of $\langle prg \rangle$. By the induction hypothesis, we know that $\vdash_{v_{\langle prg \rangle}} \langle t_i \rangle$. Since the immediate subterms of $\langle t \rangle^d$ are the $\langle t_i \rangle$ for each $t_i$, we have the derivation for $\vdash_{v_{\langle prg \rangle}} \langle t \rangle$.
 
-\item Since $\langle \cdot \rangle^{d^{-1}}$ is the inverse of $\langle \cdot \rangle^d$, this statement is equivalent to the first.
-\end{enumerate}
+$``\Leftarrow"$: By induction on the structure of $t$. By the derivation of $\vdash_{v_{\langle prg \rangle}} t$ it is (a) $\vdash_{v_{\langle prg \rangle}} t'_i$ for all immediate subterms $t'_i$ of $\langle t \rangle$ and (b) $\langle t \rangle \neq^? q'$ for all lhss $q'$ of rules of $\langle prg \rangle$. By the premiss we know that for all lhss $q$ of rules of $prg$, there is a lhs $\langle q \rangle$ of $\langle prg \rangle$; thus it is $t \neq^? q$ for all lhss $q$ of rules of $prg$. By the induction hypothesis, since it is $\langle t_i \rangle = t'_i$ for each immediate subterm $t_i$ of $t$, we know that $\vdash_{v_{prg}} t_i$. All in all, we have the derivation for $\vdash_{v_{prg}} t$.
 \end{proof}
 \end{lemma}
 
-\begin{lemma}[Bisimulation]
+\begin{lemma}[Isomorphic evaluation contexts]
+\label{lem:iec}
+For any program $prg$, when it is
 \[
-\forall s,t \in \textrm{Term}_{prg}. s \longrightarrow_{prg} t \iff \langle s \rangle^d \longrightarrow_{\langle prg \rangle} \langle t \rangle^d.
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(prg).
+\]
+, then it also holds that
+\[
+\forall \mathcal{E}. \mathcal{E} \in \textrm{EC}_{prg} \iff \langle \mathcal{E} \rangle \in \textrm{EC}_{\langle prg \rangle}
 \]
 \begin{proof}
-We consider the category $\mathbf{Bin}$ of binary relations over sets. $(\textrm{Term}_{prg}, \textrm{Rules}({prg}))$ and $(\textrm{Term}_{\langle prg \rangle}, \textrm{Rules}({\langle prg \rangle}))$ are objects of this category. \autoref{lem:iso} is equivalent to $\langle \cdot \rangle^d$ being an isomorphism between these two objects, and thus an isomorphism of $\mathbf{Bin}$. Now, we consider the map from rules of a program to reduction relations defined in chapter 2. Call this map $\mathbf{Red}$; both domain and range of $\mathbf{Red}$ are subsets of binary relations. $\mathbf{Red}$ can be trivially extended to binary relations over sets by leaving the sets unchanged. Then this resulting map can be arbitrarily extended to the whole domain of binary relations over sets. Finally, equip this map from objects to objects of the category $\mathbf{Bin}$ with the identity map over its morphism to obtain a map from $\mathbf{Bin}$ to itself, which we again call $\mathbf{Red}$. By its definition, it is $\mathbf{Red}((\textrm{Term}_{prg}, \textrm{Rules}({prg}))) = (\textrm{Term}_{prg}, \longrightarrow_{prg})$, and analogously for $\langle prg \rangle$. For any two objects of $\mathbf{Bin}$ with the same underlying set, the identity morphism is the same, namely the identity map on the set. It follows that $\mathbf{Red}$ is an endofunctor on $\mathbf{Bin}$. Since all functors preserve isomorphisms, especially it is
-\[
-\forall s,t \in \textrm{Term}_{prg}. s \longrightarrow_{prg} t \iff \langle s \rangle^d \longrightarrow_{\langle prg \rangle} \langle t \rangle^d. \qedhere
-\]
+$``\Rightarrow"$: By induction on the structure of $\mathcal{E}$. $\mathcal{E}$ has a corresponding generic evaluation context $\mathcal{GE}$ and a placeholder order $<$ such that there is a placeholder $p$ that is replaced by an evaluation context $\mathcal{E}'$ for $prg$ in $\mathcal{E}$, and that all placeholders $< p$ are replaced in $\mathcal{E}$ by values, i.e., terms $v$ with $\vdash_{v_{prg}} v$. By \autoref{lem:ivj}, for each such $v$ it is $\vdash_{v_{\langle prg \rangle}} \langle v \rangle$, and by the induction hypothesis $\langle \mathcal{E}' \rangle$ is an evaluation context for $prg$. Consequent, we can construct an evaluation context starting with $\langle \mathcal{GE} \rangle$ as follows: In this g.e.c., replace all placeholders $< p$ with the respective $\langle v \rangle$, replace $p$ with $\langle \mathcal{E}' \rangle$, and replace all placeholders $> p$ with the respective terms from $\mathcal{E}$. The result is the desired $\langle \mathcal{E} \rangle$.
+
+$``\Leftarrow"$: Analogously to $``\Rightarrow"$.
 \end{proof}
 \end{lemma}
+
+Next, we show that \autoref{lem:iso} holds restricted to contraction, from which the full \autoref{lem:iso} directly follows.
+
+\begin{lemma}[Rules isomorphism is contraction isomorphism]
+\label{lem:isoc}
+For any program $prg$, when it is
+\[
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(prg).
+\]
+, then it also holds that
+\[
+\forall s,t \in \textrm{Term}_{prg}. s \mapsto_{prg} t \iff \langle s \rangle \mapsto_{\langle prg \rangle} \langle t \rangle.
+\]
+\begin{proof}
+$``\Rightarrow"$: By the derivation of $s \mapsto_{prg} t$ there is a rule $r := (q_r, t_r) \in \textrm{Rules}(prg)$ and a substitution $\sigma$ such that $s = q_r[\sigma]$ and $t = t_r[\sigma]$ and the right-hand sides of $\sigma$ are values in $prg$. By the premiss we know that there is a rule $\langle r \rangle := (\langle q_r \rangle, \langle t_r \rangle) \in \textrm{Rules}(prg)$, and by \autoref{lem:ivj} we know that, for each term $v$ that is a value in $prg$, $\langle v \rangle$ is a value in $\langle prg \rangle$ and thus the right-hand sides of $\sigma \circ \langle \cdot \rangle$ are values in $\langle prg \rangle$. Consequently, it is $\langle s \rangle = \langle q_r \rangle[\sigma \circ \langle \cdot \rangle] \mapsto \langle t_r \rangle[\sigma \circ \langle \cdot \rangle] = \langle t \rangle$.
+
+$``\Leftarrow"$: By the derivation of $\langle s \rangle \mapsto_{prg} \langle t \rangle$ there is a rule $r' := (q_{r'}, t_{r'}) \in \textrm{Rules}(\langle prg \rangle)$ and a substitution $\sigma'$ such that $\langle s \rangle = q_{r'}[\sigma']$ and $\langle t \rangle = t_{r'}[\sigma']$ and the right-hand sides of $\sigma'$ are values in $prg$. By the premiss we know that there is a rule $r  := (q_r, t_r) \in \textrm{Rules}(prg)$ such that $\langle q_r \rangle = q_{r'}, \langle t_r \rangle = t_{r'}$, and by \autoref{lem:ivj} we know that, for each term $v'$ that is a value in $\langle prg \rangle$, each term $v$ with $v' = \langle v \rangle$ is a value in $prg$ and thus the right-hand sides of $\sigma$ with $\sigma' = \sigma \circ \langle \cdot \rangle$ are values in $prg$. Consequently, it is $s = q_r[\sigma] \mapsto t_r[\sigma] = t$.
+\end{proof}
+\end{lemma}
+
+\begin{proof}[Proof of \autoref{lem:iso}]
+$``\Rightarrow"$: By the derivation of $s \longrightarrow_{prg} t$ there are terms $s', t'$ and an evaluation context $\mathcal{E}$ for $prg$ such that $s = \mathcal{E}[s'], t = \mathcal{E}[t']$ and $s' \mapsto_{prg} t'$. By \autoref{lem:iec} and \autoref{lem:isoc} we know that $\langle \mathcal{E} \rangle$ is an evaluation context for $\langle prg \rangle$ and that $\langle s' \rangle \mapsto_{\langle prg \rangle} \langle t' \rangle^d$, respectively. Consequently, it is $\langle s \rangle = \langle \mathcal{E} \rangle [\langle s' \rangle] \longrightarrow_{\langle prg \rangle} \langle \mathcal{E} \rangle [\langle t' \rangle] = \langle t \rangle$.
+
+$``\Leftarrow"$: By the derivation of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ there are terms $\langle s' \rangle, \langle t' \rangle$ and an evaluation context $\langle \mathcal{E} \rangle$ for $prg$ such that $\langle s \rangle = \langle \mathcal{E} \rangle[\langle s' \rangle], \langle t \rangle = \langle \mathcal{E} \rangle [\langle t' \rangle]$ and $\langle s' \rangle \mapsto_{\langle prg \rangle} \langle t' \rangle$. By \autoref{lem:iec} and \autoref{lem:isoc} we know that $\mathcal{E}$ is an evaluation context for $prg$ and that $s' \mapsto_{prg} t'$, respectively. Consequently, it is $s = \mathcal{E}[s'] \longrightarrow_{prg} \mathcal{E}[t'] = t$.
+\end{proof}
+
+Using \autoref{lem:iso}, we finally prove strong bisimulation for \textsf{CoreDefunc}, by showing that the premiss of the lemma holds.
+
+\begin{lemma}[Strong bisimulation of the rule relations]
+\label{lem:sbruld}
+\[
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle^d, \langle t \rangle^d) \in \textrm{Rules}(\langle prg \rangle^{\textsf{CoreDefunc}}).
+\]
+\begin{proof}
+By inspecting the definition of \textsf{CoreDefunc}, it can be easily seen that for each rule $(s, t) \in \textrm{Rules}(prg)$, there is a rule $(\langle s \rangle^d, \langle t \rangle^d) \in \textrm{Rules}(\langle prg \rangle^{\textsf{CoreDefunc}})$, and that there are no other rules in $\textrm{Rules}(\langle prg \rangle^{\textsf{CoreDefunc}})$.
+\end{proof}
+\end{lemma}
+
+\begin{corollary}[Strong bisimulation of \textsf{CoreDefunc}]
+\[
+\forall s,t \in \textrm{Term}_{prg}. s \longrightarrow_{prg} t \iff \langle s \rangle^d \longrightarrow_{\langle prg \rangle^{\textsf{CoreDefunc}}} \langle t \rangle^d.
+\]
+\begin{proof}
+By combining \autoref{lem:sbruld} and \autoref{lem:iso}.
+\end{proof}
+\end{corollary}
 
 \subsection{Core refunctionalization}
 
