@@ -29,6 +29,21 @@ b = t_r[\sigma_{[]}][t(a), ..., t(a)] \longrightarrow^{aux} t_r[\sigma_{[]}][t(c
 \end{proof}
 \end{lemma}
 
+\begin{fact}
+\label{fac:app1}
+For any term $a$ that is not a constructor call, pattern $p$, substitution $\sigma$ with a domain including at least the variables in $p$, and evaluation context $\mathcal{E}' \in \mathbf{EC}[\vdash'_v]$: When $\mathcal{E}'[a] = \sigma(p)$, then there is a variable $x$ in $p$ and an evaluation context $\mathcal{E}'_0 \in \mathbf{EC}[\vdash'_v]$ such that $\mathcal{E}'_0[a] = \sigma(x)$.
+\begin{proof}
+By induction on the structure of $p$.
+\begin{itemize}
+\item $p= y$ for some variable $y$.
+Then it is $y = x$ and $\mathcal{E}'[a] = \sigma(x)$. Thus simply choose $\mathcal{E}'_0 = \mathcal{E}'$.
+
+\item $p = con(p_1, ..., p_n)$ for some $n$-ary constructor $con$ and some patterns $p_1, ..., p_n$.
+Then it is $\mathcal{E}'[a] = con(p_1, ..., p_n)[\sigma]$. When $\mathcal{E}' = []$, it would be $a = con(p^i_1, ..., p^i_{i_n})[\sigma]$, contradicting the premiss that $a$ isn't a constructor call. Thus it must be $\mathcal{E}' = con(\sigma(p_1), ..., \mathcal{E}'_{0'} ..., \sigma(p_n))$ for some $\mathcal{E}'_{0'} \in \mathcal{EC}[\vdash'_v]$, with $\mathcal{E}'_{0'}[a] = p_j$ for a $j \in \{1, ..., n\}$. By the induction hypothesis, there is a variable $x$ in $p_j$ and thus in $p$ such that $\sigma(x) = \mathcal{E}'_1$ for some $\mathcal{E}'_1 \in \mathbf{EC}[\vdash'_v]$.
+\end{itemize}
+\end{proof}
+\end{fact}
+
 \begin{lemma}
 \label{lem:app2}
 Let $a, b, c$ be terms and $\mathcal{E}' \in \textrm{EC}[\vdash'_v]$ an evaluation context. When
@@ -37,20 +52,38 @@ a \longrightarrow' b \land \mathcal{E}'[a] \longrightarrow^{aux} c
 \]
 and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
 \[
-c \longrightarrow' d \land \mathcal{E}'[b] \longrightarrow^{aux} d
+c {\longrightarrow'}^= d \land \mathcal{E}'[b] {\longrightarrow^{aux}}^= d.
 \]
 \begin{proof}
-Since $a$ matches $q_r$ for some equation $r$, we know that $a$ is a function or destructor call, and not a constructor call. Because $a = q_\epsilon[\sigma], c = t_\epsilon[\sigma]$ and $r$ and $r'$ don't overlap, it follows that $a$ is a subterm of a right-hand side of $\sigma$. Put in another way, there is a variable $x$ and a term $t(a)$ with subterm $a$ such that $\{x \mapsto t\} \subseteq \sigma$. Define a $\sigma_{mod}$ with $dom(\sigma_{mod}) = \sigma$ as $\sigma_{mod}(x) = t(b)$ and $\sigma_{mod}(y) = \sigma(y)$ for $y \neq x$, and choose $d = t_\epsilon[\sigma_{mod}]$. The two desired reductions can be derived as follows.
+We distinguish the following cases for the form of $\mathcal{E}'$. (Note that only the third case, concerning function calls, is truly important, as the others are either essentially identical to it or trivial.)
+
 \begin{enumerate}
-\item By the definition of extractions, it is $t_\epsilon = aux(x_1, ..., x_n)$, for some variables $x_1, ..., x_n$ in the domain of $\sigma$, with these variables appearing in the same order as they do in $q_\epsilon$. One of these variables is $x$. Construct an evaluation context $\mathcal{E}'_1 \in \textrm{EC}_<[\vdash'_v]$ as follows: Begin with $t_\epsilon$, consider its variables as placeholders, replace the variables $x_i \neq x$ with $\sigma(x_i)$ and replace $x$ with $\sigma_{t([])}$. The variables left of $x$ (w.r.t. $<$) are replaced by values w.r.t. $\vdash'_v$, because $\mathcal{E}' = q_\epsilon[\sigma_{t([])}] \in \textrm{EC}_<[\vdash'_v]$, in which they appear in the same order, and thus those variables must be values w.r.t. to this judgement; by a similar argument we have $t([]) \in \textrm{EC}_<[\vdash'_v]$. By its construction, it is $\mathcal{E}'_1 = t_\epsilon[\sigma_{t([])}]$. By the ``Cong'' rule for evaluation context $\mathcal{E}'_1$, on top of the ``Subst'' rule for $r$, we have the desired reduction:
+\item $\mathcal{E}' = []$. Then it is $\mathcal{E}'[a] = a$. Since there are no overlapping equations, it follows that $b = c$. It also is $\mathcal{E}'[b] = b$. Thus, simply choose $d = b = c$.
+
+\item $\mathcal{E}' = con(t_1, ..., t_{i-1}, \mathcal{E}'_0, t_{i+1}, ..., t_n)$, for some constructor $con$. In this case, $\mathcal{E}'[a]$ wouldn't match any lhs, contrary to assumption.
+
+\item $\mathcal{E}' = fun(t_1, ..., t_{i-1}, \mathcal{E}'_0, t_{i+1}, ..., t_n)$, for some $\mathcal{E}'_0 \in \mathbf{EC}[\vdash'_v]$.
+Because $\mathcal{E}'[a] = q_\epsilon[\sigma]$ for some $\sigma$, it is $q_\epsilon = fun(p_1, ..., p_n)$ with $\sigma(p_i) = \mathcal{E}'_0[a], \sigma(p_j) = t_j$ for $j \neq i$. For $j < i$, $t_j = \sigma(p_j)$ is a value w.r.t. $\vdash'_v$. By the definition of the value judgement, since these are subterms of the respective $t_j$, we know that the same holds for $\sigma(x)$, for any variable $x$ in one of the $p_j$ with $j < i$. From \autoref{fac:app1} we know that, since $a$ matches a lhs and is thus not a constructor call, it is $\sigma(x) = \mathcal{E}'_1[a]$ for an $\mathcal{E}'_1 \in \mathbf{EC}[\vdash'_v]$ and a variable $x$ in $p_i$. Thus we can choose $d = aux(\sigma(x_1), ..., \mathcal{E}'_1[b], ..., \sigma(x_k))$ and derive the first desired reduction as follows. By the definition of extractions, it is $t_\epsilon = aux(x_1, ..., x_k)$, with $x_1, ..., x_k$ the variables in $q_\epsilon$, in the order appearing there. Especially, it is $x_j = x$, for some $j \in \{1, ..., k\}$, and each variable $x_1, ..., x_{j-1}$ is contained in one of $p_1, ..., p_{i-1}$, and thus, as shown above, the $\sigma(x_1), ..., \sigma(x_{j-1})$ are all values w.r.t. $\vdash'_v$. Consequently, it is $c = t_\epsilon[\sigma] = aux(\sigma(x_1), ..., \sigma(x), ..., \sigma(x_k)) = aux(\sigma(x_1), ..., \mathcal{E}'_1[a], ..., \sigma(x_k)) \in \mathbf{EC}[\vdash'_v]$ and thus we can derive:
+
+\begin{prooftree}
+\AxiomC{(by the premiss)}
+\UnaryInfC{$a \longrightarrow' b$}
+\RightLabel{Cong}
+\UnaryInfC{$aux(\sigma(x_1), ..., \mathcal{E}'_1[a], ..., \sigma(x_k)) \longrightarrow' d$}
+\end{prooftree}
+
+For the second reduction, let $\sigma^{aux} = \sigma \mid_{dom(\sigma) \setminus \{x\}} \cup \{x \mapsto \mathcal{E}'_0[b]\}$. Especially, this means that $\mathcal{E}'[b] = fun(\sigma(p_1), ..., \mathcal{E}'_1[b], ..., \sigma(p_n)) =^? q_\epsilon \searrow \sigma^{aux}$. Thus, apply the ``Subst'' rule for $\epsilon$ to get the reduction
 \[
-c = t_\epsilon[\sigma] = t_\epsilon[\sigma_{t([])}][a] = \mathcal{E}'_1[a] \longrightarrow' \mathcal{E}'_1[b] = t_\epsilon[\sigma_{t([])}][b] = t_\epsilon[\sigma_{mod}] = d
+\mathcal{E}'[b] \longrightarrow^{aux} t_\epsilon[\sigma^{aux}].
+\]
+This is the desired reduction since
+\[
+t_\epsilon[\sigma^{aux}] = aux(x_1, ..., x_k)[\sigma^{aux}] = aux(\sigma(x_1), ..., \mathcal{E}'_1[b], ..., \sigma(x_k)) = d.
 \]
 
-\item Define a $\sigma_{[]}$ with $dom(\sigma_{t([])}) = \sigma$ as $\sigma_{t([])}(x) = t([])$ and $\sigma_{t([])}(y) = \sigma(y)$ for $y \neq x$. This way, $t_\epsilon[\sigma_{t([])}]$ is a context with one hole, since $x$ only appears once in $t_\epsilon$ because it is a linear copattern by definition, and with $\mathcal{E'} = q_\epsilon[\sigma_{t([])}]$, since $\mathcal{E'}[a] = q_\epsilon[\sigma] = q_\epsilon[\sigma_{t([])}][a]$. By the ``Subst'' rule for $\epsilon$, we have
-\[
-\mathcal{E}'[b] = q_\epsilon[\sigma_{t([])}][b] = q_\epsilon[\sigma_{mod}] \longrightarrow^{aux}  t_\epsilon[\sigma_{mod}] = d.
-\]
+\item $\mathcal{E}' = v.des(\overline{v}, \mathcal{E}'_0, \overline{t})$. The proof proceeds essentially identical to that for the function call case above; to see this, keep in mind that the destructor call syntax desugars to $des(v, \overline{v}, \mathcal{E}'_0, \overline{t})$. Thus the destructed value is actually just the first argument of the destructor, with the only difference being that it isn't an instance of a pattern. But this doesn't actually require a different argument than that of the previous function call case, because, regarding the arguments left of $\mathcal{E}'_0$, this argument only depends on them being values.
+
+\item $\mathcal{E}' = \mathcal{E}'_0.des(\overline{t})$, with $\mathcal{E}'_0 \in \mathbf{EC}[\vdash'_v]$. By expanding along the definition of evaluation contexts, we know that $\mathcal{E}'$ either has the form (a) $fun(\overline{v}, \mathcal{E}'_0, \overline{t})\overline{des(\overline{t'})}$, or (b) $v.des(\overline{v}, \mathcal{E}'_0, \overline{t}).\overline{des(\overline{t'})}$. In case (a), proceed like in the function call case above, and just add the destructor calls behind the function calls to $fun$. In case (b), proceed like in the destructor call case above, and again just add the destructor calls behind the function calls to $fun$.
 \end{enumerate}
 \end{proof}
 \end{lemma}
