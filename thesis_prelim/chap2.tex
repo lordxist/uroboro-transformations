@@ -209,7 +209,23 @@ Finally, we define the actual reduction relation by a congruence rule.
 
 Write $\longrightarrow^=$ for the reflexive closure, $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^=_{prg}$, $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
 
-Concerning evaluation contexts, the following holds, which will be used in the proof of \autoref{lem:cdpaux}.
+The well-known notions of \textit{context} and \textit{multi-hole context} are related to that of evaluation context. We will use them in some of the proofs of this work, and therefore give an Uroboro-specific definition for each of them here.
+
+\begin{definition}[Context]
+Contexts are defined by the following EBNF rule.
+\[
+\mathcal{E} ::= [] ~ | ~ fun(t^*, \mathcal{E}, t^*) ~ | ~ con(t^*, \mathcal{E}, t^*) ~ | ~ \mathcal{E}.des(t^*) ~ | ~ t.des(t^*, \mathcal{E}, t^*)
+\]
+\end{definition}
+
+\begin{definition}[Multi-hole context]
+Multi-hole contexts are defined by the following EBNF rule.
+\[
+\mathcal{E} ::= [] ~ | ~ fun((\mathcal{E} ~ | ~ t)^*) ~ | ~ con((\mathcal{E} ~ | ~ t)^*) ~ | ~ \mathcal{E}.des(t^*) ~ | ~ t.des((\mathcal{E} ~ | ~ t)^*)
+\]
+\end{definition}
+
+Concerning evaluation contexts and contexts, the following holds, which will be used in the proof of \autoref{lem:cdpaux}.
 
 \begin{fact}
 \label{fac:chp21}
