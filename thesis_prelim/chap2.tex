@@ -209,6 +209,16 @@ Finally, we define the actual reduction relation by a congruence rule.
 
 Write $\longrightarrow^=$ for the reflexive closure, $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^=_{prg}$, $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
 
+Concerning evaluation contexts, the following holds, which will be used in the proof of \autoref{lem:cdpaux}.
+
+\begin{fact}
+\label{fac:chp21}
+For any two contexts $\mathcal{C}, \mathcal{C}_0$ and any evaluation context $\mathcal{E} \in \mathbf{EC}[V]$ for some set of values $V$:
+\[
+\mathcal{E} = \mathcal{C}[\mathcal{C}_0] \implies \mathcal{C} \in \mathbf{EC}[V].
+\]
+\end{fact}
+
 \subsection{As an extension of (Co)Data Fragment semantics}
 
 The properties of the reductions and the de- and refunctionalization transformations of the paper of Rendel, Trieflinger, and Ostermann are used for the proofs of the next section. The domain of their defunctionalization is what they call the Codata Fragment, and that of refunctionalization the Data Fragment. Their semantic properties can be used in the proofs because, for well-typed programs and limited to terms which have copattern coverage for all of their subterms in the program (TODO: define this more precisely), this work's reducibility notion is a conservative extension of either the Data Fragment's notion or the Codata Fragment's notion. When the well-typedness and coverage conditions are dropped, the reducibility notion is still a conservative extension of the Data Fragment's notion.
