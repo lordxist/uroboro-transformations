@@ -182,29 +182,32 @@ The value judgement makes use of a ``no-match" judgement. This judgement is comp
 
 \subsection{The reduction relation}
 
-$\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction depends upon a set of terms $\textrm{Val}$ which are considered to be values and a set of generic evaluation contexts $\textrm{EC}_<$. When left unspecified, $\textrm{Val}$ will be assumed to be the set of terms $t$ which are standardly judged to be values in Uroboro, i.e., for which it is $\vdash_v t$. Let $\mathcal{E}$ be an element of $\textrm{EC}_<[\textrm{Val}]$.
+$\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction depends upon a set of terms $\textrm{Val}$ which are considered to be values. Standardly, $\textrm{Val}$ is assumed to be the set of terms which are judged to be values by $\vdash_v t$. Sometimes, an alternative reduction judgement will be used, which will only differ in the underlying value set $\textrm{Val}$. This alternative reduction will then be defined by giving the alternative $\textrm{Val}$.
 
-\begin{prooftree}
-\AxiomC{$t \longrightarrow t'$}
-\RightLabel{Cong}
-\UnaryInfC{$\mathcal{E}[t] \longrightarrow \mathcal{E}[t']$}
-\end{prooftree}
+We define evaluation contexts for left-to-right, call-by-value evaluation.
+\begin{alignat*}{2}
+& v  \in &&\textrm{Val} \\
+& \mathcal{E} ::= ~&& [] ~ | ~ fun(v^*, \mathcal{E}, t^*) ~ | ~ con(v^*, \mathcal{E}, t^*) ~ | ~ \mathcal{E}.des(t^*) ~ | ~ v.des(v^*, \mathcal{E}, t^*)
+\end{alignat*}
+We let $\mathbf{EC}$ denote the set of evaluation contexts for the standard value judgement $\vdash'_v$, and we let $\mathbf{EC}[V]$ denote the set of evaluation contexts for other value sets (or their respective judgements).
+
+Contraction $\mapsto$ of terms using equations is defined as follows.
 
 if the immediate subterms of $t$ are values:
 \begin{prooftree}
 \AxiomC{$t =^? q \searrow \sigma$ with $(q, t') \in \textrm{Rules}(prg)$}
 \RightLabel{Subst}
-\UnaryInfC{$t \longrightarrow t'[\sigma]$}
+\UnaryInfC{$t \mapsto t'[\sigma]$}
 \end{prooftree}
 
-Write $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
+Finally, we define the actual reduction relation by a congruence rule.
+\begin{prooftree}
+\AxiomC{$t \mapsto t'$}
+\RightLabel{Cong}
+\UnaryInfC{$\mathcal{E}[t] \longrightarrow \mathcal{E}[t']$}
+\end{prooftree}
 
-\subsection{Standard evaluation context}
-
-\begin{alignat*}{2}
-& v  = &&\textrm{placeholder for value, that is } v \in \textrm{Val} \\
-& \mathcal{E} ::= ~&& [] ~ | ~ fun(v^*, \mathcal{E}, t^*) ~ | ~ con(v^*, \mathcal{E}, t^*) ~ | ~ \mathcal{E}.des(t^*) ~ | ~ v.des(v^*, \mathcal{E}, t^*)
-\end{alignat*}
+Write $\longrightarrow^=$ for the reflexive closure, $\longrightarrow^*$ for the reflexive and transitive closure of $\longrightarrow$. To make it clear that the reduction relation is meant with respect to a certain program $prg$, write $\longrightarrow^=_{prg}$, $\longrightarrow^*_{prg}$ and $\longrightarrow_{prg}$. When clear from the context or unimportant for the statement to make, this subscript will be omitted.
 
 \subsection{As an extension of (Co)Data Fragment semantics}
 

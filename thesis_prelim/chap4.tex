@@ -269,7 +269,11 @@ For any program $prg$, when it is
 \forall \mathcal{E}. \mathcal{E} \in \textrm{EC}_{prg} \iff \langle \mathcal{E} \rangle \in \textrm{EC}_{\langle prg \rangle}
 \]
 \begin{proof}
-$``\Rightarrow"$: By induction on the structure of $\mathcal{E}$. $\mathcal{E}$ has a corresponding generic evaluation context $\mathcal{GE}$ and a placeholder order $<$ such that there is a placeholder $p$ that is replaced by an evaluation context $\mathcal{E}'$ for $prg$ in $\mathcal{E}$, and that all placeholders $< p$ are replaced in $\mathcal{E}$ by values, i.e., terms $v$ with $\vdash_{v_{prg}} v$. By \autoref{lem:ivj}, for each such $v$ it is $\vdash_{v_{\langle prg \rangle}} \langle v \rangle$, and by the induction hypothesis $\langle \mathcal{E}' \rangle$ is an evaluation context for $prg$. Consequent, we can construct an evaluation context starting with $\langle \mathcal{GE} \rangle$ as follows: In this g.e.c., replace all placeholders $< p$ with the respective $\langle v \rangle$, replace $p$ with $\langle \mathcal{E}' \rangle$, and replace all placeholders $> p$ with the respective terms from $\mathcal{E}$. The result is the desired $\langle \mathcal{E} \rangle$.
+$``\Rightarrow"$: By induction on the structure of $\mathcal{E}$.
+
+When $\mathcal{E} = []$, then it is $\langle \mathcal{E} \rangle = []$, and this is clearly an evaluation context for $\langle prg \rangle$.
+
+When $\mathcal{E} \neq []$, all immediate subterms $t_{left}$ of $\mathcal{E}$ to the left of the hole are values under judgement $prg \vdash_v$. The ``middle'' term that follows after all these is again an evaluation context $\mathcal{E}_0$ for $prg$. $\langle \mathcal{E} \rangle$ is $\mathcal{E}$ with each $t_{left}$ replaced by $\langle t_{left} \rangle$, the immediate subterms right of the hole replaced in the same way, and the ``middle'' term replaced by $\langle \mathcal{E}_0 \rangle$. By the induction hypothesis, $\langle \mathcal{E}_0 \rangle$ is an evaluation context for $\langle prg \rangle$ because $\mathcal{E}_0$ is one for $prg$. By \autoref{lem:ivj}, it is $\langle prg \rangle \vdash_v \langle t_{left} \rangle$ for all $t_{left}$ because $prg \vdash_v t_{left}$.
 
 $``\Leftarrow"$: Analogously to $``\Rightarrow"$.
 \end{proof}

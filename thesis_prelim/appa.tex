@@ -4,11 +4,11 @@
 
 \begin{lemma}
 \label{lem:app1}
-Let $a, b, c$ be terms and $\mathcal{E}^{aux}$ be an evaluation context. When
+Let $a, b, c$ be terms and $\mathcal{E}^{aux}$ be an evaluation context for $\longrightarrow^{aux}$. When
 \[
-\mathcal{E}^{aux}[a] \longrightarrow' b \land a \longrightarrow^{aux} c
+\mathcal{E}^{aux}[a] \mapsto' b \land a \mapsto^{aux} c,
 \]
-and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
+then there is a $d$ such that
 \[
 \mathcal{E}^{aux}[c] \longrightarrow' d \land b {\longrightarrow^{aux}}^* d
 \]
@@ -92,7 +92,7 @@ t_\epsilon[\sigma^{aux}] = aux(x_1, ..., x_k)[\sigma^{aux}] = aux(\sigma(x_1), .
 \begin{proof}
 We make use of the fact that a reduction that can be derived by multiple applications of the ``Cong" rule can also be derived by just one application of the ``Cong" rule. When a reduction is derived by the ``Subst'' rule, it can also be derived by applying the ``Cong'' rule for the empty evaluation context on top of that. Thus, we have the following:
 \begin{itemize}
-\item From $a \longrightarrow' b$: $a = \mathcal{E}'[a'_0], b = \mathcal{E}'[b_0]$ for an $\mathcal{E} \in \textrm{EC}_<[\vdash'_v]$ and terms $a'_0, b_0$ with $a'_0 \longrightarrow' b_0$ and $a'_0 = q_r[\sigma'], b_0 = t_r[\sigma']$ for some equation $r$.
+\item From $a \longrightarrow' b$: $a = \mathcal{E}'[a'_0], b = \mathcal{E}'[b_0]$ for an $\mathcal{E} \in \mathbf{EC}[\vdash'_v]$ and terms $a'_0, b_0$ with $a'_0 \longrightarrow' b_0$ and $a'_0 = q_r[\sigma'], b_0 = t_r[\sigma']$ for some equation $r$.
 
 \item From $a \longrightarrow^{aux} c$: $a = \mathcal{E}^{aux}[a^{aux}_0], c = \mathcal{E}^{aux}[c^0]$ for some term with hole $\mathcal{E}^{aux}$ and terms $a^{aux}_0, c^0$ with $a^{aux}_0 \longrightarrow^{aux} c^0$ and $a^{aux}_0 = q_\epsilon[\sigma^{aux}], c^0 = t_\epsilon[\sigma^{aux}]$.
 \end{itemize}
@@ -103,9 +103,9 @@ We compare $\mathcal{E}'$ and $\mathcal{E}^{aux}$ and distinguish four cases.
 
 \item The hole of $\mathcal{E}'$ properly contains that of $\mathcal{E}^{aux}$, i.e., there is a context $\mathcal{E}^{aux}_0 \neq []$ such that $\mathcal{E}^{aux} = \mathcal{E}'[\mathcal{E}^{aux}_0]$. It follows that $\mathcal{E}^{aux}_0[a^{aux}_0] = a'_0$. By \autoref{lem:app1} we have a $d_0$ with $\mathcal{E}^{aux}_0[c_0] \longrightarrow' d_0$ and $b_0 {\longrightarrow^{aux}}^* d_0$. That second reduction means that there are terms $t_1, ..., t_n$ with $b_0 \longrightarrow^{aux} t_1 \longrightarrow^{aux} ... \longrightarrow^{aux} t_n \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}'[d_0]$; the property holds since $b = \mathcal{E}'[b_0] \longrightarrow^{aux} \mathcal{E}'[t_1] \longrightarrow^{aux} ... \longrightarrow^{aux} \mathcal{E}'[t_n] \longrightarrow^{aux} \mathcal{E}'[d_0] = d$ and $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0][c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0[c^0]] \longrightarrow' \mathcal{E}'[d_0] = d$.
 
-\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{E}'_0 \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{E}'_0]$. It follows that $\mathcal{E}^{aux} \in \textrm{EC}_<[\vdash'_v]$. TODO: why? Further, it follows that $\mathcal{E}'_0[a'_0] = a^{aux}_0$. By \autoref{lem:app2} we have a $d_0$ with $c_0 \longrightarrow' d_0$ and $\mathcal{E}'_0[b_0] \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}^{aux}[d_0]$; the property holds since $b = \mathcal{E}'[b_0] = \mathcal{E}^{aux}[\mathcal{E}'_0][b_0] = \mathcal{E}^{aux}[\mathcal{E}'_0[b_0]] \longrightarrow^{aux} \mathcal{E}^{aux}[d_0] = d$ and $c = \mathcal{E}^{aux}[c_0] \longrightarrow' \mathcal{E}^{aux}[d_0] = d$.
+\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{E}'_0 \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{E}'_0]$. It follows that $\mathcal{E}^{aux} \in \textrm{EC}[\vdash'_v]$. TODO: why? Further, it follows that $\mathcal{E}'_0[a'_0] = a^{aux}_0$. By \autoref{lem:app2} we have a $d_0$ with $c_0 \longrightarrow' d_0$ and $\mathcal{E}'_0[b_0] \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}^{aux}[d_0]$; the property holds since $b = \mathcal{E}'[b_0] = \mathcal{E}^{aux}[\mathcal{E}'_0][b_0] = \mathcal{E}^{aux}[\mathcal{E}'_0[b_0]] \longrightarrow^{aux} \mathcal{E}^{aux}[d_0] = d$ and $c = \mathcal{E}^{aux}[c_0] \longrightarrow' \mathcal{E}^{aux}[d_0] = d$.
 
-\item Neither the hole of $\mathcal{E}'$ contains that of $\mathcal{E}^{aux}$, nor the other way around. Then we have a two-hole context $\mathcal{E}^{merge}$ such that $\mathcal{E}^{merge}[[], a^{aux}_0] = \mathcal{E}'$ and $\mathcal{E}^{merge}[a'_0, []] = \mathcal{E}^{aux}$. Choose $d$ as $\mathcal{E}^{merge}[b_0, c_0]$. The property holds because $b = \mathcal{E}'[b_0] = \mathcal{E}^{merge}[[], a^{aux}_0][b_0] = \mathcal{E}^{merge}[b_0, a^{aux}_0] = \mathcal{E}^{merge}[b_0, []][a^{aux}_0] \longrightarrow^{aux} \mathcal{E}^{merge}[b_0, []][c_0] = \mathcal{E}^{merge}[b_0, c_0] = d$ and $c = \mathcal{E}^{aux}[c_0] = \mathcal{E}^{merge}[a'_0, []][c_0] = \mathcal{E}^{merge}[a'_0, c_0] = \mathcal{E}^{merge}[[], c_0][a'_0] \longrightarrow' \mathcal{E}^{merge}[[], c_0][b_0] = d$. This second reduction is possible because, by \autoref{lem:gec1}, $\mathcal{E}^{merge}[[], c_0] \in \textrm{EC}[\vdash'_v]$ since $\mathcal{E}' = \mathcal{E}^{merge}[[], a^{aux}_0] \in \textrm{EC}[\vdash'_v]$ and $\langle a^{aux}_0 \rangle^{aux^{-1}} = \langle c_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a^{aux}_0$ iff $\vdash'_v c_0$.
+\item Neither the hole of $\mathcal{E}'$ contains that of $\mathcal{E}^{aux}$, nor the other way around. Then we have a two-hole context $\mathcal{E}^{merge}$ such that $\mathcal{E}^{merge}[[], a^{aux}_0] = \mathcal{E}'$ and $\mathcal{E}^{merge}[a'_0, []] = \mathcal{E}^{aux}$. Choose $d$ as $\mathcal{E}^{merge}[b_0, c_0]$. The property holds because $b = \mathcal{E}'[b_0] = \mathcal{E}^{merge}[[], a^{aux}_0][b_0] = \mathcal{E}^{merge}[b_0, a^{aux}_0] = \mathcal{E}^{merge}[b_0, []][a^{aux}_0] \longrightarrow^{aux} \mathcal{E}^{merge}[b_0, []][c_0] = \mathcal{E}^{merge}[b_0, c_0] = d$ and $c = \mathcal{E}^{aux}[c_0] = \mathcal{E}^{merge}[a'_0, []][c_0] = \mathcal{E}^{merge}[a'_0, c_0] = \mathcal{E}^{merge}[[], c_0][a'_0] \longrightarrow' \mathcal{E}^{merge}[[], c_0][b_0] = d$. This second reduction is possible because it is $\mathcal{E}^{merge}[[], c_0] \in \mathbf{EC}[\vdash'_v]$, since $\mathcal{E}' = \mathcal{E}^{merge}[[], a^{aux}_0] \in \mathbf{EC}[\vdash'_v]$ and $\langle a^{aux}_0 \rangle^{aux^{-1}} = \langle c_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a^{aux}_0$ iff $\vdash'_v c_0$.
 \end{itemize}
 
 \end{proof}
@@ -131,7 +131,8 @@ By induction on the structure of $t$. We distinguish two cases.
 t = q_\epsilon[\sigma] \longrightarrow t_\epsilon[\sigma], t = q_\epsilon[\sigma] \longrightarrow^{aux} t_\epsilon[\sigma].
 \]
 
-\item There are immediate subterms of $t$ which aren't values under judgement $\vdash_v$. Obtain a generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ by replacing all immediate subterms $t_i$ of $t$ with placeholders $p_i$, with $p_1, ..., p_n$ ordered according to the order $<$ of $\textrm{EC}_<$. Let $k$ be the smallest index for which $\not\vdash_v t_k$. We define $\mathcal{E} \in \textrm{EC}_<[\vdash_v]$ as the instance of $\mathcal{GE}$ which assigns, for all $i \neq k$, $t_i$ to placeholder $p_i$, and the hole $[]$ to placeholder $p_k$. By the induction hypothesis, we have a term $t'_k$ and reductions
+\item There are immediate subterms of $t$ which aren't values under judgement $\vdash_v$.
+Let $t_1, ..., t_n$ be the immediate subterms of $t$, and let $k$ be the smallest index for which $\not\vdash_v t_k$. Define $\mathcal{E} \in \mathbf{EC}$ by taking $t$ and replacing $t_k$ by a hole. By the induction hypothesis, we have a term $t'_k$ and reductions
 \[
 t_k \longrightarrow t'_k, t_k \longrightarrow^{aux} t'_k.
 \]
@@ -148,13 +149,13 @@ t = \mathcal{E}[t_k] \longrightarrow \mathcal{E}[t'_k] = t', t = \mathcal{E}[t_k
 \compl*
 \begin{proof}
 
-There is an evaluation context $\mathcal{E} \in \textrm{EC}_<[\vdash'_v]$, with $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}_<[\vdash_v]$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Consider the generic evaluation context $\mathcal{GE} \in \textrm{EC}_<$ that $\mathcal{E}$ is an instance of, and the order $<$ on its placeholders. Construct an evaluation context $\mathcal{E}' \in \textrm{EC}_<[\vdash_v]$ from $\mathcal{E}$ by replacing the smallest placeholder of $\mathcal{GE}$, that $\mathcal{E}$ replaced with a term $t$ with $\not\vdash_v t$, by the hole $[]$. By \autoref{lem:app3}, we have a term $t_{aux}$ and reductions
+There is an evaluation context $\mathcal{E} \in \textrm{EC}[\vdash'_v]$, with $\mathcal{E} \not\in \textrm{EC}$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Construct an $\mathcal{E}' \in \mathbf{EC}$ from $\mathcal{E}$ by replacing $t$ with $[]$ and the original hole with $a^0$. By \autoref{lem:app3}, we have a term $t_{aux}$ and reductions
 \[
 t \longrightarrow t_{aux}, t \longrightarrow^{aux} t_{aux},
 \]
 and consequently there is a $c = \mathcal{E}'[t_{aux}]$ with
 \[
-\mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], \mathcal{E}'[t] \longrightarrow^{aux} \mathcal{E}'[t_{aux}].
+a = \mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], a = \mathcal{E}'[t] \longrightarrow^{aux} \mathcal{E}'[t_{aux}].
 \]
 
 \end{proof}
