@@ -327,42 +327,71 @@ By combining \autoref{lem:sbruld} and \autoref{lem:iso}.
 
 \subsection{Core refunctionalization}
 
-Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of Rendel et al. for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. 
+Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of Rendel et al. for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. Unfortunately, and unlike defunctionalization, this algorithm requires some kind of preprocessing, since the actual refunctionalization requires all constructors to be the first pattern of an lhs. We first describe this asymmetry in more detail and illustrate the underlying problem, then consider a possible workaround for our situation, and finally give the actual refunctionalization and, as with defunctionalization, consider important properties of it.
 
-\textbf{Preprocessing } Before we give the actual algorithm, as stated above, one more preprocessing is necessary. We first explain the reason for it. The actual algorithm given below has a domain slightly different from that given in the introduction. The difference is that it doesn't suffice that at most one constructor appears in lhss, this constructor also needs to be at the correct place, that is, at the leftmost position. In symbols, the lhss need to have one of the two forms $fun(\overline{x}).des(\overline{y})$ and $fun(con(\overline{x}), \overline{y})$, it doesn't suffice to be of the form $fun(\overline{x}, con(\overline{y}), \overline{z})$. The fragment $\mathbf{U}_cc[fdef_{un,r'}]$ of Uroboro that is the domain for the actual \textsf{CoreRefunc} is induced by the following syntax for function definitions:
+\subsubsection{An asymmetry: The problem at hand}
+
+In the introduction to this chapter, we gave two fragments of Uroboro induced by unnested function definition fragments, as the domain of defunctionalization and refunctionalization, respectively. The first fragment, for defunctionalization, has the following syntax for function definitions.
+
+\begin{align*}
+fdef_{un,d} &::= eqn_{nr}^* ~ | ~ eqn_r^* \\
+eqn_r &::= fun(x^*).des(y^*) = t \\
+eqn_{nr} &::= fun(p^*) = t \\
+\end{align*}
+
+It is unnested regarding destructors, and allows arbitrary patterns when no destructors are present. The second fragment, for refunctionalization, is somewhat analogous to the first, in that it is unnested regarding constructors, and allows arbitrarily many destructors when no constructors are present.
+
 \begin{align*}
 fdef_{un,r} &::= eqn_{nr}^* ~ | ~ eqn_r^* \\
 eqn_r &::= fun(x^*).des(y^*)^* = t \\
-eqn_{nr} &::= fun(con(x^*), z^*) = t \\
+eqn_{nr} &::= fun(x^*, con(y^*), z^*) = t \\
 \end{align*}
-Now, we briefly outline the preprocessing. To get from the original input fragment for refunctionalization, $\mathbf{U}_{cc}[fdef_{un,r}]$, to $\mathbf{U}_{cc}[fdef_{un,r'}]$, simply
-\begin{itemize}
-\item reorder the arguments in the signature and in the lhss of the function definitions which don't have the desired form yet, bringing the constructors in front, and
-\item change calls to the function accordingly.
-\end{itemize}
-As an example, consider the program fragment below.
-\begin{lstlisting}
 
-function f(T, T) where
-  f(x, c1()) = t1
-  f(x, c2()) = t2
+However, there is an asymmetry between the two fragments. When only one destructor is allowed, this can also only be placed at one position. On the other hand, allowing only one constructor leaves open the possibility of placing this at different positions. More on this later.
 
-function g() where
-  g() = f(c1(), c2())
+The refunctionalization algorithm given below requires the constructor to be at the first position, i.e., it has as its domain the fragment $\mathbf{U}_cc[fdef_{un,r'}]$ of Uroboro defined as follows.
 
-\end{lstlisting}
-By the preprocessing, the arguments of \texttt{f} are reordered such that the constructors are in front, resulting in the program fragment below.
-\begin{lstlisting}
+\begin{definition}[Unnested Fragment for the actual \textsf{CoreRefunc}]
+The fragment $\mathbf{U}_cc[fdef_{un,r'}]$, for the actual \textsf{CoreRefunc}, is induced by the function definition fragment $fdef_{un,r'}$, defined below using EBNF rules.
+\begin{align*}
+fdef_{un,r'} &::= eqn_{nr'}^* ~ | ~ eqn_r^* \\
+eqn_r &::= fun(x^*).des(y^*)^* = t \\
+eqn_{nr'} &::= fun(con(x^*), y^*) = t \\
+\end{align*}
+\end{definition}
 
-function f(T, T) where
-  f(c1(), x) = t1
-  f(c2(), x) = t2
+The two fragments $\mathbf{U}_cc[fdef_{un,d}]$ and $\mathbf{U}_cc[fdef_{un,r'}]$ are the Data and Codata fragment from Rendel et al., extended to allow arbitrary lhss, as long as they are already defunctionalized or refunctionalized, i.e., they contain no destructors or no constructors, respectively. This allows us to extend their de- and refunctionalization transformations for the Codata and Data Fragments, to our core de- and refunctionalization for$\mathbf{U}_cc[fdef_{un,r'}]$ and $\mathbf{U}_cc[fdef_{un,d}]$, respectively. The Data and Codata Fragment are symmetric to each other, as de- and refunctionalization can switch between them; as Rendel et al. describe it, for these fragments, de- and refunctionalization is the same transformation, namely a matrix transposition for a two-dimensional matrix representation of programs.
 
-function g() where
-  g() = f(c2(), c1())
+All this would be good and well, were it not for the fact that unnesting to prepare for refunctionalization doesn't arrive at $\mathbf{U}_cc[fdef_{un,r'}]$. A somewhat ad-hoc workaround is presented in the section following the next. More importantly, however, this situation shines a light on the asymmetry between destructors and constructors -- in Uroboro and elsewhere, as this difference is not one exclusive to Uroboro. This underlying problem is illustrated in the next section.
 
-\end{lstlisting}
-It is clear that this preprocessing doesn't affect the semantics of the program in a disruptive way, i.e., reductions might be carried out in a different order.
+\subsubsection{An asymmetry: The general problem}
+
+The general problem is that destructors allow one to ``observe'' the result in only one way at a time, i.e., the next destructor in the stack already observes the result of the previous, while constructors allow one to observe input in different ways. As an example, consider the function $fun$ with two arguments $x, y$.
+\[
+fun(x, y) = ?
+\]
+In order to refine the definition of $fun$, one might choose to observe its output by destructing it. Suppose there are two destructors that fit the type of $fun$, a coverage complete definition thus would be:
+\begin{align*}
+& fun(x, y).des1 = x \\
+& fun(x, y).des2 = y
+\end{align*}
+Instead of stopping here, this might be refined further, but, when starting refinement with output observation, the refinement will always invariantly start with this step as long as coverage completeness is desired. On the other hand, one might choose to observe the input of $fun$ by replacing a variable with the constructor calls that fit its type.
+\begin{align*}
+& fun(con1(), y) = con1() \\
+& fun(con2(), y) = y
+\end{align*}
+Here $x$ was chosen to be observed. But, unlike with outputs, this isn't the only way to start the refinement, since we could have instead chosen to observe $y$.
+\begin{align*}
+& fun(x, con()) = con() \\
+\end{align*}
+
+The problem is directly related to the difference between natural deduction and arbitrary sequent calculus. In natural deduction, the left-hand side sequence consists of many elements, while the right-hand side sequence consists of only one element. Similarly, the many sets of constructors for each type of the variables allow many ``dimensions'' of the input to be observed, while the set of destructors for the codata type of a function only allows one ``dimension'' of the output to be observed.
+
+\subsubsection{A workaround}
+
+...
+
+\subsubsection{The actual algorithm}
 
 Now, we turn to the actual algorithm, with domain $\mathbf{U}_{cc}[fdef_{un,r'}]$.
 
