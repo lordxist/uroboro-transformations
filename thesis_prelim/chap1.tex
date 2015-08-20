@@ -221,6 +221,18 @@ For this simple example, it is no problem that we need to introduce the codata t
 \section{Summary of content}
 \label{sec:soc}
 
+In this section, we sum up the remaining contents of this work.
+
+In the second chapter, we define the language Uroboro. We give its syntax \autoref{sec:urosyn}, static semantics \autoref{sec:urostatsem}, and finally its dynamic semantics in a small-step operational way \autoref{sec:urosos}. We also show how the reduction relation of the full Uroboro extends that of the Data and Codata Fragment.
+
+In the third chapter, we introduce the notion of \textit{extractions}. Extractions are basic automatic program transformations that decrease the syntactic complexity of the program while preserving its reduction semantics in some way. Syntactic complexity is decreased in the left-hand sides of some of the program's equations, such that the new lhs is the result of what we call a extraction projection applied to the old lhs. An extraction projection is a function which is the inverse of either a substitution or its dual, a co-substitution. The reduction semantics are preserved in a weak bisimulation; this is achieved by introducing an auxiliary function. The precise definition of extractions is given in \autoref{sec:extrdef}. The proof of bisimulation follows in \autoref{sec:extrbis}. Under which circumstances an important property, the absence of overlaps, holds in programs that are the result of extraction, is stated and proven in \autoref{sec:extrovl}. Example extractions are given in \autoref{sec:extrex}.
+
+In the fourth chapter, we give an automatic defunctionalization and refunctionalization for the full Uroboro. Both are made up of two phases. First, the program needs to be simplified. We describe this process, called unnesting, in \autoref{sec:unn}. After this, core defunctionalization and core refunctionalization follow, described in \autoref{sec:coredr}.
+
+The fifth chapter considers related and future work.
+
+The sixth and final chapter concludes.
+
 \section{Preliminaries}
 \label{sec:prel}
 
