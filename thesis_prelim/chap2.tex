@@ -1,38 +1,175 @@
 \chapter{The language Uroboro}
 
-...
+In this chapter we formally define the language Uroboro. It is a more or less straightforward generalization of Rendel et al.s Data and Codata Fragments; we therefore orient ourselves on their presentation. We will also sometimes orient ourselves on Abel et al., which also define a language with copatterns, albeit including first-class functions unlike Uroboro. We first define the syntax of Uroboro (\autoref{sec:urosyn}), then its typing (\autoref{sec:urostatsem}), and finally its dynamic semantics (\autoref{sec:urosos}), which we present as small-step operational semantics.
+
+In the introduction, we have already shown example programs from the Data and Codata Fragments. Before we start with the definitions, we give an example Uroboro program that is neither in the Data nor in the Codata Fragments, i.e., it contains both data and codata types.
+
+\begin{lstlisting}
+
+
+
+\end{lstlisting}
 
 \section{Syntax}
 \label{sec:urosyn}
 
-Domains:\\
-$\sigma, \tau = $ type names\\
-$con = $ constructor names\\
-$des = $ destructor names\\
-$fun = $ function names\\
-$x, y = $ variable names\\
-\\
-EBNF rules:\\
-Programs:\\
-$prg ::= (ddef ~ | ~ coddef ~ | ~  fdef)^*$\\
-\\
-Data definitions:\\
-$ddef ::= \textbf{data } \sigma \textbf{ where } csig^*$\\
-Codata definitions:\\
-$coddef ::= \textbf{codata } \sigma \textbf{ where } dsig^*$\\
-$csig ::= con(\tau^*): \tau$\\
-$dsig ::= \sigma.des(\tau^*): \tau$\\
-Function definitions:\\
-$fdef ::= \textbf{function } fun(\tau^*): \tau \textbf{ where } eqn^*$\\
-$eqn ::= q = t$\\
-$s, t ::= x ~ | ~ fun(t^*) ~ | ~ con(t^*) ~ | ~ s.des(t^*)$\\
-$q ::= fun(p^*) ~ | ~ q.des(p^*)$\\
-$p ::= x ~ | ~ con(p^*) $\\
+We assume the following domains of symbols.
+
+\begin{align*}
+&\sigma, \tau = &\textrm{type names}\\
+&con = &\textrm{constructor names}\\
+&des = &\textrm{destructor names}\\
+&fun = &\textrm{function names}\\
+&x, y = &\textrm{variable names}\\
+\end{align*}
+
+The \textit{terms} of Uroboro are variables, and constructor calls, destructor calls, and function calls to lists of terms.
+
+\[
+s, t ::= x ~ | ~ fun(t^*) ~ | ~ con(t^*) ~ | ~ s.des(t^*)
+\]
+
+The destructor call syntax is syntactical sugar for $des(s, t^*)$, meant to easier distinguish between the destructed (or observed) term and the other arguments of the destructor. A subset of terms is the set of copatterns, which we denote $\mathbf{Cop}$; a copattern is either a function call applied to patterns, or a destructor destructing another copattern and otherwise applied to patterns.
+
+\begin{align*}
+&q ::= fun(p^*) ~ | ~ q.des(p^*) \\
+&p ::= x ~ | ~ con(p^*)
+\end{align*}
+
+\textit{Programs} are defined to be sets of \textit{definitions}. A definition can either be a data type definition, a codata type definition, or a function definition.
+
+\[
+prg ::= (ddef ~ | ~ coddef ~ | ~  fdef)^*
+\]
+
+\textit{Data (type) definitions} consist of the name of the data type together with a set of constructor signatures.
+
+\begin{align*}
+&ddef &::= \textbf{data } \sigma \textbf{ where } csig^* &\\
+&csig &::= con(\tau^*): \tau &\\
+\end{align*}
+
+\textit{Codata (type) definitions} consist of the name of the codata type together with a set of destructor signatures.
+
+\begin{align*}
+&coddef &::= \textbf{codata } \sigma \textbf{ where } dsig^*\\
+&dsig &::= \sigma.des(\tau^*): \tau\\
+\end{align*}
+
+\textit{Function definitions} consist of the signature of the function together with a set of \textit{equations}. Equations have a left-hand side, which is a copattern, and a right-hand side, which is some term.
+
+\begin{align*}
+&fdef &::= \textbf{function } fun(\tau^*): \tau \textbf{ where } eqn^*\\
+&eqn &::= q = t
+\end{align*}
 
 \section{Static semantics}
 \label{sec:urostatsem}
 
-...
+As is the case with the copattern language of Abel et al., there are two kinds of types in Uroboro. \textit{Positive types}, which are those defined by data type definitions, and \textit{negative types}, which are those defined by codata type definitions. Like Rendel et al. do for their fragments, we give a type judgement for terms, and one to judge whether equations are well-typed.  Like them, we let $\Sigma$ be the signatures of a program, that is, its function signatures, codata signatures, and data signatures, as defined above, and we let $\Gamma$ be a typing context, i.e., a set of type assignments to variables, and write
+\begin{itemize}
+\item $\Gamma \vdash_{\Sigma} t : \tau$ to mean that term $t$ is well-typed with type $\tau$ under typing context $\Gamma$ and signature $\Sigma$, and
+
+\item $\Sigma \vdash eqn \textrm{ ok}$ to mean that equation $eqn$ is well-typed under signature $\Sigma$.
+\end{itemize}
+We give the following rules for the type judgement for terms, which extend those of the Data and Codata Fragments. In fact, we simply combine the rules of the Data and Codata Fragments.
+
+\begin{prooftree}
+\AxiomC{$``x : \tau" \in \Gamma$}
+\RightLabel{Var}
+\UnaryInfC{$\Gamma \vdash_{\Sigma} x : \tau$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$``fun(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+\AxiomC{$\Gamma \vdash_{\Sigma} t_1 : \tau_1$}
+\AxiomC{...}
+\AxiomC{$\Gamma \vdash_{\Sigma} t_n : \tau_n$}
+\RightLabel{Fun}
+\QuaternaryInfC{$\Gamma \vdash_{\Sigma} fun(t_1, ..., t_n): \tau$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$``con(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+\AxiomC{$\Gamma \vdash_{\Sigma} t_1 : \tau_1$}
+\AxiomC{...}
+\AxiomC{$\Gamma \vdash_{\Sigma} t_n : \tau_n$}
+\RightLabel{Con}
+\QuaternaryInfC{$\Gamma \vdash_{\Sigma} con(t_1, ..., t_n): \tau$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$``\sigma.des(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+\AxiomC{$\Gamma \vdash_{\Sigma} s : \sigma$}
+\AxiomC{$\Gamma \vdash_{\Sigma} t_1 : \tau_1$}
+\AxiomC{...}
+\AxiomC{$\Gamma \vdash_{\Sigma} t_n : \tau_n$}
+\RightLabel{Des}
+\QuinaryInfC{$\Gamma \vdash_{\Sigma} s.des(t_1, ..., t_n): \tau$}
+\end{prooftree}
+
+We give the following rules for the well-typedness judgement for equations, which generalize the rules for the Data and Codata Fragment. We write $V(q)$ to denote the variables occuring in $q$.
+
+\begin{prooftree}
+\AxiomC{$q = q'.des(p_1, ..., p_n)$}
+\noLine
+\UnaryInfC{$``\sigma.des(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+\AxiomC{$(q \vdash_{\Sigma} x : \sigma_x)_{x \in V(q)}$}
+\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q) \} \vdash_{\Sigma} t : \tau$}
+\RightLabel{Des}
+\TrinaryInfC{$\Sigma \vdash q = t \textrm{ ok}$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$q = fun(p_1, ..., p_n)$}
+\noLine
+\UnaryInfC{$``fun(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+\AxiomC{$(q \vdash_{\Sigma} x : \sigma_x)_{x \in V(q)}$}
+\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q) \} \vdash_{\Sigma} t : \tau$}
+\RightLabel{Fun}
+\TrinaryInfC{$\Sigma \vdash q = t \textrm{ ok}$}
+\end{prooftree}
+
+Here, $q \vdash_{\Sigma} x : \sigma$, for $x \in V(q)$, is an auxiliary judgement which means that, within copattern $q$, the variable has type $\sigma$ under signature $\Sigma$. To put it another way, it is a type inference for variables. This judgement, in turn, uses an analogous judgement for patterns. The rules for both judgements are given below.
+
+\begin{center}
+\AxiomC{$x = p_i$}
+\AxiomC{$``con(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+\RightLabel{Con\textsubscript{Var}}
+\BinaryInfC{$con(p_1, ..., p_n) \vdash_{\Sigma} x : \tau_i$}
+\DisplayProof
+\AxiomC{$x \in V(p_i), x \neq p_i$}
+\AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
+\RightLabel{Con\textsubscript{Con}}
+\BinaryInfC{$con(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
+\DisplayProof
+\end{center}
+
+\begin{prooftree}
+\AxiomC{$x \in V(p_i)$}
+\AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
+\RightLabel{Fun}
+\BinaryInfC{$fun(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
+\end{prooftree}
+
+\begin{center}
+\AxiomC{$x \in V(p_i)$}
+\AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
+\RightLabel{Des\textsubscript{P}}
+\BinaryInfC{$q.des(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
+\DisplayProof
+\AxiomC{$x \in V(q)$}
+\AxiomC{$q \vdash_{\Sigma} x : \sigma$}
+\RightLabel{Des\textsubscript{Q}}
+\BinaryInfC{$q.des(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
+\DisplayProof
+\end{center}
+
+
+
+
+
+We say that a program with signatures $\Sigma$ is well-typed when it is $\Sigma \vdash eqn \textrm{ ok}$ for all equations $eqn$ of the program.
 
 \section{Dynamic semantics}
 \label{sec:urosos}
