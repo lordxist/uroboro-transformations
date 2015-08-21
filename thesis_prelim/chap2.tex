@@ -1,6 +1,6 @@
 \chapter{The language Uroboro}
 
-In this chapter we formally define the language Uroboro. It is a more or less straightforward generalization of Rendel et al.s Data and Codata Fragments; we therefore orient ourselves on their presentation. We will also sometimes orient ourselves on Abel et al., which also define a language with copatterns, albeit including first-class functions unlike Uroboro. We first define the syntax of Uroboro (\autoref{sec:urosyn}), then its typing (\autoref{sec:urostatsem}), and finally its dynamic semantics (\autoref{sec:urosos}), which we present as small-step operational semantics.
+In this chapter we formally define the language Uroboro. It is a more or less straightforward generalization of the Data and Codata Fragments of Rendel et al.\cite{rendel15}; we therefore orient ourselves on their presentation. We will also sometimes orient ourselves on Abel et al.\cite{abel13copatterns}, which also define a language with copatterns, albeit including first-class functions unlike Uroboro. We first define the syntax of Uroboro (\autoref{sec:urosyn}), then its typing (\autoref{sec:urostatsem}), and finally its dynamic semantics (\autoref{sec:urosos}), which we present as small-step operational semantics.
 
 In the introduction, we have already shown example programs from the Data and Codata Fragments. Before we start with the definitions, we give an example Uroboro program that is neither in the Data nor in the Codata Fragments, i.e., it contains both data and codata types.
 
@@ -66,7 +66,7 @@ prg ::= (ddef ~ | ~ coddef ~ | ~  fdef)^*
 \section{Static semantics}
 \label{sec:urostatsem}
 
-As is the case with the copattern language of Abel et al., there are two kinds of types in Uroboro. \textit{Positive types}, which are those defined by data type definitions, and \textit{negative types}, which are those defined by codata type definitions. Like Rendel et al. do for their fragments, we give a type judgement for terms, and one to judge whether equations are well-typed.  Like them, we let $\Sigma$ be the signatures of a program, that is, its function signatures, codata signatures, and data signatures, as defined above, and we let $\Gamma$ be a typing context, i.e., a set of type assignments to variables, and write
+As is the case with the copattern language of Abel et al.\cite{abel13copatterns}, there are two kinds of types in Uroboro. \textit{Positive types}, which are those defined by data type definitions, and \textit{negative types}, which are those defined by codata type definitions. Like Rendel et al. do for their fragments, we give a type judgement for terms, and one to judge whether equations are well-typed.  Like them, we let $\Sigma$ be the signatures of a program, that is, its function signatures, codata signatures, and data signatures, as defined above, and we let $\Gamma$ be a typing context, i.e., a set of type assignments to variables, and write
 \begin{itemize}
 \item $\Gamma \vdash_{\Sigma} t : \tau$ to mean that term $t$ is well-typed with type $\tau$ under typing context $\Gamma$ and signature $\Sigma$, and
 
@@ -165,20 +165,17 @@ Here, $q \vdash_{\Sigma} x : \sigma$, for $x \in V(q)$, is an auxiliary judgemen
 \DisplayProof
 \end{center}
 
-
-
-
-
 We say that a program with signatures $\Sigma$ is well-typed when it is $\Sigma \vdash eqn \textrm{ ok}$ for all equations $eqn$ of the program.
 
 \section{Dynamic semantics}
 \label{sec:urosos}
 
+In this section, we formally define the semantics of Uroboro. We present them as small-step operational semantics. Before defining the reduction relation, a few other definitions are in order. In Uroboro, a reduction is a term rewriting that uses one of the equations of the program. Therefore, we need to define what it means for a term to match an lhs, that is, a copattern; we do so in \autoref{ssec:copm}. For languages with codata, there is a special notion of value; we define what values are in Uroboro in \autoref{ssec:val}. Then we define the reduction relation (\autoref{ssec:red}). For some programs, terms can be stuck, that is, they are neither reducible nor considered a value. Such cases are excluded by copattern coverage, for which we give a judgement in \autoref{ssec:cc}. Finally, we consider how the semantics relate to the semantics of the Data and Codata Fragments (\autoref{ssec:codfragext}).
+
 \subsection{Copattern matching}
+\label{ssec:copm}
 
-orients itself on and borrows notations from paper ``Copatterns" (Abel et al.), section 4
-
-$t =^? p \searrow \sigma$ means that term t matches with pattern $p$ under substitution $\sigma$.
+Here, we define what it means for a term to match a copattern. In short, a term $t$ matches a copattern $q$ when there is a substitution $\sigma$ such that $t = q[\sigma]$. We give a judgement for this, which orients itself on and borrows notations from Abel et al.\cite{abel13copatterns}, section 4. In order to do so, we also give an analogous judgement for patterns. In terms of the judgement for patterns, $t =^? p \searrow \sigma$ means that term t matches with pattern $p$ under substitution $\sigma$ (i.e. it is equivalent to $t = p[\sigma]$). The meaning of $t =^? q \searrow \sigma$, for copatterns $q$, is defined analogously. The rules for the pattern matching judgement are as follows.
 
 \begin{prooftree}
 \AxiomC{}
@@ -192,7 +189,7 @@ $t =^? p \searrow \sigma$ means that term t matches with pattern $p$ under subst
 \UnaryInfC{$con(t_1, ..., t_n) =^? con(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
 \end{prooftree}
 
-$t =^? q \searrow \sigma$ means that term $t$ matches copattern $q$ returning substitution $\sigma$.
+Using this judgement for patterns, we define the rules for the copattern matching judgement.
 
 \begin{prooftree}
 \AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
@@ -208,14 +205,13 @@ $t =^? q \searrow \sigma$ means that term $t$ matches copattern $q$ returning su
 \end{prooftree}
 
 \subsection{Values}
+\label{ssec:val}
 
-This section formalizes the notion of value for Uroboro. As is the case with the language of Abel et al., whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed.
+This section formalizes the notion of value for Uroboro. As is the case with the language of Abel et al.\cite{abel13copatterns}, whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed.
 
-$\vdash_v t$ means that the closed term $t$ is a value. This notation is borrowed from `Copatterns" (Abel et al.), section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
+$\vdash_v t$ means that the closed term $t$ is a value. This notation is borrowed from Abel et al.\cite{abel13copatterns}, section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
 
-%%-- under construction
-
-The value judgement makes use of a ``no-match" judgement. This judgement is complementary to the pattern matching judgement of the previous section.
+The value judgement makes use of a ``no-match'' judgement. We write $t \neq^? q$ to mean that $t$ doesn't match $q$, i.e., it is $t \neq q[\sigma]$ for all substitutions $\sigma$. This judgement is complementary to the copattern matching judgement of the previous section. In order to define the rules of the ``no-match'' judgement for copatterns, as with the matching judgement, we give the rules of an analogous ``no-match'' judgement for patterns.
 
 \begin{prooftree}
 \AxiomC{$t_i \neq^? p_i$}
@@ -224,21 +220,21 @@ The value judgement makes use of a ``no-match" judgement. This judgement is comp
 \end{prooftree}
 
 \begin{prooftree}
-\AxiomC{$n \neq m$}
-\RightLabel{NPM\textsubscript{Con/Card}}
-\UnaryInfC{$con(t_1, , ..., t_n) \neq^? con(p_1, ..., p_m)$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$n \neq m$}
-\RightLabel{NPM\textsubscript{App/Mism}}
-\UnaryInfC{$fun(t_1, ..., t_n) \neq^? fun(p_1, ..., p_m)$}
+\AxiomC{$con \neq con'$}
+\RightLabel{NPM\textsubscript{Con/Diff}}
+\UnaryInfC{$con(t_1, , ..., t_n) \neq^? con'(p_1, ..., p_m)$}
 \end{prooftree}
 
 \begin{prooftree}
 \AxiomC{$t_i \neq^? p_i$}
-\RightLabel{NPM\textsubscript{App/Card}}
+\RightLabel{NPM\textsubscript{App/Mism}}
 \UnaryInfC{$fun(t_1, ..., t_i, ..., t_n) \neq^? fun(p_1, ..., p_i, ..., p_n)$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$fun \neq fun'$}
+\RightLabel{NPM\textsubscript{App/Diff}}
+\UnaryInfC{$fun(t_1, ..., t_n) \neq^? fun'(p_1, ..., p_m)$}
 \end{prooftree}
 
 \begin{prooftree}
@@ -254,9 +250,9 @@ The value judgement makes use of a ``no-match" judgement. This judgement is comp
 \end{prooftree}
 
 \begin{prooftree}
-\AxiomC{$n \neq m$}
-\RightLabel{NPM\textsubscript{Des/Card}}
-\UnaryInfC{$t.des(t_1, ..., t_n) \neq^? q.des(p_1, ..., p_m)$}
+\AxiomC{$des \neq des'$}
+\RightLabel{NPM\textsubscript{Des/Diff}}
+\UnaryInfC{$t.des(t_1, ..., t_n) \neq^? q.des'(p_1, ..., p_m)$}
 \end{prooftree}
 
 \begin{prooftree}
@@ -271,7 +267,7 @@ The value judgement makes use of a ``no-match" judgement. This judgement is comp
 \UnaryInfC{$t.des(...) \neq^? fun(...)$}
 \end{prooftree}
 
-%%--
+Finally, using this ``no-match'' judgement, we define the rules of the value judgement. As said above, this judgement also depends upon the type of the term. In short, a term is a value whenever it is a either (a) constructor applied to values, or (b) a function or destructor applied to values such that the return type of the function or destructor is a negative type, i.e., a type defined by a codata type definition.
 
 \begin{prooftree}
 \AxiomC{$fun(t_1, ..., t_n) \neq^? q ~ \forall (q, t) \in \textrm{Rules}(prg)$}
@@ -300,27 +296,8 @@ The value judgement makes use of a ``no-match" judgement. This judgement is comp
 \TrinaryInfC{$\vdash_v con(t_1, ..., t_n)$}
 \end{prooftree}
 
-\subsection{Copattern coverage}
-
-\begin{prooftree}
-\AxiomC{}
-\RightLabel{C\textsubscript{Head}}
-\UnaryInfC{$fun \lhd | (fun(\overline{x}))$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$fun \lhd | ~ Q ~ (q^\tau)$}
-\RightLabel{C\textsubscript{Des}}
-\UnaryInfC{$fun \lhd | ~ Q ~ (q.des(\overline{x^{des}}))_{des \in Dess_\tau}$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$fun \lhd | ~ Q ~ (q(x^\tau))$}
-\RightLabel{C\textsubscript{Con}}
-\UnaryInfC{$fun \lhd | ~ Q ~ (q[x := con(\overline{y^{con}})])_{con \in Cons_\tau}$}
-\end{prooftree}
-
 \subsection{The reduction relation}
+\label{ssec:red}
 
 $\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction depends upon a set of terms $\textrm{Val}$ which are considered to be values. Standardly, $\textrm{Val}$ is assumed to be the set of terms which are judged to be values by $\vdash_v t$. Sometimes, an alternative reduction judgement will be used, which will only differ in the underlying value set $\textrm{Val}$. This alternative reduction will then be defined by giving the alternative $\textrm{Val}$.
 
@@ -333,12 +310,13 @@ We let $\mathbf{EC}$ denote the set of evaluation contexts for the standard valu
 
 Contraction $\mapsto$ of terms using equations is defined as follows.
 
+\begin{center}
 if the immediate subterms of $t$ are values:
-\begin{prooftree}
 \AxiomC{$t =^? q \searrow \sigma$ with $(q, t') \in \textrm{Rules}(prg)$}
 \RightLabel{Subst}
 \UnaryInfC{$t \mapsto t'[\sigma]$}
-\end{prooftree}
+\DisplayProof
+\end{center}
 
 Finally, we define the actual reduction relation by a congruence rule.
 \begin{prooftree}
@@ -375,23 +353,54 @@ For any two contexts $\mathcal{C}, \mathcal{C}_0$ and any evaluation context $\m
 \]
 \end{fact}
 
-\subsection{As an extension of (Co)Data Fragment semantics}
+\subsection{Copattern coverage}
 
-The properties of the reductions and the de- and refunctionalization transformations of the paper of Rendel, Trieflinger, and Ostermann are used for the proofs of the next section. The domain of their defunctionalization is what they call the Codata Fragment, and that of refunctionalization the Data Fragment. Their semantic properties can be used in the proofs because, for well-typed programs and limited to terms which have copattern coverage for all of their subterms in the program (TODO: define this more precisely), this work's reducibility notion is a conservative extension of either the Data Fragment's notion or the Codata Fragment's notion. When the well-typedness and coverage conditions are dropped, the reducibility notion is still a conservative extension of the Data Fragment's notion.
+In general, for programs with \textit{coverage} it is guaranteed that no term is stuck. We adapt the judgement for \textit{copattern coverage} from Abel et al.\cite{abel13copatterns} for Uroboro. $fun \lhd | ~ Q$ means that the set of copatterns $Q$ \textit{covers} the function $fun$. Intuitively, when this set $Q$ is the set of left-hand sides of the function definition for $fun$, this function is fully specified. One can regard the consecutive application of the rules of the coverage judgement as a way of step-wise refining the specification of the function. The rule C\textsubscript{Head} stands for the start point, where the only left-hand side of the function neither has destructor nor constructor calls. The other two rules refine the specification of $fun$ by variable splitting (C\textsubscript{Con}), that is, refining based upon the input, or by result splitting (C\textsubscript{Des}), that is, refining based upon the output (or result). The terminology ``variable splitting'' and ``result splitting'' is also borrowed from Abel et al. and will become relevant in chapter 4.
+
+These rules for the judgement are defined below. We assume a program and write $Dess_\tau$ for the set of destructors for codata type $\tau$, and $Cons_\tau$ for the set of constructors for data type $\tau$. We also write $q^\tau$ and $x^\tau$ to indicate that the type of the copattern $q$ or the variable $x$, respectively, has been inferred to be $\tau$. \autoref{sec:urostatsem} provides a way to infer types for variables, the type of a copattern is found out by looking it up in the respective function or destructor signature.
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{C\textsubscript{Head}}
+\UnaryInfC{$fun \lhd | (fun(\overline{x}))$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$fun \lhd | ~ Q ~ (q^\tau)$}
+\RightLabel{C\textsubscript{Des}}
+\UnaryInfC{$fun \lhd | ~ Q ~ (q.des(\overline{x^{des}}))_{des \in Dess_\tau}$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$fun \lhd | ~ Q ~ (q(x^\tau))$}
+\RightLabel{C\textsubscript{Con}}
+\UnaryInfC{$fun \lhd | ~ Q ~ (q[x := con(\overline{y^{con}})])_{con \in Cons_\tau}$}
+\end{prooftree}
+
+A program has copattern coverage whenever all of its function definitions have coverage, that is, it is $fun \lhd | ~ Q$ for each function $fun$ and its set of left-hand sides $Q$.
+
+In chapter 4, we will rely not only upon copattern coverage, but also on knowing how the coverage was derived by consecutive result and variable splitting. In other words, we need an algorithm for the judgement. Abel et al.\cite{abel13copatterns} hint, for their judgement, at a possible way to adapt other coverage algorithms for copatterns; to our knowledge, there currently is no such algorithm for copattern coverage checking, either by Abel et al. or others. For the time being, an exponential-time algorithm that goes through all derivation trees of a maximum depth will have to suffice. The maximum depth is the maximal number of constructors and destructors, added together, of all lhss of the function definition.
+
+\subsection{As an extension of (Co)Data Fragment semantics}
+\label{ssec:codfragext}
+
+To conclude this chapter, we show how Uroboro's semantics relate to those of either the Data Fragment or of the Codata Fragment. Assuming well-typedness and copattern coverage, Uroboro's notion of reducibility is a conservative extension of either the Data Fragment's notion (\autoref{sssec:df}) or the Codata Fragment's notion (\autoref{sssec:codf}). Note that, when the well-typedness and coverage conditions are dropped, Uroboro's reducibility notion is still a conservative extension of the Data Fragment's notion.
 
 \subsubsection{Data Fragment}
+\label{sssec:df}
 
-The evaluation context $\mathcal{E}$ conservatively extends the context for the Data Fragment (Figure 6b), as explained below. The common congruence rule for both of this and their Codata Fragment is used here, as well. As a result of this and of the pattern matching rules given above, the notion of reduction for Uroboro of this work is a conservative extension of their Data Fragment reduction.
+The evaluation context $\mathcal{E}$ conservatively extends the context for the Data Fragment, as explained below. The common congruence rule for both of this and their Codata Fragment is used here, as well. As a result of this and of the pattern matching rules given above, the notion of reduction for Uroboro of this work is a conservative extension of their Data Fragment reduction.
 
-$\mathcal{E}$ uses a different notion of evaluation context than the usual, in that it is not syntactic. Determining whether something is an evaluation context is nonetheless unproblematic, as one can simply use the value judgement from last section.
+$\mathcal{E}$ uses a different notion of evaluation context than the usual, in that values are not syntactic. Determining whether something is an evaluation context is nonetheless unproblematic, as one can simply use the value judgement from \autoref{ssec:val}.
 
-This work's evaluation context conservatively extends that for the Data Fragment, since the value judgement conservatively extends the syntactic notion of value for the Data Fragment: For this fragment, the Con rule is identical to the syntax rule (Figure 6b)
-\begin{equation*}
+This work's evaluation context conservatively extends that for the Data Fragment, since the value judgement conservatively extends the syntactic notion of value for the Data Fragment: For this fragment, the Con rule is identical to the syntax rule (Figure 6b of Rendel et al.\cite{rendel15})
+\[
 u, v ::= con(v^*),
-\end{equation*}
+\]
 while the V\textsubscript{CodTFun} can never be applied. This is because a function in the Data Fragment can only have data type unless it doesn't have a type defined in the program at all, as types can only be added by data definitions.
 
 \subsubsection{Codata Fragment}
+\label{sssec:codf}
 
 The Codata Fragment's evaluation context notion is conservatively extended by this work's, as well. And here again, this is why the notion of reduction for all of Uroboro conservatively extends that for the Codata Fragment.
 
@@ -399,4 +408,4 @@ As with the Data Fragment, this conservation for evaluation context notions foll
 
 Consider first the ``if" direction. By the rules of the judgement, a function application with argument values is only a value if it has codata type and doesn't match any rule of the program. Assuming well-typedness, the first constraint is always fulfilled in the Codata Fragment, since there, a type can only be added by a codata definition. That the second constraint is always fulfilled because, in the Codata Fragment, there are no left-hand sides of rules which are hole patterns.
 
-Second, consider the ``only if" direction. By the rules of the judgement, a value can also be a destructor application if it has codata type and doesn't match any rule of the program. But this case can be excluded in the Codata Fragment for programs with copattern coverage for all subterms of the input term, since those are the only ones that can be relevant for the value judgement in the one-step reduction.
+Second, consider the ``only if" direction. By the rules of the judgement, a value can also be a destructor application if it has codata type and doesn't match any rule of the program. But this case can be excluded in the Codata Fragment for programs with copattern coverage.
