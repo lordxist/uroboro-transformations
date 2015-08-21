@@ -246,46 +246,37 @@ By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* 
 
 \end{proof}
 
-To show that the $`` \Leftarrow ''$ direction of (2.2) holds, a translation for sequences $s \longrightarrow^*_{\langle prg \rangle} \widetilde{t}$ to sequences $s \longrightarrow^*_{prg} t$ is given (called Back-Translation). The correctness of the translation is verified, i.e., it is proven that each step of the sequences returned by the function is indeed a reduction step of the relevant reduction, and that the desired equality or equivalence between the end points of the original and the translated sequence holds. This correctness proofs are left for the appendix.
+Now, we show the $`` \Leftarrow ''$ direction of (3.2). This follows the following lemma.
 
-\begin{definition}[Back-Translation]
-The Back-Translation is given by a conversion function $uc$ from sequences to sequences. It is defined recursively as follows.
-\[
-  uc((s_0, ..., s_n))=\begin{cases}
-               (), &\text{ if } n = 0 \\
-               uc((s_0, ..., s_{n-1})), &\text{ if } s_{n-1} \neq s_n \land \langle s_{n-1} \rangle^{aux^{-1}} = \langle s_n \rangle^{aux^{-1}} \\
-               uc((s_0, ..., s_{n-1})) \cdot (\langle s_n \rangle^{aux^{-1}}), &\text{ otherwise} \\
-            \end{cases}
-\]
-
-\end{definition}
-
-\begin{restatable}[Correctness of the Back-Translation]{lemma}{correctb}
-The Back-Translation is correct, that is, when
-\[
-s = s_1 {\longrightarrow}_{\langle prg \rangle} ... {\longrightarrow}_{\langle prg \rangle} s_n \text{ with } \langle s_n \rangle^{aux^{-1}} = t
-\]
-then
-\[
-s^{uc}_1 \longrightarrow_{prg} ... \longrightarrow_{prg} s^{uc}_m t
-\]
-for the sequence $(s^{uc}_1, ..., s^{uc}_m) := uc((s_1, ..., s_n))$.
-\end{restatable}
+\begin{lemma}
+\label{lem:hprop2rl}
+When $s \longrightarrow' t$ and $s \not\longrightarrow^{aux} t$, then $\langle s \rangle^{aux^{-1}} \longrightarrow' \langle t \rangle^{aux^{-1}}$.
 \begin{proof}
-Left for the appendix.
+From the derivation of $s \longrightarrow' t$, we know that $s = \mathcal{E}'[s_0], t = \mathcal{E}'[t_0], s_0 \mapsto' t_0$ for terms $s_0, t_0$ and an evaluation context $\mathcal{E}' \in \mathbf{EC}[\vdash'_v]$. Because, by definition, it is $\vdash'_v v$ iff $\vdash'_v \langle v \rangle^{aux^{-1}}$ for all terms $v$, using the definition of evaluation contexts it easily follows that $\langle \mathcal{E}' \rangle^{aux^{-1}} \in \mathbf{EC}[\vdash'_v]$. By induction on the structure of $s_0$ and using the definition of $\mapsto'$, it is easily shown that $\langle s_0 \rangle^{aux^{-1}} \mapsto' \langle t_0 \rangle^{aux^{-1}}$. Consequently, since contexts and $aux^{-1}$ are compatible, we have $\langle s \rangle^{aux{-1}} = \langle \mathcal{E}' \rangle^{aux^{-1}}[\langle s_0 \rangle^{aux^{-1}}] \longrightarrow' \langle \mathcal{E}' \rangle^{aux^{-1}}[\langle t_0 \rangle^{aux^{-1}}] = \langle t \rangle^{aux^{-1}}$.
 \end{proof}
+\end{lemma}
 
-\begin{lemma}[Right-to-left direction of (2.2)]
+\begin{lemma}[Right-to-left direction of (3.2)]
 \label{lem:prop2rl}
 \[
  s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \implies s {\longrightarrow'}_{\langle prg \rangle}^* t
 \]
 
 \begin{proof}
-``$\Rightarrow$'': 
+First, note that this direction is logically equivalent to the statement
+\[
+\forall s, t \in \textrm{Term}_{prg}, \widetilde{t} \in \textrm{Term}_{\langle prg \rangle}. (s \longrightarrow^* \widetilde{t} \land \langle \widetilde{t} \rangle^{aux^{-1}} = t) \implies s {\longrightarrow'}^* t.
+\]
+We prove this statement by induction on the length $n$ of $s \longrightarrow^* \widetilde{t}$.
 
-``$\Leftarrow$'': Assume that there is a sequence of the form on the left-hand side. By the Back-Translation, there also is a sequence $s \longrightarrow_{prg} t$, and by (2.1) the desired sequence $s {\longrightarrow'}_{\langle prg \rangle} t$ obtains.
+If $n = 0$, it is $s = \widetilde{t} \in \textrm{Term}_{prg}$, therefore it must be $\widetilde{t} = t$, and thus it is $s = t$.
 
+Otherwise, consider the final step of the sequence, $s' \longrightarrow \widetilde{t}$. By the induction hypothesis, we have a sequence $s {\longrightarrow'}^* \langle s' \rangle^{aux^{-1}}$. We distinguish two cases for the final step of the original sequence. 
+\begin{itemize}
+\item $s' \not\longrightarrow^{aux} \widetilde{t}$. Because $\longrightarrow \subseteq \longrightarrow'$, we know that $s' \longrightarrow' \widetilde{t}$. By \autoref{lem:hprop2rl} it follows that $\langle s' \rangle^{aux^{-1}} \longrightarrow' \langle \widetilde{t} \rangle^{aux^{-1}}$.
+
+\item $s' \longrightarrow^{aux} \widetilde{t}$. Then it is $\langle s' \rangle^{aux^{-1}} = \langle \widetilde{t} \rangle^{aux^{-1}} = t$.
+\end{itemize}
 \end{proof}
 \end{lemma}
 
