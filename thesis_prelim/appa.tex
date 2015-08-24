@@ -160,5 +160,84 @@ a = \mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], a = \mathcal{E}'[t] \
 
 \end{proof}
 
+\begin{lemma}
+\label{lem:appinv1}
+Let $b,c,d$ be terms and $\mathcal{E}^{aux}$ be an evaluation context for $\longrightarrow^{aux}$. When
+\[
+c \mapsto' \mathcal{E}^{aux}[d] \land b \mapsto^{aux} d,
+\]
+then there is an $a$ such that
+\[
+a \longrightarrow' \mathcal{E}^{aux}[b] \land a \longrightarrow^{aux} c.
+\]
+\begin{proof}
+TODO: define $\sigma_{mod}$ and better explain the points below
+Choose $a = q_r[\sigma_{mod}]$. The two desired reductions can be derived as follows.
+\begin{enumerate}
+\item 
+\[
+a = q_r[\sigma_{mod}] \mapsto' t_r[\sigma_{mod}] = \mathcal{E}^{aux}[b]
+\]
+
+\item
+\[
+a = q_r[\sigma_{mod}] = q_r[\{x \mapsto []\}][\sigma_{mod}][\sigma_{mod}(x)] = q_r[\{x \mapsto []\}][\sigma][\sigma_{mod}(x)] \longrightarrow^{aux} q_r[\{x \mapsto []\}][\sigma][\sigma(x)] = q_r[\{x \mapsto \sigma(x)\}][\sigma] = q_r[\sigma] = c
+\]
+\end{enumerate}
+\end{proof}
+\end{lemma}
+
+\begin{lemma}
+\label{lem:appinv2}
+Let $b,c,d$ be terms and $\mathcal{E}^{aux}$ be an evaluation context for $\longrightarrow^{aux}$. When
+\[
+c \mapsto' d \land b \mapsto^{aux} \mathcal{E}^{aux}[d]
+\]
+then there is an $a$ such that
+\[
+a \longrightarrow' b \land a \longrightarrow^{aux} \mathcal{E}^{aux}[c].
+\]
+\begin{proof}
+We know that $c = q_r[\sigma], d = t_r[\sigma]$ for some equation $r$ and some $\sigma$, and that $b = q_\epsilon[\sigma^{aux}], \mathcal{E}^{aux}[d] = t_\epsilon[\sigma^{aux}]$ for some $\sigma^{aux}$. Since $t_\epsilon = aux(\overline{x})$, there is a variable $x$ such that $\sigma^{aux}(x) = \mathcal{C}[d]$ for a context $\mathcal{C}$. Also, it is $\mathcal{E}^{aux} = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}]$. Choose $a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}]$. The two desired reductions can be derived as follows.
+\begin{enumerate}
+\item
+\begin{multline*}
+a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] = q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][c] \\
+\longrightarrow' q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][d] = q_\epsilon[x \mapsto \mathcal{C}[d]][\sigma^{aux}] = q_\epsilon[\sigma^{aux}] = b
+\end{multline*}
+TODO: explain why $q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}] \in \mathbf{EC}[\vdash'_v]$
+
+\item
+\[
+a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] \mapsto^{aux} t_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][c] = \mathcal{E}^{aux}[c]
+\]
+\end{enumerate}
+\end{proof}
+\end{lemma}
+
+\comminv*
+\begin{proof}
+
+By the derivation of the two one-step reductions, we know the following:
+\begin{itemize}
+\item From $c \longrightarrow' d$: $c = \mathcal{E}'[c_0], d = \mathcal{E}'[d'_0]$ for an $\mathcal{E}' \in \mathbf{EC}[\vdash'_v]$ and terms $c_0, d'_0$ with $c_0 \mapsto' d'_0$.
+
+\item From $b \longrightarrow^{aux} d$: $b = \mathcal{E}^{aux}[b_0], d = \mathcal{E}^{aux}[d^{aux}_0]$ for an $\mathcal{E}^{aux} \in \mathbf{EC}[\vdash'_v]$ and terms $b_0 \mapsto^{aux} d^{aux}_0$.
+\end{itemize}
+
+We compare $\mathcal{E}'$ and $\mathcal{E}^{aux}$ and distinguish four cases.
+
+\begin{itemize}
+\item $\mathcal{E}' = \mathcal{E}^{aux}$. Then it is $d'_0 = d^{aux}_0$; we know that $d^{aux}_0$ must be a call to $aux$, and, by the definition of extractions, the only equation which contains such a call on the right-hand side is $q_\epsilon$. Consequently, since $c_0 \mapsto' d'_0 = d^{aux}_0$ and $b_0 \mapsto^{aux} d^{aux}_0$, it must be $c_0 = b_0$ and thus $b = c$. Thus simply choose $a = b = c$.
+
+\item The hole of $\mathcal{E}'$ properly contains that of $\mathcal{E}^{aux}$, i.e., there is a context $\mathcal{E}^{aux}_0 \neq []$ such that $\mathcal{E}^{aux} = \mathcal{E}'[\mathcal{E}^{aux}_0]$. It follows that $\mathcal{E}^{aux}_0[d^{aux}_0] = d'_0$. By \autoref{lem:appinv1} we have an $a_0$ with $a_0 \mapsto' \mathcal{E}^{aux}_0[b_0]$ and $a_0 \longrightarrow^{aux} c_0$. Choose $a = \mathcal{E}'[a_0]$; the property holds since $a = \mathcal{E}'[a_0] \longrightarrow' \mathcal{E}'[\mathcal{E}^{aux}_0[b_0]] = \mathcal{E}'[\mathcal{E}^{aux}_0][b_0] = \mathcal{E}^{aux}[b_0] = b$ and $a = \mathcal{E}'[a_0] \longrightarrow^{aux} \mathcal{E}'[c_0] = c$.
+
+\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{C} \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{C}]$. By \autoref{fac:chp21}, it follows that $\mathcal{E}^{aux} \in \mathbf{EC}[\vdash'_v]$. Further, it follows that $\mathcal{C}[d'_0] = d^{aux}_0$. By \autoref{lem:appinv2} we have an $a_0$ with $a_0 \longrightarrow' b_0$ and $a_0 \mapsto^{aux} \mathcal{C}[c_0]$. Choose $a = \mathcal{E}^{aux}[a_0]$; the property holds since $a = \mathcal{E}^{aux}[a_0] \longrightarrow' \mathcal{E}^{aux}[b_0] = b$ and $a = \mathcal{E}^{aux}[a_0] \longrightarrow^{aux} \mathcal{E}^{aux}[\mathcal{C}[c_0]] = \mathcal{E}^{aux}[\mathcal{C}][c_0] = \mathcal{E}'[c_0] = c$.
+
+\item Neither the hole of $\mathcal{E}'$ contains that of $\mathcal{E}^{aux}$, nor the other way around. Then we have a two-hole context $\mathcal{E}^{merge}$ such that $\mathcal{E}^{merge}[[], d^{aux}_0] = \mathcal{E}'$ and $\mathcal{E}^{merge}[d'_0, []] = \mathcal{E}^{aux}$. Choose $a$ as $\mathcal{E}^{merge}[c_0, b_0]$. The property holds because $a = \mathcal{E}^{merge}[c_0, b_0] = \mathcal{E}^{merge}[c_0, []][b_0] \longrightarrow^{aux} \mathcal{E}^{merge}[c_0, []][d^{aux}_0] = \mathcal{E}^{merge}[c_0, d^{aux}_0] = \mathcal{E}^{merge}[[], d^{aux}_0][c_0] = \mathcal{E}'[c_0] = c$ and $a = \mathcal{E}^{merge}[c_0, b_0] = \mathcal{E}^{merge}[[], b_0][c_0] \longrightarrow' \mathcal{E}^{merge}[[], b_0][d'_0] = \mathcal{E}^{merge}[d'_0, b_0] = \mathcal{E}^{merge}[d'_0, []][b_0] = \mathcal{E}^{aux}[b_0] = b$. This second reduction is possible because it is $\mathcal{E}^{merge}[[], b_0] \in \mathbf{EC}[\vdash'_v]$, since $\mathcal{E}' = \mathcal{E}^{merge}[[], d^{aux}_0]$ and $\langle d^{aux}_0 \rangle^{aux^{-1}} = \langle b_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v d^{aux}_0$ iff $\vdash'_v \vdash'_v c_0$.
+\end{itemize}
+
+\end{proof}
+
 \clearpage
 \newpage
