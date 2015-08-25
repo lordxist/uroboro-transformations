@@ -8,6 +8,7 @@ In this introduction, we first give an informal overview of de- and refunctional
 \label{sec:dr}
 
 \subsection{Defunctionalization}
+\label{ssec:defunc}
 
 \textit{Defunctionalization} is a technique to transform higher-order programs into semantically equivalent first-order programs. It was first described by Reynolds, who uses it as one of several tools to compile interpreters. We illustrate defunctionalization with the following example program, presented in a Haskell-like pseudocode.
 
@@ -136,7 +137,7 @@ Rendel et al.s refunctionalization for the Data Fragment finds its reverse in th
 \subsection{The full Uroboro}
 \label{ssec:urofull}
 
-Rendel et al. intend the Data Fragment and the Codata Fragment to be fragments of a common language, called Uroboro. In the following chapter, we define this language in full for the first time. Here, we motivate why we think Uroboro is interesting in general and for our purpose, automatic program transformations.
+Rendel et al. intend the Data Fragment and the Codata Fragment to be fragments of a common language, called Uroboro. In the following chapter, we formally define this language in full for the first time. Here, we motivate why we think Uroboro is interesting in general and for our purpose, automatic program transformations.
 
 \subsubsection{Automatic transformations}
 
@@ -150,75 +151,7 @@ We aren't aware of any existing languages which have both of these properties.
 
 \subsubsection{As a possible replacement of higher-order languages}
 
-As stated before, codata generalizes first-class functions. For this reason, Uroboro doesn't lose expressiveness when compared to languages with first-class functions but without parametric polymorphism. Thus, in our opinion, it has the potential to replace higher-order languages. For instance, consider the \texttt{filterNats} example, repeated from above. We will desugar it to a form which only uses codata type definitions, but no first-class functions.
-
-\begin{lstlisting}
-
-filterNats :: ((Nat -> Bool), [Nat]) -> [Nat]
-filterNats (f, x:xs)
-  | f x = x:(filterNats (f, xs))
-  | otherwise = filterNats (f, xs)
-filterNats (_, []) = []
-
-even :: Nat -> Bool
-even Zero = True
-even Succ(n) = not (even n)
-
-main :: [Nat]
-main = filterNats (even, [1, 2, 3, 4, 5])
-
-\end{lstlisting}
-
-We first turn the Haskell-like syntax into a syntax closer to Uroboro.
-
-\begin{lstlisting}
-
-function filterNats((Nat -> Bool), [Nat]): [Nat] where
-  filterNats (f, x:xs)
-    | f x = x:(filterNats (f, xs))
-    | otherwise = filterNats (f, xs)
-  filterNats (_, []) = []
-
-function even(): Nat -> Bool where
-  even Zero = True
-  even Succ(n) = not (even n)
-
-function main(): [Nat]
-  main = filterNats (even, [1, 2, 3, 4, 5])
-
-\end{lstlisting}
-
-Then, we do the following:
-\begin{itemize}
-\item Add a codata type definition \texttt{NatBoolFun} with one destructor \texttt{apply}.
-
-\item Replace function type \texttt{Nat -> Bool} with codata type \texttt{NatBoolFun}.
-
-\item Desugar the calls to a function of type \texttt{NatBoolFun} to calls to destructor \texttt{apply}.
-\end{itemize}
-The result of this is shown below.
-
-\begin{lstlisting}
-
-codata NatBoolFun where
-  NatBoolFun.apply(Nat): Bool
-
-function filterNats(NatBoolFun, [Nat]): [Nat] where
-  filterNats (f, x:xs)
-    | f.apply(x) = x:(filterNats (f, xs))
-    | otherwise = filterNats (f, xs)
-  filterNats (_, []) = []
-
-function even(): NatBoolFun where
-  even.apply(Zero) = True
-  even.apply(Succ(n)) = not (even.apply(n))
-
-function main(): [Nat]
-  main = filterNats (even(), [1, 2, 3, 4, 5])
-
-\end{lstlisting}
-
-For this simple example, it is no problem that we need to introduce the codata type \texttt{NatBoolFun}. However, since we don't have parametric polymorphism, we would have to introduce a codata type for \textit{every} concrete function type. The lack of parametric polymorphism therefore is a rather severe limitation. Rendel et al. are currently working on bringing parametric polymorphism to Uroboro.
+As stated before, codata generalizes first-class functions. For this reason, Uroboro doesn't lose expressiveness when compared to languages with first-class functions but without parametric polymorphism. Thus, in our opinion, Uroboro, or rather a future version of it that includes parametric polymorphism, has the potential to replace certain higher-order languages. We give more details on this in \autoref{sec:reluro}.
 
 \section{Summary of content}
 \label{sec:soc}

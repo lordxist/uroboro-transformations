@@ -1,0 +1,106 @@
+\chapter{Related and future work}
+
+In this chapter, we consider related and future work. We begin with several use cases for our transformations (\autoref{sec:usecases}). Then we review work that our thesis builds upon: the (principal idea for the) language Uroboro (\autoref{sec:reluro}), and the unnesting algorithm of Setzer et al. (\autoref{sec:relunn}). Finally, we talk about avenues for future research (\autoref{sec:futr}).
+
+\section{Use cases}
+\label{sec:usecases}
+
+As already hinted at in the introduction, authors like Reynolds and Danvy have shown how de- and refunctionalization, along with other transformations like CPS transformation, can be used to automatically transform programs of a simpler form into semantically equivalent programs with certain desirable properties, and the other way around. In this section, we flesh this out somewhat and connect it to our automatic transformations. First, we talk about how our transformations apply to Reynolds' meta-circular interpreter example (\autoref{ssec:mci}). 
+
+\subsection{The meta-circular interpreter}
+\label{ssec:mci}
+
+Reynolds' classical example is the ``meta-circular'' interpreter for the lambda calculus: Instead of writing an interpreter in a first-order language from scratch, he first straightforwardly translates the intuitive understanding of the semantics of the lambda calculus into a higher-order program, then mechanically defunctionalizes this program. The other direction, refunctionalization into a program that can be better understood than its first-order counterpart, has first been considered by Danvy et al.
+
+Rendel et al. have already shown how Uroboro facilitates both the defunctionalization direction and the refunctionalization direction; they have also done so specifically for the meta-circular interpreter example. But their approach still required manual, even though mechanical, work to bring programs into either the form required by their defunctionalization or their refunctionalization. Our work fully automatizes these pretransformations; all in all, we give an algorithm to defunctionalize any Uroboro program with copattern coverage, and one that refunctionalizes any such program. Applied to the meta-circular interpreter example, a programmer can now start with an easier to understand higher-order program, like Reynolds did, and then literally ``press a button'' to get the corresponding first-order program.
+
+...
+
+\section{Uroboro}
+\label{sec:reluro}
+
+In the introduction, we have already considered the Data Fragment and Codata Fragment of Uroboro and how they relate to re- and defunctionalization, respectively. We also have already talked about why Uroboro is interesting for the purpose of automatic program transformations \autoref{ssec:urofull}. In this section, we examine why Uroboro is interesting beyond that: As already outlined in \autoref{ssec:urofull}, we think that Uroboro is a potential replacement for certain higher-order languages; in the following we illustrate this point.
+
+For instance, consider the \texttt{filterNats} example, repeated from \autoref{ssec:defunc}. We will desugar it to a form which only uses codata type definitions, but no first-class functions.
+
+\begin{lstlisting}
+
+filterNats :: ((Nat -> Bool), [Nat]) -> [Nat]
+filterNats (f, x:xs)
+  | f x = x:(filterNats (f, xs))
+  | otherwise = filterNats (f, xs)
+filterNats (_, []) = []
+
+even :: Nat -> Bool
+even Zero = True
+even Succ(n) = not (even n)
+
+main :: [Nat]
+main = filterNats (even, [1, 2, 3, 4, 5])
+
+\end{lstlisting}
+
+We first turn the Haskell-like syntax into a syntax closer to Uroboro.
+
+\begin{lstlisting}
+
+function filterNats((Nat -> Bool), [Nat]): [Nat] where
+  filterNats (f, x:xs)
+    | f x = x:(filterNats (f, xs))
+    | otherwise = filterNats (f, xs)
+  filterNats (_, []) = []
+
+function even(): Nat -> Bool where
+  even Zero = True
+  even Succ(n) = not (even n)
+
+function main(): [Nat]
+  main = filterNats (even, [1, 2, 3, 4, 5])
+
+\end{lstlisting}
+
+Then, we do the following:
+\begin{itemize}
+\item Add a codata type definition \texttt{NatBoolFun} with one destructor \texttt{apply}.
+
+\item Replace function type \texttt{Nat -> Bool} with codata type \texttt{NatBoolFun}.
+
+\item Desugar the calls to a function of type \texttt{NatBoolFun} to calls to destructor \texttt{apply}.
+\end{itemize}
+The result of this is shown below.
+
+\begin{lstlisting}
+
+codata NatBoolFun where
+  NatBoolFun.apply(Nat): Bool
+
+function filterNats(NatBoolFun, [Nat]): [Nat] where
+  filterNats (f, x:xs)
+    | f.apply(x) = x:(filterNats (f, xs))
+    | otherwise = filterNats (f, xs)
+  filterNats (_, []) = []
+
+function even(): NatBoolFun where
+  even.apply(Zero) = True
+  even.apply(Succ(n)) = not (even.apply(n))
+
+function main(): [Nat]
+  main = filterNats (even(), [1, 2, 3, 4, 5])
+
+\end{lstlisting}
+
+For this simple example, it is no problem that we need to introduce the codata type \texttt{NatBoolFun}. However, since we don't have parametric polymorphism, we would have to introduce a codata type for \textit{every} concrete function type. The lack of parametric polymorphism therefore is a rather severe limitation. Rendel et al. are currently working on bringing parametric polymorphism to Uroboro.
+
+\section{Unnesting}
+\label{sec:relunn}
+
+TODO: summarize important points of \autoref{ssec:unntransl}
+
+\section{Future research}
+\label{sec:futr}
+
+Finally, we consider possible future research avenues. Uroboro is intended to not just be yet another language, but rather a programme with the goal of bringing useful automatic refactorings to higher-order programs. This programme has both theoretical and practical aspects to it. For both, we give some ideas where future research, starting from our work, could lead to.
+
+On the practical side, our transformations can be implemented in an IDE. In such an implementation, on the one hand, the user might be able to interactively carry out individual extraction refactorings. Speaking in the terminology we developed in chapter 3, the user can select a target set of equations, then, just like in other IDEs, he can be informed whether the extraction can be carried out without problems. Such problems can be the introduction of overlaps, or that the selected equations aren't actually a target set in the sense of chapter 3. On the other hand, the user might also request to de- or refunctionalize the program or some of its function definitions. In this case, as described in chapter 4, the extractions necessary for preprocessing are automatically chosen by the IDE. It might also be useful to display to the user whether the program is in a certain desired fragment of Uroboro, like the defunctionalized or refunctionalized fragment, or whether it is coverage complete.
+
+On the theoretical side, we have shone a light on the asymmetry between constructors and destructors in Uroboro in \autoref{sssec:asym}. The underlying problem directly relates to the difference between natural deduction and arbitrary sequent calculus, and it is not exclusive to Uroboro, but rather affects all current languages with copattern matching. Thus it might be beyond the principal scope of the Uroboro programme, but nonetheless an interesting research problem. In the area of object-oriented programming there already exists quite some work on the somewhat analogous topic of \textit{multimethods}. ...

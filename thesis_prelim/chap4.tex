@@ -61,6 +61,7 @@ Next, we generalize this definition to define \textit{sufficiently simple patter
 Those notions correspond directly to the forms of lhss allowed in the unnested fragments for \textsf{CoreDefunc} and \textsf{CoreRefunc}, respectively. It is clear that each simple copattern is also sufficiently simple for both de- and refunctionalization.
 
 \subsection{Translation algorithm}
+\label{ssec:unntransl}
 
 We describe the algorithm for $\textsf{Unnest}_i$, adapted from section 3.3 of the paper of Setzer et al. to Uroboro, as lined out above.
 
@@ -332,6 +333,7 @@ By combining \autoref{lem:sbruld} and \autoref{lem:iso}.
 Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of Rendel et al. for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. Unfortunately, and unlike defunctionalization, this algorithm requires some kind of preprocessing, since the actual refunctionalization requires all constructors to be the first pattern of an lhs. We first describe this asymmetry in more detail and illustrate the underlying problem, then consider a possible workaround for our situation, and finally give the actual refunctionalization and, as with defunctionalization, consider important properties of it.
 
 \subsubsection{An asymmetry: The problem at hand}
+\label{sssec:asym}
 
 In the introduction to this chapter, we gave two fragments of Uroboro induced by unnested function definition fragments, as the domain of defunctionalization and refunctionalization, respectively. The first fragment, for defunctionalization, has the following syntax for function definitions.
 
