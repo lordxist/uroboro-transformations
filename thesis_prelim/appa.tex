@@ -189,27 +189,27 @@ a = q_r[\sigma_{mod}] = q_r[\{x \mapsto []\}][\sigma_{mod}][\sigma_{mod}(x)] = q
 
 \begin{lemma}
 \label{lem:appinv2}
-Let $b,c,d$ be terms and $\mathcal{E}^{aux}$ be an evaluation context for $\longrightarrow^{aux}$. When
+Let $b,c,d$ be terms and $\mathcal{E}'$ be an evaluation context for $\longrightarrow^{aux}$. When
 \[
-c \mapsto' d \land b \mapsto^{aux} \mathcal{E}^{aux}[d]
+c \mapsto' d \land b \mapsto^{aux} \mathcal{E}'[d]
 \]
 then there is an $a$ such that
 \[
-a \longrightarrow' b \land a \longrightarrow^{aux} \mathcal{E}^{aux}[c].
+a \longrightarrow' b \land a \longrightarrow^{aux} \mathcal{E}'[c].
 \]
 \begin{proof}
-We know that $c = q_r[\sigma], d = t_r[\sigma]$ for some equation $r$ and some $\sigma$, and that $b = q_\epsilon[\sigma^{aux}], \mathcal{E}^{aux}[d] = t_\epsilon[\sigma^{aux}]$ for some $\sigma^{aux}$. Since $t_\epsilon = aux(\overline{x})$, there is a variable $x$ such that $\sigma^{aux}(x) = \mathcal{C}[d]$ for a context $\mathcal{C}$. Also, it is $\mathcal{E}^{aux} = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}]$. Choose $a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}]$. The two desired reductions can be derived as follows.
+We know that $c = q_r[\sigma], d = t_r[\sigma]$ for some equation $r$ and some $\sigma$, and that $b = q_\epsilon[\sigma^{aux}], \mathcal{E}'[d] = t_\epsilon[\sigma^{aux}]$ for some $\sigma^{aux}$. Since $t_\epsilon = aux(\overline{x})$, there is a variable $x$ such that $\sigma^{aux}(x) = \mathcal{C}[d]$ for a context $\mathcal{C}$. Also, it is $\mathcal{E}' = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}]$. Choose $a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}]$. The two desired reductions can be derived as follows.
 \begin{enumerate}
-\item
+\item Using the ``Cong'' rule for $c \mapsto' d$ and evaluation context $q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}]$ (see below):
 \begin{multline*}
 a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] = q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][c] \\
 \longrightarrow' q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][d] = q_\epsilon[x \mapsto \mathcal{C}[d]][\sigma^{aux}] = q_\epsilon[\sigma^{aux}] = b
 \end{multline*}
-TODO: explain why $q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}] \in \mathbf{EC}[\vdash'_v]$
+The reduction can be derived because $q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}] \in \mathbf{EC}[\vdash'_v]$. This is because $\mathcal{E}' = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}] \in \mathbf{EC}[\vdash'_v]$.
 
-\item
+\item Using the ``Subst'' rule for equation $\epsilon$:
 \[
-a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] \mapsto^{aux} t_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][c] = \mathcal{E}^{aux}[c]
+a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] \mapsto^{aux} t_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][c] = \mathcal{E}'[c]
 \]
 \end{enumerate}
 \end{proof}
