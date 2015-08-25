@@ -63,6 +63,8 @@ prg ::= (ddef ~ | ~ coddef ~ | ~  fdef)^*
 &eqn &::= q = t
 \end{align*}
 
+Note that we consider the collection of equations in a function definition to be a \textit{set}. This means that we establish no order on the equations. In practice, this means that programs which depend on the order of their equations first need to be transformed into order-independent, semantically equivalent programs. We consider this problem in Appendix B.
+
 \section{Static semantics}
 \label{sec:urostatsem}
 
