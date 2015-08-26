@@ -263,7 +263,7 @@ Again, we begin by showing a commutation lemma; but this time, we operate on the
 
 For all terms $b,c,d$ it holds that:
 \[
-c {\longrightarrow'} d \land b \longrightarrow^{aux} d \implies \exists a . a {\longrightarrow^{aux}}^* c \land a {\longrightarrow'}^= b
+c {\longrightarrow'} d \land b \longrightarrow^{aux} d \implies \exists a, a' . a {\longrightarrow^{aux}}^* c \land a {\longrightarrow'}^= a' {\longrightarrow^{aux}}^*  b
 \]
 
 \end{restatable}
@@ -276,7 +276,7 @@ Left for the appendix.
 
 For all terms $b,c,d$ it holds that:
 \[
-c \longrightarrow' d \land b {\longrightarrow^{aux}}^* d \implies \exists a . a {\longrightarrow^{aux}}^* c \land a {\longrightarrow'}^= b
+c \longrightarrow' d \land b {\longrightarrow^{aux}}^* d \implies \exists a, a' . a {\longrightarrow^{aux}}^* c \land a {\longrightarrow'}^= a' {\longrightarrow^{aux}}^* b
 \]
 
 \begin{proof}
@@ -294,52 +294,14 @@ First, note that this direction is logically equivalent to the statement
 \]
 We prove this statement by induction on the length $n$ of $s \longrightarrow^* \widetilde{t}$. For $n = 0$ it is $s = \widetilde{t}$; since $s \in \textrm{Term}_{prg}$ it is $\langle s \rangle^{aux^{-1}} = s$ and it follows that $s = \langle \widetilde{t} \rangle^{aux^{-1}} = t$. 
 
-Now, consider the case that $n = n'+1$ for some $n' \geq 0$. Since $\longrightarrow \subseteq \longrightarrow'$ it is $s_1 \longrightarrow' \widetilde{t}$; and since $t = \langle \widetilde{t} \rangle^{aux^{-1}}$ it is $t {\longrightarrow^{aux}}^* \widetilde{t}$. Thus, by \autoref{cor:comminvcor} we have a $t'$ with $t' {\longrightarrow'}^= t$ and $t' {\longrightarrow^{aux}}^* s_1$. By the induction hypothesis we have a reduction sequence $s {\longrightarrow'}^* \langle s_1 \rangle^{aux^{-1}}$. Since it is $t' {\longrightarrow'}^= t$, and $t$ contains no calls to $aux$, neither does $t'$. Thus, from $t' {\longrightarrow^{aux}}^* s_1$ it follows that $\langle s_1 \rangle^{aux^{-1}} = t'$. By combining the thus known sequences and equalities, we get the desired sequence $s {\longrightarrow'}^* \langle s_1 \rangle^{aux^{-1}} = t' {\longrightarrow'}^= t$.
+Now, consider the case that $n = n'+1$ for some $n' \geq 0$. Since $\longrightarrow \subseteq \longrightarrow'$ it is $s_1 \longrightarrow' \widetilde{t}$; and since $t = \langle \widetilde{t} \rangle^{aux^{-1}}$ it is $t {\longrightarrow^{aux}}^* \widetilde{t}$. Thus, by \autoref{cor:comminvcor} we have terms $t', t''$ with $t' {\longrightarrow'}^= t'' {\longrightarrow^{aux}}^* t$ and $t' {\longrightarrow^{aux}}^* s_1$. Because $t \in \textrm{Term}_{prg}$ it must be $t'' = t$. By the induction hypothesis we have a reduction sequence $s {\longrightarrow'}^* \langle s_1 \rangle^{aux^{-1}}$. Since it is $t' {\longrightarrow'}^= t$, and $t$ contains no calls to $aux$, neither does $t'$. Thus, from $t' {\longrightarrow^{aux}}^* s_1$ it follows that $\langle s_1 \rangle^{aux^{-1}} = t'$. By combining the thus known sequences and equalities, we get the desired sequence $s {\longrightarrow'}^* \langle s_1 \rangle^{aux^{-1}} = t' {\longrightarrow'}^= t$.
 
 \end{proof}
 
-%%--
-
-\begin{lemma}[lem:hh2prop2rl]
-
-\end{lemma}
-
-\begin{lemma}
-\label{lem:hprop2rl}
-When $s \longrightarrow' t$ and $s \not\longrightarrow^{aux} t$, then $\langle s \rangle^{aux^{-1}} {\longrightarrow'}^* \langle t \rangle^{aux^{-1}}$.
-\begin{proof}
-From the derivation of $s \longrightarrow' t$, we know that $s = \mathcal{E}'[s_0], t = \mathcal{E}'[t_0], s_0 \mapsto' t_0$ for terms $s_0, t_0$ and an evaluation context $\mathcal{E}' \in \mathbf{EC}[\vdash'_v]$. Because, by definition, it is $\vdash'_v v$ iff $\vdash'_v \langle v \rangle^{aux^{-1}}$ for all terms $v$, using the definition of evaluation contexts it easily follows that $\langle \mathcal{E}' \rangle^{aux^{-1}} \in \mathbf{EC}[\vdash'_v]$. Since $s_0 \mapsto' t_0$, by \autoref{lem:hh2prop2rl} we have $\langle s_0 \rangle^{aux^{-1}} {\mapsto'}^* \langle t_0 \rangle^{aux^{-1}}$. Consequently, since evaluation contexts are compatible with $\langle \cdot \rangle^{aux^{-1}}$ we have $\langle s \rangle^{aux{-1}} = \langle \mathcal{E}' \rangle^{aux^{-1}}[\langle s_0 \rangle^{aux^{-1}}] {\longrightarrow'}^* \langle \mathcal{E}' \rangle^{aux^{-1}}[\langle t_0 \rangle^{aux^{-1}}] = \langle t \rangle^{aux^{-1}}$.
-\end{proof}
-\end{lemma}
-
-\begin{lemma}[Right-to-left direction of (3.2)]
-\label{lem:prop2rl}
-\[
- s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \implies s {\longrightarrow'}_{\langle prg \rangle}^* t
-\]
-
-\begin{proof}
-First, note that this direction is logically equivalent to the statement
-\[
-\forall s, t \in \textrm{Term}_{prg}, \widetilde{t} \in \textrm{Term}_{\langle prg \rangle}. (s \longrightarrow^* \widetilde{t} \land \langle \widetilde{t} \rangle^{aux^{-1}} = t) \implies s {\longrightarrow'}^* t.
-\]
-We prove this statement by induction on the length $n$ of $s \longrightarrow^* \widetilde{t}$.
-
-If $n = 0$, it is $s = \widetilde{t} \in \textrm{Term}_{prg}$, therefore it must be $\widetilde{t} = t$, and thus it is $s = t$.
-
-Otherwise, consider the final step of the sequence, $s' \longrightarrow \widetilde{t}$. By the induction hypothesis, we have a sequence $s {\longrightarrow'}^* \langle s' \rangle^{aux^{-1}}$. We distinguish two cases for the final step of the original sequence. 
-\begin{itemize}
-\item $s' \not\longrightarrow^{aux} \widetilde{t}$. Because $\longrightarrow \subseteq \longrightarrow'$, we know that $s' \longrightarrow' \widetilde{t}$. By \autoref{lem:hprop2rl} it follows that $\langle s' \rangle^{aux^{-1}} \longrightarrow' \langle \widetilde{t} \rangle^{aux^{-1}}$.
-
-\item $s' \longrightarrow^{aux} \widetilde{t}$. Then it is $\langle s' \rangle^{aux^{-1}} = \langle \widetilde{t} \rangle^{aux^{-1}} = t$.
-\end{itemize}
-\end{proof}
-\end{lemma}
-
-Combining \autoref{lem:prop2lr} and \autoref{lem:prop2rl}, statement (2.2) obtains.
+Combining \autoref{lem:prop2lr} and \autoref{lem:prop2rl}, statement (3.2) obtains.
 \begin{proposition}
 \label{prop:bisim2}
-Statement (2.2), that is
+Statement (3.2), that is
 \[
 s {\longrightarrow'}_{\langle prg \rangle}^* t \iff s \longrightarrow^*_{\langle prg \rangle} \widetilde{t},
 \]

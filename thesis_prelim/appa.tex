@@ -166,23 +166,34 @@ Let $b,c,d$ be terms and $\mathcal{E}^{aux}$ be an evaluation context for $\long
 \[
 c \mapsto' \mathcal{E}^{aux}[d] \land b \mapsto^{aux} d,
 \]
-then there is an $a$ such that
+then there are $a, a'$ such that
 \[
-a \longrightarrow' \mathcal{E}^{aux}[b] \land a \longrightarrow^{aux} c.
+a \longrightarrow' a' {\longrightarrow^{aux}}^* \mathcal{E}^{aux}[b] \land a \longrightarrow^{aux} c.
 \]
 \begin{proof}
-TODO: define $\sigma_{mod}$ and better explain the points below
-Choose $a = q_r[\sigma_{mod}]$. The two desired reductions can be derived as follows.
+We know that $c = q_r[\sigma], \mathcal{E}^{aux}[d] = t_r[\sigma]$ for some equation $r$, and that $b = q_\epsilon[\sigma^{aux}], d = t_\epsilon[\sigma^{aux}]$ for some $\sigma^{aux}$. Since $\mathcal{E}^{aux}[d] = t_r[\sigma]$ and $d = t_\epsilon[\sigma^{aux}] = aux(\overline{x})[\sigma^{aux}]$ and thus $d$ is not a constructor or destructor call, there are two possible cases.
 \begin{enumerate}
-\item 
+\item $d$ is a term somewhere within a constructor call in $t_r[\sigma]$ (and, as stated, not a constructor call itself). Thus there is an occurrence of some variable $x$ in $t_r$ such that, for $t^y_r = t_r$ with this occurrence replaced by a fresh (in $t_r$) variable $y$, it is $t^y_r[y \mapsto \mathcal{C}[d]][\sigma] = t_r[\sigma]$ for some context $\mathcal{C}$.
+\item $d$ is the term destructed in $t_r[\sigma] = \mathcal{E}^{aux}[d]$, that is, it is $\mathcal{E}^{aux} = [].\overline{des(\overline{x})}$. In this case, since $c \mapsto' \mathcal{E}^{aux}[d]$ and the only equation that $\longrightarrow^{aux}$ uses for contraction, namely $\epsilon$, doesn't have a destructor on its right-hand side, this contraction doesn't use $\epsilon$. All other equations don't have a call to $aux$ on their right-hand side, but $d$ is call to $aux$ and therefore can only have been carried over from $q_r[\sigma]$ via some variable. Thus there also is a variable $x$ in $t_r$ with the same properties as in the first case.
+\end{enumerate}
+Choose $a = q_r[x \mapsto \mathcal{C}[b]][\sigma]$. The two desired reductions can be derived as follows.
+\begin{enumerate}
+\item The first step, using the ``Subst'' rule for $r$:
 \[
-a = q_r[\sigma_{mod}] \mapsto' t_r[\sigma_{mod}] = \mathcal{E}^{aux}[b]
+a = q_r[x \mapsto \mathcal{C}[b]][\sigma] \mapsto' t_r[x \mapsto \mathcal{C}[b]][\sigma]
 \]
+Then the other steps, each using the ``Cong'' rule for $b \mapsto^{aux} d$:
+\begin{multline*}
+t_r[x \mapsto \mathcal{C}[b]][\sigma] = t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}[b]][\sigma] = t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}][\sigma][b, b, ..., b] \\
+\longrightarrow^{aux} t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}][\sigma][d, b, ..., b] \longrightarrow^{aux} ... \\
+\longrightarrow^{aux} t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}][\sigma][d, d, ..., d] = t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}[d]][\sigma] \\
+= t^y_r[y \mapsto \mathcal{C}[b]][\sigma] = t^y_r[y \mapsto \mathcal{C}][\sigma][b] = \mathcal{E}^{aux}[b]
+\end{multline*}
 
-\item
-\[
-a = q_r[\sigma_{mod}] = q_r[\{x \mapsto []\}][\sigma_{mod}][\sigma_{mod}(x)] = q_r[\{x \mapsto []\}][\sigma][\sigma_{mod}(x)] \longrightarrow^{aux} q_r[\{x \mapsto []\}][\sigma][\sigma(x)] = q_r[\{x \mapsto \sigma(x)\}][\sigma] = q_r[\sigma] = c
-\]
+\item Using the ``Cong'' rule for $b \mapsto^{aux} d$ and evaluation context $q_r[x \mapsto \mathcal{C}][\sigma]$:
+\begin{multline*}
+a = q_r[x \mapsto \mathcal{C}[b]][\sigma] = q_r[x \mapsto \mathcal{C}][\sigma][b] \\ \longrightarrow^{aux} q_r[x \mapsto \mathcal{C}][\sigma][d] = q_r[x \mapsto \mathcal{C}[d]][\sigma] = q_r[\sigma] = c
+\end{multline*}
 \end{enumerate}
 \end{proof}
 \end{lemma}
