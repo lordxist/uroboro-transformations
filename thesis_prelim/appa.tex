@@ -171,12 +171,12 @@ then there are $a, a'$ such that
 a \longrightarrow' a' {\longrightarrow^{aux}}^* \mathcal{E}^{aux}[b] \land a \longrightarrow^{aux} c.
 \]
 \begin{proof}
-We know that $c = q_r[\sigma], \mathcal{E}^{aux}[d] = t_r[\sigma]$ for some equation $r$, and that $b = q_\epsilon[\sigma^{aux}], d = t_\epsilon[\sigma^{aux}]$ for some $\sigma^{aux}$. Since $\mathcal{E}^{aux}[d] = t_r[\sigma]$ and $d = t_\epsilon[\sigma^{aux}] = aux(\overline{x})[\sigma^{aux}]$ and thus $d$ is not a constructor or destructor call, there are two possible cases.
+We know that $c = q_r[\sigma], \mathcal{E}^{aux}[d] = t_r[\sigma]$ for some equation $r$, and that $b = q_\epsilon[\sigma^{aux}], d = t_\epsilon[\sigma^{aux}]$ for some $\sigma^{aux}$.
+In order to choose $a$, we first need to find out where $d$ can be found in $t_r[\sigma]$. It is $d = t_\epsilon[\sigma^{aux}] = aux(\overline{x})[\sigma^{aux}]$, and calls to $aux$ only appear on one right-hand side in the program, namely $t_\epsilon$. Thus we distinguish two cases for $\mathcal{E}^{aux}[d] = t_r[\sigma]$.
 \begin{enumerate}
-\item $d$ is a term somewhere within a constructor call in $t_r[\sigma]$ (and, as stated, not a constructor call itself). Thus there is an occurrence of some variable $x$ in $t_r$ such that, for $t^y_r = t_r$ with this occurrence replaced by a fresh (in $t_r$) variable $y$, it is $t^y_r[y \mapsto \mathcal{C}[d]][\sigma] = t_r[\sigma]$ for some context $\mathcal{C}$.
-\item $d$ is the term destructed in $t_r[\sigma] = \mathcal{E}^{aux}[d]$, that is, it is $\mathcal{E}^{aux} = [].\overline{des(\overline{x})}$. In this case, since $c \mapsto' \mathcal{E}^{aux}[d]$ and the only equation that $\longrightarrow^{aux}$ uses for contraction, namely $\epsilon$, doesn't have a destructor on its right-hand side, this contraction doesn't use $\epsilon$. All other equations don't have a call to $aux$ on their right-hand side, but $d$ is call to $aux$ and therefore can only have been carried over from $q_r[\sigma]$ via some variable. Thus there also is a variable $x$ in $t_r$ with the same properties as in the first case.
-\end{enumerate}
-Choose $a = q_r[x \mapsto \mathcal{C}[b]][\sigma]$. The two desired reductions can be derived as follows.
+\item $r = \epsilon$. ... (trivial)
+
+\item $r \neq \epsilon$. Then $t_r$ doesn't contain calls to $aux$, and thus $d = aux(\overline{x})[\sigma^{aux}$ must be a subterm of a right-hand side of $\sigma$. Thus there is an occurrence of some variable $x$ in $t_r$ such that, for $t^y_r = t_r$ with this occurrence replaced by a fresh (in $t_r$) variable $y$, it is $t^y_r[y \mapsto \mathcal{C}[d]][\sigma] = t_r[\sigma]$ for some context $\mathcal{C}$. Choose $a = q_r[x \mapsto \mathcal{C}[b]][\sigma]$. The two desired reductions can be derived as follows.
 \begin{enumerate}
 \item The first step, using the ``Subst'' rule for $r$:
 \[
@@ -194,6 +194,7 @@ t_r[x \mapsto \mathcal{C}[b]][\sigma] = t^y_r[y \mapsto \mathcal{C}[b]][x \mapst
 \begin{multline*}
 a = q_r[x \mapsto \mathcal{C}[b]][\sigma] = q_r[x \mapsto \mathcal{C}][\sigma][b] \\ \longrightarrow^{aux} q_r[x \mapsto \mathcal{C}][\sigma][d] = q_r[x \mapsto \mathcal{C}[d]][\sigma] = q_r[\sigma] = c
 \end{multline*}
+\end{enumerate}
 \end{enumerate}
 \end{proof}
 \end{lemma}
