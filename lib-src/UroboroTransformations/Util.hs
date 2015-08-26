@@ -72,9 +72,17 @@ collectVars :: PP -> [PP]
 collectVars (PPCon _ _ pps) = concatMap collectVars pps
 collectVars v = [v]
 
+collectVarsT :: TP -> [TP]
+collectVarsT (TPCon _ _ tps) = concatMap collectVarsT tps
+collectVarsT v = [v]
+
 collectVarsPQ :: PQ -> [PP]
 collectVarsPQ (PQDes _ _ pps pq') = (collectVarsPQ pq') ++ (concatMap collectVars pps)
 collectVarsPQ (PQApp _ _ pps)     = concatMap collectVars pps
+
+collectVarsTQ :: TQ -> [TP]
+collectVarsTQ (TQDes _ _ tps tq') = (collectVarsTQ tq') ++ (concatMap collectVarsT tps)
+collectVarsTQ (TQApp _ _ tps)     = concatMap collectVarsT tps
 
 -- Requires globally unique constructor names. Otherwise collectVarTypes needs to be implemented
 -- using typed syntax trees (and the transformation is run on the typecheck result).
