@@ -162,7 +162,7 @@ a = \mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], a = \mathcal{E}'[t] \
 
 \begin{lemma}
 \label{lem:appinv1}
-Let $b,c,d$ be terms and $\mathcal{E}^{aux}$ be an evaluation context for $\longrightarrow^{aux}$. When
+Let $b,c,d$ be terms and $\mathcal{E}^{aux} \neq []$ be an evaluation context for $\longrightarrow^{aux}$. When
 \[
 c \mapsto' \mathcal{E}^{aux}[d] \land b \mapsto^{aux} d,
 \]
@@ -172,9 +172,20 @@ a \longrightarrow' a' {\longrightarrow^{aux}}^* \mathcal{E}^{aux}[b] \land a \lo
 \]
 \begin{proof}
 We know that $c = q_r[\sigma], \mathcal{E}^{aux}[d] = t_r[\sigma]$ for some equation $r$, and that $b = q_\epsilon[\sigma^{aux}], d = t_\epsilon[\sigma^{aux}]$ for some $\sigma^{aux}$.
-In order to choose $a$, we first need to find out where $d$ can be found in $t_r[\sigma]$. It is $d = t_\epsilon[\sigma^{aux}] = aux(\overline{x})[\sigma^{aux}]$, and calls to $aux$ only appear on one right-hand side in the program, namely $t_\epsilon$. Thus we distinguish two cases for $\mathcal{E}^{aux}[d] = t_r[\sigma]$.
+In order to choose $a$, we first need to find out where $d$ can be found in $t_r[\sigma]$; we will show that it isn't part of $t_r$, but rather is introduced by the substitution $\sigma$, i.e., it appears as a subterm of a right-hand side of $\sigma$. It is $d = t_\epsilon[\sigma^{aux}] = aux(\overline{x})[\sigma^{aux}]$, and calls to $aux$ only appear on one right-hand side in the program, namely $t_\epsilon$. Thus we distinguish two cases for $\mathcal{E}^{aux}[d] = t_r[\sigma]$.
 \begin{enumerate}
-\item $r = \epsilon$. ... (trivial)
+\item $r = \epsilon$. Then it is $\mathcal{E}^{aux}[d] = t_\epsilon[\sigma] = aux(\overline{x})[\sigma]$; since $\mathcal{E}^{aux} \neq []$, we know that $\sigma(x) = \mathcal{C}[d]$ for some variable appearing in $t_\epsilon$ and some context $\mathcal{C}$. From this it also follows that $\mathcal{E}^{aux} = t_\epsilon[x \mapsto \mathcal{C}][\sigma]$, since plugging in $d$ on both sides gives the equivalent equation $\mathcal{E}^{aux}[d] = t_\epsilon[x \mapsto \mathcal{C}[d]][\sigma] = t_\epsilon[\sigma]$, which is true by assumption. Choose $a = q_\epsilon[x \mapsto \mathcal{C}[b]][\sigma]$. The two desired reductions can be derived as follows.
+\begin{enumerate}
+\item Using the ``Subst'' rule for $\epsilon$:
+\[
+a = q_\epsilon[x \mapsto \mathcal{C}[b]][\sigma] \mapsto' t_\epsilon[x \mapsto \mathcal{C}[b]][\sigma] = t_\epsilon[x \mapsto \mathcal{C}][\sigma][b] = \mathcal{E}^{aux}[b]
+\]
+
+\item Using the ``Cong'' rule for $b \mapsto^{aux} d$ and evaluation context $ q_\epsilon[x \mapsto \mathcal{C}][\sigma]$:
+\[
+a = q_\epsilon[x \mapsto \mathcal{C}[b]][\sigma] = q_\epsilon[x \mapsto \mathcal{C}][\sigma][b] \longrightarrow^{aux} q_\epsilon[x \mapsto \mathcal{C}][\sigma][d] = q_\epsilon[x \mapsto \mathcal{C}[d]][\sigma] = q_\epsilon[\sigma] = c
+\]
+\end{enumerate}
 
 \item $r \neq \epsilon$. Then $t_r$ doesn't contain calls to $aux$, and thus $d = aux(\overline{x})[\sigma^{aux}$ must be a subterm of a right-hand side of $\sigma$. Thus there is an occurrence of some variable $x$ in $t_r$ such that, for $t^y_r = t_r$ with this occurrence replaced by a fresh (in $t_r$) variable $y$, it is $t^y_r[y \mapsto \mathcal{C}[d]][\sigma] = t_r[\sigma]$ for some context $\mathcal{C}$. Choose $a = q_r[x \mapsto \mathcal{C}[b]][\sigma]$. The two desired reductions can be derived as follows.
 \begin{enumerate}
