@@ -48,7 +48,7 @@ Then it is $\mathcal{E}'[a] = con(p_1, ..., p_n)[\sigma]$. When $\mathcal{E}' = 
 \label{lem:app2}
 Let $a, b, c$ be terms and $\mathcal{E}' \in \textrm{EC}[\vdash'_v]$ an evaluation context. When
 \[
-a \longrightarrow' b \land \mathcal{E}'[a] \longrightarrow^{aux} c
+a \mapsto' b \land \mathcal{E}'[a] \mapsto^{aux} c
 \]
 and both reduction steps are derived by the ``Subst'' rule, then there is a $d$ such that
 \[
@@ -90,7 +90,7 @@ t_\epsilon[\sigma^{aux}] = aux(x_1, ..., x_k)[\sigma^{aux}] = aux(\sigma(x_1), .
 
 \cdpaux*
 \begin{proof}
-We make use of the fact that a reduction that can be derived by multiple applications of the ``Cong" rule can also be derived by just one application of the ``Cong" rule. When a reduction is derived by the ``Subst'' rule, it can also be derived by applying the ``Cong'' rule for the empty evaluation context on top of that. Thus, we have the following:
+By the derivation of the two one-step reductions, we know the following:
 \begin{itemize}
 \item From $a \longrightarrow' b$: $a = \mathcal{E}'[a'_0], b = \mathcal{E}'[b_0]$ for an $\mathcal{E} \in \mathbf{EC}[\vdash'_v]$ and terms $a'_0, b_0$ with $a'_0 \longrightarrow' b_0$ and $a'_0 = q_r[\sigma'], b_0 = t_r[\sigma']$ for some equation $r$.
 
