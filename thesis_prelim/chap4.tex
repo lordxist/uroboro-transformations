@@ -54,7 +54,7 @@ We adapt the translation algorithm from section 3.3 of the paper of Setzer et al
 
 \subsection{Simple patterns}
 
-Before we start with the translation algorithm, we adapt and introduce, respectively, two notions of simplicity for patterns, the second of which corresponds to the intended range of the translation algorithm. We first adapt the definition of a \textit{simple pattern}, as given by Setzer et al., to Uroboro. Call a copattern simple if it is of one of the three forms $fun(\overline{x})$, $fun(\overline{x}).des(\overline{y})$, or $fun(\overline{x}, con(\overline{y}), \overline{z})$.
+Before we start with the translation algorithm, we adapt and introduce, respectively, two notions of simplicity for patterns, the second of which corresponds to the intended range of the translation algorithm. We first adapt the definition of a simple pattern, as given by Setzer et al., to Uroboro. Call a copattern \textit{simple} if it is of one of the three forms $fun(\overline{x})$, $fun(\overline{x}).des(\overline{y})$, or $fun(\overline{x}, con(\overline{y}), \overline{z})$.
 
 Next, we generalize this definition to define \textit{sufficiently simple patterns} for a purpose, which is either de- or refunctionalization. Call a copattern \textit{sufficiently simple for defunctionalization} if it is of one of the two forms $fun(\overline{x}).des(\overline{y})$, $fun(\overline{p})$, and \textit{sufficiently simple for refunctionalization} if it is of one of the two forms $fun(\overline{x}).\overline{des(\overline{y})}$, $fun(\overline{x}, con(\overline{y}), \overline{z})$. We will also say that a copattern is sufficiently simple for $i$, for $i \in \{d,r\}$, and mean that it is sufficiently simple for defunctionalization or refunctionalization, respectively.
 
@@ -90,7 +90,7 @@ Apply extraction \textsf{ExtractDes} targeting the equations with lhss $q.des(\o
 \[
 Q \cup \{ \texttt{get}(q.des(\overline{x^{des}})) ~ | ~ des \in Dess_\tau \} = Q \cup \{q\},
 \]
-where \texttt{get} is the retrieving part of the lens underlying \textsf{ExtractDes}. This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q^\tau)$ from the derivation step above. The lhss of the auxiliary function definition are
+where the pair of \texttt{get} and \texttt{putback} is the lens underlying \textsf{ExtractDes}. This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q^\tau)$ from the derivation step above. The lhss of the auxiliary function definition are
 \begin{multline*}
 \{ q_{\zeta_r} ~ | ~ r \in T \} = \{ \texttt{putback}(\langle \texttt{get}(q_r) \rangle^{aux}, q_r) ~ | ~ r \in T \} \\
 = \{ \sigma^{q_r}_\pi(aux(\langle q \rangle^{vars})) ~ | ~ r \in T \} = \{ aux(\langle q \rangle^{vars}).des(\overline{x^{des}}) ~ | ~ des \in Dess_\tau \} \\
@@ -138,9 +138,11 @@ As shown for each of the two cases, after the extractions copattern coverage sti
 
 Next, we consider important properties of the translation algorithm.
 
+\textbf{Termination.} To show that the algorithm terminates, we can basically repeat the argument of Setzer et al. Each translation results in a changed function definition $def'_{fun}$ for $fun$ and a new function definition $def_{aux}$ for the auxiliary function. The lhss of $def'_{fun}$ are $Q \cup \{q\}$, which means that they cover $fun$ in the same way $fun$ is covered via $fun \lhd | ~ Q ~ (q)$ in the derivation step above. This means that the translation reduces the depth of the derivation tree for the coverage of $fun$, thus eventually arriving at sufficiently simple patterns. The added auxiliary function definitions already have simple lhss, thus they are not translated, and eventually the algorithm terminates.
+
 \textbf{Range.} The algorithm only stops when all lhss are sufficiently simple for $i$ and works on the coverage derivation trees, thus we have the desired range $\mathbf{U}_{cc}[fdef_{un,i}]$ if it terminates in all cases, which is shown next.
 
-\textbf{Termination.} To show that the algorithm terminates, we can basically repeat the argument of Setzer et al. Each translation results in a changed function definition $def'_{fun}$ for $fun$ and a new function definition $def_{aux}$ for the auxiliary function. The lhss of $def'_{fun}$ are $Q \cup \{q\}$, which means that they cover $fun$ in the same way $fun$ is covered via $fun \lhd | ~ Q ~ (q)$ in the derivation step above. This means that the translation reduces the depth of the derivation tree for the coverage of $fun$, thus eventually arriving at sufficiently simple patterns. The added auxiliary function definitions already have simple lhss, thus they are not translated, and eventually the algorithm terminates.
+\textbf{Preservation of well-typedness.} The only changes made to the program are a series of extractions (each is either constructor or destructor extraction). All extractions preserve the well-typedness of a program, therefore well-typedness is also preserved by $\texttt{Unnest}_i$.
 
 \textbf{Bisimulation.} Because copattern coverage holds for the translated program, the translated program has no overlapping lhss. Therefore, by the propositions 3.3.1 and 3.3.2, we know that the translation preserves the semantics of the program in the kind of weak bisimulation described in section 3.3.
 
@@ -206,7 +208,7 @@ Using this definition, we define defunctionalization of terms.
 \langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)
 \end{align*}
 
-This transformation only changes symbols, but leaves the structure of the terms unchanged (disregarding the syntactic sugar for destructor calls). Especially, this means that $\langle q[\sigma] \rangle^d = \langle q \rangle^d [\langle \cdot \rangle^d \circ \sigma]$ for any copattern $q$ and substitution $\sigma$. A property that is important for the definition of \textsf{CoreRefunc} below is that, for any copattern $q$ that is allowed as a lhs in the domain of \textsf{CoreRefunc}, $\langle q \rangle^d$ is also a copattern. This can be easily shown by induction on the structure of $q$.
+This transformation only changes symbols, but leaves the structure of the terms unchanged (disregarding the syntactic sugar for destructor calls). Especially, this means that $\langle q[\sigma] \rangle^d = \langle q \rangle^d [\langle \cdot \rangle^d \circ \sigma]$ for any copattern $q$ and substitution $\sigma$. A property that is important for the definition of \textsf{CoreDefunc} below is that, for any copattern $q$ that is allowed as a lhs in the domain of \textsf{CoreDefunc}, $\langle q \rangle^d$ is also a copattern. This can be easily shown by induction on the structure of $q$.
 
 Next, we give the definition for \textsf{CoreDefunc}. Like Rendel et al. do for their de- and refunctionalization, we use set-builder notation.
 
@@ -227,6 +229,22 @@ Next, we give the definition for \textsf{CoreDefunc}. Like Rendel et al. do for 
 \end{algorithm}
 
 We consider important properties of the transformation.
+
+\textbf{Termination.} In the set-builder notation we used to define the algorithm, it is clear how the resulting program is constructed by going through the syntax of the input program. That is, the set-builder definitions for each of the sets in the union can be implemented as loops over specific syntactic parts of the input program, like the codata signatures, the destructor signatures, or the equations. Some of the loops are nested, but each time the collection that is looped over is finite, thus the transformation algorithm terminates.
+
+\textbf{Range.} It can be directly seen in the definition that the resulting program contains no codata type definitions. The copattern coverage of the resulting program is also easy to see. In the set-builder definition, the last set in the union contains function definitions taken over from the original program with only the right-hand sides of their equations changed (by $\langle \cdot \rangle^d$); since the left-hand sides stay the same, these function definitions again have copattern coverage. The function definitions from the second set in the union remain to be considered. For each of their equations, each of its left-hand sides is constructed (disregarding the receiver notation for destructors) from the original left-hand side by turning the destructor name into the corresponding function name and the function name into the corresponding constructor name. For the original function definitions, copattern coverage was derived by result splitting; consequently, copattern coverage for the new function definitions can be derived by variable splitting on the first variable.
+
+\textbf{Preservation of well-typedness.} Let $prg$ be the program to be transformed; we assume $prg$ to be well-typed. This means that for each equation $eqn = `` q = t ''$ of $prg$ we have a derivation of $\Sigma_{prg} \vdash eqn \textrm{ ok}$, with $\Sigma_{prg}$ being the signatures of $prg$. We will show that each equation of $\langle prg \rangle^{\textsf{CoreDefunc}}$ is well-typed. In the definition of \textsf{CoreDefunc}, we can see that the signatures $\Sigma_{\langle prg \rangle^{\textsf{CoreDefunc}}}$ of $\langle prg \rangle^{\textsf{CoreDefunc}}$ are exactly the following: for each destructor signature in $\Sigma_{prg}$ an identical function signature, for some function signatures in $\Sigma_{prg}$ identical constructor signatures, and for the other function signatures in $\Sigma_{prg}$ the identical function signatures. From this, we have the following lemma.
+
+\begin{lemma}
+\label{lem:pwtdefunc}
+When $\Sigma_{prg} \vdash `` q = t " \textrm{ ok}$, then $\Sigma_{\langle prg \rangle^{\textsf{CoreDefunc}}} \vdash `` \langle q \rangle^d = \langle t \rangle^d " \textrm{ ok}$.
+\begin{proof}
+By induction on the derivation of $\Sigma \vdash `` q = t " \textrm{ ok}$, using the similarity of $\Sigma_{prg}$ and $\Sigma_{\langle prg \rangle^{\textsf{CoreDefunc}}}$.
+\end{proof}
+\end{lemma}
+
+In the definition of \textsf{CoreDefunc} we can see that each equation $eqn = `` q = t "$ in $prg$ corresponds to exactly one equation $`` \langle q \rangle^d = \langle t \rangle^d "$ of $\langle prg \rangle^{\textsf{CoreDefunc}}$. Combine this with \autoref{lem:pwtdefunc} to get $\Sigma_{\langle prg \rangle^{\textsf{CoreDefunc}}} \vdash `` q = t " \textrm{ ok}$ for each equation $eqn$ of $\langle prg \rangle^{\textsf{CoreDefunc}}$. Thus $\langle prg \rangle^{\textsf{CoreDefunc}}$ is well-typed whenever $prg$ is.
 
 \textbf{Bisimulation.} For \textsf{CoreDefunc}, strong bisimulation holds. To show this, we first show a general result that an isomorphism between rule sets of two programs is also an isomorphism between the respective reduction relations of the programs. In the following, $\langle \cdot \rangle$ is some program transformation when applied to programs. When applied to terms it stands for some transformation of terms that only changes symbols, but leaves the structure of the terms unchanged.
 
@@ -295,7 +313,7 @@ For any program $prg$, when it is
 \forall s,t \in \textrm{Term}_{prg}. s \mapsto_{prg} t \iff \langle s \rangle \mapsto_{\langle prg \rangle} \langle t \rangle.
 \]
 \begin{proof}
-$``\Rightarrow"$: By the derivation of $s \mapsto_{prg} t$ there is a rule $r := (q_r, t_r) \in \textrm{Rules}(prg)$ and a substitution $\sigma$ such that $s = q_r[\sigma]$ and $t = t_r[\sigma]$ and the right-hand sides of $\sigma$ are values in $prg$. By the premiss we know that there is a rule $\langle r \rangle := (\langle q_r \rangle, \langle t_r \rangle) \in \textrm{Rules}(prg)$, and by \autoref{lem:ivj} we know that, for each term $v$ that is a value in $prg$, $\langle v \rangle$ is a value in $\langle prg \rangle$ and thus the right-hand sides of $\sigma \circ \langle \cdot \rangle$ are values in $\langle prg \rangle$. Consequently, it is $\langle s \rangle = \langle q_r \rangle[\sigma \circ \langle \cdot \rangle] \mapsto \langle t_r \rangle[\sigma \circ \langle \cdot \rangle] = \langle t \rangle$.
+$``\Rightarrow"$: By the derivation of $s \mapsto_{prg} t$ there is a rule $r := (q_r, t_r) \in \textrm{Rules}(prg)$ and a substitution $\sigma$ such that $s = q_r[\sigma]$ and $t = t_r[\sigma]$ and the right-hand sides of $\sigma$ are values in $prg$. By the premiss we know that there is a rule $\langle r \rangle := (\langle q_r \rangle, \langle t_r \rangle) \in \textrm{Rules}(prg)$, and by \autoref{lem:ivj} we know that, for each term $v$ that is a value in $prg$, $\langle v \rangle$ is a value in $\langle prg \rangle$ and thus the right-hand sides of $\sigma \circ \langle \cdot \rangle$ are values in $\langle prg \rangle$. Consequently, it is $\langle s \rangle = \langle q_r \rangle[\langle \cdot \rangle \circ \sigma] \mapsto \langle t_r \rangle[\langle \cdot \rangle \circ \sigma] = \langle t \rangle$.
 
 $``\Leftarrow"$: By the derivation of $\langle s \rangle \mapsto_{prg} \langle t \rangle$ there is a rule $r' := (q_{r'}, t_{r'}) \in \textrm{Rules}(\langle prg \rangle)$ and a substitution $\sigma'$ such that $\langle s \rangle = q_{r'}[\sigma']$ and $\langle t \rangle = t_{r'}[\sigma']$ and the right-hand sides of $\sigma'$ are values in $prg$. By the premiss we know that there is a rule $r  := (q_r, t_r) \in \textrm{Rules}(prg)$ such that $\langle q_r \rangle = q_{r'}, \langle t_r \rangle = t_{r'}$, and by \autoref{lem:ivj} we know that, for each term $v'$ that is a value in $\langle prg \rangle$, each term $v$ with $v' = \langle v \rangle$ is a value in $prg$ and thus the right-hand sides of $\sigma$ with $\sigma' = \sigma \circ \langle \cdot \rangle$ are values in $prg$. Consequently, it is $s = q_r[\sigma] \mapsto t_r[\sigma] = t$.
 \end{proof}
@@ -353,10 +371,10 @@ eqn_{nr} &::= fun(x^*, con(y^*), z^*) = t \\
 
 However, there is an asymmetry between the two fragments. When only one destructor is allowed, this can also only be placed at one position. On the other hand, allowing only one constructor leaves open the possibility of placing this at different positions. More on this later.
 
-The refunctionalization algorithm given below requires the constructor to be at the first position, i.e., it has as its domain the fragment $\mathbf{U}_cc[fdef_{un,r'}]$ of Uroboro defined as follows.
+The refunctionalization algorithm given below requires the constructor to be at the first position, i.e., it has as its domain the fragment $\mathbf{U}_{cc}[fdef_{un,r'}]$ of Uroboro defined as follows.
 
 \begin{definition}[Unnested Fragment for the actual \textsf{CoreRefunc}]
-The fragment $\mathbf{U}_cc[fdef_{un,r'}]$, for the actual \textsf{CoreRefunc}, is induced by the function definition fragment $fdef_{un,r'}$, defined below using EBNF rules.
+The fragment $\mathbf{U}_{cc}[fdef_{un,r'}]$, for the actual \textsf{CoreRefunc}, is induced by the function definition fragment $fdef_{un,r'}$, defined below using EBNF rules.
 \begin{align*}
 fdef_{un,r'} &::= eqn_{nr'}^* ~ | ~ eqn_r^* \\
 eqn_r &::= fun(x^*).des(y^*)^* = t \\
@@ -364,9 +382,9 @@ eqn_{nr'} &::= fun(con(x^*), y^*) = t \\
 \end{align*}
 \end{definition}
 
-The two fragments $\mathbf{U}_cc[fdef_{un,d}]$ and $\mathbf{U}_cc[fdef_{un,r'}]$ are the Data and Codata fragment from Rendel et al., extended to allow arbitrary lhss, as long as they are already defunctionalized or refunctionalized, i.e., they contain no destructors or no constructors, respectively. This allows us to extend their de- and refunctionalization transformations for the Codata and Data Fragments, to our core de- and refunctionalization for$\mathbf{U}_cc[fdef_{un,r'}]$ and $\mathbf{U}_cc[fdef_{un,d}]$, respectively. The Data and Codata Fragment are symmetric to each other, as de- and refunctionalization can switch between them; as Rendel et al. describe it, for these fragments, de- and refunctionalization is the same transformation, namely a matrix transposition for a two-dimensional matrix representation of programs.
+The two fragments $\mathbf{U}_{cc}[fdef_{un,d}]$ and $\mathbf{U}_{cc}[fdef_{un,r'}]$ are the Data and Codata fragment from Rendel et al., extended to allow arbitrary lhss, as long as they are already defunctionalized or refunctionalized, i.e., they contain no destructors or no constructors, respectively. This allows us to extend their de- and refunctionalization transformations for the Codata and Data Fragments, to our core de- and refunctionalization for$\mathbf{U}_{cc}[fdef_{un,r'}]$ and $\mathbf{U}_{cc}[fdef_{un,d}]$, respectively. The Data and Codata Fragment are symmetric to each other, as de- and refunctionalization can switch between them; as Rendel et al. describe it, for these fragments, de- and refunctionalization is the same transformation, namely a matrix transposition for a two-dimensional matrix representation of programs.
 
-All this would be good and well, were it not for the fact that unnesting to prepare for refunctionalization doesn't arrive at $\mathbf{U}_cc[fdef_{un,r'}]$. A somewhat ad-hoc workaround is presented in the section following the next. More importantly, however, this situation shines a light on the asymmetry between destructors and constructors -- in Uroboro and elsewhere, as this difference is not one exclusive to Uroboro. This underlying problem is illustrated in the next section.
+All this would be good and well, were it not for the fact that unnesting to prepare for refunctionalization doesn't arrive at $\mathbf{U}_{cc}[fdef_{un,r'}]$. A somewhat ad-hoc workaround is presented in the section following the next. More importantly, however, this situation shines a light on the asymmetry between destructors and constructors -- in Uroboro and elsewhere, as this difference is not one exclusive to Uroboro. This underlying problem is illustrated in the next section.
 
 \subsubsection{An asymmetry: The general problem}
 
@@ -429,9 +447,11 @@ Next, we give the definition for \textsf{CoreRefunc}.
 
 \end{algorithm}
 
-We consider important properties of the transformation.
+We consider important properties of the transformation. Termination and preservation of well-typedness can be shown completely analogously to \textsf{CoreDefunc}; simply use \textsf{CoreRefunc} and $\langle \cdot \rangle^r$ instead of \textsf{CoreDefunc} and $\langle \cdot \rangle^d$, respectively.
 
-\textbf{Bisimulation.} For \textsf{CoreRefunc}, strong bisimulation holds.
+\textbf{Range.} This is also shown completely analogously to \textsf{CoreDefunc}, again using the respective dual notions. It can be directly seen in the definition that the resulting program contains no data type definitions. The copattern coverage of the resulting program is also easy to see. In the set-builder definition, the last set in the union contains function definitions taken over from the original program with only the right-hand sides of their equations changed (by $\langle \cdot \rangle^r$); since the left-hand sides stay the same, these function definitions again have copattern coverage. The function definitions from the second set in the union remain to be considered. For each of their equations, each of its left-hand sides is constructed (disregarding the receiver notation for destructors) from the original left-hand side by turning the function name into the corresponding destructor name and the constructor name into the corresponding function name. For the original function definitions, copattern coverage was derived by variable splitting on the first variable; consequently, copattern coverage for the new function definitions can be derived by result splitting.
+
+\textbf{Bisimulation.} For \textsf{CoreRefunc}, strong bisimulation holds. Again, this is shown completely analogously to \textsf{CoreDefunc}; we reuse \autoref{lem:iso}.
 
 \begin{lemma}[Strong bisimulation of the rule relations]
 \label{lem:sbrulr}
