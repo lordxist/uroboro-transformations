@@ -63,7 +63,7 @@ prg ::= (ddef ~ | ~ coddef ~ | ~  fdef)^*
 &eqn &::= q = t
 \end{align*}
 
-Note that we consider the collection of equations in a function definition to be a \textit{set}. This means that we establish no order on the equations. In practice, this means that programs which depend on the order of their equations first need to be transformed into order-independent, semantically equivalent programs. We consider this problem in Appendix B.
+Note that we consider the collection of equations in a function definition to be a \textit{set}. This means that we establish no order on the equations. We don't consider order-dependent programs in this work; suffice it to say that a variant of Uroboro augmented with order would require a change to the semantics. In general, this is a problem not yet considered for languages with copattern matching; for instance, the language of Abel et al.\cite{abel13copatterns} also doesn't have an order on equations.
 
 \section{Static semantics}
 \label{sec:urostatsem}
