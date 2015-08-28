@@ -337,7 +337,62 @@ First, the equations of the transformed are classified. There are three kinds of
 
 \section{Preservation of well-typedness}
 
-TODO: a brief section on why well-typedness is preserved by extractions
+In this section, we show that extractions preserve well-typedness, i.e., that when applying an extraction to a well-typed program a well-typed program obtains. Let $prg$ be the original program, and $\langle prg \rangle$ the program after extraction. By definition a program is well-typed when all of its equations $eqn$ are well-typed, i.e., it is $\Sigma \vdash eqn \textrm{ ok}$, where $\Sigma$ are the signatures of the program. Let $\Sigma_{prg}$ be the signatures of $prg$, and $\Sigma_{\langle prg \rangle}$ be the signatures of $\langle prg \rangle$. Since extractions only add one function signature, but leave the other signatures unchanged, it is $\Sigma_{prg} \subseteq \Sigma_{\langle prg \rangle}$. The following thus holds trivially.
+
+\begin{fact}
+\label{fac:wtpfac}
+All typing judgements still hold when replacing $\Sigma_{prg}$ with $\Sigma_{\langle prg \rangle}$.
+\end{fact}
+
+Like in \autoref{sec:extrovl}, we distinguish three kinds of equations in $\langle prg \rangle$: those left unchanged, the $\epsilon$ equation, and the $\zeta_r$ equations. For each of these kinds, we show a lemma stating that all of its equations are well-typed, under the assumption that $prg$  is well-typed (and thus all its equations). Combining these, the preservation of well-typedness follows.
+
+\begin{lemma}
+Assuming that $prg$ is well-typed, all equations $eqn$ of $\langle prg \rangle$ taken over unchanged from $prg$ are well-typed.
+
+\begin{proof}
+By assumption, we know that $\Sigma_{prg} \vdash eqn \textrm{ ok}$. By \autoref{fac:wtpfac} it follows that $\Sigma_{\langle prg \rangle} \vdash eqn \textrm{ ok}$.
+\end{proof}
+\end{lemma}
+
+\begin{lemma}
+Assuming that $prg$ is well-typed, the equation $\epsilon$ of $\langle prg \rangle$, as specified in the definition of extractions, is well-typed.
+
+\begin{proof}
+We want to show that $\Sigma \vdash `` q_\epsilon = t_\epsilon " \textrm{ ok}$. By the judgement for well-typedness of equations this means that we have to show the following.
+\begin{enumerate}
+\item $q_\epsilon$ is either a function or destructor call, with the respective function or destructor signature present in $\Sigma_{\langle prg \rangle}$; let the return type given in this signature be $\sigma$.
+
+\item For each variable $x$ in $q_\epsilon$ it is $q_\epsilon \vdash_{\Sigma_{\langle prg \rangle}} x : \sigma_x$ for some type $\sigma_x$.
+
+\item It is $\{ x : \sigma_x ~ | ~ x \in V(q_\epsilon) \} \vdash_{\Sigma_{\langle prg \rangle}} t_\epsilon : \sigma$.
+\end{enumerate}
+The first point is easy to see. Since there is at least one left-hand side $q \in T$ (part of the extraction target) of $prg$, that we know is the result of applying a (co-)substitution to $q_\epsilon$, and $prg$ is well-typed, there must be a signature in $\Sigma_{prg}$ which holds the return type $\sigma$ for the destructor or function call that $q_\epsilon$ is. Consequently, since $\Sigma_{prg} \subseteq \Sigma_{\langle prg \rangle}$, we also have the return type $\sigma$ for the destructor or function call $q_\epsilon$ in the signature set $\Sigma_{\langle prg \rangle}$ of $\langle prg \rangle$.
+
+For the second point, again consider an lhs $q \in T$. Because it is possible to infer, using $\Sigma_{prg}$, a type for all variables in $q$, which results from applying a (co-)substitution to $q_\epsilon$, it also is possible to infer a type for all variables in $q_\epsilon$ using $\Sigma_{prg}$, and, by \autoref{fac:wtpfac}, also using $\Sigma_{\langle prg \rangle}$.
+
+The third point follows immediately from the definition of the signature of $aux$, as it is $t_\epsilon = aux(x_1, ..., x_n)$, with the $x_i$ being the variables of $q_\epsilon$, and the argument types of $aux$ are defined to be the types inferred for the variables of $q_\epsilon$, and the return type of $aux$ is defined to be the type $\sigma$ inferred for $q_\epsilon$.
+\end{proof}
+\end{lemma}
+
+\begin{lemma}
+Assuming that $prg$ is well-typed, the equations $\zeta_r$, as specified in the definition of extractions, are well-typed.
+
+\begin{proof}
+First, note that by definition $aux$ is the function definition that $\zeta_r$ is a part of. We want to show that $\Sigma \vdash `` q_{\zeta_r} = t_{\zeta_r} " \textrm{ ok}$. By the judgement for well-typedness of equations this means that we have to show the following.
+\begin{enumerate}
+\item $q_{\zeta_r}$ is either a function or destructor call, with the respective function or destructor signature present in $\Sigma_{\langle prg \rangle}$; let the return type given in this signature be $\sigma$.
+
+\item For each variable $x$ in $q_{\zeta_r}$ it is $q_{\zeta_r} \vdash_{\Sigma_{\langle prg \rangle}} x : \sigma_x$ for some type $\sigma_x$.
+
+\item It is $\{ x : \sigma_x ~ | ~ x \in V(q_{\zeta_r}) \} \vdash_{\Sigma_{\langle prg \rangle}} t_{\zeta_r} : \sigma$.
+\end{enumerate}
+For the first point, we distinguish between the possible forms of $q_{\zeta_r}$. It can either be a function call, then we infer its type as the return type $\sigma$ of $aux$, given in the signature for $aux$, which is present in $\Sigma_{\langle prg \rangle}$. Or it can be a destructor call; by definition, $q_{\zeta_r}$ is the result of a (co-)substitution applied to $t_\epsilon$, and since $q_{\zeta_r}$ contains a destructor call and $t_\epsilon$ doesn't, the destructor must be a part of the co-substitution. Since $q_r \in T$ results from $q_\epsilon$ by applying this co-substitution to it, and $prg$ is well-typed, we know that the respective destructor signature is present in $\Sigma_{prg}$, and thus in $\Sigma_{\langle prg \rangle}$.
+
+Concerning the second point, first note that the variables of $q_{\zeta_r}$ are exactly those of $q_r$. The types inferred for the variables in $q_{\zeta_r}$ are identical to the types inferred for them in $q_r$. To see this, combine the facts that the argument types of $aux$ are defined to be the types inferred for the variables of $q_\epsilon$, the return type of $aux$ is defined to be the type inferred for $q_\epsilon$, and that $q_r$ is the result of applying a (co-)substitution to $q_\epsilon$. Thus we know the following. For each variable $x$ of $q_r$ and $q_{\zeta_r}$, let $\sigma_x$ be the type inferred for it in $prg$, i.e., it is $q_r \vdash_{\Sigma_{prg}} x : \sigma_x$. Since the types inferred for the variables in $q_{\zeta_r}$ are identical to the types inferred for them in $q_r$, it also is $q_{\zeta_r} \vdash_{\Sigma_{\langle prg \rangle}} x : \sigma_x$.
+
+For the third point, we use the fact that the types inferred for the variables of $q_{\zeta_r}$ and $q_r$ are identical in $prg$ and $\langle prg \rangle$, as established for the second point. Since $prg$ is well-typed, and thus it is $\Sigma_{prg} \vdash `` q_r = t_r " \textrm{ ok}$, it also is $\{ x : \sigma_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma_{prg}} t_r$, and by \autoref{fac:wtpfac} it is $\{ x : \sigma_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma_{\langle prg \rangle}} t_r$.
+\end{proof}
+\end{lemma}
 
 \section{Example extractions}
 \label{sec:extrex}
