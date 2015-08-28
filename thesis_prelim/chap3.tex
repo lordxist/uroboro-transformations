@@ -1,24 +1,29 @@
+% !TEX root = main.tex
 \chapter{Extraction transformations}
 
-Most of the steps that comprise the transformations of the following chapters are \textit{extractions}. Roughly speaking, this means that they decrease, in some way, the syntactic complexity of the program, while preserving its semantics to some degree.
+The automatic de- and refunctionalization algorithms presented in chapter 4 are made up of several ingredients, some of which are part of the motivation for the contents of this chapter. In the preprocessing phase of either algorithm, there are steps which eliminate destructors or constructors from copatterns. In this chapter, we generalize this concept to arbitrary \textit{extractions}.
 
-As an example, consider the extraction of a destructor out of the following program fragment:
+Extractions are (a way to describe) transformations, that roughly speaking, decrease, in some way, the syntactic complexity of the program, while preserving its semantics to some degree. We think that this might also be interesting independent of its application for automatic de- and refunctionalization in chapter 4. For instance, the user might want to decrease the syntactic complexity, e.g., by reducing the maximum number of destructors appearing in any lhs, in order to better understand the program. This situation is comparable to certain refactorings in object-oriented programming, like moving methods or extracting classes.
+
+As an example, consider the extraction of a destructor out of the following program fragment.
 \begin{lstlisting}
 fun().des().des() = t
 \end{lstlisting}
-
+The result is shown below; the transformation has introduced an auxiliary function, which is the reason why we chose the name ``extraction'': Some syntactic component is ``extracted'' into a newly added part of the program.
 \begin{lstlisting}
 fun().des() = aux()
 aux().des() = t
 \end{lstlisting}
 The resulting program fragment doesn't contain any copatterns with two destructors, unlike the original, thus the transformation has decreased the syntactic complexity in this way. The transformation preserves the semantics because, roughly, in the transformed program there is a way to go from the original equation's lhs to its rhs: $\mathtt{fun().des().des()} \longrightarrow \mathtt{aux().des()} \longrightarrow \mathtt{t}$.
 
+In the next section, we formally define extractions and how they are applied to programs. Then we show how extractions preserve the semantics of a program in a weak bisimulation (\autoref{sec:extrbis}). The preservation of the semantics depends upon the absence of overlapping equations both in the original and in the resulting program; therefore, the section that follows shows under which circumstances extractions don't introduce overlaps (\autoref{sec:extrovl}). Then we show that extractions preserve the well-typedness of programs (\autoref{sec:extrpwt}). Finally, we give some example extractions, two of which are used in chapter 4 (\autoref{sec:extrex}).
+
 \section{Extractions}
 \label{sec:extrdef}
 
-Extractions are induced by a function $\pi$ that specifies how to decrease the syntactic complexity. Before defining extractions a way is described to uniformly express extractions ``from the outside in'', such as the destructor extraction exemplified above.
+Extractions are induced by a function $\pi$ that specifies how to decrease the syntactic complexity. Broadly, extractions fall into two classes: extractions that change the ``outer'' form, and those which change the ``inner'' form. Before defining extractions, we describe a way to uniformly express extractions that change the ``outer'' form, such as the destructor extraction exemplified above.
 
-Changing the ``outer'' form of the copattern, i.e., removing or adding destructors, is dual to changing its ``inner'' form, i.e., replacing patterns with other patterns. For the purpose of defining extractions of the latter type, substitutions will be used. For the purpose of defining extractions of the former, the notion of \textit{co-substitution} is introduced.
+Changing the ``outer'' form of the copattern, i.e., removing or adding destructors, is dual to changing its ``inner'' form, i.e., replacing patterns with other patterns. For the purpose of defining extractions of the latter type, substitutions will be used. For the purpose of defining extractions of the former, we introduce the notion of \textit{co-substitution}.
 
 \begin{definition}[Co-substitution]
 A function $\sigma$ from copatterns to copatterns is called a \textit{co-substitution}, if, for every copattern $q$, it is defined as follows:
@@ -53,7 +58,7 @@ A $\pi$-extraction target $T$ is a set of equations such that $\pi(q) = \pi(q')$
 A $\pi$-extraction targeting an extraction target $T$ is a triple consisting of
 \begin{itemize}
 \item an equation $\epsilon$ with lhs $q_\epsilon = \mathtt{get}(q)$ and rhs $t_\epsilon = \langle q_\epsilon \rangle^{aux}$, for some lhs $q$ of an equation in $T$,
-\item a function $\zeta: T \to \mathbf{Eqn}, \zeta_r = ``\mathtt{putback}(t_\epsilon, q_r) = t_r  "$, and
+\item a function $\zeta$ with domain $T$, defined as follows: $\zeta_r := ``\mathtt{putback}(t_\epsilon, q_r) = t_r  "$, and
 \item the following signature for the auxiliary function $aux$ (its equations are the image of $\zeta$): $`` \textrm{\textbf{function }} aux(\tau_1, ..., \tau_n): \sigma "$, with $\tau_1, ..., \tau_n$ the types inferred, using the signatures of $prg$, for the variables in $q_\epsilon$, in the order that they appear in in $q_\epsilon$, and $\sigma$ the type inferred, also using the signatures of $prg$, for $q_\epsilon$.
 \end{itemize}
 
@@ -83,31 +88,32 @@ the function definition that contains the lhss of $T$.
 \section{Bisimulation}
 \label{sec:extrbis}
 
-Every $\pi$-extraction function targeting a $q$ preserves the semantics of programs in a kind of weak bisimulation. There are two equivalent characterizations of this bisimulation. One is given and proved in the first subsection, the other follows in the second subsection and is shown to be equivalent to the first.
+Every extraction preserves the semantics of programs in a kind of weak bisimulation, assuming that the neither the original nor the transformed program have overlapping equations. There are two equivalent characterizations of this bisimulation. One is given and proved in the first subsection, the other follows in the second subsection and is shown to be equivalent to the first. For this section, we will always assume that neither the original nor the transformed program have overlapping equations.
 
-Before that, a function $\langle \cdot \rangle^{aux^{-1}}$ from terms to terms needs to be defined that serves as the opposite of $\langle \cdot \rangle^{aux}$. It is defined as replacing calls to the auxiliary function as generated by $\langle \cdot \rangle^{aux}$ with the original copatterns with their variables instantiated accordingly. This corresponds to what Setzer et al. call a \textit{back-interpretation} in the framework of their paper ``Unnesting of copatterns''; this term will be used here as well when referring to $\langle \cdot \rangle^{aux^{-1}}$.
+Before we start, we define a function $\langle \cdot \rangle^{aux^{-1}}$ from terms to terms that serves as the opposite of $\langle \cdot \rangle^{aux}$. It is defined as replacing calls to the auxiliary function as generated by $\langle \cdot \rangle^{aux}$ with the original copatterns with their variables instantiated accordingly. This corresponds to what Setzer et al.\cite{setzer14unnesting} call a \textit{back-interpretation}; we will use this term here as well when referring to $\langle \cdot \rangle^{aux^{-1}}$.
 
 \subsection{Using a modified value judgement}
 
-For the definition of this weak bisimulation, a modification, using the back-interpretation, of the value judgement needs to be defined. For any term $t$ with names declared in $\langle prg \rangle$, let
+For the definition of this weak bisimulation, we modify the value judgement, using the back-interpretation, in the following way. For any term $t$ with names declared in $\langle prg \rangle$, let
 \[
 \langle prg \rangle \vdash'_v t :\iff prg \vdash_v \langle t \rangle^{aux^{-1}}.
 \]
 
-From this it immediately follows that $\mathcal{E}$ is an evaluation context with respect to this modified value judgement for $\langle prg \rangle$ if and only if $\langle \mathcal{E} \rangle^{aux^{-1}}$ is an evaluation context with respect to the original value judgement for $prg$. It also means that, for a term $t$ with all names declared in $\langle prg \rangle$, the immediate subterms of $t$ are values with this judgement for $\langle prg \rangle$ if and only if the immediate subterms of $\langle t \rangle^{aux^{-1}}$ are values with the original judgement for $prg$.
+From this definition it immediately follows that $\mathcal{E}$ is an evaluation context with respect to this modified value judgement for $\langle prg \rangle$ if and only if $\langle \mathcal{E} \rangle^{aux^{-1}}$ is an evaluation context with respect to the original value judgement for $prg$. It also means that, for a term $t$ with all names declared in $\langle prg \rangle$, the immediate subterms of $t$ are values with this judgement for $\langle prg \rangle$ if and only if the immediate subterms of $\langle t \rangle^{aux^{-1}}$ are values with the original judgement for $prg$.
 
 Write $\longrightarrow'$ for the reduction relation $\longrightarrow$ with its value judgement modified in this way. The weak bisimulation is defined as follows, for every $s,t$ with all of their names declared in $prg$:
 \begin{equation}
+\label{eq:bisim1}
 s \longrightarrow_{prg}^* t \iff s {\longrightarrow'}_{\langle prg \rangle}^* t
 \end{equation}
-This statement is now proved using Theorem 4 of ``Unnesting of copatterns'' (Setzer et al.).
+This statement is now proved using Theorem 4 of Setzer et al.\cite{setzer14unnesting}
 
 \begin{proposition}
 \label{prop:bisim1}
-The weak bisimulation statement (2.1) holds for any transformation defined as $liftp(e)$ for some $\pi$-extraction targeting a $q$.
+The weak bisimulation statement~\ref{eq:bisim1} holds for any transformation defined as $apply(e)$ for some $\pi$-extraction $e$ targeting a $T$.
 
 \begin{proof}
-By Theorem 4 of ``Unnesting of copatterns'' (Setzer et al.), it suffices to show the statements (SN1) and (SN2), defined there along with the theorem. For this, set $\textrm{Int} = \langle \cdot \rangle^{aux^{-1}}$. Note that this unconversion is compatible with evaluation contexts, i.e.,
+By Theorem 4 of Setzer et al.\cite{setzer14unnesting}, it suffices to show the statements (SN1) and (SN2), defined there along with the theorem. For this, set $\textrm{Int} = \langle \cdot \rangle^{aux^{-1}}$. Note that this unconversion is compatible with evaluation contexts, i.e.,
 \[
 \langle \mathcal{E}[s'] \rangle^{aux^{-1}} = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}],
 \]
@@ -115,52 +121,51 @@ because $\langle \cdot \rangle^{aux}$ converts to function calls, not destructor
 Further, set $m$ as the number of calls to the function targeted in the transformation, i.e., that of $q_\epsilon$.
 
 (SN1): We know that $s = \mathcal{E}[s'] = \mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]] = t$, for some evaluation context $\mathcal{E}$ of $prg$ and some equation $r$ of $prg$.
-\[
-s = \mathcal{E}[s'] = \mathcal{E}[\sigma^{q_r}_\pi(q_\epsilon)[\sigma]]
-\]
-\[
-\longrightarrow'_{\langle prg \rangle} \mathcal{E}[\sigma^{q_r}_\pi(t_\epsilon)[\sigma]] = \mathcal{E}[q_{\zeta_r}[\sigma]]
-\]
-\[
-\longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_{\zeta_r}[\sigma]] = \mathcal{E}[t_r[\sigma]] = t
-\]
+\begin{flalign*}
+&s = \mathcal{E}[s'] = \mathcal{E}[\sigma^{q_r}_\pi(q_\epsilon)[\sigma]] \\
+\longrightarrow'_{\langle prg \rangle} ~ &\mathcal{E}[\sigma^{q_r}_\pi(t_\epsilon)[\sigma]] = \mathcal{E}[q_{\zeta_r}[\sigma]] \\
+\longrightarrow'_{\langle prg \rangle} ~ &\mathcal{E}[t_{\zeta_r}[\sigma]] = \mathcal{E}[t_r[\sigma]] = t
+\end{flalign*}
 
-(SN2): Three cases will be distinguished: The reduction in $\langle prg \rangle$ can use either an equation taken over unchanged from $prg$ (1.), it can use a $\zeta_r$ (2.), or it can use $\epsilon$. Each case makes use of an evaluation context $\mathcal{E}$ of the reduction relation for $\langle prg \rangle$.
+(SN2): Three cases will be distinguished: The reduction in $\langle prg \rangle$ can use either an equation taken over unchanged from $prg$ (1.), it can use a $\zeta_r$ (2.), or it can use $\epsilon$ (3.). Each case makes use of an evaluation context $\mathcal{E}$ of the reduction relation for $\langle prg \rangle$.
 \begin{enumerate}
 \item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_r[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]] = t$. The desired reduction sequence can be given as follows:
-\[
-\langle \mathcal{E}[s'] \rangle^{aux^{-1}} = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}] = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle q_r \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]]
-\]
-\[
- \longrightarrow_{prg} \langle \mathcal{E} \rangle^{aux^{-1}}[t_r[\langle t_r \rangle^{aux^{-1}}]] = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]] = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r[\sigma] \rangle^{aux^{-1}}]
-\]
-\[
-= \langle \mathcal{E}[t_r[\sigma]] \rangle^{aux^{-1}} = \langle t \rangle^{aux^{-1}}.
-\]
+\begin{flalign*}
+&\langle \mathcal{E}[s'] \rangle^{aux^{-1}} \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}] \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle q_r \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]] \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[q_r[\langle \sigma \rangle^{aux^{-1}}]] \\
+ \longrightarrow_{prg}~& \langle \mathcal{E} \rangle^{aux^{-1}}[t_r[\langle \sigma \rangle^{aux^{-1}}]] \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]] \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r[\sigma] \rangle^{aux^{-1}}] \\
+=~& \langle \mathcal{E}[t_r[\sigma]] \rangle^{aux^{-1}} \\
+=~& \langle t \rangle^{aux^{-1}}.
+\end{flalign*}
 
 \item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_{\zeta_r}[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_{\zeta_r}[\sigma]] = t$. The desired reduction sequence can be given as follows:
-\[
-\langle \mathcal{E}[s'] \rangle^{aux^{-1}} = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}] = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle q_{\zeta_r} \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]] = \langle \mathcal{E} \rangle^{aux^{-1}}[q_r[\langle \sigma \rangle^{aux^{-1}}]]
-\]
-\[
-\longrightarrow_{prg} \langle \mathcal{E} \rangle^{aux^{-1}}[t_r[\langle t_r \rangle^{aux^{-1}}]] = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]] = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r[\sigma] \rangle^{aux^{-1}}]
-\]
-\[
-= \langle \mathcal{E}[t_r[\sigma]] \rangle^{aux^{-1}} = \langle t \rangle^{aux^{-1}}.
-\]
+\begin{flalign*}
+&\langle \mathcal{E}[s'] \rangle^{aux^{-1}} \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}] \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle q_{\zeta_r} \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]] \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[q_r[\langle \sigma \rangle^{aux^{-1}}]] \\
+\longrightarrow_{prg}~& \langle \mathcal{E} \rangle^{aux^{-1}}[t_r[\langle t_r \rangle^{aux^{-1}}]] \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]] \\
+=~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r[\sigma] \rangle^{aux^{-1}}] \\
+=~& \langle \mathcal{E}[t_r[\sigma]] \rangle^{aux^{-1}} = \langle t \rangle^{aux^{-1}}.
+\end{flalign*}
 
 \item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_\epsilon[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_\epsilon[\sigma]] = t$. In this case, instead of giving a reduction sequence, the other side of the disjunction will be shown to hold.
 
 Because $\langle q_\epsilon \rangle^{aux^{-1}} = \langle t_\epsilon \rangle^{aux^{-1}}$, it is $\langle s \rangle^{aux^{-1}} = \langle t \rangle^{aux^{-1}}$.
 
-And because $q_\epsilon$ is of the function that is targeted in the transformation, and $t_\epsilon$ isn't, it is $m(q_\epsilon) > m(t_\epsilon)$, and consequently $m(s) > m(t)$.
+And because $q_\epsilon$ is of the function that is targeted in the transformation, and $t_\epsilon$ isn't, it is $m(q_\epsilon) > m(t_\epsilon)$, and consequently $m(s) > m(t)$. \qedhere
 \end{enumerate}
 \end{proof}
 \end{proposition}
 
 \subsection{Using the back-interpretation directly}
 
-This characterization of the bisimulation, equivalent to the first, directly uses the back-interpretation. In short, extractions preserve semantic properties by introducing an equation which leads from a, syntactically, more complex to a less complex term, where both terms are meant to represent, semantically, the same ``object''. This ``sameness'' is expressed by one being the back-interpretation of the other.
+This characterization of the bisimulation, which is equivalent to the first, directly uses the back-interpretation. In short, extractions preserve semantic properties by introducing an equation which leads from a, syntactically, more complex to a less complex term, where both terms are meant to represent, semantically, the same ``object''. This ``sameness'' is expressed by one being the back-interpretation of the other.
 
 The bisimulation is characterized as follows:
 \[
@@ -183,7 +188,7 @@ s {\longrightarrow'}_{\langle prg \rangle}^* t \implies s \longrightarrow^*_{\la
 
 In order to prove this, we define a counterpart to the $\longrightarrow'$ reduction relation: Let
 \[
-\longrightarrow^{aux} = \{(a,b) : a \longrightarrow^{all} b \land \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\},
+\longrightarrow^{aux} = \{(a,b) : a \longrightarrow^{all} b ~ \land ~ \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\},
 \]
 where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle$ whose underlying value set is the set of all terms, i.e., the reduction is allowed to choose any redex. Where $\longrightarrow'$ can ``sidestep'' reductions which don't change the back-interpretation of a term, $\longrightarrow^{aux}$ is purely ``interpretative'', that is, it only allows reductions to terms with equal back-interpretation. This is expressed formally in the following lemmas relating $\longrightarrow'$ and $\longrightarrow^{aux}$, one concerning their commutation, the other what we call their complementarity. The $`` \Rightarrow "$ direction of (2.2) follows from these, as shown below.
 
@@ -192,7 +197,7 @@ where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle
 
 For all terms $a,b,c$ it holds that:
 \[
-a {\longrightarrow'} b \land a \longrightarrow^{aux} c \implies \exists d . b {\longrightarrow^{aux}}^* d \land c {\longrightarrow'}^= d
+a {\longrightarrow'} b ~ \land ~ a \longrightarrow^{aux} c \implies \exists d . b {\longrightarrow^{aux}}^* d ~ \land ~ c {\longrightarrow'}^= d
 \]
 
 \end{restatable}
@@ -205,7 +210,7 @@ Left for the appendix.
 
 For all terms $a,b,c$ and $n \in \mathbb{N}$ it holds that:
 \[
-a {\longrightarrow'}^n b \land a {\longrightarrow^{aux}}^* c \implies \exists d . b {\longrightarrow^{aux}}^* d \land c {\longrightarrow'}^{\leq n} d
+a {\longrightarrow'}^n b ~ \land ~ a {\longrightarrow^{aux}}^* c \implies \exists d . b {\longrightarrow^{aux}}^* d ~ \land ~ c {\longrightarrow'}^{\leq n} d
 \]
 
 \begin{proof}
@@ -229,7 +234,7 @@ When $a \longrightarrow' b$ but $a \not\longrightarrow b$, then there is a $c$ w
 Left for the appendix.
 \end{proof}
 
-\begin{proof}[Proof of \autoref{lem:cdpaux}]
+\begin{proof}[Proof of \autoref{lem:prop2lr}]
 
 By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$. For $n = 0$ it is $s = t$, thus simply choose $\widetilde{t} = t$. Now, consider the case that $n = n'+1$ for some $n' \geq 0$. We proceed by induction on the number $k$ of calls in $s$ to the function targeted in the transformation, i.e., that of $q_\epsilon$.
 
@@ -256,14 +261,14 @@ s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \implies s {\longrightar
 \]
 \end{lemma}
 
-Again, we begin by showing a commutation lemma; but this time, we operate on the inverse relations of $\longrightarrow'$ and $\longrightarrow^{aux}$.
+Again, we begin by showing a commutation lemma; but this time, we operate on the inverse relations of $\longrightarrow'$ and $\longrightarrow^{aux}$. The commutation of the inverses is different and non-standard, since it has an intermediate sequence of $\longrightarrow^{aux}$-steps, as shown in diagram TODO.
 
 \begin{restatable}[Commutation (inverses)]{lemma}{comminv}
 \label{lem:comminv}
 
 For all terms $b,c,d$ it holds that:
 \[
-c {\longrightarrow'} d \land b \longrightarrow^{aux} d \implies \exists a, a' . a {\longrightarrow^{aux}}^* c \land a {\longrightarrow'}^= a' {\longrightarrow^{aux}}^*  b
+c {\longrightarrow'} d ~ \land ~ b \longrightarrow^{aux} d \implies \exists a, a' . a {\longrightarrow^{aux}}^* c ~ \land ~ a {\longrightarrow'}^= a' {\longrightarrow^{aux}}^*  b
 \]
 
 \end{restatable}
@@ -276,7 +281,7 @@ Left for the appendix.
 
 For all terms $b,c,d$ it holds that:
 \[
-c \longrightarrow' d \land b {\longrightarrow^{aux}}^* d \implies \exists a, a' . a {\longrightarrow^{aux}}^* c \land a {\longrightarrow'}^= a' {\longrightarrow^{aux}}^* b
+c \longrightarrow' d ~ \land ~ b {\longrightarrow^{aux}}^* d \implies \exists a, a' . a {\longrightarrow^{aux}}^* c ~ \land ~ a {\longrightarrow'}^= a' {\longrightarrow^{aux}}^* b
 \]
 
 \begin{proof}
@@ -290,7 +295,7 @@ By induction on the length of $b {\longrightarrow^{aux}}^* d$.
 
 First, note that this direction is logically equivalent to the statement
 \[
-\forall s, t \in \textrm{Term}_{prg}, \widetilde{t} \in \textrm{Term}_{\langle prg \rangle}. (s \longrightarrow^* \widetilde{t} \land \langle \widetilde{t} \rangle^{aux^{-1}} = t) \implies s {\longrightarrow'}^* t.
+\forall s, t \in \textrm{Term}_{prg}, \widetilde{t} \in \textrm{Term}_{\langle prg \rangle}. (s \longrightarrow^* \widetilde{t} ~ \land ~ \langle \widetilde{t} \rangle^{aux^{-1}} = t) \implies s {\longrightarrow'}^* t.
 \]
 We prove this statement by induction on the length $n$ of $s \longrightarrow^* \widetilde{t}$. For $n = 0$ it is $s = \widetilde{t}$; since $s \in \textrm{Term}_{prg}$ it is $\langle s \rangle^{aux^{-1}} = s$ and it follows that $s = \langle \widetilde{t} \rangle^{aux^{-1}} = t$. 
 
@@ -311,7 +316,7 @@ for every $s, t$ with names declared in $prg$, holds.
 \section{Absence of overlaps}
 \label{sec:extrovl}
 
-Since, in the context of this work, it is always presupposed that a program to be transformed has no overlapping copatterns, a desirable property of the transformed program is that it doesn't have overlapping copatterns, as well. This is now shown to be the case whenever $q_\epsilon$ doesn't overlap with any lhs of an equation taken over unchanged from $prg$.
+For the bisimulation, we presupposed that the transformed program has no overlapping copatterns. Here, we shown that this is the case whenever $q_\epsilon$ doesn't overlap with any lhs of an equation taken over unchanged from $prg$.
 
 \begin{proposition}
 For any well-behaved extraction function lifted to programs, $\langle \cdot \rangle$, it is the case that if $prg$ has no overlapping copatterns and $q_\epsilon$ doesn't overlap with any lhs of an equation taken over unchanged from $prg$, then $\langle prg \rangle$ has no overlapping copatterns, as well.
@@ -336,6 +341,7 @@ First, the equations of the transformed are classified. There are three kinds of
 \end{proposition}
 
 \section{Preservation of well-typedness}
+\label{sec:extrpwt}
 
 In this section, we show that extractions preserve well-typedness, i.e., that when applying an extraction to a well-typed program a well-typed program obtains. Let $prg$ be the original program, and $\langle prg \rangle$ the program after extraction. By definition a program is well-typed when all of its equations $eqn$ are well-typed, i.e., it is $\Sigma \vdash eqn \textrm{ ok}$, where $\Sigma$ are the signatures of the program. Let $\Sigma_{prg}$ be the signatures of $prg$, and $\Sigma_{\langle prg \rangle}$ be the signatures of $\langle prg \rangle$. Since extractions only add one function signature, but leave the other signatures unchanged, it is $\Sigma_{prg} \subseteq \Sigma_{\langle prg \rangle}$. The following thus holds trivially.
 
