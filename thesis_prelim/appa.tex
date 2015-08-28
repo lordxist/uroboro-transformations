@@ -1,30 +1,33 @@
+% !TEX root = main.tex
 \chapter{Proofs}
 
 \section{Proofs for section 3.3.2}
 
 \begin{lemma}
 \label{lem:app1}
-Let $a, b, c$ be terms and $\mathcal{E}^{aux}$ be an evaluation context for $\longrightarrow^{aux}$. When
+Let $a, b, c$ be terms and $\mathcal{E}^{aux} \neq []$ be an evaluation context for $\longrightarrow^{aux}$. When
 \[
-\mathcal{E}^{aux}[a] \mapsto' b \land a \mapsto^{aux} c,
+\mathcal{E}^{aux}[a] \mapsto' b  ~ \land ~ a \mapsto^{aux} c,
 \]
 then there is a $d$ such that
 \[
-\mathcal{E}^{aux}[c] \longrightarrow' d \land b {\longrightarrow^{aux}}^* d
+\mathcal{E}^{aux}[c] \longrightarrow' d ~ \land ~ b {\longrightarrow^{aux}}^* d
 \]
 \begin{proof}
-Since $a$ matches $q_\epsilon$, we know that $a$ is a function or destructor call, and not a constructor call. Because $\mathcal{E}^{aux}[a] = q_r[\sigma], b = t_r[\sigma]$ for an equation $r$, and $q_r$ and $q_{r'}$ don't overlap, it follows that $a$ is a subterm of a right-hand side of $\sigma$. Put in another way, there is a variable $x$ and a term $t(a)$ with subterm $a$ such that $\{x \mapsto t\} \subseteq \sigma$. Define a $\sigma_{mod}$ with $dom(\sigma_{mod}) = \sigma$ as $\sigma_{mod}(x) = t(c)$ and $\sigma_{mod}(y) = \sigma(y)$ for $y \neq x$, and choose $d = t_r[\sigma_{mod}]$. The two desired reductions can be derived as follows.
+We know that $\mathcal{E}^{aux}[a] = q_r[\sigma], b = t_r[\sigma]$ for an equation $r$. In order to choose $d$, we first need to find out where $d$ can be found in $q_r[\sigma]$; we will show that it isn't part of $q_r$, but rather is introduced by the substitution $\sigma$. Since $a$ matches $q_\epsilon$, we know that $a$ is a function or destructor call, and not a constructor call. Since $q_r$ and $q_\epsilon$ don't overlap unless they are the same, and they cannot be the same because $\mathcal{E}^{aux} \neq []$, $d$ cannot be part of $q_r$; it follows that there is a variable $x$ of $q_r$ and a context $\mathcal{C}$ such that $\sigma(x) = \mathcal{C}[a]$. Define $\sigma_{mod} := \sigma \circ \{x \mapsto \mathcal{C}[c]\}$, and choose $d = t_r[\sigma_{mod}]$. The two desired reductions can be derived as follows.
 \begin{enumerate}
 \item By the ``Subst'' rule for $r$:
 \[
-\mathcal{E}^{aux}[c] = q_r[\sigma_{mod}] \longrightarrow' t_r[\sigma_{mod}] = d
+\mathcal{E}^{aux}[c] = q_r[\sigma_{mod}] \mapsto' t_r[\sigma_{mod}] = d
 \]
 This is possible because each immediate subterm $s$ of $\mathcal{E}^{aux}[a]$ is a value under judgement $\vdash'_v$, and it is $\langle \mathcal{E}^{aux}[a] \rangle^{aux^{-1}} = \langle \mathcal{E}^{aux}[c] \rangle^{aux^{-1}}$ since $\langle a \rangle^{aux^{-1}} = \langle c \rangle^{aux^{-1}}$, thus it is $\langle s \rangle^{aux^{-1}} = \langle s' \rangle^{aux^{-1}}$ for the subterm $s'$ of $\mathcal{E}^{aux}[c]$ corresponding to $s$ and consequently it is $\vdash'_v s'$, as well.
 
-\item Define a $\sigma_{[]}$ with $dom(\sigma_{[]}) = \sigma$ as $\sigma_{[]}(x) = []$ and $\sigma_{[]}(y) = \sigma(y)$ for $y \neq x$. This way, $t_r[\sigma_{[]}]$ is a multi-hole context, such that $b = t_r[\sigma] = t_r[\sigma_{[]}][t(a), ..., t(a)]$ and $t_r[\sigma_{[]}][t(c), ..., t(c)] = t_r[\sigma_{mod}] = d$. By consecutive applications of the ``Cong'' rule on top of the ``Subst'' rule for $\epsilon$ we have the desired reduction sequence:
-\[
-b = t_r[\sigma_{[]}][t(a), ..., t(a)] \longrightarrow^{aux} t_r[\sigma_{[]}][t(c), t(a), ..., t(a)] \longrightarrow^{aux} t_r[\sigma_{[]}][t(c), ..., t(c)] = t_r[\sigma_{mod}] = d.
-\]
+\item Define $\sigma_{[]} := \sigma \circ \{x \mapsto []\}$. This way, $t_r[\sigma_{[]}]$ is a multi-hole context, such that $b = t_r[\sigma] = t_r[\sigma_{[]}][\mathcal{C}[a], ..., \mathcal{C}[a]]$ and $t_r[\sigma_{[]}][\mathcal{C}[c], ..., \mathcal{C}[c]] = t_r[\sigma_{mod}] = d$. By consecutive applications of the ``Cong'' rule on top of the ``Subst'' rule for $\epsilon$ we have the desired reduction sequence:
+\begin{flalign*}
+&b = t_r[\sigma_{[]}][\mathcal{C}[a], ..., \mathcal{C}[a]] \\
+\longrightarrow^{aux}~& t_r[\sigma_{[]}][\mathcal{C}[c], \mathcal{C}[a], ..., \mathcal{C}[a]] \\
+\longrightarrow^{aux}~& t_r[\sigma_{[]}][\mathcal{C}[c], ..., \mathcal{C}[c]] = t_r[\sigma_{mod}] = d.
+\end{flalign*}
 \end{enumerate}
 \end{proof}
 \end{lemma}
