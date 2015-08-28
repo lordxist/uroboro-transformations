@@ -54,14 +54,14 @@ A $\pi$-extraction targeting an extraction target $T$ is a triple consisting of
 \begin{itemize}
 \item an equation $\epsilon$ with lhs $q_\epsilon = \mathtt{get}(q)$ and rhs $t_\epsilon = \langle q_\epsilon \rangle^{aux}$, for some lhs $q$ of an equation in $T$,
 \item a function $\zeta: T \to \mathbf{Eqn}, \zeta_r = ``\mathtt{putback}(t_\epsilon, q_r) = t_r  "$, and
-\item a signature $sig$ for the range of $\zeta$
+\item the following signature for the auxiliary function $aux$ (its equations are the image of $\zeta$): $`` \textrm{\textbf{function }} aux(\tau_1, ..., \tau_n): \sigma "$, with $\tau_1, ..., \tau_n$ the types inferred, using the signatures of $prg$, for the variables in $q_\epsilon$, in the order that they appear in in $q_\epsilon$, and $\sigma$ the type inferred, also using the signatures of $prg$, for $q_\epsilon$.
 \end{itemize}
 
-Here, the pair of \texttt{get} and \texttt{putback} is the $\pi$-lens. $\langle \cdot \rangle^{aux}$ is the call to the auxiliary function that corresponds to the given copattern, defined as follows for copatterns $q$:
+Here $aux$ is a fresh function name\footnote{In practice this means that is in undeclared in the program that is transformed by the extraction lifted to programs (see next section).}. The pair of \texttt{get} and \texttt{putback} is the $\pi$-lens. $\langle \cdot \rangle^{aux}$ is the call to the auxiliary function that corresponds to the given copattern, defined as follows for copatterns $q$:
 \[
 \langle q \rangle^{aux} = aux(\langle q \rangle^{vars}),
 \]
-where $aux$ is a fresh function name\footnote{In practice this means that is in undeclared in the program that is transformed by the extraction lifted to programs (see next section).} and $\langle q \rangle^{vars}$ denotes the list of all variables of $q$ in the order that they appear in in $q$.
+where $\langle q \rangle^{vars}$ denotes the list of all variables of $q$ in the order that they appear in in $q$.
 \end{definition}
 
 \subsection{Applying extractions to programs}
