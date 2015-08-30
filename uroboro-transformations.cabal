@@ -27,6 +27,10 @@ library
     , UroboroTransformations.Util
     , UroboroTransformations.Util.HelperFuns
     , UroboroTransformations.Util.DesExtraction
+    , UroboroTransformations.CopatternCoverage.CCTree
+    , UroboroTransformations.Extraction
+    , UroboroTransformations.Extraction.DesExtraction
+    , UroboroTransformations.Extraction.ConExtraction
   build-depends:     base >= 4.7 && < 4.8, uroboro, transformers, mtl, containers
   default-language:  Haskell2010
 
@@ -103,5 +107,17 @@ executable split
 executable refunc-core
   hs-source-dirs:    main-src
   main-is:           RefuncCore.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable cc
+  hs-source-dirs:    main-src
+  main-is:           CC.hs
+  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
+  default-language:  Haskell2010
+
+executable unnest-d-one-step
+  hs-source-dirs:    main-src
+  main-is:           UnnestDOneStep.hs
   build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
   default-language:  Haskell2010

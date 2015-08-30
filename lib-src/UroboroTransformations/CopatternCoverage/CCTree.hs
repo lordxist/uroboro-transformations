@@ -12,7 +12,7 @@ import Uroboro.Error
 
 import UroboroTransformations.Util (dummyLocation)
 
-data Tree a = Branch a [Tree a] | Leaf a deriving (Show)
+data CCTree a = VarSplit a [CCTree a] | ResSplit a [CCTree a] | Leaf a deriving (Show)
 
 type PTSig = (Identifier, (Location, [Type], Type))
 
@@ -97,22 +97,22 @@ splitRes tq = do
     BetterProgram _ _ ds _ _ <- ask
     return $ map (tqForDes tq) (fromJust (lookup (getType tq) ds))
 
-possibleTreesWithRoot :: Int -> TQ -> Reader BetterProgram [Tree TQ]
+possibleTreesWithRoot :: Int -> TQ -> Reader BetterProgram [CCTree TQ]
 possibleTreesWithRoot 0 tq = return [Leaf tq]
 possibleTreesWithRoot d tq = do
     tqs1 <- splitRes tq
     trees1 <- mapM (possibleTreesWithRoot (d-1)) tqs1
     tqs2 <- splitVars tq
     trees2 <- mapM (possibleTreesWithRoot (d-1)) tqs2
-    return $ (Leaf tq):(map (Branch tq) ((sequence trees1)++(sequence trees2)))
+    return $ (Leaf tq):((map (ResSplit tq) (sequence trees1))++(map (VarSplit tq) (sequence trees2)))
 
 headTQ :: PTSig -> TQ
 headTQ (id, (_, ts, t)) = TQApp t id (evalState (mapM convertToVar ts) 0)
 
-possibleTreesBProg :: PTSig -> Int -> Reader BetterProgram [Tree TQ]
+possibleTreesBProg :: PTSig -> Int -> Reader BetterProgram [CCTree TQ]
 possibleTreesBProg sig d = possibleTreesWithRoot d (headTQ sig)
 
-possibleTrees :: PTSig -> Int -> Reader Program [Tree TQ]
+possibleTrees :: PTSig -> Int -> Reader Program [CCTree TQ]
 possibleTrees sig d = withReader betterProgram (possibleTreesBProg sig d)
 
 splittingDepthPP :: PP -> Int
@@ -134,9 +134,10 @@ toPQ :: TQ -> PQ
 toPQ (TQApp _ id tps) = PQApp dummyLocation id (map toPP tps)
 toPQ (TQDes _ id tps tq) = PQDes dummyLocation id (map toPP tps) (toPQ tq)
 
-leaves :: Tree TQ -> [TQ]
+leaves :: CCTree TQ -> [TQ]
 leaves (Leaf tq) = [tq]
-leaves (Branch _ trees) = concatMap leaves trees
+leaves (ResSplit _ trees) = concatMap leaves trees
+leaves (VarSplit _ trees) = concatMap leaves trees
 
 instance Eq PP where
   (PPVar _ id) == (PPVar _ id') = id == id'
@@ -148,10 +149,10 @@ instance Eq PQ where
   (PQDes _ id pps pq) == (PQDes _ id' pps' pq') = (id == id') && (pps == pps') && (pq == pq')
   _ == _ = False
 
-leavesEqualPQs :: [PQ] -> Tree TQ -> Bool
+leavesEqualPQs :: [PQ] -> CCTree TQ -> Bool
 leavesEqualPQs pqs tree = (fromList (map toPQ (leaves tree))) == (fromList pqs)
 
-checkCoverage :: PTSig -> PT -> Reader Program (Maybe (Tree TQ))
+checkCoverage :: PTSig -> PT -> Reader Program (Maybe (CCTree TQ))
 checkCoverage sig (PTFun _ _ _ _ rs) = (liftM $ find (leavesEqualPQs (map lhs rs))) searchSpace
   where
     searchSpace = possibleTrees sig (maximum $ map (splittingDepth . lhs) rs)
@@ -164,3 +165,21 @@ zipCoverageRules (tq:tqs) rs
     = ((fromJust $ find fitsWithTQ rs),tq):(zipCoverageRules tqs rs)
   where
     fitsWithTQ (PTRule _ pq _) = (toPQ tq) == pq
+
+data SubtreeMode = Initial | NonInitial
+
+lowestSubtrees :: CCTree TQ -> SubtreeMode -> [CCTree TQ]
+lowestSubtrees t@(Leaf tq) Initial = [t]
+lowestSubtrees (Leaf _) NonInitial = []
+lowestSubtrees t _
+  | all isLeaf (children t) = [t]
+  | otherwise = concatMap (flip lowestSubtrees NonInitial) (children t)
+    where
+      isLeaf (Leaf _) = True
+      isLeaf _ = False
+
+      children (ResSplit _ ts) = ts
+      children (VarSplit _ ts) = ts
+
+lowestSubtree :: CCTree TQ -> CCTree TQ
+lowestSubtree t = (lowestSubtrees t Initial) !! 0

@@ -18,8 +18,9 @@ data ExtractionLens = ExtractionLens {
 }
 
 data ExtractionSpec = ExtractionSpec {
-      lens   :: ExtractionLens
-    , target :: [(PTRule, TQ)]
+      lens     :: ExtractionLens
+    , fullProg :: [PT]
+    , target   :: [(PTRule, TQ)]
 }
 
 type Extraction = Reader ExtractionSpec (PTRule, PT)
@@ -28,19 +29,26 @@ typeOfTQ :: TQ -> Type
 typeOfTQ (TQApp t _ _) = t
 typeOfTQ (TQDes t _ _ _) = t
 
-auxify :: TQ -> TExp
-auxify tq = TApp (typeOfTQ tq) "aux" (map tpToTExp (collectVarsTQ tq))
+auxName :: Reader ExtractionSpec Identifier
+auxName = do
+  ExtractionSpec _ prog _ <- ask
+  return $ autogen "aux" prog
+
+auxify :: TQ -> Reader ExtractionSpec TExp
+auxify tq = do
+    id <- auxName
+    return $ TApp (typeOfTQ tq) id (map tpToTExp (collectVarsTQ tq))
   where
     tpToTExp (TPVar t id) = TVar t id
 
 epsilonLhs :: Reader ExtractionSpec TQ
 epsilonLhs = do
-    (ExtractionSpec lens target) <- ask
+    (ExtractionSpec lens _ target) <- ask
     let (_, tq) = target !! 0
     return $ (get lens) tq
 
 epsilonRhs :: Reader ExtractionSpec TExp
-epsilonRhs = liftM auxify epsilonLhs
+epsilonRhs = epsilonLhs >>=  auxify
 
 tpToPP :: TP -> PP
 tpToPP (TPVar t id) = PPVar dummyLocation id
@@ -52,7 +60,7 @@ tqToPQ (TQDes t id tps tq) = PQDes dummyLocation id (map tpToPP tps) (tqToPQ tq)
 
 extractEpsilon :: Reader ExtractionSpec PTRule
 extractEpsilon = do
-    ExtractionSpec _ (((PTRule l _ _), _):_) <- ask
+    ExtractionSpec _ _ (((PTRule l _ _), _):_) <- ask
     lhs <- epsilonLhs
     rhs <- epsilonRhs
     return $ PTRule l (tqToPQ lhs) (tExpToPExp rhs)
@@ -64,9 +72,9 @@ extractEpsilon = do
 
 extractZetaRules :: Reader ExtractionSpec [PTRule]
 extractZetaRules = do
-    (ExtractionSpec lens target) <- ask
+    (ExtractionSpec lens _ target) <- ask
     lhs <- epsilonRhs
-    return $ map (replacePQ . (second (tqToPQ . ((putback lens) (tExpToTQ lhs))))) target
+    return $ map (replacePQ . (second (tqToPQ . ((flip $ putback lens) (tExpToTQ lhs))))) target
   where
     replacePQ ((PTRule l  _ pexp), pq) = PTRule l pq pexp
 
@@ -79,7 +87,8 @@ extractZetaRules = do
 extractZetaSig :: Reader ExtractionSpec ([PTRule] -> PT)
 extractZetaSig = do
     texp <- epsilonRhs
-    return $ PTFun dummyLocation "aux" (argTs texp) (resT texp)
+    id <- auxName
+    return $ PTFun dummyLocation id (argTs texp) (resT texp)
   where
     argTs (TApp _ _ texps) = map varT texps
 

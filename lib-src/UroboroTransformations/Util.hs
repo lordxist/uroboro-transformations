@@ -42,8 +42,24 @@ funIdentifier :: PT -> Identifier
 funIdentifier (PTFun _ id _ _ _) = id
 funIdentifier _ = undefined
 
+-- the old version of what is now autogen (see below)
 gensym :: Identifier -> Identifier -> [PT] -> Identifier
 gensym id1 id2 pts = (findUnusedIdPrefix 0) ++ "_" ++ id1 ++ "_" ++ id2
+  where
+    findUnusedIdPrefix n
+        | not (any (isPrefixOf pref) usedNames) = pref
+        | otherwise = findUnusedIdPrefix (n+1)
+        where pref = "autogen" ++ (show n)
+
+    usedNames = (map desIdentifier (concatMap destructors pts)) ++
+                    (map conIdentifier (concatMap constructors pts)) ++
+                    (map funIdentifier (filter isFunctionDef pts))
+
+    isFunctionDef (PTFun _ _ _ _ _) = True
+    isFunctionDef _ = False
+
+autogen :: Identifier -> [PT] -> Identifier
+autogen id pts = (findUnusedIdPrefix 0) ++ "_" ++ id
   where
     findUnusedIdPrefix n
         | not (any (isPrefixOf pref) usedNames) = pref

@@ -21,3 +21,6 @@ conExtractionLensPutback (PQDes l id pq pps) pq = PQDes l id pq pps
 conExtractionLens :: ExtractionLens
 conExtractionLens = ExtractionLens {get = conExtractionLensGet, putback = conExtractionLensPutback}
 -}
+
+conExtractionLens :: ExtractionLens
+conExtractionLens = undefined
