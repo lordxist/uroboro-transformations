@@ -6,6 +6,11 @@ import Uroboro.Error
 import Data.List(intercalate, isPrefixOf)
 import Control.Monad.State.Lazy
 
+type PathToSubterm = [Int]
+
+nextOnSameLevel :: PathToSubterm -> PathToSubterm
+nextOnSameLevel p = reverse $ ((last p)+1):(reverse $ init p)
+
 -- At the moment, locations aren't correctly stored after transformations anyway
 dummyLocation :: Location
 dummyLocation = MakeLocation "" (-1) (-1)

@@ -1,26 +1,26 @@
 module UroboroTransformations.Extraction.ConExtraction where
 
+import UroboroTransformations.Util (PathToSubterm)
 import UroboroTransformations.Extraction
 
--- problem: need a TQ with location information (see data type ExtractionLens)
+extractionProjectionPP :: PathToSubterm -> PP -> PP
+extractionProjectionPP _ (PPVar _ _) = undefined
+extractionProjectionPP (p1:p) (PPCon l id pps)
+  | p1 == 0 = newvar -- TODO: implement newvar
+  | otherwise = PPCon l id (extractionProjectionPPs p pps)
 
-{-extractionProjectionPP :: Location -> PP -> PP
-extractionProjectionPP l var@(PPVar _ _) = var
-extractionProjectionPP l (PPCon l' id pps)
-  | l == l' = newvar
-  | otherwise = PPCon l' id (map (extractionProjectionPP l) pps)
+extractionProjectionPPs :: PathToSubterm -> [PP] -> [PP]
+extractionProjectionPPs (p1:p) pps =
+    ((take p1 pps)++((extractionProjectionPP p) (pps !! p1))++(drop (p1+1) pps))
 
-conExtractionLensGet :: Location -> PQ -> PQ
-conExtractionLensGet l (PQDes l' id pq pps) =
-    PQDes l' id (conExtractionLensGet l pq) (map (extractionProjectionPP l) pps)
-conExtractionLensGet l (PQApp l' id pps) = PQApp l' id (map (extractionProjectionPP l) pps)
+conExtractionLensGet :: PathToSubterm -> PQ -> PQ
+conExtractionLensGet (p1:p) (PQDes l id pq pps) =
+  | p1 == 0 = PQDes l id (conExtractionLensGet p pq) pps
+  | otherwise = PQDes l id pq (extractionProjectionPPs ((p1-1):p) pps)
+conExtractionLensGet (_:p) (PQApp l id pps) = PQApp l id (extractionProjectionPPs p pps)
 
-conExtractionLensPutback :: Location -> PQ -> PQ -> PQ
+conExtractionLensPutback :: PathToSubterm -> PQ -> PQ -> PQ
 conExtractionLensPutback (PQDes l id pq pps) pq = PQDes l id pq pps
 
-conExtractionLens :: ExtractionLens
-conExtractionLens = ExtractionLens {get = conExtractionLensGet, putback = conExtractionLensPutback}
--}
-
-conExtractionLens :: ExtractionLens
-conExtractionLens = undefined
+conExtractionLens :: PathToSubterm -> ExtractionLens
+conExtractionLens p = ExtractionLens {get = (conExtractionLensGet p), putback = (conExtractionLensPutback p)}

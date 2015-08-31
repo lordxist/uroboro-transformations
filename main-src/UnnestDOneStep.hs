@@ -28,7 +28,7 @@ betterTypecheck defs = do
 
 extractionSpec :: CCTree TQ -> [PT] -> [(PTRule, TQ)] -> ExtractionSpec
 extractionSpec (ResSplit _ _) = ExtractionSpec desExtractionLens
-extractionSpec (VarSplit _ _) = ExtractionSpec conExtractionLens
+extractionSpec (VarSplit _ p _) = ExtractionSpec $ conExtractionLens p
 
 rulesForFunDef :: PT -> [PTRule]
 rulesForFunDef (PTFun _ _ _ _ rs) = rs

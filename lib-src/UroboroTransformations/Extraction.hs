@@ -12,7 +12,6 @@ import Uroboro.Error
 import UroboroTransformations.Util
 
 data ExtractionLens = ExtractionLens {
-    -- actually, a TQ with location information is necessary here
       get     :: TQ -> TQ
     , putback :: TQ -> TQ -> TQ
 }

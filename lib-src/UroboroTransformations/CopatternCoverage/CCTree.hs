@@ -1,18 +1,20 @@
 module UroboroTransformations.CopatternCoverage.CCTree where
 
+import Control.Arrow
 import Control.Monad.Reader
 import Control.Monad.State.Lazy
+import Data.Char
 import Data.Maybe
-import Data.List (find)
+import Data.List (find, maximumBy)
 import Data.Set (fromList)
 
 import Uroboro.Checker
 import Uroboro.Tree
 import Uroboro.Error
 
-import UroboroTransformations.Util (dummyLocation)
+import UroboroTransformations.Util (dummyLocation, PathToSubterm, nextOnSameLevel)
 
-data CCTree a = VarSplit a [CCTree a] | ResSplit a [CCTree a] | Leaf a deriving (Show)
+data CCTree a = VarSplit a PathToSubterm [CCTree a] | ResSplit a [CCTree a] | Leaf a deriving (Show)
 
 type PTSig = (Identifier, (Location, [Type], Type))
 
@@ -58,28 +60,28 @@ containsVarTP :: Identifier -> TP -> Bool
 containsVarTP id' (TPVar _ id) = id == id'
 containsVarTP id (TPCon _ _ tps) = any (containsVarTP id) tps
 
-ptConToTP :: PTCon -> TP
-ptConToTP (PTCon _ t id ts) = TPCon t id (evalState (mapM convertToVar ts) 0)
+ptConToTP :: Int -> PTCon -> TP
+ptConToTP n (PTCon _ t id ts) = TPCon t id (evalState (mapM convertToVar ts) n)
 
-splitVarTPs :: [TP] -> Identifier -> Reader BetterProgram [[TP]]
-splitVarTPs ((tp@(TPVar t id)):tps) id'
+splitVarTPs :: [TP] -> Identifier -> PathToSubterm -> Reader (BetterProgram, Int) ([[TP]], PathToSubterm)
+splitVarTPs ((tp@(TPVar t id)):tps) id' p
   | id == id' = do
-    BetterProgram _ cs _ _ _ <- ask
-    return $ map (:tps) (map ptConToTP (fromJust (lookup t cs)))
-  | otherwise = liftM (liftM (tp:)) (splitVarTPs tps id)
+    ((BetterProgram _ cs _ _ _), n) <- ask
+    return ((map (:tps) (map (ptConToTP n) (fromJust (lookup t cs)))), p)
+  | otherwise = liftM (liftM (first (tp:))) (splitVarTPs tps id (nextOnSameLevel p))
 splitVarTPs ((TPCon l cid tps):tps') id
-  | any (containsVarTP id) tps = liftM (liftM $ ((:tps').(TPCon l cid))) (splitVarTPs tps id)
-  | otherwise = liftM (liftM $ ((TPCon l cid tps):)) (splitVarTPs tps' id)
+  | any (containsVarTP id) tps = liftM (liftM $ first ((:tps').(TPCon l cid))) (splitVarTPs tps id (p++[0]))
+  | otherwise = liftM (liftM $ first ((TPCon l cid tps):)) (splitVarTPs tps' id (nextOnSameLevel p))
 
 containsVar :: TQ -> Identifier -> Bool
 containsVar (TQDes _ _ tps tq) id = (any (containsVarTP id) tps) || (containsVar tq id)
 containsVar (TQApp _ _ tps) id = any (containsVarTP id) tps
 
-splitVar :: TQ -> Identifier -> Reader BetterProgram [TQ]
-splitVar (TQDes l id' tps tq) id
-  | tq `containsVar` id = liftM (liftM $ TQDes l id' tps) (splitVar tq id)
-  | otherwise = liftM (liftM $ flip (TQDes l id') tq) (splitVarTPs tps id)
-splitVar (TQApp l id' tps) id = liftM (liftM $ TQApp l id') (splitVarTPs tps id)
+splitVar :: PathToSubterm -> TQ -> Identifier -> Reader (BetterProgram, Int) ([TQ], PathToSubterm)
+splitVar p (TQDes l id' tps tq) id
+  | tq `containsVar` id = liftM (liftM $ first $ TQDes l id' tps) (splitVar (p++[0]) tq id)
+  | otherwise = liftM (liftM $ first $ flip (TQDes l id') tq) (splitVarTPs tps id (p++[1]))
+splitVar p (TQApp l id' tps) id = liftM (liftM $ first $ TQApp l id') (splitVarTPs tps id (p++[0]))
 
 varsTP :: TP -> [Identifier]
 varsTP (TPVar _ id) = [id]
@@ -89,8 +91,21 @@ vars :: TQ -> [Identifier]
 vars (TQDes _ _ tps tq) = (vars tq) ++ (concatMap varsTP tps)
 vars (TQApp _ _ tps) = (concatMap varsTP tps)
 
-splitVars :: TQ -> Reader BetterProgram [TQ]
-splitVars tq = (liftM concat) $ mapM (splitVar tq) (vars tq)
+largestVarIndex :: [Identifier] -> Int
+largestVarIndex ids = getIndex $ maximumBy maxInXScheme (filter hasXScheme ids)
+  where
+    hasXScheme ('x':rs) = all isDigit rs
+    hasXScheme _ = False
+
+    maxInXScheme ('x':rs) ('x':rs') = (compare :: Int -> Int -> Ordering) (read rs) (read rs')
+
+    getIndex ('x':rs) = read rs
+
+splitVars :: TQ -> Reader BetterProgram ([TQ], PathToSubterm)
+splitVars tq = do
+  bp <- ask
+  let vs = vars tq
+  return $ concat $ runReader (mapM (splitVar [] tq) vs) (bp, ((largestVarIndex vs)+1))
 
 splitRes :: TQ -> Reader BetterProgram [TQ]
 splitRes tq = do
@@ -102,9 +117,9 @@ possibleTreesWithRoot 0 tq = return [Leaf tq]
 possibleTreesWithRoot d tq = do
     tqs1 <- splitRes tq
     trees1 <- mapM (possibleTreesWithRoot (d-1)) tqs1
-    tqs2 <- splitVars tq
+    (tqs2, p) <- splitVars tq
     trees2 <- mapM (possibleTreesWithRoot (d-1)) tqs2
-    return $ (Leaf tq):((map (ResSplit tq) (sequence trees1))++(map (VarSplit tq) (sequence trees2)))
+    return $ (Leaf tq):((map (ResSplit tq) (sequence trees1))++(map (VarSplit tq p) (sequence trees2)))
 
 headTQ :: PTSig -> TQ
 headTQ (id, (_, ts, t)) = TQApp t id (evalState (mapM convertToVar ts) 0)
@@ -137,7 +152,7 @@ toPQ (TQDes _ id tps tq) = PQDes dummyLocation id (map toPP tps) (toPQ tq)
 leaves :: CCTree TQ -> [TQ]
 leaves (Leaf tq) = [tq]
 leaves (ResSplit _ trees) = concatMap leaves trees
-leaves (VarSplit _ trees) = concatMap leaves trees
+leaves (VarSplit _ _ trees) = concatMap leaves trees
 
 instance Eq PP where
   (PPVar _ id) == (PPVar _ id') = id == id'
@@ -179,7 +194,7 @@ lowestSubtrees t _
       isLeaf _ = False
 
       children (ResSplit _ ts) = ts
-      children (VarSplit _ ts) = ts
+      children (VarSplit _ _ ts) = ts
 
 lowestSubtree :: CCTree TQ -> CCTree TQ
 lowestSubtree t = (lowestSubtrees t Initial) !! 0
