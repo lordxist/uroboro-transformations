@@ -356,6 +356,7 @@ For any two contexts $\mathcal{C}, \mathcal{C}_0$ and any evaluation context $\m
 \end{fact}
 
 \subsection{Copattern coverage}
+\label{ssec:cc}
 
 In general, for programs with \textit{coverage} it is guaranteed that no term is stuck. We adapt the judgement for \textit{copattern coverage} from Abel et al.\cite{abel13copatterns} for Uroboro. $fun \lhd | ~ Q$ means that the set of copatterns $Q$ \textit{covers} the function $fun$. Intuitively, when this set $Q$ is the set of left-hand sides of the function definition for $fun$, this function is fully specified. One can regard the consecutive application of the rules of the coverage judgement as a way of step-wise refining the specification of the function. The rule C\textsubscript{Head} stands for the start point, where the only left-hand side of the function neither has destructor nor constructor calls. The other two rules refine the specification of $fun$ by variable splitting (C\textsubscript{Con}), that is, refining based upon the input, or by result splitting (C\textsubscript{Des}), that is, refining based upon the output (or result). The terminology ``variable splitting'' and ``result splitting'' is also borrowed from Abel et al. and will become relevant in chapter 4.
 
