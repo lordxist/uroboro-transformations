@@ -104,11 +104,46 @@ We compare $\mathcal{E}'$ and $\mathcal{E}^{aux}$ and distinguish four cases.
 \begin{itemize}
 \item $\mathcal{E}' = \mathcal{E}^{aux}$. Then it is $a'_0 = a^{aux}_0$; since $\langle prg \rangle$ has no overlapping lhss, it must be $b^0 = c^0$, thus simply choose $d = b = c$.
 
-\item The hole of $\mathcal{E}'$ properly contains that of $\mathcal{E}^{aux}$, i.e., there is a context $\mathcal{E}^{aux}_0 \neq []$ such that $\mathcal{E}^{aux} = \mathcal{E}'[\mathcal{E}^{aux}_0]$. It follows that $\mathcal{E}^{aux}_0[a^{aux}_0] = a'_0$. By \autoref{lem:app1} we have a $d_0$ with $\mathcal{E}^{aux}_0[c_0] \longrightarrow' d_0$ and $b_0 {\longrightarrow^{aux}}^* d_0$. That second reduction means that there are terms $t_1, ..., t_n$ with $b_0 \longrightarrow^{aux} t_1 \longrightarrow^{aux} ... \longrightarrow^{aux} t_n \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}'[d_0]$; the property holds since $b = \mathcal{E}'[b_0] \longrightarrow^{aux} \mathcal{E}'[t_1] \longrightarrow^{aux} ... \longrightarrow^{aux} \mathcal{E}'[t_n] \longrightarrow^{aux} \mathcal{E}'[d_0] = d$ and $c = \mathcal{E}^{aux}[c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0][c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0[c^0]] \longrightarrow' \mathcal{E}'[d_0] = d$.
+\item The hole of $\mathcal{E}'$ properly contains that of $\mathcal{E}^{aux}$, i.e., there is a context $\mathcal{E}^{aux}_0 \neq []$ such that $\mathcal{E}^{aux} = \mathcal{E}'[\mathcal{E}^{aux}_0]$. It follows that $\mathcal{E}^{aux}_0[a^{aux}_0] = a'_0$. By \autoref{lem:app1} we have a $d_0$ with $\mathcal{E}^{aux}_0[c_0] \longrightarrow' d_0$ and $b_0 {\longrightarrow^{aux}}^* d_0$. That second reduction means that there are terms $t_1, ..., t_n$ with
+\[
+b_0 \longrightarrow^{aux} t_1 \longrightarrow^{aux} ... \longrightarrow^{aux} t_n \longrightarrow^{aux} d_0.
+\]
+Choose $d = \mathcal{E}'[d_0]$; the property holds since
+\[
+b = \mathcal{E}'[b_0] \longrightarrow^{aux} \mathcal{E}'[t_1] \longrightarrow^{aux} ... \longrightarrow^{aux} \mathcal{E}'[t_n] \longrightarrow^{aux} \mathcal{E}'[d_0] = d
+\]
+and
+\[
+c = \mathcal{E}^{aux}[c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0][c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0[c^0]] \longrightarrow' \mathcal{E}'[d_0] = d.
+\]
 
-\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{C} \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{C}]$. By fact \autoref{fac:chp21}, it follows that $\mathcal{E}^{aux} \in \textrm{EC}[\vdash'_v]$. Further, it follows that $\mathcal{C}[a'_0] = a^{aux}_0$. By \autoref{lem:app2} we have a $d_0$ with $c_0 \longrightarrow' d_0$ and $\mathcal{C}[b_0] \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}^{aux}[d_0]$; the property holds since $b = \mathcal{E}'[b_0] = \mathcal{E}^{aux}[\mathcal{C}][b_0] = \mathcal{E}^{aux}[\mathcal{C}[b_0]] \longrightarrow^{aux} \mathcal{E}^{aux}[d_0] = d$ and $c = \mathcal{E}^{aux}[c_0] \longrightarrow' \mathcal{E}^{aux}[d_0] = d$.
+\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{C} \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{C}]$. By fact \autoref{fac:chp21}, it follows that $\mathcal{E}^{aux} \in \textrm{EC}[\vdash'_v]$. Further, it follows that $\mathcal{C}[a'_0] = a^{aux}_0$. By \autoref{lem:app2} we have a $d_0$ with $c_0 \longrightarrow' d_0$ and $\mathcal{C}[b_0] \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}^{aux}[d_0]$; the property holds since
+\[
+b = \mathcal{E}'[b_0] = \mathcal{E}^{aux}[\mathcal{C}][b_0] = \mathcal{E}^{aux}[\mathcal{C}[b_0]] \longrightarrow^{aux} \mathcal{E}^{aux}[d_0] = d
+\]
+and
+\[
+c = \mathcal{E}^{aux}[c_0] \longrightarrow' \mathcal{E}^{aux}[d_0] = d.
+\]
 
-\item Neither the hole of $\mathcal{E}'$ contains that of $\mathcal{E}^{aux}$, nor the other way around. Then we have a two-hole context $\mathcal{E}^{merge}$ such that $\mathcal{E}^{merge}[[], a^{aux}_0] = \mathcal{E}'$ and $\mathcal{E}^{merge}[a'_0, []] = \mathcal{E}^{aux}$. Choose $d$ as $\mathcal{E}^{merge}[b_0, c_0]$. The property holds because $b = \mathcal{E}'[b_0] = \mathcal{E}^{merge}[[], a^{aux}_0][b_0] = \mathcal{E}^{merge}[b_0, a^{aux}_0] = \mathcal{E}^{merge}[b_0, []][a^{aux}_0] \longrightarrow^{aux} \mathcal{E}^{merge}[b_0, []][c_0] = \mathcal{E}^{merge}[b_0, c_0] = d$ and $c = \mathcal{E}^{aux}[c_0] = \mathcal{E}^{merge}[a'_0, []][c_0] = \mathcal{E}^{merge}[a'_0, c_0] = \mathcal{E}^{merge}[[], c_0][a'_0] \longrightarrow' \mathcal{E}^{merge}[[], c_0][b_0] = d$. This second reduction is possible because it is $\mathcal{E}^{merge}[[], c_0] \in \mathbf{EC}[\vdash'_v]$, since $\mathcal{E}' = \mathcal{E}^{merge}[[], a^{aux}_0] \in \mathbf{EC}[\vdash'_v]$ and $\langle a^{aux}_0 \rangle^{aux^{-1}} = \langle c_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a^{aux}_0$ iff $\vdash'_v c_0$.
+\item Neither the hole of $\mathcal{E}'$ contains that of $\mathcal{E}^{aux}$, nor the other way around. Then we have a two-hole context $\mathcal{E}^{merge}$ such that $\mathcal{E}^{merge}[[], a^{aux}_0] = \mathcal{E}'$ and $\mathcal{E}^{merge}[a'_0, []] = \mathcal{E}^{aux}$. Choose $d$ as $\mathcal{E}^{merge}[b_0, c_0]$. The property holds because
+\begin{flalign*}
+&b = \mathcal{E}'[b_0] \\
+= ~&\mathcal{E}^{merge}[[], a^{aux}_0][b_0] \\
+= ~&\mathcal{E}^{merge}[b_0, a^{aux}_0] \\
+= ~&\mathcal{E}^{merge}[b_0, []][a^{aux}_0] \\
+\longrightarrow^{aux} ~& \mathcal{E}^{merge}[b_0, []][c_0] \\
+= ~&\mathcal{E}^{merge}[b_0, c_0] = d
+\end{flalign*}
+and
+\begin{flalign*}
+&c = \mathcal{E}^{aux}[c_0] \\
+= ~&\mathcal{E}^{merge}[a'_0, []][c_0] \\
+= ~&\mathcal{E}^{merge}[a'_0, c_0] \\
+= ~&\mathcal{E}^{merge}[[], c_0][a'_0] \\
+\longrightarrow' ~&\mathcal{E}^{merge}[[], c_0][b_0] = d.
+\end{flalign*}
+This second reduction is possible because it is $\mathcal{E}^{merge}[[], c_0] \in \mathbf{EC}[\vdash'_v]$, since $\mathcal{E}' = \mathcal{E}^{merge}[[], a^{aux}_0] \in \mathbf{EC}[\vdash'_v]$ and $\langle a^{aux}_0 \rangle^{aux^{-1}} = \langle c_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a^{aux}_0$ iff $\vdash'_v c_0$.
 \end{itemize}
 
 \end{proof}
@@ -130,19 +165,22 @@ t \longrightarrow^{aux} t'.
 By induction on the structure of $t$. We distinguish two cases.
 \begin{enumerate}
 \item All immediate subterms of $t$ are values under judgement $\vdash_v$. We will show that $t$ matches $q_\epsilon$, and from this the desired reductions immediately follow. Because $\not\vdash_v t$, by the definition of the value judgement $t$ itself has to match some lhs $q$ of $\langle prg \rangle$. Since $\vdash'_v t$, there cannot be an equation $q'$ of $prg$ with $\langle q \rangle^{aux^{-1}} = q'$. By the definition of extractions, the only equation of $\langle prg \rangle$ for which this can be the case is $q = q_\epsilon$. Consequently, we have some $\sigma$ that substitutes only with terms which are values under judgement $\vdash_v$ and the desired reductions
-\[
-t = q_\epsilon[\sigma] \longrightarrow t_\epsilon[\sigma], t = q_\epsilon[\sigma] \longrightarrow^{aux} t_\epsilon[\sigma].
-\]
+\begin{flalign*}
+&t = q_\epsilon[\sigma] \longrightarrow t_\epsilon[\sigma], \\
+&t = q_\epsilon[\sigma] \longrightarrow^{aux} t_\epsilon[\sigma].
+\end{flalign*}
 
 \item There are immediate subterms of $t$ which aren't values under judgement $\vdash_v$.
 Let $t_1, ..., t_n$ be the immediate subterms of $t$, and let $k$ be the smallest index for which $\not\vdash_v t_k$. Define $\mathcal{E} \in \mathbf{EC}$ by taking $t$ and replacing $t_k$ by a hole. By the induction hypothesis, we have a term $t'_k$ and reductions
-\[
-t_k \longrightarrow t'_k, t_k \longrightarrow^{aux} t'_k.
-\]
+\begin{flalign*}
+&t_k \longrightarrow t'_k \\
+&t_k \longrightarrow^{aux} t'_k.
+\end{flalign*}
 Consequently, we have the desired term as $t' = \mathcal{E}[t'_k]$ and reductions
-\[
-t = \mathcal{E}[t_k] \longrightarrow \mathcal{E}[t'_k] = t', t = \mathcal{E}[t_k] \longrightarrow^{aux} \mathcal{E}[t'_k] = t'.
-\]
+\begin{flalign*}
+&t = \mathcal{E}[t_k] \longrightarrow \mathcal{E}[t'_k] = t', \\
+&t = \mathcal{E}[t_k] \longrightarrow^{aux} \mathcal{E}[t'_k] = t'. 
+\end{flalign*}
 \end{enumerate}
 
 \end{proof}
@@ -153,13 +191,15 @@ t = \mathcal{E}[t_k] \longrightarrow \mathcal{E}[t'_k] = t', t = \mathcal{E}[t_k
 \begin{proof}
 
 There is an evaluation context $\mathcal{E} \in \textrm{EC}[\vdash'_v]$, with $\mathcal{E} \not\in \textrm{EC}$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Construct an $\mathcal{E}' \in \mathbf{EC}$ from $\mathcal{E}$ by replacing $t$ with $[]$ and the original hole with $a^0$. By \autoref{lem:app3}, we have a term $t_{aux}$ and reductions
-\[
-t \longrightarrow t_{aux}, t \longrightarrow^{aux} t_{aux},
-\]
+\begin{flalign*}
+&t \longrightarrow t_{aux}, \\
+&t \longrightarrow^{aux} t_{aux},
+\end{flalign*}
 and consequently there is a $c = \mathcal{E}'[t_{aux}]$ with
-\[
-a = \mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], a = \mathcal{E}'[t] \longrightarrow^{aux} \mathcal{E}'[t_{aux}].
-\]
+\begin{flalign*}
+&a = \mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], \\
+&a = \mathcal{E}'[t] \longrightarrow^{aux} \mathcal{E}'[t_{aux}].
+\end{flalign*}
 
 \end{proof}
 
@@ -167,11 +207,11 @@ a = \mathcal{E}'[t] \longrightarrow \mathcal{E}'[t_{aux}], a = \mathcal{E}'[t] \
 \label{lem:appinv1}
 Let $b,c,d$ be terms and $\mathcal{E}^{aux} \neq []$ be an evaluation context for $\longrightarrow^{aux}$. When
 \[
-c \mapsto' \mathcal{E}^{aux}[d] \land b \mapsto^{aux} d,
+c \mapsto' \mathcal{E}^{aux}[d] ~ \land ~ b \mapsto^{aux} d,
 \]
 then there are $a, a'$ such that
 \[
-a \longrightarrow' a' {\longrightarrow^{aux}}^* \mathcal{E}^{aux}[b] \land a \longrightarrow^{aux} c.
+a \longrightarrow' a' {\longrightarrow^{aux}}^* \mathcal{E}^{aux}[b] ~ \land ~ a \longrightarrow^{aux} c.
 \]
 \begin{proof}
 We know that $c = q_r[\sigma], \mathcal{E}^{aux}[d] = t_r[\sigma]$ for some equation $r$, and that $b = q_\epsilon[\sigma^{aux}], d = t_\epsilon[\sigma^{aux}]$ for some $\sigma^{aux}$.
@@ -180,34 +220,50 @@ In order to choose $a$, we first need to find out where $d$ can be found in $t_r
 \item $r = \epsilon$. Then it is $\mathcal{E}^{aux}[d] = t_\epsilon[\sigma] = aux(\overline{x})[\sigma]$; since $\mathcal{E}^{aux} \neq []$, we know that $\sigma(x) = \mathcal{C}[d]$ for some variable appearing in $t_\epsilon$ and some context $\mathcal{C}$. From this it also follows that $\mathcal{E}^{aux} = t_\epsilon[x \mapsto \mathcal{C}][\sigma]$, since plugging in $d$ on both sides gives the equivalent equation $\mathcal{E}^{aux}[d] = t_\epsilon[x \mapsto \mathcal{C}[d]][\sigma] = t_\epsilon[\sigma]$, which is true by assumption. Choose $a = q_\epsilon[x \mapsto \mathcal{C}[b]][\sigma]$. The two desired reductions can be derived as follows.
 \begin{enumerate}
 \item Using the ``Subst'' rule for $\epsilon$:
-\[
-a = q_\epsilon[x \mapsto \mathcal{C}[b]][\sigma] \mapsto' t_\epsilon[x \mapsto \mathcal{C}[b]][\sigma] = t_\epsilon[x \mapsto \mathcal{C}][\sigma][b] = \mathcal{E}^{aux}[b]
-\]
+\begin{flalign*}
+&a = q_\epsilon[x \mapsto \mathcal{C}[b]][\sigma] \\
+\mapsto' ~&t_\epsilon[x \mapsto \mathcal{C}[b]][\sigma] \\
+= ~&t_\epsilon[x \mapsto \mathcal{C}][\sigma][b] = \mathcal{E}^{aux}[b]
+\end{flalign*}
 
 \item Using the ``Cong'' rule for $b \mapsto^{aux} d$ and evaluation context $ q_\epsilon[x \mapsto \mathcal{C}][\sigma]$:
-\[
-a = q_\epsilon[x \mapsto \mathcal{C}[b]][\sigma] = q_\epsilon[x \mapsto \mathcal{C}][\sigma][b] \longrightarrow^{aux} q_\epsilon[x \mapsto \mathcal{C}][\sigma][d] = q_\epsilon[x \mapsto \mathcal{C}[d]][\sigma] = q_\epsilon[\sigma] = c
-\]
+\begin{flalign*}
+&a = q_\epsilon[x \mapsto \mathcal{C}[b]][\sigma] \\
+= ~&q_\epsilon[x \mapsto \mathcal{C}][\sigma][b] \\
+\longrightarrow^{aux} ~&q_\epsilon[x \mapsto \mathcal{C}][\sigma][d] \\
+= ~&q_\epsilon[x \mapsto \mathcal{C}[d]][\sigma] \\
+= ~&q_\epsilon[\sigma] = c
+\end{flalign*}
 \end{enumerate}
 
 \item $r \neq \epsilon$. Then $t_r$ doesn't contain calls to $aux$, and thus $d = aux(\overline{x})[\sigma^{aux}$ must be a subterm of a right-hand side of $\sigma$. Thus there is an occurrence of some variable $x$ in $t_r$ such that, for $t^y_r = t_r$ with this occurrence replaced by a fresh (in $t_r$) variable $y$, it is $t^y_r[y \mapsto \mathcal{C}[d]][\sigma] = t_r[\sigma]$ for some context $\mathcal{C}$. Choose $a = q_r[x \mapsto \mathcal{C}[b]][\sigma]$. The two desired reductions can be derived as follows.
 \begin{enumerate}
 \item The first step, using the ``Subst'' rule for $r$:
-\[
-a = q_r[x \mapsto \mathcal{C}[b]][\sigma] \mapsto' t_r[x \mapsto \mathcal{C}[b]][\sigma]
-\]
+\begin{flalign*}
+&a = q_r[x \mapsto \mathcal{C}[b]][\sigma] \\
+\mapsto' ~&t_r[x \mapsto \mathcal{C}[b]][\sigma]
+\end{flalign*}
 Then the other steps, each using the ``Cong'' rule for $b \mapsto^{aux} d$:
-\begin{multline*}
-t_r[x \mapsto \mathcal{C}[b]][\sigma] = t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}[b]][\sigma] = t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}][\sigma][b, b, ..., b] \\
-\longrightarrow^{aux} t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}][\sigma][d, b, ..., b] \longrightarrow^{aux} ... \\
-\longrightarrow^{aux} t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}][\sigma][d, d, ..., d] = t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}[d]][\sigma] \\
-= t^y_r[y \mapsto \mathcal{C}[b]][\sigma] = t^y_r[y \mapsto \mathcal{C}][\sigma][b] = \mathcal{E}^{aux}[b]
-\end{multline*}
+\begin{flalign*}
+&t_r[x \mapsto \mathcal{C}[b]][\sigma] \\
+= ~&t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}[b]][\sigma] \\
+= ~&t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}][\sigma][b, b, ..., b] \\
+\longrightarrow^{aux} ~&t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}][\sigma][d, b, ..., b] \\
+\longrightarrow^{aux} ~&... \\
+\longrightarrow^{aux} ~&t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}][\sigma][d, d, ..., d] \\
+= ~&t^y_r[y \mapsto \mathcal{C}[b]][x \mapsto \mathcal{C}[d]][\sigma] \\
+= ~&t^y_r[y \mapsto \mathcal{C}[b]][\sigma] \\
+= ~&t^y_r[y \mapsto \mathcal{C}][\sigma][b] = \mathcal{E}^{aux}[b]
+\end{flalign*}
 
 \item Using the ``Cong'' rule for $b \mapsto^{aux} d$ and evaluation context $q_r[x \mapsto \mathcal{C}][\sigma]$:
-\begin{multline*}
-a = q_r[x \mapsto \mathcal{C}[b]][\sigma] = q_r[x \mapsto \mathcal{C}][\sigma][b] \\ \longrightarrow^{aux} q_r[x \mapsto \mathcal{C}][\sigma][d] = q_r[x \mapsto \mathcal{C}[d]][\sigma] = q_r[\sigma] = c
-\end{multline*}
+\begin{flalign*}
+&a = q_r[x \mapsto \mathcal{C}[b]][\sigma] \\
+= ~&q_r[x \mapsto \mathcal{C}][\sigma][b] \\
+\longrightarrow^{aux} ~&q_r[x \mapsto \mathcal{C}][\sigma][d] \\
+= ~&q_r[x \mapsto \mathcal{C}[d]][\sigma] \\
+= ~&q_r[\sigma] = c
+\end{flalign*}
 \end{enumerate}
 \end{enumerate}
 \end{proof}
@@ -217,26 +273,31 @@ a = q_r[x \mapsto \mathcal{C}[b]][\sigma] = q_r[x \mapsto \mathcal{C}][\sigma][b
 \label{lem:appinv2}
 Let $b,c,d$ be terms and $\mathcal{E}'$ be an evaluation context for $\longrightarrow^{aux}$. When
 \[
-c \mapsto' d \land b \mapsto^{aux} \mathcal{E}'[d]
+c \mapsto' d ~ \land ~ b \mapsto^{aux} \mathcal{E}'[d]
 \]
 then there is an $a$ such that
 \[
-a \longrightarrow' b \land a \longrightarrow^{aux} \mathcal{E}'[c].
+a \longrightarrow' b ~ \land ~ a \longrightarrow^{aux} \mathcal{E}'[c].
 \]
 \begin{proof}
 We know that $c = q_r[\sigma], d = t_r[\sigma]$ for some equation $r$ and some $\sigma$, and that $b = q_\epsilon[\sigma^{aux}], \mathcal{E}'[d] = t_\epsilon[\sigma^{aux}]$ for some $\sigma^{aux}$. Since $t_\epsilon = aux(\overline{x})$, there is a variable $x$ such that $\sigma^{aux}(x) = \mathcal{C}[d]$ for a context $\mathcal{C}$. Also, it is $\mathcal{E}' = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}]$. Choose $a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}]$. The two desired reductions can be derived as follows.
 \begin{enumerate}
 \item Using the ``Cong'' rule for $c \mapsto' d$ and evaluation context $q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}]$ (see below):
-\begin{multline*}
-a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] = q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][c] \\
-\longrightarrow' q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][d] = q_\epsilon[x \mapsto \mathcal{C}[d]][\sigma^{aux}] = q_\epsilon[\sigma^{aux}] = b
-\end{multline*}
+\begin{flalign*}
+&a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] \\
+= ~&q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][c] \\
+\longrightarrow' ~&q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][d] \\
+= ~&q_\epsilon[x \mapsto \mathcal{C}[d]][\sigma^{aux}] \\
+= ~&q_\epsilon[\sigma^{aux}] = b
+\end{flalign*}
 The reduction can be derived because $q_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}] \in \mathbf{EC}[\vdash'_v]$. This is because $\mathcal{E}' = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}] \in \mathbf{EC}[\vdash'_v]$.
 
 \item Using the ``Subst'' rule for equation $\epsilon$:
-\[
-a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] \mapsto^{aux} t_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] = t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][c] = \mathcal{E}'[c]
-\]
+\begin{flalign*}
+&a = q_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] \\
+\mapsto^{aux} ~&t_\epsilon[x \mapsto \mathcal{C}[c]][\sigma^{aux}] \\
+= ~&t_\epsilon[x \mapsto \mathcal{C}][\sigma^{aux}][c] = \mathcal{E}'[c]
+\end{flalign*}
 \end{enumerate}
 \end{proof}
 \end{lemma}
@@ -248,7 +309,7 @@ By the derivation of the two one-step reductions, we know the following:
 \begin{itemize}
 \item From $c \longrightarrow' d$: $c = \mathcal{E}'[c_0], d = \mathcal{E}'[d'_0]$ for an $\mathcal{E}' \in \mathbf{EC}[\vdash'_v]$ and terms $c_0, d'_0$ with $c_0 \mapsto' d'_0$.
 
-\item From $b \longrightarrow^{aux} d$: $b = \mathcal{E}^{aux}[b_0], d = \mathcal{E}^{aux}[d^{aux}_0]$ for an $\mathcal{E}^{aux} \in \mathbf{EC}[\vdash'_v]$ and terms $b_0 \mapsto^{aux} d^{aux}_0$.
+\item From $b \longrightarrow^{aux} d$: $b = \mathcal{E}^{aux}[b_0], d = \mathcal{E}^{aux}[d^{aux}_0]$ for an $\mathcal{E}^{aux} \in \mathbf{EC}[\vdash'_v]$ and terms $b_0, d^{aux}_0$ with $b_0 \mapsto^{aux} d^{aux}_0$.
 \end{itemize}
 
 We compare $\mathcal{E}'$ and $\mathcal{E}^{aux}$ and distinguish four cases.
@@ -256,11 +317,43 @@ We compare $\mathcal{E}'$ and $\mathcal{E}^{aux}$ and distinguish four cases.
 \begin{itemize}
 \item $\mathcal{E}' = \mathcal{E}^{aux}$. Then it is $d'_0 = d^{aux}_0$; we know that $d^{aux}_0$ must be a call to $aux$, and, by the definition of extractions, the only equation which contains such a call on the right-hand side is $q_\epsilon$. Consequently, since $c_0 \mapsto' d'_0 = d^{aux}_0$ and $b_0 \mapsto^{aux} d^{aux}_0$, it must be $c_0 = b_0$ and thus $b = c$. Thus simply choose $a = b = c$.
 
-\item The hole of $\mathcal{E}'$ properly contains that of $\mathcal{E}^{aux}$, i.e., there is a context $\mathcal{E}^{aux}_0 \neq []$ such that $\mathcal{E}^{aux} = \mathcal{E}'[\mathcal{E}^{aux}_0]$. It follows that $\mathcal{E}^{aux}_0[d^{aux}_0] = d'_0$. By \autoref{lem:appinv1} we have an $a_0$ with $a_0 \mapsto' \mathcal{E}^{aux}_0[b_0]$ and $a_0 \longrightarrow^{aux} c_0$. Choose $a = \mathcal{E}'[a_0]$; the property holds since $a = \mathcal{E}'[a_0] \longrightarrow' \mathcal{E}'[\mathcal{E}^{aux}_0[b_0]] = \mathcal{E}'[\mathcal{E}^{aux}_0][b_0] = \mathcal{E}^{aux}[b_0] = b$ and $a = \mathcal{E}'[a_0] \longrightarrow^{aux} \mathcal{E}'[c_0] = c$.
+\item The hole of $\mathcal{E}'$ properly contains that of $\mathcal{E}^{aux}$, i.e., there is a context $\mathcal{E}^{aux}_0 \neq []$ such that $\mathcal{E}^{aux} = \mathcal{E}'[\mathcal{E}^{aux}_0]$. It follows that $\mathcal{E}^{aux}_0[d^{aux}_0] = d'_0$. By \autoref{lem:appinv1} we have an $a_0$ with $a_0 \mapsto' \mathcal{E}^{aux}_0[b_0]$ and $a_0 \longrightarrow^{aux} c_0$. Choose $a = \mathcal{E}'[a_0]$; the property holds since
+\[
+a = \mathcal{E}'[a_0] \longrightarrow' \mathcal{E}'[\mathcal{E}^{aux}_0[b_0]] = \mathcal{E}'[\mathcal{E}^{aux}_0][b_0] = \mathcal{E}^{aux}[b_0] = b
+\]
+and
+\[
+a = \mathcal{E}'[a_0] \longrightarrow^{aux} \mathcal{E}'[c_0] = c.
+\]
 
-\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{C} \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{C}]$. By \autoref{fac:chp21}, it follows that $\mathcal{E}^{aux} \in \mathbf{EC}[\vdash'_v]$. Further, it follows that $\mathcal{C}[d'_0] = d^{aux}_0$. By \autoref{lem:appinv2} we have an $a_0$ with $a_0 \longrightarrow' b_0$ and $a_0 \mapsto^{aux} \mathcal{C}[c_0]$. Choose $a = \mathcal{E}^{aux}[a_0]$; the property holds since $a = \mathcal{E}^{aux}[a_0] \longrightarrow' \mathcal{E}^{aux}[b_0] = b$ and $a = \mathcal{E}^{aux}[a_0] \longrightarrow^{aux} \mathcal{E}^{aux}[\mathcal{C}[c_0]] = \mathcal{E}^{aux}[\mathcal{C}][c_0] = \mathcal{E}'[c_0] = c$.
+\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{C} \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{C}]$. By \autoref{fac:chp21}, it follows that $\mathcal{E}^{aux} \in \mathbf{EC}[\vdash'_v]$. Further, it follows that $\mathcal{C}[d'_0] = d^{aux}_0$. By \autoref{lem:appinv2} we have an $a_0$ with $a_0 \longrightarrow' b_0$ and $a_0 \mapsto^{aux} \mathcal{C}[c_0]$. Choose $a = \mathcal{E}^{aux}[a_0]$; the property holds since
+\[
+a = \mathcal{E}^{aux}[a_0] \longrightarrow' \mathcal{E}^{aux}[b_0] = b
+\]
+and
+\[
+a = \mathcal{E}^{aux}[a_0] \longrightarrow^{aux} \mathcal{E}^{aux}[\mathcal{C}[c_0]] = \mathcal{E}^{aux}[\mathcal{C}][c_0] = \mathcal{E}'[c_0] = c.
+\]
 
-\item Neither the hole of $\mathcal{E}'$ contains that of $\mathcal{E}^{aux}$, nor the other way around. Then we have a two-hole context $\mathcal{E}^{merge}$ such that $\mathcal{E}^{merge}[[], d^{aux}_0] = \mathcal{E}'$ and $\mathcal{E}^{merge}[d'_0, []] = \mathcal{E}^{aux}$. Choose $a$ as $\mathcal{E}^{merge}[c_0, b_0]$. The property holds because $a = \mathcal{E}^{merge}[c_0, b_0] = \mathcal{E}^{merge}[c_0, []][b_0] \longrightarrow^{aux} \mathcal{E}^{merge}[c_0, []][d^{aux}_0] = \mathcal{E}^{merge}[c_0, d^{aux}_0] = \mathcal{E}^{merge}[[], d^{aux}_0][c_0] = \mathcal{E}'[c_0] = c$ and $a = \mathcal{E}^{merge}[c_0, b_0] = \mathcal{E}^{merge}[[], b_0][c_0] \longrightarrow' \mathcal{E}^{merge}[[], b_0][d'_0] = \mathcal{E}^{merge}[d'_0, b_0] = \mathcal{E}^{merge}[d'_0, []][b_0] = \mathcal{E}^{aux}[b_0] = b$. This second reduction is possible because it is $\mathcal{E}^{merge}[[], b_0] \in \mathbf{EC}[\vdash'_v]$, since $\mathcal{E}' = \mathcal{E}^{merge}[[], d^{aux}_0]$ and $\langle d^{aux}_0 \rangle^{aux^{-1}} = \langle b_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v d^{aux}_0$ iff $\vdash'_v \vdash'_v c_0$.
+\item Neither the hole of $\mathcal{E}'$ contains that of $\mathcal{E}^{aux}$, nor the other way around. Then we have a two-hole context $\mathcal{E}^{merge}$ such that $\mathcal{E}^{merge}[[], d^{aux}_0] = \mathcal{E}'$ and $\mathcal{E}^{merge}[d'_0, []] = \mathcal{E}^{aux}$. Choose $a$ as $\mathcal{E}^{merge}[c_0, b_0]$. The property holds because 
+\begin{flalign*}
+&a = \mathcal{E}^{merge}[c_0, b_0] \\
+= ~&\mathcal{E}^{merge}[c_0, []][b_0] \\
+\longrightarrow^{aux} ~&\mathcal{E}^{merge}[c_0, []][d^{aux}_0] \\
+= ~&\mathcal{E}^{merge}[c_0, d^{aux}_0] \\
+= ~&\mathcal{E}^{merge}[[], d^{aux}_0][c_0] \\
+= ~&\mathcal{E}'[c_0] = c
+\end{flalign*}
+and
+\begin{flalign*}
+&a = \mathcal{E}^{merge}[c_0, b_0] \\
+= ~&\mathcal{E}^{merge}[[], b_0][c_0] \\
+\longrightarrow' ~&\mathcal{E}^{merge}[[], b_0][d'_0] \\
+= ~&\mathcal{E}^{merge}[d'_0, b_0] \\
+= ~&\mathcal{E}^{merge}[d'_0, []][b_0] \\
+= ~&\mathcal{E}^{aux}[b_0] = b.
+\end{flalign*}
+This second reduction is possible because it is $\mathcal{E}^{merge}[[], b_0] \in \mathbf{EC}[\vdash'_v]$, since $\mathcal{E}' = \mathcal{E}^{merge}[[], d^{aux}_0]$ and $\langle d^{aux}_0 \rangle^{aux^{-1}} = \langle b_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v d^{aux}_0$ iff $\vdash'_v \vdash'_v c_0$. \qedhere
 \end{itemize}
 
 \end{proof}
