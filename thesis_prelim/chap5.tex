@@ -146,7 +146,8 @@ codata Fun2 where
 
 function zipWith(): Fun2 where
   zipWith.apply(f, s1, s2).head() = f.apply(s1.head(), s2.head())
-  zipWith.apply(f, s1, s2).tail() = zipWith.apply(f, s1.tail(), s2.tail())
+  zipWith.apply(f, s1, s2).tail() =
+    zipWith.apply(f, s1.tail(), s2.tail())
 
 function add(): Fun1 where
   add().apply(a, Zero()) = a
@@ -174,9 +175,12 @@ codata Stream where
   Stream.head(): Nat
   Stream.tail(): Stream
 
-function zipWith(): Fun<(Fun<(Nat, Nat), Nat>, Stream, Stream), Stream> where
-  zipWith().apply((f, s1, s2)).head() = f.apply((s1.head(), s2.head()))
-  zipWith().apply((f, s1, s2)).tail() = zipWith().apply((f, s1.tail(), s2.tail()))
+function zipWith():
+    Fun<(Fun<(Nat, Nat), Nat>, Stream, Stream), Stream> where
+  zipWith().apply((f, s1, s2)).head() =
+    f.apply((s1.head(), s2.head()))
+  zipWith().apply((f, s1, s2)).tail() =
+    zipWith().apply((f, s1.tail(), s2.tail()))
 
 function add(): Fun1 where
   add().apply((a, Zero())) = a
