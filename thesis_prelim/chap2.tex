@@ -1,6 +1,6 @@
 \chapter{The language Uroboro}
 
-In this chapter we formally define the language Uroboro. It is a more or less straightforward generalization of the Data and Codata Fragments of Rendel et al.\cite{rendel15automatic}; we therefore orient ourselves on their presentation. We will also sometimes orient ourselves on Abel et al.\cite{abel13copatterns}, which also define a language with copatterns, albeit including first-class functions unlike Uroboro. We first define the syntax of Uroboro (\autoref{sec:urosyn}), then its typing (\autoref{sec:urostatsem}), and finally its dynamic semantics (\autoref{sec:urosos}), which we present as small-step operational semantics.
+In this chapter we formally define the language Uroboro. It is a more or less straightforward generalization of the Data and Codata Fragments of Rendel et al.\cite{rendel15automatic}; we therefore orient ourselves on their presentation. We will also sometimes orient ourselves on Abel et al.\cite{abel13copatterns}, which also define a language with copatterns, albeit including first-class functions unlike Uroboro. We first define the syntax of Uroboro (\autoref{sec:urosyn}), then its typing (\autoref{sec:urostatsem}), and finally its dynamic semantics (\autoref{sec:urosos}), which we present as small-step operational semantics. Afterwards, we define copattern coverage for Uroboro (\autoref{sec:cc}), which is analogous to coverage in functional programming languages with pattern matching. Then we show type soundness for Uroboro (\autoref{sec:urots}). We conclude the chapter by showing how the reduction semantics of Uroboro extends those of either the Data or Codata Fragment (\autoref{codfragext}).
 
 In the introduction, we have already shown example programs from the Data and Codata Fragments. Before we start with the definitions, we give an example Uroboro program that is neither in the Data nor in the Codata Fragments, i.e., it contains both data and codata types.
 
@@ -172,7 +172,7 @@ We say that a program with signatures $\Sigma$ is well-typed when it is $\Sigma 
 \section{Dynamic semantics}
 \label{sec:urosos}
 
-In this section, we formally define the semantics of Uroboro. We present them as small-step operational semantics. Before defining the reduction relation, a few other definitions are in order. In Uroboro, a reduction is a term rewriting that uses one of the equations of the program. Therefore, we need to define what it means for a term to match an lhs, that is, a copattern; we do so in \autoref{ssec:copm}. For languages with codata, there is a special notion of value; we define what values are in Uroboro in \autoref{ssec:val}. Then we define the reduction relation (\autoref{ssec:red}). For some programs, terms can be stuck, that is, they are neither reducible nor considered a value. Such cases are excluded by copattern coverage, for which we give a judgement in \autoref{ssec:cc}. Finally, we consider how the semantics relate to the semantics of the Data and Codata Fragments (\autoref{ssec:codfragext}).
+In this section, we formally define the semantics of Uroboro. We present them as small-step operational semantics. Before defining the reduction relation, a few other definitions are in order. In Uroboro, a reduction is a term rewriting that uses one of the equations of the program. Therefore, we need to define what it means for a term to match an lhs, that is, a copattern; we do so in \autoref{ssec:copm}. For languages with codata, there is a special notion of value; we define what values are in Uroboro in \autoref{ssec:val}. Then we define the reduction relation (\autoref{ssec:red}).
 
 \subsection{Copattern matching}
 \label{ssec:copm}
@@ -355,10 +355,10 @@ For any two contexts $\mathcal{C}, \mathcal{C}_0$ and any evaluation context $\m
 \]
 \end{fact}
 
-\subsection{Copattern coverage}
-\label{ssec:cc}
+\section{Copattern coverage}
+\label{sec:cc}
 
-In general, for programs with \textit{coverage} it is guaranteed that no term is stuck. We adapt the judgement for \textit{copattern coverage} from Abel et al.\cite{abel13copatterns} for Uroboro. $fun \lhd | ~ Q$ means that the set of copatterns $Q$ \textit{covers} the function $fun$. Intuitively, when this set $Q$ is the set of left-hand sides of the function definition for $fun$, this function is fully specified. One can regard the consecutive application of the rules of the coverage judgement as a way of step-wise refining the specification of the function. The rule C\textsubscript{Head} stands for the start point, where the only left-hand side of the function neither has destructor nor constructor calls. The other two rules refine the specification of $fun$ by variable splitting (C\textsubscript{Con}), that is, refining based upon the input, or by result splitting (C\textsubscript{Des}), that is, refining based upon the output (or result). The terminology ``variable splitting'' and ``result splitting'' is also borrowed from Abel et al. and will become relevant in chapter 4.
+In general, when a language enjoys type soundness, for programs with \textit{coverage} it is guaranteed that no term is stuck. We adapt the judgement for \textit{copattern coverage} from Abel et al.\cite{abel13copatterns} for Uroboro. $fun \lhd | ~ Q$ means that the set of copatterns $Q$ \textit{covers} the function $fun$. Intuitively, when this set $Q$ is the set of left-hand sides of the function definition for $fun$, this function is fully specified. One can regard the consecutive application of the rules of the coverage judgement as a way of step-wise refining the specification of the function. The rule C\textsubscript{Head} stands for the start point, where the only left-hand side of the function neither has destructor nor constructor calls. The other two rules refine the specification of $fun$ by variable splitting (C\textsubscript{Con}), that is, refining based upon the input, or by result splitting (C\textsubscript{Des}), that is, refining based upon the output (or result). The terminology ``variable splitting'' and ``result splitting'' is also borrowed from Abel et al. and will become relevant in chapter 4.
 
 These rules for the judgement are defined below. We assume a program and write $Dess_\tau$ for the set of destructors for codata type $\tau$, and $Cons_\tau$ for the set of constructors for data type $\tau$. We also write $q^\tau$ and $x^\tau$ to indicate that the type of the copattern $q$ or the variable $x$, respectively, has been inferred to be $\tau$. \autoref{sec:urostatsem} provides a way to infer types for variables, the type of a copattern is found out by looking it up in the respective function or destructor signature.
 
@@ -384,13 +384,39 @@ A program has copattern coverage whenever all of its function definitions have c
 
 In chapter 4, we will rely not only upon copattern coverage, but also on knowing how the coverage was derived by consecutive result and variable splitting. In other words, we need an algorithm for the judgement. Abel et al.\cite{abel13copatterns} hint, for their judgement, at a possible way to adapt other coverage algorithms for copatterns; to our knowledge, there currently is no such algorithm for copattern coverage checking, either by Abel et al. or others. For the time being, an exponential-time algorithm that goes through all derivation trees of a maximum depth will have to suffice. The maximum depth is the maximal number of constructors and destructors, added together, of all lhss of the function definition.
 
-\subsection{As an extension of (Co)Data Fragment semantics}
-\label{ssec:codfragext}
+\section{Type soundness}
+\label{sec:urots}
 
-To conclude this chapter, we show how Uroboro's semantics relate to those of either the Data Fragment or of the Codata Fragment. Assuming well-typedness and copattern coverage, Uroboro's notion of reducibility is a conservative extension of either the Data Fragment's notion (\autoref{sssec:df}) or the Codata Fragment's notion (\autoref{sssec:codf}). Note that, when the well-typedness and coverage conditions are dropped, Uroboro's reducibility notion is still a conservative extension of the Data Fragment's notion.
+We show that Uroboro enjoys type-soundness. As usual, we do so by showing preservation and progress for the reduction relation $\longrightarrow$. The notion of completeness used in the progress lemma is the copattern coverage defined in the previous section; the value notion is that of the judgement $\vdash_v$ defined in \autoref{ssec:val}.
 
-\subsubsection{Data Fragment}
-\label{sssec:df}
+\begin{lemma}[Type preservation]
+If a program $prg$ with signatures $\Sigma$ is well-typed, the following holds for any two terms $s, t$: When $\Gamma \vdash_{\Sigma} s : \tau$ and $s \longrightarrow_{prg} t$, then $\Gamma \vdash_{\Sigma} t : \tau$.
+\begin{proof}
+TODO
+\end{proof}
+\end{lemma}
+
+\begin{lemma}[Progress]
+If a program $prg$ with signatures $\Sigma$ is well-typed and has copattern coverage, any term with $\vdash_{\Sigma} t : \tau$ (especially: $t$ is closed) is either reducible, i.e., their exists a term $t'$ with $t \longrightarrow_{prg} t'$, or it is $\vdash_v t$.
+\begin{proof}
+Suppose that $t$ doesn't reduce, i.e., there is no term $t'$ with $t \longrightarrow_{prg} t'$. By induction on the structure of $t$ we show that in this case it is $\vdash_v t$.
+
+Assume that for all subterms $t_0$ of $t$ it is $\vdash_v t_0$ (the induction hypothesis). If $t$ matched an lhs of $prg$, it would thus reduce (contract) using this equation, contrary to assumption. If the type $\tau$ of $t$ is a negative (codata) type, we have $\vdash_v t$ by either the rule V\textsubscript{CodTFun} or the rule V\textsubscript{CodTDes} of the value judgement, depending on whether $t$ is a function call or a destructor call. If $\tau$ is a positive (data) type, we distinguish two cases.
+\begin{enumerate}
+\item $t$ is a constructor call. Then we have $\vdash_v t$ by the V\textsubscript{Con} rule of the value judgement.
+
+\item $t$ is a function or destructor call. Since $t$ doesn't match any lhs of $prg$, this contradicts the fact that $prg$ has copattern coverage. This is because coverage for the function definition of the function of $t$ can only be established when there is an lhs that $t$ itself matches, since (a) coverage cannot be established by result splitting, as $\tau$ is a positive type, and (b) all subterms of $t$ are values and thus don't match any lhs.
+\end{enumerate}
+\end{proof}
+\end{lemma}
+
+\section{As an extension of (Co)Data Fragment semantics}
+\label{sec:codfragext}
+
+To conclude this chapter, we show how Uroboro's semantics relate to those of either the Data Fragment or of the Codata Fragment. Assuming well-typedness and copattern coverage, Uroboro's notion of reducibility is a conservative extension of either the Data Fragment's notion (\autoref{ssec:df}) or the Codata Fragment's notion (\autoref{ssec:codf}). Note that, when the well-typedness and coverage conditions are dropped, Uroboro's reducibility notion is still a conservative extension of the Data Fragment's notion.
+
+\subsection{Data Fragment}
+\label{ssec:df}
 
 The evaluation context $\mathcal{E}$ conservatively extends the context for the Data Fragment, as explained below. The common congruence rule for both of this and their Codata Fragment is used here, as well. As a result of this and of the pattern matching rules given above, the notion of reduction for Uroboro of this work is a conservative extension of their Data Fragment reduction.
 
@@ -402,8 +428,8 @@ u, v ::= con(v^*),
 \]
 while the V\textsubscript{CodTFun} can never be applied. This is because a function in the Data Fragment can only have data type unless it doesn't have a type defined in the program at all, as types can only be added by data definitions.
 
-\subsubsection{Codata Fragment}
-\label{sssec:codf}
+\subsection{Codata Fragment}
+\label{ssec:codf}
 
 The Codata Fragment's evaluation context notion is conservatively extended by this work's, as well. And here again, this is why the notion of reduction for all of Uroboro conservatively extends that for the Codata Fragment.
 
