@@ -13,10 +13,7 @@ As already hinted at in the introduction, authors like Reynolds and Danvy have s
 
 Reynolds' classical example is the ``meta-circular'' interpreter for the lambda calculus: Instead of writing an interpreter in a first-order language from scratch, he first straightforwardly translates the intuitive understanding of the semantics of the lambda calculus into a higher-order program, then mechanically defunctionalizes this program. The other direction, refunctionalization into a program that can be better understood than its first-order counterpart, has first been considered by Danvy and Millikin\cite{danvy09refunctionalization}; more details follow in \autoref{ssec:refuncex}.
 
-Rendel et al.\cite{rendel15automatic} have already shown how Uroboro facilitates both the defunctionalization direction and the refunctionalization direction; they have also done so specifically for the meta-circular interpreter example. But their approach still required manual, even though mechanical, work to bring arbitrary Uroboro programs into either the form required by their defunctionalization or their refunctionalization, i.e., into the Codata or Data Fragment, respectively. Our work fully automatizes these pretransformations; all in all, we give an algorithm to defunctionalize any Uroboro program with copattern coverage, and one that refunctionalizes any such program. Our transformations can now be implemented in an IDE such that a programmer can start with an easier to understand higher-order program, like Reynolds\cite{reynolds72definitional} did with the meta-circular interpreter, and then literally ``press a button'' to get the corresponding first-order program. What is more, this higher-order program can use the full expressiveness of Uroboro, not just that of either the Data or Codata Fragment. To illustrate this, we give an Uroboro definition of Reynolds' meta-circular interpreter that we think is as straightforward as one might wish for. By this we mean that anybody with an intuitive understanding of lambda calculus (and the knowledge on how to read functional programs with data and codata types) should be able to comprehend it without thinking deeply about it (one shouldn't need to ``run an interpreter'' in their mind).
-
-TODO: make the example more concise by moving some stuff into an assumed standard library
-TODO2: in the Uroboro section, continue this example instead of the one from the introduction
+Rendel et al.\cite{rendel15automatic} have already shown how Uroboro facilitates both the defunctionalization direction and the refunctionalization direction; they have also done so specifically for the meta-circular interpreter example. But their approach still required manual, even though mechanical, work to bring arbitrary Uroboro programs into either the form required by their defunctionalization or their refunctionalization, i.e., into the Codata or Data Fragment, respectively. Our work fully automatizes these pretransformations; all in all, we give an algorithm to defunctionalize any Uroboro program with copattern coverage, and one that refunctionalizes any such program. Our transformations can now be implemented in an IDE such that a programmer can start with an easier to understand higher-order program, like Reynolds\cite{reynolds72definitional} did with the meta-circular interpreter, and then literally ``press a button'' to get the corresponding first-order program. This higher-order program can use the full expressiveness of Uroboro, not just that of either the Data or Codata Fragment. To illustrate this, we give an Uroboro definition of Reynolds' meta-circular interpreter that we think is as straightforward as one might wish for.\footnote{Except for the way environments are defined and used; this is due to Uroboro not supporting parametric polymorphism. We get back to this point in \autoref{sec:reluro}.} By this we mean that anybody with an intuitive understanding of lambda calculus (and the knowledge on how to read functional programs with data and codata types) should be able to comprehend it without thinking deeply about it (one shouldn't need to ``run an interpreter'' in their mind).
 
 \begin{lstlisting}
 
@@ -58,7 +55,7 @@ Note especially the equation
   eval(Abs(exp), env).apply(val) = eval(exp, cons(val, env)),
 \end{lstlisting}
 
-which is allowed neither in the Data nor in the Codata Fragment, since it has both a constructor and a destructor in its lhs.
+which is allowed neither in the Data nor in the Codata Fragment, since it has both a constructor and a destructor in its lhs. This is a point where the full expressiveness of Uroboro is helpful, as it allows to directly express the intuitive fact that, in the lambda calculus, abstractions evaluate to functions which can then be applied to another value $v$ by evaluating the body of the abstraction in a changed environment which binds $v$ to a variable.\footnote{As stated before, in this example, environments aren't as easily understood as the rest, due to the (current) limitations of Uroboro. The interpreter relies upon a naming scheme for variables that isn't immediately obvious, in order to bind $v$ to the correct variable; specifically, the natural number corresponding to the variable must be the next free, i.e., not corresponding to any variable, in the environment. Ideally, we would like to define environments using higher-order concepts involving parametric polymorphism, which Uroboro doesn't support (yet).}
 
 \subsection{Other defunctionalization examples}
 \label{ssec:defuncex}
@@ -92,77 +89,109 @@ When we say that we adapted the unnesting algorithm to Uroboro, we mean that we 
 \section{Uroboro}
 \label{sec:reluro}
 
-In the introduction, we have already considered the Data Fragment and Codata Fragment of Uroboro and how they relate to re- and defunctionalization, respectively. We also have already talked about why Uroboro is interesting for the purpose of automatic program transformations \autoref{ssec:urofull}. In this section, we examine why Uroboro is interesting beyond that: As already outlined in \autoref{ssec:urofull}, we think that Uroboro is a potential replacement for certain higher-order languages; in the following we illustrate this point.
+In the introduction, we have already considered the Data Fragment and Codata Fragment of Uroboro and how they relate to re- and defunctionalization, respectively. We also have already talked about why Uroboro is interesting for the purpose of automatic program transformations. In this section, we examine why Uroboro is interesting beyond that: As already outlined in the introduction, we think that Uroboro is a potential replacement for certain higher-order languages; in the following we illustrate this point.
 
-For instance, consider the \texttt{filterNats} example, repeated from \autoref{ssec:defunc}. We will desugar it to a form which only uses codata type definitions, but no first-class functions.
+As an example, consider the definition of Fibonacci streams, borrowed from Abel et al.\cite{abel13copatterns}, and presented here in a hypothetical higher-order language meant to resemble Uroboro.
 
 \begin{lstlisting}
+  
+data Nat where
+  Zero: Nat
+  Succ: Nat -> Nat
 
-filterNats :: ((Nat -> Bool), [Nat]) -> [Nat]
-filterNats (f, x:xs)
-  | f x = x:(filterNats (f, xs))
-  | otherwise = filterNats (f, xs)
-filterNats (_, []) = []
+codata Stream where
+  Stream.head: Nat
+  Stream.tail: Stream
 
-even :: Nat -> Bool
-even Zero = True
-even Succ(n) = not (even n)
+def zipWith: ((Nat, Nat) -> Nat, Stream, Stream) -> Stream where
+  (zipWith (f, s1, s2)).head = f (s1.head, s2.head)
+  (zipWith (f, s1, s2)).tail = zipWith (f, s1.tail, s2.tail)
 
-main :: [Nat]
-main = filterNats (even, [1, 2, 3, 4, 5])
+def add: (Nat, Nat) -> Nat where
+  add (a, Zero) = a
+  add (a, Succ b) = Succ (add (a, b))
+
+def fib: Stream where
+  fib.head = Zero
+  fib.tail.head = Succ Zero
+  fib.tail.tail = zipWith (add, fib, fib.tail)
 
 \end{lstlisting}
 
-We first turn the Haskell-like syntax into a syntax closer to Uroboro.
-
-\begin{lstlisting}
-
-function filterNats((Nat -> Bool), [Nat]): [Nat] where
-  filterNats (f, x:xs)
-    | f x = x:(filterNats (f, xs))
-    | otherwise = filterNats (f, xs)
-  filterNats (_, []) = []
-
-function even(): Nat -> Bool where
-  even Zero = True
-  even Succ(n) = not (even n)
-
-function main(): [Nat]
-  main = filterNats (even, [1, 2, 3, 4, 5])
-
-\end{lstlisting}
-
-Then, we do the following:
+We will desugar this to a form which only uses codata type definitions, but no first-class functions. To achieve this, we do the following:
 \begin{itemize}
-\item Add a codata type definition \texttt{NatBoolFun} with one destructor \texttt{apply}.
+\item Add codata type definitions \texttt{Fun1} and \texttt{Fun2} with one destructor \texttt{apply} for each. The argument and result types of \texttt{apply} correspond to the respective function type that is replaced by the codata type in the next step.
 
-\item Replace function type \texttt{Nat -> Bool} with codata type \texttt{NatBoolFun}.
+\item Replace function types \texttt{(Nat, Nat) -> Nat} and \texttt{((Nat, Nat) -> Nat, Stream, Stream) -> Stream} with codata types \texttt{Fun1} and \texttt{Fun2}, respectively.
 
-\item Desugar the calls to a function of type \texttt{NatBoolFun} to calls to destructor \texttt{apply}.
+\item Desugar the calls to a function of type \texttt{Fun1} or \texttt{Fun2} to calls to the respective destructor \texttt{apply}.
 \end{itemize}
-The result of this is shown below.
+We also change the concrete syntax of the original program, removing higher-order constructs such that the resulting program, shown below, is valid Uroboro. This is possible because there are no more function types and first-class functions.
 
 \begin{lstlisting}
 
-codata NatBoolFun where
-  NatBoolFun.apply(Nat): Bool
+data Nat where
+  Zero(): Nat
+  Succ(Nat): Nat
 
-function filterNats(NatBoolFun, [Nat]): [Nat] where
-  filterNats (f, x:xs)
-    | f.apply(x) = x:(filterNats (f, xs))
-    | otherwise = filterNats (f, xs)
-  filterNats (_, []) = []
+codata Stream where
+  Stream.head(): Nat
+  Stream.tail(): Stream
 
-function even(): NatBoolFun where
-  even.apply(Zero) = True
-  even.apply(Succ(n)) = not (even.apply(n))
+codata Fun1 where
+  Fun1.apply(Nat, Nat): Nat
 
-function main(): [Nat]
-  main = filterNats (even(), [1, 2, 3, 4, 5])
+codata Fun2 where
+  Fun2.apply(Fun1, Stream, Stream): Stream
+
+function zipWith(): Fun2 where
+  zipWith.apply(f, s1, s2).head() = f.apply(s1.head(), s2.head())
+  zipWith.apply(f, s1, s2).tail() = zipWith.apply(f, s1.tail(), s2.tail())
+
+function add(): Fun1 where
+  add().apply(a, Zero()) = a
+  add().apply(a, Succ(b)) = Succ(add().apply(a, b))
+
+function fib(): Stream where
+  fib().head() = Zero()
+  fib().tail().head() = Succ(Zero())
+  fib().tail().tail() = zipWith(add(), fib(), fib().tail())
 
 \end{lstlisting}
 
-For this simple example, it is no problem that we need to introduce the codata type \texttt{NatBoolFun}. However, since we don't have parametric polymorphism, we would have to introduce a codata type for \textit{every} concrete function type. The lack of parametric polymorphism therefore is a rather severe limitation. Rendel et al. are currently working on bringing parametric polymorphism to Uroboro.
+For this simple example, it is not much of a problem that we need to introduce two codata types for two different function types. However, since we don't have parametric polymorphism, we would have to introduce a codata type for \textit{every} concrete function type. The lack of parametric polymorphism therefore is a rather severe limitation. Rendel et al. are currently working on bringing parametric polymorphism to Uroboro. We imagine a version of the above program using parametric polymorphism to look similar to the following; we use arrow brackets to indicate type parameters. We also implicitly use a tuple type, but this is just for simplicity, as we could also just curry all uses of the codata type for functions.
+
+\begin{lstlisting}
+
+codata Fun<A, B> where
+  Fun<A, B>.apply(A): B
+
+data Nat where
+  Zero(): Nat
+  Succ(Nat): Nat
+
+codata Stream where
+  Stream.head(): Nat
+  Stream.tail(): Stream
+
+function zipWith(): Fun<(Fun<(Nat, Nat), Nat>, Stream, Stream), Stream> where
+  zipWith().apply((f, s1, s2)).head() = f.apply((s1.head(), s2.head()))
+  zipWith().apply((f, s1, s2)).tail() = zipWith().apply((f, s1.tail(), s2.tail()))
+
+function add(): Fun1 where
+  add().apply((a, Zero())) = a
+  add().apply((a, Succ(b))) = Succ(add().apply((a, b)))
+
+function fib(): Stream where
+  fib().head() = Zero()
+  fib().tail().head() = Succ(Zero())
+  fib().tail().tail() = zipWith().apply((add(), fib(), fib().tail()))
+
+\end{lstlisting}
+
+The definition of the parametric codata type \texttt{Fun<A, B>} for functions from \texttt{A} to \texttt{B} could then be moved to a standard library and reused. Consider the usual higher-order syntax for function calls and the arrow syntax for function types as syntactic sugar for a call to the \texttt{apply} destructors and the respective instance of the parametric codata type \texttt{Fun<A, B>} (recursively), respectively. When desugaring the program in this way, we arrive back at the original program from the start (in the hypothetical higher-order language with copatterns).
+
+Our example is straightforwardly generalized. Thus, when parametric polymorphism can be successfully brought to Uroboro, this variant of Uroboro would have the same expressiveness as many of the usual higher-order programming languages with parametric polymorphism.
 
 \section{Future research}
 \label{sec:futr}
