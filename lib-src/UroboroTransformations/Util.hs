@@ -3,10 +3,34 @@ module UroboroTransformations.Util where
 import Uroboro.Tree
 import Uroboro.Error
 
-import Data.List(intercalate, isPrefixOf)
+import Data.Char
+import Data.List(intercalate, isPrefixOf, maximumBy)
 import Control.Monad.State.Lazy
 
 type PathToSubterm = [Int]
+
+containsVarTP :: Identifier -> TP -> Bool
+containsVarTP id' (TPVar _ id) = id == id'
+containsVarTP id (TPCon _ _ tps) = any (containsVarTP id) tps
+
+containsVar :: TQ -> Identifier -> Bool
+containsVar (TQDes _ _ tps tq) id = (any (containsVarTP id) tps) || (containsVar tq id)
+containsVar (TQApp _ _ tps) id = any (containsVarTP id) tps
+
+largestVarIndex :: [Identifier] -> Int
+largestVarIndex ids = getIndex $ maximumBy maxInXScheme (filter hasXScheme ids)
+  where
+    hasXScheme ('x':rs) = all isDigit rs
+    hasXScheme _ = False
+
+    maxInXScheme ('x':rs) ('x':rs') = (compare :: Int -> Int -> Ordering) (read rs) (read rs')
+
+    getIndex ('x':rs) = read rs
+
+tqVarIds :: TQ -> [Identifier]
+tqVarIds tq = map getId (collectVarsTQ tq)
+  where
+    getId (TPVar _ id) = id
 
 nextOnSameLevel :: PathToSubterm -> PathToSubterm
 nextOnSameLevel p = reverse $ ((last p)+1):(reverse $ init p)
