@@ -411,11 +411,100 @@ The problem is directly related to the difference between natural deduction and 
 
 \subsubsection{A workaround}
 
-...
+Since solving the underlying problem presented above is beyond the scope of our work, we will just present a workaround for the problem at hand, which is, transforming a program in the fragment $\mathbf{U}_{cc}[fdef_{un,r}]$ to a semantically equivalent program in fragment $\mathbf{U}_{cc}[fdef_{un,r'}]$. We start with a naive approach, which doesn't preserve the semantics, and then refine this approach using an extraction.
+
+Consider the following program. It is in fragment $\mathbf{U}_{cc}[fdef_{un,r}]$, but not in $\mathbf{U}_{cc}[fdef_{un,r'}]$, since the constructors in the function definition for $f$ are not at the first argument position.
+
+\begin{lstlisting}
+
+data P where
+  c1(P): P
+  c2(): P
+
+codata N where
+  N.des(): N
+
+function g(): N where
+  g() = g()
+
+function h(): P where
+  h() = c2()
+
+function f(N, P): P where
+  f(x, c1(y)) = c1(y)
+  f(x, c2()) = c2()
+
+function main(): P where
+  main() = f(g(), c1(h()))
+
+\end{lstlisting}
+
+What is the easiest way to bring this to the form required by $\mathbf{U}_{cc}[fdef_{un,r'}]$? Arguably, the approach that requires the minimal amount of syntactic change is to simply switch the arguments of $f$, in the signature and equations of the function definition and at the call sites. The resulting program looks as follows (we omit the unchanged data and codata type definitions).
+
+\begin{lstlisting}
+
+function g(): N where
+  g() = g()
+
+function h(): P where
+  h() = c2()
+
+function f(P, N): P where
+  f(c1(y), x) = c1(y)
+  f(c2(), x) = c2()
+
+function main(): P where
+  main() = f(c1(h()), g())
+
+\end{lstlisting}
+
+However, this also changes the semantics of the program. For instance, consider the term \texttt{main()}. In the original program, this term reduces as follows:
+\[
+\texttt{main()} \longrightarrow \texttt{f(g(), c1(h()))} \longrightarrow \texttt{f(g(), c1(h()))} \longrightarrow ...
+\]
+The equation \texttt{g() = g()} leads to an infinite reduction sequence. Thus, under left-to-right call-by-value semantics, the equation \texttt{h() = c2()} can never be used. Now, consider how \texttt{main()} reduces in the transformed program:
+\[
+\texttt{main()} \longrightarrow \texttt{f(c1(h()), g())} \longrightarrow \texttt{f(c2(), g())} \longrightarrow \texttt{f(c2(), g())} \longrightarrow ...
+\]
+Eventually, we again have an infinite reduction sequence, but before that, the equation \texttt{h() = c2()} is used, unlike in the original program. The reason is that the term \texttt{g()}, that triggers the infinite sequence, cannot prevent the reduction by this equation anymore since it is now in the second argument position, behind \texttt{c1(h())}.
+
+How to fix this? By first extracting the constructor, and then switching the arguments of the auxiliary function. Under this approach, the transformed program looks as follows (again omitting the unchanged (co)data type definitions):
+
+\begin{lstlisting}
+
+function g(): N where
+  g() = g()
+
+function h(): P where
+  h() = c2()
+
+function f(N, P): P where
+  f(x, y) = aux(y, x)
+
+function aux(P, N): P where
+  aux(c1(y), x) = c1(y)
+  aux(c2(), x) = c2()
+
+function main(): P where
+  main() = f(g(), c1(h()))
+
+\end{lstlisting}
+
+How about reducing \texttt{main()} in this program? The reduction sequence we get is no different from that of the original program.
+\[
+\texttt{main()} \longrightarrow \texttt{f(g(), c1(h()))} \longrightarrow \texttt{f(g(), c1(h()))} \longrightarrow ...
+\]
+And this is no surprise, since we didn't change the order of the arguments of $f$, but rather those of $aux$. In general, this approach preserves the semantics of a program in the weak bisimilarity presented for extractions, for the following reasons.
+\begin{enumerate}
+\item Extracting the constructor preserves the semantics in this weak bisimilarity, as proven in chapter 3, as long as both the original and the transformed program have no overlapping equations. For the original program, this holds since it has copattern coverage by assumption. The transformed program again has copattern coverage, for the same reasons as presented for the variable splitting case of the unnesting algorithm.
+
+\item Switching the arguments of the auxiliary function doesn't change the semantics, when one only considers reductions starting with terms of the original program.
+\end{enumerate}
+As this solution is rather ad-hoc, we don't go into the details of how to prove the bisimulation.
 
 \subsubsection{The actual algorithm}
 
-Now, we turn to the actual algorithm, with domain $\mathbf{U}_{cc}[fdef_{un,r'}]$.
+Now, we turn to the actual refunctionalization algorithm, with domain $\mathbf{U}_{cc}[fdef_{un,r'}]$.
 
 First, we define the class of function definitions of a program $prg$ which are already refunctionalized. A function definition is already refunctionalized when (a) all of its equations have destructor patterns, or (b) the function has no arguments, or (c) the first argument of every lhs is a variable. We define the class of already refunctionalized functions $F^{prg}_r$ as those which have already defunctionalized function definitions.
 
