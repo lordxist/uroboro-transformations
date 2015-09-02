@@ -87,7 +87,7 @@ splitVars :: TQ -> Reader BetterProgram [([TQ], PathToSubterm)]
 splitVars tq = do
   bp <- ask
   let vs = tqPosVarIds tq bp
-  return $ runReader (mapM (splitVar [] tq) (trace (show $ lookup (Type "Val") (ds bp)) vs)) (bp, ((largestVarIndex vs)+1))
+  return $ runReader (mapM (splitVar [] tq) vs) (bp, ((largestVarIndex vs)+1))
 
 splitRes :: TQ -> Reader BetterProgram [TQ]
 splitRes tq = do
