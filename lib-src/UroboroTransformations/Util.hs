@@ -32,6 +32,9 @@ tqVarIds tq = map getId (collectVarsTQ tq)
   where
     getId (TPVar _ id) = id
 
+newvarIndex :: TQ -> Int
+newvarIndex tq = (largestVarIndex $ tqVarIds tq) + 1
+
 nextOnSameLevel :: PathToSubterm -> PathToSubterm
 nextOnSameLevel p = reverse $ ((last p)+1):(reverse $ init p)
 

@@ -5,14 +5,13 @@ import Control.Monad.Reader
 
 import Uroboro.Tree
 
-import UroboroTransformations.Util (PathToSubterm, largestVarIndex, tqVarIds, containsVar, containsVarTP)
+import UroboroTransformations.Util (PathToSubterm, largestVarIndex, tqVarIds, containsVar, containsVarTP, newvarIndex)
 import UroboroTransformations.Extraction
 
 extractionProjectionTP :: PathToSubterm -> TP -> Reader Int TP
 extractionProjectionTP _ (TPVar _ _) = undefined
-extractionProjectionTP (p1:p) (TPCon t id tps)
-  | p1 == 0 = reader $ (TPVar t).("x"++).show
-  | otherwise = (liftM $ TPCon t id) (extractionProjectionTPs p tps)
+extractionProjectionTP [] (TPCon t id tps) = reader $ (TPVar t).("x"++).show
+extractionProjectionTP p@(_:_) (TPCon t id tps) = (liftM $ TPCon t id) (extractionProjectionTPs p tps)
 
 extractionProjectionTPs :: PathToSubterm -> [TP] -> Reader Int [TP]
 extractionProjectionTPs (p1:p) tps = do
@@ -24,9 +23,6 @@ conExtractionLensGetReader (p1:p) (TQDes t id tps tq)
   | p1 == 0 = (liftM $ TQDes t id tps) (conExtractionLensGetReader p tq)
   | otherwise = (liftM $ (flip $ TQDes t id) tq) (extractionProjectionTPs ((p1-1):p) tps)
 conExtractionLensGetReader (_:p) (TQApp t id tps) = (liftM $ TQApp t id) (extractionProjectionTPs p tps)
-
-newvarIndex :: TQ -> Int
-newvarIndex tq = largestVarIndex $ tqVarIds tq
 
 conExtractionLensGet :: PathToSubterm -> TQ -> TQ
 conExtractionLensGet p tq = runReader (conExtractionLensGetReader p tq) (newvarIndex tq)
