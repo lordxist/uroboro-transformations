@@ -1,3 +1,4 @@
+% !TEX root = main.tex
 \chapter{The language Uroboro}
 
 In this chapter we formally define the language Uroboro. It is a more or less straightforward generalization of the Data and Codata Fragments of Rendel et al.\cite{rendel15automatic}; we therefore orient ourselves on their presentation. We will also sometimes orient ourselves on Abel et al.\cite{abel13copatterns}, which also define a language with copatterns, albeit including first-class functions unlike Uroboro. We first define the syntax of Uroboro (\autoref{sec:urosyn}), then its typing (\autoref{sec:urostatsem}), and finally its dynamic semantics (\autoref{sec:urosos}), which we present as small-step operational semantics. Afterwards, we define copattern coverage for Uroboro (\autoref{sec:cc}), which is analogous to coverage in functional programming languages with pattern matching. Then we show type soundness for Uroboro (\autoref{sec:urots}). We conclude the chapter by showing how the reduction semantics of Uroboro extends those of either the Data or Codata Fragment (\autoref{codfragext}).
@@ -390,9 +391,11 @@ In chapter 4, we will rely not only upon copattern coverage, but also on knowing
 We show that Uroboro enjoys type-soundness. As usual, we do so by showing preservation and progress for the reduction relation $\longrightarrow$. The notion of completeness used in the progress lemma is the copattern coverage defined in the previous section; the value notion is that of the judgement $\vdash_v$ defined in \autoref{ssec:val}.
 
 \begin{lemma}[Type preservation]
-If a program $prg$ with signatures $\Sigma$ is well-typed, the following holds for any two terms $s, t$: When $\Gamma \vdash_{\Sigma} s : \tau$ and $s \longrightarrow_{prg} t$, then $\Gamma \vdash_{\Sigma} t : \tau$.
+If a program $prg$ with signatures $\Sigma$ is well-typed, the following holds for any two terms $s, t$: When $\vdash_{\Sigma} s : \tau$ and $s \longrightarrow_{prg} t$, then $\vdash_{\Sigma} t : \tau$.
 \begin{proof}
-TODO
+From the derivation of $s \longrightarrow_{prg} t$ we know that there is an evaluation context $\mathcal{E}$ and terms $s_0, t_0$ such that $s = \mathcal{E}[s_0], t = \mathcal{E}[t_0]$ and $s_0 \mapsto t_0$. From the derivation of the contraction, we know that $s_0 = q_r[\sigma], t_0 = t_r[\sigma]$ for some equation $r$ of $prg$ and some $\sigma$.  By its derivation, we know that from $\vdash_{\Sigma} s : \tau$ it follows that $\vdash_{\Sigma} s_0 : \tau_0$ for some type $\tau_0$.
+
+Since $r$ is well-typed, it is $\Sigma \vdash q_r = t_r \textrm{ ok}$. From its derivation we know (a) that for each variable $x$ of $q_r$ there exists a $\tau_x$ such that $q_r \vdash_{\Sigma} x : \tau_x$ (type inference in $q_r$) and (b) that $\{ x : \tau_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma} t_r : \tau'$, with $\tau'$ being the return type of the function or destructor that $q_r$ is a call to. Since $s_0 = q_r[\sigma]$, by the derivation of $\vdash_{\Sigma} s_0 : \tau_0$ we know that $\tau' = \tau_0$. By induction on the derivation of $q_r \vdash_{\Sigma} x : \tau_x$ (the type inference for $x$ in $q_r$), using the fact that $\vdash_{\Sigma} q_r[\sigma]: \tau_0$, we can see that, for all variables $x$ of $q_r$, it is $\vdash_{\Sigma} \sigma(x) : \tau_x$. We combine this with $\{ x : \tau_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma} t_r : \tau_0$ to derive $\vdash_{\Sigma} t_r[\sigma] : \tau_0$. Using this, we derive $\vdash_{\Sigma} \mathcal{E}[t_r[\sigma]] : \tau$, which is the desired typing judgement.
 \end{proof}
 \end{lemma}
 
