@@ -12,7 +12,7 @@ import Uroboro.Checker
 import Uroboro.Tree
 import Uroboro.Error
 
-import UroboroTransformations.Util (dummyLocation, PathToSubterm, nextOnSameLevel, largestVarIndex, collectVarsTQ, containsVar, containsVarTP)
+import UroboroTransformations.Util (dummyLocation, PathToSubterm, nextOnSameLevel, largestVarIndex, collectVarsTQ, containsVar, containsVarTP, newvarIndex)
 
 data CCTree a = VarSplit a PathToSubterm [CCTree a] | ResSplit a [CCTree a] | Leaf a deriving (Show)
 
@@ -54,7 +54,7 @@ convertToVar t = do
     return $ TPVar t ("x"++(show n))
 
 tqForDes :: TQ -> PTDes -> TQ
-tqForDes tq (PTDes l t id ts _) = TQDes t id (evalState (mapM convertToVar ts) 0) tq
+tqForDes tq (PTDes l t id ts _) = TQDes t id (evalState (mapM convertToVar ts) (newvarIndex tq)) tq
 
 ptConToTP :: Int -> PTCon -> TP
 ptConToTP n (PTCon _ t id ts) = TPCon t id (evalState (mapM convertToVar ts) n)
@@ -87,7 +87,7 @@ splitVars :: TQ -> Reader BetterProgram [([TQ], PathToSubterm)]
 splitVars tq = do
   bp <- ask
   let vs = tqPosVarIds tq bp
-  return $ runReader (mapM (splitVar [] tq) vs) (bp, ((largestVarIndex vs)+1))
+  return $ runReader (mapM (splitVar [] tq) vs) (bp, (newvarIndex tq))
 
 splitRes :: TQ -> Reader BetterProgram [TQ]
 splitRes tq = do
@@ -142,7 +142,7 @@ leaves (ResSplit _ trees) = concatMap leaves trees
 leaves (VarSplit _ _ trees) = concatMap leaves trees
 
 instance Eq PP where
-  (PPVar _ id) == (PPVar _ id') = id == id'
+  (PPVar _ id) == (PPVar _ id') = True
   (PPCon _ id pps) == (PPCon _ id' pps') = (id == id') && (pps == pps')
   _ == _ = False
 
