@@ -6,12 +6,13 @@ import Control.Monad.State.Lazy
 import Data.Maybe
 import Data.List (find)
 import Data.Set (fromList)
+import Debug.Trace
 
 import Uroboro.Checker
 import Uroboro.Tree
 import Uroboro.Error
 
-import UroboroTransformations.Util (dummyLocation, PathToSubterm, nextOnSameLevel, largestVarIndex, tqVarIds, containsVar, containsVarTP)
+import UroboroTransformations.Util (dummyLocation, PathToSubterm, nextOnSameLevel, largestVarIndex, collectVarsTQ, containsVar, containsVarTP)
 
 data CCTree a = VarSplit a PathToSubterm [CCTree a] | ResSplit a [CCTree a] | Leaf a deriving (Show)
 
@@ -32,7 +33,7 @@ instance Typed PTCon where
   getType (PTCon _ t _ _) = t
 
 instance Typed PTDes where
-  getType (PTDes _ t _ _ _) = t
+  getType (PTDes _ _ _ _ t) = t
 
 instance Typed TQ where
   getType (TQApp t _ _) = t
@@ -67,6 +68,7 @@ splitVarTPs ((tp@(TPVar t id)):tps) id' p
 splitVarTPs ((TPCon l cid tps):tps') id p
   | any (containsVarTP id) tps = liftM (first $ liftM ((:tps').(TPCon l cid))) (splitVarTPs tps id (p++[0]))
   | otherwise = liftM (first $ liftM ((TPCon l cid tps):)) (splitVarTPs tps' id (nextOnSameLevel p))
+splitVarTPs _ id p = error (show id)
 
 splitVar :: PathToSubterm -> TQ -> Identifier -> Reader (BetterProgram, Int) ([TQ], PathToSubterm)
 splitVar p (TQDes l id' tps tq) id
@@ -74,11 +76,18 @@ splitVar p (TQDes l id' tps tq) id
   | otherwise = liftM (first $ liftM $ flip (TQDes l id') tq) (splitVarTPs tps id (p++[1]))
 splitVar p (TQApp l id' tps) id = liftM (first $ liftM $ TQApp l id') (splitVarTPs tps id (p++[0]))
 
+tqPosVarIds :: TQ -> BetterProgram -> [Identifier]
+tqPosVarIds tq bp = map getId (filter positive (collectVarsTQ tq))
+  where
+    getId (TPVar _ id) = id
+
+    positive (TPVar t _) = (null $ fromJust $ lookup t (ds bp)) -- warning: wrongly judges a type to be positive when it is the empty codata type
+
 splitVars :: TQ -> Reader BetterProgram [([TQ], PathToSubterm)]
 splitVars tq = do
   bp <- ask
-  let vs = tqVarIds tq
-  return $ runReader (mapM (splitVar [] tq) vs) (bp, ((largestVarIndex vs)+1))
+  let vs = tqPosVarIds tq bp
+  return $ runReader (mapM (splitVar [] tq) (trace (show $ lookup (Type "Val") (ds bp)) vs)) (bp, ((largestVarIndex vs)+1))
 
 splitRes :: TQ -> Reader BetterProgram [TQ]
 splitRes tq = do
