@@ -1,37 +1,17 @@
 % !TEX root = main.tex
 \chapter{Automatic de- and refunctionalization}
 
-Defunctionalization and refunctionalization have already been outlined in the introduction. In this chapter, we build upon the works of Rendel et al.\cite{rendel15automatic} and Setzer et al.\cite{setzer14unnesting} to automatize defunctionalization and refunctionalization for Uroboro. Before we outline the algorithms, let us begin with an example program that cannot be de- or refunctionalized using the automatic transformations of Rendel et al. because it isn't in the Codata or Data Fragment of Uroboro, respectively. We start with the example program for the Data Fragment of the introduction, which consisted of a data type for natural numbers and function definitions for addition and multiplication, and add (a) a codata type for infinite arrays, (b) a function that, given a natural number $n$, returns such an array with $n$ as its first element and all other elements $0$, and (c) a predicate that determines whether the input is $1$ (we use \texttt{Succ(Zero())} and \texttt{Zero()} and in the place of true and false, respectively).
+\begin{figure}
+\begin{align*}
+& \textsf{Unnest}_i: \mathbf{U}_{cc} \to \mathbf{U}_{cc}[fdef_{un,i}] \text{ for } i \in \{d,r\} \\
+& \textsf{CoreDefunc}: \mathbf{U}_{cc}[fdef_{un,d}] \to \mathbf{U}^{defunc}_{cc} \\
+& \textsf{CoreRefunc}: \mathbf{U}_{cc}[fdef_{un,r}] \to \mathbf{U}^{refunc}_{cc}
+\end{align*}
+\caption{Domains and ranges for the algorithms of ch.4}
+\label{fig:ch4domrng}
+\end{figure}
 
-\begin{lstlisting}
-
-data Nat where
-  Zero(): Nat
-  Succ(Nat): Nat
-
-function add(Nat, Nat): Nat where
-  add(Zero(), n) = n
-  add(Succ(m), n) = Succ(add(m, n))
-
-function multiply(Nat, Nat): Nat where
-  multiply(Zero(), n) = Zero()
-  multiply(Succ(m), n) = add(multiply(m, n), n)
-
-codata Array where
-  Array.get(Nat): Nat
-
-function oneElemArray(Nat): Array where
-  oneElemArray(n).get(Zero()) = n
-  oneElemArray(n).get(Succ(m)) = Zero()
-
-function isOne(Nat): Nat where
-  isOne(Zero()) = Zero()
-  isOne(Succ(Zero())) = Succ(Zero())
-  isOne(Succ(Succ(n))) = Zero()
-
-\end{lstlisting}
-
-We will carry this example along in this chapter, and at the end we will have both de- and refunctionalized it to a semantically equivalent program.
+Defunctionalization and refunctionalization have already been outlined in the introduction. In this chapter, we build upon the works of Rendel et al.\cite{rendel15automatic} and Setzer et al.\cite{setzer14unnesting} to automatize defunctionalization and refunctionalization for Uroboro. 
 
 We present an algorithm that defunctionalizes arbitrary Uroboro programs with copattern coverage, and an algorithm that refunctionalizes such programs. Both algorithms are made up of two phases, in order:
 \begin{enumerate}
@@ -43,12 +23,7 @@ In short, the entire process can be described as follows. By unnesting them as f
 
 The unnesting is done by a parameterized algorithm $\textsf{Unnest}_i$, where the parameter $i$ can be either $d$ or $r$, standing for defunctionalization and refunctionalization, respectively. The parameter determines when the algorithm may stop, such that its results are legal inputs for de- or refunctionalization. The unnesting algorithm is essentially the copattern unnesting algorithm of Setzer et al.\cite{setzer14unnesting}, adapted to Uroboro.
 
-We give the intended domain and range for each of the algorithms, all of which are specific fragments of Uroboro. Call the set of all Uroboro programs with copattern coverage $\mathbf{U}_{cc}$; the other fragments are defined below.
-\begin{align*}
-& \textsf{Unnest}_i: \mathbf{U}_{cc} \to \mathbf{U}_{cc}[fdef_{un,i}] \text{ for } i \in \{d,r\} \\
-& \textsf{CoreDefunc}: \mathbf{U}_{cc}[fdef_{un,d}] \to \mathbf{U}^{defunc}_{cc} \\
-& \textsf{CoreRefunc}: \mathbf{U}_{cc}[fdef_{un,r}] \to \mathbf{U}^{refunc}_{cc}
-\end{align*}
+In \autoref{fig:ch4domrng}, we give the intended domain and range for each of the algorithms, all of which are specific fragments of Uroboro. We call the set of all Uroboro programs with copattern coverage $\mathbf{U}_{cc}$; the other fragments are defined below.
 
 \begin{definition}[Unnested Fragments for \textsf{CoreDefunc} and \textsf{CoreRefunc}]
 The fragments $\mathbf{U}_{cc}[fdef_{un,d}]$, $\mathbf{U}_{cc}[fdef_{un,r}]$, for lhss unnested as far as necessary for \textsf{CoreDefunc} and \textsf{CoreRefunc}, respectively, are induced by the function definition fragments $fdef_{un,d}$ and $fdef_{un,r}$, respectively, both defined below using EBNF rules. For these, the basic EBNF rules from the definition of the syntax of Uroboro are reused.
@@ -94,7 +69,7 @@ Those notions correspond directly to the forms of lhss allowed in the unnested f
 
 \subsubsection{Example}
 
-To illustrate what the algorithms $\textsf{Unnest}_d$ and $\textsf{Unnest}_r$ are doing, we first show what happens when either algorithm is used on the example program at the start of the chapter.
+To illustrate what the algorithms $\textsf{Unnest}_d$ and $\textsf{Unnest}_r$ are doing, we first show what happens when either algorithm is used on the example program presented in \autoref{fig:ch2uroex}.
 
 \textbf{Unnesting for defunc.} We begin with $\textsf{Unnest}_d$, and first consider the function definition for \texttt{oneElemArray}.
 
@@ -152,7 +127,7 @@ We try all possible derivation trees of depth two, and get the following derivat
 \UnaryInfC{$fun \lhd | ~ \texttt{isOne(Zero())} ~ \texttt{isOne(Succ(Zero()))} ~ \texttt{isOne(Succ(Succ(n)))} $}
 \end{prooftree}
 
-The last step in the derivation is a variable split; we ``undo'' this by extracting the respective constructor calls into an auxiliary function.
+The last step in the derivation is a variable split; we ``undo'' this by extracting the respective constructor calls into an auxiliary function. In the terminology developed in chapter 3, we target the last two lhss in the function definition for constructor extraction; the position to be targeted is the (only) argument position of the constructor call that is the first argument of the function call in both lhss.
 
 \begin{lstlisting}
 
@@ -255,51 +230,13 @@ Next, we consider important properties of the translation algorithm.
 
 \textbf{Bisimulation.} Because copattern coverage holds for the translated program, the translated program has no overlapping lhss. Therefore, by the propositions 3.3.1 and 3.3.2, we know that the translation preserves the semantics of the program in the kind of weak bisimulation described in section 3.3.
 
-\subsection{Example}
-
-As an example application of the algorithm, consider the following program fragment.
-
-\begin{lstlisting}
-
-fun(x).des().des1(con1()) = t1
-fun(x).des().des1(con2()) = t2
-fun(x).des().des2() = t3
-
-\end{lstlisting}
-
-The final step in the coverage derivation for $fun$ is splitting \texttt{fun(x).des().des1(y)} into \texttt{fun(x).des().des1(con1())} and \texttt{fun(x).des().des1(con2())} by splitting variable $y$. Therefore we first target these two lhss for constructor extraction at the common position of \texttt{con1()} and \texttt{con2()} in the two lhss; the result of the extraction can be seen below.
-
-\begin{lstlisting}
-
-fun(x).des().des1(y) = aux(y, x)
-fun(x).des().des2() = t3
-
-aux(con1(), x) = t1
-aux(con2(), x) = t2
-
-\end{lstlisting}
-
-For this program, the final step in the coverage derivation for $fun$ is splitting \texttt{fun(x).des()} into \texttt{fun(x).des().des1(y)} and \texttt{fun(x).des().des2()} by result splitting. Therefore we target these two lhss for destructor extraction; the result of the extraction can be seen below. Note that \texttt{fun(x).des() = aux2(x)} is generated twice but only present once in the function definition, as these are sets.
-
-\begin{lstlisting}
-
-fun(x).des() = aux2(x)
-
-aux2(x).des1(y) = aux(y, x)
-aux2(x).des2() = t3
-
-\end{lstlisting}
-
-The \texttt{aux} function definition remains unchanged and is omitted. This program is in the desired fragment; the algorithm terminates here because all lhss of the program are simple.
-
 \section{Core defunctionalization}
 
 The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of Rendel et al. for the Codata Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a defunctionalized form after \textsf{Unnest}, virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the syntactic differences between function and destructor calls.\footnote{I.e., the difference between $fun(...)$ and $t.des(...)$. This difference vanishes when changing the syntax of destructor calls to $des(t, ...)$.} The respective transformation for terms is $d$, defined below with the algorithm.
 
 \subsection{Example}
 
-Before we formally define the defunctionalization algorithm, we illustrate it with an example, which we continue from that for $\textsf{Unnest}_d$. The result of $\textsf{Unnest}_d$ applied to this example is sufficiently simple for our core defunctionalization; it is shown below.
-
+\begin{figure}
 \begin{lstlisting}
 
 data Nat where
@@ -330,9 +267,11 @@ function isOne(Nat): Nat where
   isOne(Succ(Succ(n))) = Zero()
 
 \end{lstlisting}
+\caption{Uroboro sample before core defunctionalization}
+\label{fig:ch4urosamplepredefunc}
+\end{figure}
 
-All function definitions except for \texttt{oneElemArray} are already in a defunctionalized form, in the sense that they have no destructors in their lhss. All that \textsf{CoreDefunc} does with this program is to turn the function \texttt{oneElemArray} into a constructor for \texttt{Array}, which is now a data type replacing the original codata type, and to turn the destructor \texttt{Array.get} into a function that dispatches upon an \texttt{Array} argument.
-
+\begin{figure}
 \begin{lstlisting}
 
 data Nat where
@@ -363,15 +302,17 @@ function isOne(Nat): Nat where
   isOne(Succ(Succ(n))) = Zero()
 
 \end{lstlisting}
+\caption{Uroboro sample after core defunctionalization}
+\label{fig:ch4urosamplepostdefunc}
+\end{figure}
 
-The result is free of codata types and copattern matching, as desired.
+Before we formally describe the defunctionalization algorithm, we illustrate it with an example, which we continue from that for $\textsf{Unnest}_d$. In \autoref{fig:ch4urosamplepredefunc}, we show the result of $\textsf{Unnest}_d$ applied to this example; it is sufficiently simple for our core defunctionalization.
+
+All function definitions except for \texttt{oneElemArray} are already in a defunctionalized form, in the sense that they have no destructors in their lhss. All that \textsf{CoreDefunc} does with this program is to turn the function \texttt{oneElemArray} into a constructor for \texttt{Array}, which is now a data type replacing the original codata type, and to turn the destructor \texttt{Array.get} into a function that dispatches upon an \texttt{Array} argument. The result, as shown in \autoref{fig:ch4urosamplepostdefunc}, is free of codata types and copattern matching, as desired.
 
 \subsection{Formal definition}
 
-First, we define the class of function definitions of a program $prg$ which are already defunctionalized. A function definition is already defunctionalized when all of its equations have lhss without destructors. We define the class of already defunctionalized functions $F^{prg}_d$ as those which have already defunctionalized function definitions.
-
-Using this definition, we define defunctionalization of terms.
-
+\begin{figure}
 \begin{align*}
 \langle x \rangle^d = x \\
 \langle s.des(t_1, ..., t_n) \rangle^d = \langle des \rangle^d (\langle s \rangle^d, \langle t_1 \rangle^d, ..., \langle t_n \rangle^d) \\
@@ -379,8 +320,11 @@ Using this definition, we define defunctionalization of terms.
 \langle fun(t_1, ..., t_n) \rangle^d = \langle fun \rangle^d (\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \not\in F_d \\
 \langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)
 \end{align*}
+\end{figure}
 
-This transformation only changes symbols, but leaves the structure of the terms unchanged (disregarding the syntactic sugar for destructor calls). Especially, this means that $\langle q[\sigma] \rangle^d = \langle q \rangle^d [\langle \cdot \rangle^d \circ \sigma]$ for any copattern $q$ and substitution $\sigma$. A property that is important for the definition of \textsf{CoreDefunc} below is that, for any copattern $q$ that is allowed as a lhs in the domain of \textsf{CoreDefunc}, $\langle q \rangle^d$ is also a copattern. This can be easily shown by induction on the structure of $q$.
+First, we define the class of function definitions of a program $prg$ which are already defunctionalized. A function definition is already defunctionalized when all of its equations have lhss without destructors. We define the class of already defunctionalized functions $F^{prg}_d$ as those which have already defunctionalized function definitions.
+
+Using this definition, we define defunctionalization of terms in figure ???. This transformation only changes symbols, but leaves the structure of the terms unchanged (disregarding the syntactic sugar for destructor calls). Especially, this means that $\langle q[\sigma] \rangle^d = \langle q \rangle^d [\langle \cdot \rangle^d \circ \sigma]$ for any copattern $q$ and substitution $\sigma$. A property that is important for the definition of \textsf{CoreDefunc} below is that, for any copattern $q$ that is allowed as a lhs in the domain of \textsf{CoreDefunc}, $\langle q \rangle^d$ is also a copattern. This can be easily shown by induction on the structure of $q$.
 
 Next, we give the definition for \textsf{CoreDefunc}. Like Rendel et al. do for their de- and refunctionalization, we use set-builder notation.
 
@@ -529,23 +473,31 @@ Core refunctionalization is defined analogously to core defunctionalization, wit
 \subsubsection{The problem at hand}
 \label{sssec:asym}
 
-In the introduction to this chapter, we gave two fragments of Uroboro induced by unnested function definition fragments, as the domain of defunctionalization and refunctionalization, respectively. The first fragment, for defunctionalization, has the following syntax for function definitions.
-
+\begin{figure}
+\begin{subfigure}{0.5\textwidth}
 \begin{align*}
-fdef_{un,d} &::= eqn_{nr}^* ~ | ~ eqn_r^* \\
-eqn_r &::= fun(x^*).des(y^*) = t \\
-eqn_{nr} &::= fun(p^*) = t \\
+fdef_{un,d} &::= eqn_{nd}^* ~ | ~ eqn_d^* \\
+eqn_d &::= fun(x^*).des(y^*) = t \\
+eqn_{nd} &::= fun(p^*) = t \\
 \end{align*}
-
-It is unnested regarding destructors, and allows arbitrary patterns when no destructors are present. The second fragment, for refunctionalization, is somewhat analogous to the first, in that it is unnested regarding constructors, and allows arbitrarily many destructors when no constructors are present.
-
+\caption{For defunctionalization}
+\label{fig:unnfddefunc}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
 \begin{align*}
 fdef_{un,r} &::= eqn_{nr}^* ~ | ~ eqn_r^* \\
 eqn_r &::= fun(x^*).des(y^*)^* = t \\
 eqn_{nr} &::= fun(x^*, con(y^*), z^*) = t \\
 \end{align*}
+\caption{For refunctionalization}
+\label{fig:unnfdrefunc}
+\end{subfigure}
+\caption{Syntax for unnested function definitions}
+\end{figure}
 
-However, there is an asymmetry between the two fragments. When only one destructor is allowed, this can also only be placed at one position. On the other hand, allowing only one constructor leaves open the possibility of placing this at different positions. More on this later.
+In the introduction to this chapter, we gave two fragments of Uroboro induced by unnested function definition fragments, as the domain of defunctionalization and refunctionalization, respectively. The first fragment, for defunctionalization, has the syntax for function definitions shown in \autoref{fig:unnfddefunc}. It is unnested regarding destructors, and allows arbitrary patterns when no destructors are present.
+
+The second fragment, for refunctionalization, with its syntax for function definitions shown in \autoref{fig:unnfdrefunc}, is somewhat analogous to the first, in that it is unnested regarding constructors, and allows arbitrarily many destructors when no constructors are present. However, there is an asymmetry between the two fragments. When only one destructor is allowed, this can also only be placed at one position. On the other hand, allowing only one constructor leaves open the possibility of placing this at different positions. More on this later.
 
 The refunctionalization algorithm given below requires the constructor to be at the first position, i.e., it has as its domain the fragment $\mathbf{U}_{cc}[fdef_{un,r'}]$ of Uroboro defined as follows.
 
@@ -684,8 +636,7 @@ Now, we turn to the actual refunctionalization algorithm, with domain $\mathbf{U
 
 \subsubsection{Example}
 
-Before formally defining \textsf{CoreRefunc}, like with defunctionalization, we continue the example from unnesting, here with the result of applying $\textsf{Unnest}_r$ to it. The auxiliary function $aux$ generated by it has to be subjected to the workaround presented above, since its lhss have constructors at non-initial argument positions. After applying this workaround, the program looks as follows.
-
+\begin{figure}
 \begin{lstlisting}
 
 data Nat where
@@ -707,7 +658,7 @@ function oneElemArray(Nat): Array where
   oneElemArray(n).get(m) = aux(n, m)
 
 function aux(Nat, Nat): Nat where
-  aux(n, m) = aux3(m, n)
+  aux(n, m) = m.aux3(n)
 
 function aux3(Nat, Nat): Nat where
   aux3(Zero(), n) = n
@@ -722,9 +673,11 @@ function aux2(Nat): Nat where
   aux2(Succ(n)) = Zero()
 
 \end{lstlisting}
+\caption{Uroboro sample before core refunctionalization}
+\label{fig:ch4urosampleprerefunc}
+\end{figure}
 
-The only function definitions which are already refunctionalized, in the sense that their lhss contain no constructors, are \texttt{oneElemArray} and \texttt{aux}. All other function definitions dispatch on their first argument of type \texttt{Nat}; \textsf{CoreRefunc} turns data type \texttt{Nat} into a codata type with a destructor replacing each of these functions, and produces function definitions replacing the constructors \texttt{Zero()} and \texttt{Succ(Nat)}. These function definitions collect all equations which have the respective constructor on their lhs. The result is shown below.
-
+\begin{figure}
 \begin{lstlisting}
 
 codata Nat where
@@ -758,8 +711,13 @@ function aux(Nat, Nat): Nat where
   aux(n, m) = m.aux3(n)
 
 \end{lstlisting}
+\caption{Uroboro sample after core refunctionalization}
+\label{fig:ch4urosamplepostrefunc}
+\end{figure}
 
-As desired, all data types and constructor patterns have been eliminated.
+Before formally defining \textsf{CoreRefunc}, like with defunctionalization, we continue the example from unnesting, here with the result of applying $\textsf{Unnest}_r$ to it. The auxiliary function $aux$ generated by it has to be subjected to the workaround presented above, since its lhss have constructors at non-initial argument positions. After applying this workaround, the program looks as shown in \autoref{fig:ch4urosampleprerefunc}.
+
+The only function definitions which are already refunctionalized, in the sense that their lhss contain no constructors, are \texttt{oneElemArray} and \texttt{aux}. All other function definitions dispatch on their first argument of type \texttt{Nat}; \textsf{CoreRefunc} turns data type \texttt{Nat} into a codata type with a destructor replacing each of these functions, and produces function definitions replacing the constructors \texttt{Zero()} and \texttt{Succ(Nat)}. These function definitions collect all equations which have the respective constructor on their lhs; the result is shown in figure ???. As desired, all data types and constructor patterns have been eliminated.
 
 \subsubsection{Formal definition}
 
@@ -795,9 +753,23 @@ Next, we give the definition for \textsf{CoreRefunc}.
 
 \subsection{Properties}
 
-We consider important properties of the transformation. Termination and preservation of well-typedness can be shown completely analogously to \textsf{CoreDefunc}; simply use \textsf{CoreRefunc} and $\langle \cdot \rangle^r$ instead of \textsf{CoreDefunc} and $\langle \cdot \rangle^d$, respectively.
+We consider important properties of the transformation.
+
+\textbf{Termination.} The argument here is virtually identical to that for \textsf{CoreDefunc}; just replace ``codata signatures'' with ``data signatures'' and ``destructor signatures'' with ``constructor signatures''.
 
 \textbf{Range.} This is also shown completely analogously to \textsf{CoreDefunc}, again using the respective dual notions. It can be directly seen in the definition that the resulting program contains no data type definitions. The copattern coverage of the resulting program is also easy to see. In the set-builder definition, the last set in the union contains function definitions taken over from the original program with only the right-hand sides of their equations changed (by $\langle \cdot \rangle^r$); since the left-hand sides stay the same, these function definitions again have copattern coverage. The function definitions from the second set in the union remain to be considered. For each of their equations, each of its left-hand sides is constructed (disregarding the receiver notation for destructors) from the original left-hand side by turning the function name into the corresponding destructor name and the constructor name into the corresponding function name. For the original function definitions, copattern coverage was derived by variable splitting on the first variable; consequently, copattern coverage for the new function definitions can be derived by result splitting.
+
+\textbf{Preservation of well-typedness.} Again, this is dual to\textsf{CoreDefunc}. Let $prg$ be the program to be transformed; we assume $prg$ to be well-typed. This means that for each equation $eqn = `` q = t ''$ of $prg$ we have a derivation of $\Sigma_{prg} \vdash eqn \textrm{ ok}$, with $\Sigma_{prg}$ being the signatures of $prg$. We will show that each equation of $\langle prg \rangle^{\textsf{CoreRefunc}}$ is well-typed. In the definition of \textsf{CoreRefunc}, we can see that the signatures $\Sigma_{\langle prg \rangle^{\textsf{CoreRefunc}}}$ of $\langle prg \rangle^{\textsf{CoreRefunc}}$ are exactly the following: for each constructor signature in $\Sigma_{prg}$ an identical function signature, for some function signatures in $\Sigma_{prg}$ identical destructor signatures, and for the other function signatures in $\Sigma_{prg}$ the identical function signatures. From this, we have the following lemma.
+
+\begin{lemma}
+\label{lem:pwtrefunc}
+When $\Sigma_{prg} \vdash `` q = t " \textrm{ ok}$, then $\Sigma_{\langle prg \rangle^{\textsf{CoreRefunc}}} \vdash `` \langle q \rangle^r = \langle t \rangle^r " \textrm{ ok}$.
+\begin{proof}
+By induction on the derivation of $\Sigma \vdash `` q = t " \textrm{ ok}$, using the similarity of $\Sigma_{prg}$ and $\Sigma_{\langle prg \rangle^{\textsf{CoreRefunc}}}$.
+\end{proof}
+\end{lemma}
+
+In the definition of \textsf{CoreRefunc} we can see that each equation $eqn = `` q = t "$ in $prg$ corresponds to exactly one equation $`` \langle q \rangle^r = \langle t \rangle^r "$ of $\langle prg \rangle^{\textsf{CoreRefunc}}$. Combine this with \autoref{lem:pwtrefunc} to get $\Sigma_{\langle prg \rangle^{\textsf{CoreRefunc}}} \vdash `` q = t " \textrm{ ok}$ for each equation $eqn$ of $\langle prg \rangle^{\textsf{CoreRefunc}}$. Thus $\langle prg \rangle^{\textsf{CoreRefunc}}$ is well-typed whenever $prg$ is.
 
 \textbf{Bisimulation.} For \textsf{CoreRefunc}, strong bisimulation holds. Again, this is shown completely analogously to \textsf{CoreDefunc}; we reuse \autoref{lem:iso}.
 

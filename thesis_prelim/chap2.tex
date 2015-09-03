@@ -1,17 +1,43 @@
 % !TEX root = main.tex
 \chapter{The language Uroboro}
 
+\begin{figure}
+\begin{lstlisting}
+
+data Nat where
+  Zero(): Nat
+  Succ(Nat): Nat
+
+function add(Nat, Nat): Nat where
+  add(Zero(), n) = n
+  add(Succ(m), n) = Succ(add(m, n))
+
+function multiply(Nat, Nat): Nat where
+  multiply(Zero(), n) = Zero()
+  multiply(Succ(m), n) = add(multiply(m, n), n)
+
+codata Array where
+  Array.get(Nat): Nat
+
+function oneElemArray(Nat): Array where
+  oneElemArray(n).get(Zero()) = n
+  oneElemArray(n).get(Succ(m)) = Zero()
+
+function isOne(Nat): Nat where
+  isOne(Zero()) = Zero()
+  isOne(Succ(Zero())) = Succ(Zero())
+  isOne(Succ(Succ(n))) = Zero()
+
+\end{lstlisting}
+\caption{Uroboro sample outside (Co)Data Fragments}
+\label{fig:ch2uroex}
+\end{figure}
+
 In this chapter we formally define the language Uroboro. It is a more or less straightforward generalization of the Data and Codata Fragments of Rendel et al.\cite{rendel15automatic}; we therefore orient ourselves on their presentation. We will also sometimes orient ourselves on Abel et al.\cite{abel13copatterns}, which also define a language with copatterns, albeit including first-class functions unlike Uroboro.
 
 In this chapter, we start with some notational preliminaries (\autoref{sec:uronotp}). Then we define the syntax of Uroboro (\autoref{sec:urosyn}), then its typing (\autoref{sec:urostatsem}), and finally its dynamic semantics (\autoref{sec:urosos}), which we present as small-step operational semantics. Afterwards, we define copattern coverage for Uroboro (\autoref{sec:cc}), which is analogous to coverage in functional programming languages with pattern matching. Then we show type soundness for Uroboro (\autoref{sec:urots}). We conclude the chapter by showing how the reduction semantics of Uroboro extends those of either the Data or Codata Fragment (\autoref{sec:codfragext}).
 
-In the introduction, we have already shown example programs from the Data and Codata Fragments. Before we start with the definitions, we give an example Uroboro program that is neither in the Data nor in the Codata Fragments, i.e., it contains both data and codata types.
-
-\begin{lstlisting}
-
-
-
-\end{lstlisting}
+In the introduction, we have already shown example programs from the Data and Codata Fragments. Before we start with the definitions, we give an example Uroboro program, shown in \autoref{fig:ch2uroex}, that is neither in the Data nor in the Codata Fragments, i.e., it contains both data and codata types. We start with the example program for the Data Fragment of the introduction, which consisted of a data type for natural numbers and function definitions for addition and multiplication, and add (a) a codata type for infinite arrays, (b) a function that, given a natural number $n$, returns such an array with $n$ as its first element and all other elements $0$, and (c) a predicate that determines whether the input is $1$ (we use \texttt{Succ(Zero())} and \texttt{Zero()} and in the place of true and false, respectively). We will carry this example along in this chapter, and at the end we will have both de- and refunctionalized it to a semantically equivalent program.
 
 \section{Notational preliminaries}
 \label{sec:uronotp}
