@@ -18,9 +18,13 @@ containsVar (TQDes _ _ tps tq) id = (any (containsVarTP id) tps) || (containsVar
 containsVar (TQApp _ _ tps) id = any (containsVarTP id) tps
 
 largestVarIndex :: [Identifier] -> Int
-largestVarIndex ids = getIndex $ maximumBy maxInXScheme (filter hasXScheme ids)
+largestVarIndex ids
+    | null xSchemeIds = 0
+    | otherwise = getIndex $ maximumBy maxInXScheme xSchemeIds
   where
-    hasXScheme ('x':rs) = all isDigit rs
+    xSchemeIds = filter hasXScheme ids
+
+    hasXScheme ('x':rs) = ((not.null) rs) && (all isDigit rs)
     hasXScheme _ = False
 
     maxInXScheme ('x':rs) ('x':rs') = (compare :: Int -> Int -> Ordering) (read rs) (read rs')
