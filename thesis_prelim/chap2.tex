@@ -38,25 +38,32 @@ We think that this notation is especially useful for such cases where length par
 \label{sec:urosyn}
 
 \begin{figure}
-\begin{flalign*}
-\sigma, \tau ~&= \textrm{type names}\\
-con ~&= \textrm{constructor names}\\
-des ~&= \textrm{destructor names}\\
-fun ~&= \textrm{function names}\\
-x, y ~&= \textrm{variable names}\\
-\end{flalign*}
-\end{figure}
-
-\begin{figure}
-\begin{flalign*}
+\begin{subfigure}{0.5\textwidth}
+\begin{align*}
+\sigma, \tau ~&= \textrm{type names}&\\
+con ~&= \textrm{constructor names}&\\
+des ~&= \textrm{destructor names}&\\
+fun ~&= \textrm{function names}&\\
+x, y ~&= \textrm{variable names}&\\
+\end{align*}
+\caption{Syntactic domains}
+\label{fig:syndomain}
+\end{subfigure}
+~
+\begin{subfigure}{0.5\textwidth}
+\begin{align*}
 s, t ~&::= x ~ | ~ fun(t^*) ~ | ~ con(t^*) ~ | ~ s.des(t^*) &\\
 q ~&::= fun(p^*) ~ | ~ q.des(p^*) &\\
 p ~&::= x ~ | ~ con(p^*) &
-\end{flalign*}
+\end{align*}
+\caption{Terms}
+\label{fig:uroterms}
+\end{subfigure}
+\caption{Uroboro syntactic domains and terms}
 \end{figure}
 
 \begin{figure}
-\begin{flalign*}
+\begin{align*}
 prg ~&::= (ddef ~ | ~ coddef ~ | ~  fdef)^* &\\
 ~\\
 ddef ~&::= \textbf{data } \sigma \textbf{ where } csig^* &\\
@@ -67,14 +74,14 @@ dsig ~&::= \sigma.des(\tau^*): \tau &\\
 ~\\
 fdef ~&::= \textbf{function } fun(\tau^*): \tau \textbf{ where } eqn^* &\\
 eqn ~&::= q = t &
-\end{flalign*}
+\end{align*}
+\caption{Uroboro programs and definitions}
+\label{fig:uroprogdefs}
 \end{figure}
 
-We assume the domains of symbols presented in figure ???. The syntax of Uroboro is presented in figures ???.
+We assume the domains of symbols presented in \autoref{fig:syndomain}. The \textit{terms} of Uroboro, as presented in \autoref{fig:uroterms}, are variables, and constructor calls, destructor calls, and function calls to lists of terms. The destructor call syntax is syntactical sugar for $des(s, t^*)$, meant to easier distinguish between the destructed (or observed) term and the other arguments of the destructor. A subset of terms is the set of copatterns, which we denote $\mathbf{Cop}$; a copattern is either a function call applied to patterns, or a destructor destructing another copattern and otherwise applied to patterns.
 
-The \textit{terms} of Uroboro are variables, and constructor calls, destructor calls, and function calls to lists of terms. The destructor call syntax is syntactical sugar for $des(s, t^*)$, meant to easier distinguish between the destructed (or observed) term and the other arguments of the destructor. A subset of terms is the set of copatterns, which we denote $\mathbf{Cop}$; a copattern is either a function call applied to patterns, or a destructor destructing another copattern and otherwise applied to patterns.
-
-\textit{Programs} are defined to be sets of \textit{definitions}. A definition can either be a data type definition, a codata type definition, or a function definition. \textit{Data (type) definitions} consist of the name of the data type together with a set of constructor signatures. \textit{Codata (type) definitions} consist of the name of the codata type together with a set of destructor signatures. \textit{Function definitions} consist of the signature of the function together with a set of \textit{equations}. Equations have a left-hand side, which is a copattern, and a right-hand side, which is some term.
+\textit{Programs} are defined to be sets of \textit{definitions}, the syntax rules for all of these are given in \autoref{fig:uroprogdefs}. A definition can either be a data type definition, a codata type definition, or a function definition. \textit{Data (type) definitions} consist of the name of the data type together with a set of constructor signatures. \textit{Codata (type) definitions} consist of the name of the codata type together with a set of destructor signatures. \textit{Function definitions} consist of the signature of the function together with a set of \textit{equations}. Equations have a left-hand side, which is a copattern, and a right-hand side, which is some term.
 
 Note that we consider the collection of equations in a function definition to be a \textit{set}. This means that we establish no order on the equations. We don't consider order-dependent programs in this work; suffice it to say that a variant of Uroboro augmented with order would require a change to the semantics. In general, this is a problem not yet considered for languages with copattern matching; for instance, the language of Abel et al.\cite{abel13copatterns} also doesn't have an order on equations.
 
@@ -115,6 +122,8 @@ Note that we consider the collection of equations in a function definition to be
 \RightLabel{Des}
 \QuinaryInfC{$\Gamma \vdash_{\Sigma} s.des(t_1, ..., t_n): \tau$}
 \end{prooftree}
+\caption{Type judgement for terms}
+\label{fig:typjterm}
 \end{figure}
 
 \begin{figure}
@@ -137,9 +146,12 @@ Note that we consider the collection of equations in a function definition to be
 \RightLabel{Fun}
 \TrinaryInfC{$\Sigma \vdash q = t \textrm{ ok}$}
 \end{prooftree}
+\caption{Well-typedness judgement for equations}
+\label{fig:wtjteq}
 \end{figure}
 
 \begin{figure}
+\begin{subfigure}{\textwidth}
 \begin{center}
 \AxiomC{$x = p_i$}
 \AxiomC{$``con(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
@@ -152,7 +164,12 @@ Note that we consider the collection of equations in a function definition to be
 \BinaryInfC{$con(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
 \DisplayProof
 \end{center}
-
+\caption{Type inference in patterns}
+\label{fig:typeinfjp}
+\end{subfigure}
+~\\
+~\\
+\begin{subfigure}{\textwidth}
 \begin{prooftree}
 \AxiomC{$x \in V(p_i)$}
 \AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
@@ -172,6 +189,11 @@ Note that we consider the collection of equations in a function definition to be
 \BinaryInfC{$q.des(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
 \DisplayProof
 \end{center}
+\caption{Type inference in copatterns}
+\label{fig:typeinfjq}
+\end{subfigure}
+
+\caption{Type inference judgements}
 \end{figure}
 
 As is the case with the copattern language of Abel et al.\cite{abel13copatterns}, there are two kinds of types in Uroboro. \textit{Positive types}, which are those defined by data type definitions, and \textit{negative types}, which are those defined by codata type definitions. Like Rendel et al. do for their fragments, we give a type judgement for terms, and one to judge whether equations are well-typed.  Like them, we let $\Sigma$ be the signatures of a program, that is, its function signatures, codata signatures, and data signatures, as defined above, and we let $\Gamma$ be a typing context, i.e., a set of type assignments to variables, and write
@@ -180,9 +202,9 @@ As is the case with the copattern language of Abel et al.\cite{abel13copatterns}
 
 \item $\Sigma \vdash eqn \textrm{ ok}$ to mean that equation $eqn$ is well-typed under signature $\Sigma$.
 \end{itemize}
-We give the rules for the type judgement for terms in figure ???, which extend those of the Data and Codata Fragments. In fact, we simply combine the rules of the Data and Codata Fragments.
+We give the rules for the type judgement for terms in \autoref{fig:typjterm}, which extend those of the Data and Codata Fragments. In fact, we simply combine the rules of the Data and Codata Fragments.
 
-In figure ???, we give the rules for the well-typedness judgement for equations, which generalize the rules for the Data and Codata Fragment. We write $V(q)$ to denote the variables occuring in $q$, and we use an auxiliary judgement, presented in figure ??=: $q \vdash_{\Sigma} x : \sigma$, for $x \in V(q)$,  means that, within copattern $q$, the variable has type $\sigma$ under signature $\Sigma$. To put it another way, this judgement is a type inference for variables. This judgement, in turn, uses an analogous judgement for patterns.
+In \autoref{fig:wtjteq}, we give the rules for the well-typedness judgement for equations, which generalize the rules for the Data and Codata Fragment. We write $V(q)$ to denote the variables occuring in $q$, and we use an auxiliary judgement, presented in \autoref{fig:typeinfjq}: $q \vdash_{\Sigma} x : \sigma$, for $x \in V(q)$,  means that, within copattern $q$, the variable has type $\sigma$ under signature $\Sigma$. To put it another way, this judgement is a type inference for variables. This judgement, in turn, uses an analogous judgement for patterns, presented in \autoref{fig:typeinfjp}.
 
 We say that a program with signatures $\Sigma$ is well-typed when it is $\Sigma \vdash eqn \textrm{ ok}$ for all equations $eqn$ of the program.
 
@@ -206,29 +228,34 @@ In this section, we formally define the semantics of Uroboro. We present them as
 \RightLabel{PM\textsubscript{Con}}
 \UnaryInfC{$con(t_1, ..., t_n) =^? con(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
 \end{prooftree}
+\caption{Pattern matching}
+\label{fig:pm}
 \end{figure}
 
 \begin{figure}
 \begin{prooftree}
 \AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
-\RightLabel{PM\textsubscript{App}}
+\RightLabel{QM\textsubscript{App}}
 \UnaryInfC{$fun(t_1, ..., t_n) =^? fun(p_1, ..., p_n) \searrow \sigma_1, ..., \sigma_n$}
 \end{prooftree}
 
 \begin{prooftree}
 \AxiomC{$t =^? q \searrow \sigma$}
 \AxiomC{$t_i =^? p_i \searrow \sigma_i ~ \forall i \in \{1, ..., n\}$}
-\RightLabel{PM\textsubscript{Des}}
+\RightLabel{QM\textsubscript{Des}}
 \BinaryInfC{$t.des(t_1, ...t_n) =^? q.des(p_1, ..., p_n) \searrow \sigma, \sigma_1, ..., \sigma_n$}
 \end{prooftree}
+\caption{Copattern matching}
+\label{fig:copm}
 \end{figure}
 
-Here, we define what it means for a term to match a copattern. In short, a term $t$ matches a copattern $q$ when there is a substitution $\sigma$ such that $t = q[\sigma]$. We give a judgement for this, which orients itself on and borrows notations from Abel et al.\cite{abel13copatterns}, section 4. In order to do so, we also give an analogous judgement for patterns in figure ???. In terms of the judgement for patterns, $t =^? p \searrow \sigma$ means that term t matches with pattern $p$ under substitution $\sigma$ (i.e. it is equivalent to $t = p[\sigma]$). The meaning of $t =^? q \searrow \sigma$, for copatterns $q$, is defined analogously in figure ???.
+Here, we define what it means for a term to match a copattern. In short, a term $t$ matches a copattern $q$ when there is a substitution $\sigma$ such that $t = q[\sigma]$. We give a judgement for this, which orients itself on and borrows notations from Abel et al.\cite{abel13copatterns}, section 4. In order to do so, we also give an analogous judgement for patterns in \autoref{fig:pm}. In terms of the judgement for patterns, $t =^? p \searrow \sigma$ means that term t matches with pattern $p$ under substitution $\sigma$ (i.e. it is equivalent to $t = p[\sigma]$). The meaning of $t =^? q \searrow \sigma$, for copatterns $q$, is defined analogously in \autoref{fig:copm}.
 
 \subsection{Values}
 \label{ssec:val}
 
 \begin{figure}
+\begin{subfigure}{\textwidth}
 \begin{prooftree}
 \AxiomC{$t_i \neq^? p_i$}
 \RightLabel{NPM\textsubscript{Con/Mism}}
@@ -240,7 +267,12 @@ Here, we define what it means for a term to match a copattern. In short, a term 
 \RightLabel{NPM\textsubscript{Con/Diff}}
 \UnaryInfC{$con(t_1, , ..., t_n) \neq^? con'(p_1, ..., p_m)$}
 \end{prooftree}
-
+\caption{For patterns}
+\label{fig:nmp}
+\end{subfigure}
+~\\
+~\\
+\begin{subfigure}{\textwidth}
 \begin{prooftree}
 \AxiomC{$t_i \neq^? p_i$}
 \RightLabel{NPM\textsubscript{App/Mism}}
@@ -282,6 +314,11 @@ Here, we define what it means for a term to match a copattern. In short, a term 
 \RightLabel{NPM\textsubscript{Diff2}}
 \UnaryInfC{$t.des(...) \neq^? fun(...)$}
 \end{prooftree}
+\caption{For copatterns}
+\label{fig:nmq}
+\end{subfigure}
+
+\caption{``No-match'' judgement}
 \end{figure}
 
 \begin{figure}
@@ -311,13 +348,15 @@ Here, we define what it means for a term to match a copattern. In short, a term 
 \RightLabel{V\textsubscript{Con}}
 \TrinaryInfC{$\vdash_v con(t_1, ..., t_n)$}
 \end{prooftree}
+\caption{Value judgement}
+\label{fig:valj}
 \end{figure}
 
 This section formalizes the notion of value for Uroboro. As is the case with the language of Abel et al.\cite{abel13copatterns}, whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed.
 
 $\vdash_v t$ means that the closed term $t$ is a value. This notation is borrowed from Abel et al.\cite{abel13copatterns}, section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
 
-The value judgement makes use of a ``no-match'' judgement. We write $t \neq^? q$ to mean that $t$ doesn't match $q$, i.e., it is $t \neq q[\sigma]$ for all substitutions $\sigma$. This judgement is complementary to the copattern matching judgement of the previous section. In order to define the rules of the ``no-match'' judgement for copatterns, as with the matching judgement, we give the rules of an analogous ``no-match'' judgement for patterns, presented in figure ???.
+The value judgement makes use of a ``no-match'' judgement, presented in \autoref{fig:nmq}. We write $t \neq^? q$ to mean that $t$ doesn't match $q$, i.e., it is $t \neq q[\sigma]$ for all substitutions $\sigma$. This judgement is complementary to the copattern matching judgement of the previous section. In order to define the rules of the ``no-match'' judgement for copatterns, as with the matching judgement, we give the rules of an analogous ``no-match'' judgement for patterns, presented in \autoref{fig:nmp}.
 
 Finally, using this ``no-match'' judgement, we define the rules of the value judgement in figure ???. As said above, this judgement also depends upon the type of the term. In short, a term is a value whenever it is a either (a) constructor applied to values, or (b) a function or destructor applied to values such that the return type of the function or destructor is a negative type, i.e., a type defined by a codata type definition.
 
@@ -329,11 +368,13 @@ Finally, using this ``no-match'' judgement, we define the rules of the value jud
 & v  \in &&\textrm{Val} \\
 & \mathcal{E} ::= ~&& [] ~ | ~ fun(v^*, \mathcal{E}, t^*) ~ | ~ con(v^*, \mathcal{E}, t^*) ~ | ~ \mathcal{E}.des(t^*) ~ | ~ v.des(v^*, \mathcal{E}, t^*)
 \end{alignat*}
+\caption{Uroboro evaluation contexts}
+\label{fig:uroevalc}
 \end{figure}
 
 $\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction depends upon a set of terms $\textrm{Val}$ which are considered to be values. Standardly, $\textrm{Val}$ is assumed to be the set of terms which are judged to be values by $\vdash_v t$. Sometimes, an alternative reduction judgement will be used, which will only differ in the underlying value set $\textrm{Val}$. This alternative reduction will then be defined by giving the alternative $\textrm{Val}$.
 
-In figure ???, we define evaluation contexts for left-to-right, call-by-value evaluation. We let $\mathbf{EC}$ denote the set of evaluation contexts for the standard value judgement $\vdash'_v$, and we let $\mathbf{EC}[V]$ denote the set of evaluation contexts for other value sets (or their respective judgements).
+In figure \autoref{fig:uroevalc}, we define evaluation contexts for left-to-right, call-by-value evaluation. We let $\mathbf{EC}$ denote the set of evaluation contexts for the standard value judgement $\vdash'_v$, and we let $\mathbf{EC}[V]$ denote the set of evaluation contexts for other value sets (or their respective judgements).
 
 Contraction $\mapsto$ of terms using equations is defined as follows.
 
@@ -401,11 +442,13 @@ For any two contexts $\mathcal{C}, \mathcal{C}_0$ and any evaluation context $\m
 \RightLabel{C\textsubscript{Con}}
 \UnaryInfC{$fun \lhd | ~ Q ~ (q[x := con(\overline{y^{con}})])_{con \in Cons_\tau}$}
 \end{prooftree}
+\caption{Copattern coverage}
+\label{fig:cc}
 \end{figure}
 
 In general, when a language enjoys type soundness, for programs with \textit{coverage} it is guaranteed that no term is stuck. We adapt the judgement for \textit{copattern coverage} from Abel et al.\cite{abel13copatterns} for Uroboro. $fun \lhd | ~ Q$ means that the set of copatterns $Q$ \textit{covers} the function $fun$. Intuitively, when this set $Q$ is the set of left-hand sides of the function definition for $fun$, this function is fully specified. One can regard the consecutive application of the rules of the coverage judgement as a way of step-wise refining the specification of the function. The rule C\textsubscript{Head} stands for the start point, where the only left-hand side of the function neither has destructor nor constructor calls. The other two rules refine the specification of $fun$ by variable splitting (C\textsubscript{Con}), that is, refining based upon the input, or by result splitting (C\textsubscript{Des}), that is, refining based upon the output (or result). The terminology ``variable splitting'' and ``result splitting'' is also borrowed from Abel et al. and will become relevant in chapter 4.
 
-These rules for the judgement are defined in figure ???. We assume a program and write $Dess_\tau$ for the set of destructors for codata type $\tau$, and $Cons_\tau$ for the set of constructors for data type $\tau$. We also write $q^\tau$ and $x^\tau$ to indicate that the type of the copattern $q$ or the variable $x$, respectively, has been inferred to be $\tau$. \autoref{sec:urostatsem} provides a way to infer types for variables, the type of a copattern is found out by looking it up in the respective function or destructor signature.
+These rules for the judgement are defined in \autoref{fig:cc}. We assume a program and write $Dess_\tau$ for the set of destructors for codata type $\tau$, and $Cons_\tau$ for the set of constructors for data type $\tau$. We also write $q^\tau$ and $x^\tau$ to indicate that the type of the copattern $q$ or the variable $x$, respectively, has been inferred to be $\tau$. \autoref{sec:urostatsem} provides a way to infer types for variables, the type of a copattern is found out by looking it up in the respective function or destructor signature.
 
 A program has copattern coverage whenever all of its function definitions have coverage, that is, it is $fun \lhd | ~ Q$ for each function $fun$ and its set of left-hand sides $Q$.
 
