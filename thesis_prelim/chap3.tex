@@ -101,13 +101,24 @@ The extraction $des\_extract(q)$ of a single destructor targeting some copattern
 \pi(`` q.des(\overline{p}) ") = `` q "
 \]
 
-Since copatterns without destructors aren't affected, this extraction is only meant to be used for copatterns with at least one destructor. We now show that $\pi$ is an extraction projection, by giving a cosubstitution $\sigma^q_\pi$ for each $q$ such that $\sigma^q_\pi(\pi(q)) = q$: Set
+Since copatterns without destructors aren't affected, this extraction is only meant to be used for copatterns with at least one destructor. We now show that $\pi$ is indeed an extraction projection, by giving a cosubstitution $\sigma^q_\pi$ for each $q$ such that $\sigma^q_\pi(\pi(q)) = q$.
 \[
-\sigma^q_\pi(q') = \begin{cases}
-                              q'.des(\overline{p}) &,\text{ if } q = q''.des(\overline{p}) \\
-                              q' &,\text{ otherwise}
+\sigma^{q^c}_\pi(q^a) = \begin{cases}
+                              q^a.des(\overline{p}) &,\text{ if } q^c = q'.des(\overline{p}) \\
+                              q^a &,\text{ otherwise}
                               \end{cases}
 \]
+With $\texttt{get} = \pi$ and $\putback(q^a, q^c) = \sigma^{q^c}_\pi(q^a)$ we have the $\pi$-lens. We would like to illustrate with a little Haskell implementation how straightforward the two parts of the lens fit together.
+
+\begin{lstlisting}
+
+desExtrGet :: Cop -> Cop
+desExtrGet (Des _ cop _) = cop
+
+desExtrPutback :: Cop -> Cop -> Cop
+desExtrPutback cop (Des des _ args) = Des des cop args
+
+\end{lstlisting}
 
 \subsection{Constructor extraction}
 
