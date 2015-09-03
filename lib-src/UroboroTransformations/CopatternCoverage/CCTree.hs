@@ -161,12 +161,24 @@ checkCoverage sig (PTFun _ _ _ _ rs) = (liftM $ find (leavesEqualPQs (map lhs rs
 
     lhs (PTRule _ pq _) = pq
 
+fitVariablesTP :: TP -> PP -> TP
+fitVariablesTP (TPVar t _) (PPVar _ id) = TPVar t id
+fitVariablesTP (TPCon t id tps) (PPCon _ _ pps) = TPCon t id (map (uncurry fitVariablesTP) (zip tps pps))
+
+fitVariablesTQ :: TQ -> PQ -> TQ
+fitVariablesTQ (TQDes t id tps tq) (PQDes _ _ pps pq) =
+  TQDes t id (map (uncurry fitVariablesTP) (zip tps pps)) (fitVariablesTQ tq pq)
+fitVariablesTQ (TQApp t id tps) (PQApp _ _ pps) =
+  TQApp t id (map (uncurry fitVariablesTP) (zip tps pps))
+
 zipCoverageRules :: [TQ] -> [PTRule] -> [(PTRule, TQ)]
 zipCoverageRules [] _ = []
 zipCoverageRules (tq:tqs) rs
-    = ((fromJust $ find fitsWithTQ rs),tq):(zipCoverageRules tqs rs)
+    = (fitVariables ((fromJust $ find fitsWithTQ rs),tq)):(zipCoverageRules tqs rs)
   where
     fitsWithTQ (PTRule _ pq _) = (toPQ tq) == pq
+
+    fitVariables (r@(PTRule _ pq _), tq) = (r, (fitVariablesTQ tq pq))
 
 data SubtreeMode = Initial | NonInitial
 
