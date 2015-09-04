@@ -402,7 +402,7 @@ reserved.\par\permission}}
 % Occacionally you will need to exactly specify the text of the 
 % copyright notice.  The \copyrightnoticetext command is then useful.
 \long\def\copyrightnoticetext#1{\gdef\@copyrightnotice{#1}}
-\def\@copyrightnotice{\copyright\ \Mit\ \@degreeyear.  All rights reserved.}
+\def\@copyrightnotice{\copyright\ \EKUT\ \@degreeyear.  All rights reserved.}
 
 %% `vi' documentclass option: Specifying this option automatically
 %% copyrights the thesis to the author and gives MIT permission to copy and
@@ -434,16 +434,26 @@ reserved.\par\permission}}
 % to \supervisor
 \newbox\@titlesupervisor 	\newbox\@abstractsupervisor
 
-\def\supervisor#1#2{\setbox\@titlesupervisor\vbox
+\def\supervisor#1{\setbox\@titlesupervisor\vbox
   {\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
   \def\baselinestretch{1}\large
-  \signature{Certified by}{#1 \\ #2 \\ Thesis Supervisor}}
+  \signature{Certified by}{#1 \\ Thesis Supervisor}}
   \setbox\@abstractsupervisor\vbox{\unvbox\@abstractsupervisor
   \vskip\baselineskip \def\baselinestretch{1}\@normalsize 
-  \par\noindent Thesis Supervisor: #1 \\ Title: #2}}
+  \par\noindent Thesis Supervisor: #1}}
+
+\def\secondexaminer#1{\setbox\@titlesupervisor\vbox
+  {\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
+  \def\baselinestretch{1}\large
+  \signature{Certified by}{#1 \\ Second Examiner}}
+  \setbox\@abstractsupervisor\vbox{\unvbox\@abstractsupervisor
+  \vskip\baselineskip \def\baselinestretch{1}\@normalsize 
+  \par\noindent Second Examiner: #1}}
 
 % department chairman, not thesis committee chairman
 \def\chairman#1#2{\gdef\@chairmanname{#1}\gdef\@chairmantitle{#2}}
+
+\def\EKUT{Eberhard Karls Universität Tübingen}
 
 %% `upcase' documentclass option: \choosecase is defined either as a dummy or
 %% a macro to change the (expanded) argument to uppercase.
@@ -463,20 +473,20 @@ by\par
 \choosecase{\@degree}
 \par
 at the
-\par\MIT\par
+\par\EKUT\par
 \@degreemonth\ \@degreeyear
-\par
-\@copyrightnotice
-\par
-\vskip 3\baselineskip
-\signature{Author}{\@department \\ \@thesisdate}
-\par
-\vfill
-\unvbox\@titlesupervisor
-\par
-\vfill
-\signature{Accepted by}{\@chairmanname \\ \@chairmantitle}
-\vfill
+%\par
+%\@copyrightnotice
+%\par
+%\vskip 3\baselineskip
+%\signature{Author}{\@department \\ \@thesisdate}
+%\par
+%\vfill
+%\unvbox\@titlesupervisor
+%\par
+%\vfill
+%\signature{Accepted by}{\@chairmanname \\ \@chairmantitle}
+%\vfill
 \end{titlepage}}
 
 % this environment should probably be called abstract,
