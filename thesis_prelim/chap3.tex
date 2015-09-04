@@ -249,6 +249,39 @@ In order to prove this, we define a counterpart to the $\longrightarrow'$ reduct
 \]
 where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle$ whose underlying value set is the set of all terms, i.e., the reduction is allowed to choose any redex. Where $\longrightarrow'$ can ``sidestep'' reductions which don't change the back-interpretation of a term, $\longrightarrow^{aux}$ is purely ``interpretative'', that is, it only allows reductions to terms with equal back-interpretation. This is expressed formally in the following lemmas relating $\longrightarrow'$ and $\longrightarrow^{aux}$, one concerning their commutation, the other what we call their complementarity. The $`` \Rightarrow "$ direction of (2.2) follows from these, as shown below.
 
+\begin{figure}
+\begin{subfigure}{0.3\textwidth}
+\begin{tikzpicture}
+\path (0,0) node(a) {} 
+      (3,0) node(b) {}
+      (0,-3) node(c) {}
+      (3,-3) node(d) {};
+\draw[->] (a) -- (b);
+\draw[->,color=blue] (a) -- (c);
+\draw[->,dashed,color=blue] (b) -- (d) node [midway, above, sloped] () {$*$};
+\draw[->,dashed] (c) -- (d) node [midway, above, sloped] () {$=$};
+\end{tikzpicture}
+\caption{For \autoref{lem:cdpaux}}
+\end{subfigure}
+\begin{subfigure}{0.3\textwidth}
+\begin{tikzpicture}
+\path (0,0) node(a) {}
+      (3,1) node (a') {}
+      (3,0) node(b) {}
+      (0,-3) node(c) {}
+      (3,-3) node(d) {};
+\draw[->,dashed] (a) -- (a') node [midway, above, sloped] () {$=$};
+\draw[->,dashed,color=blue] (a') -- (b) node [midway, above, sloped] () {$*$};
+\draw[->,dashed,color=blue] (a) -- (c) node [midway, above, sloped] () {$*$};
+\draw[->,color=blue] (b) -- (d);
+\draw[->] (c) -- (d);
+\end{tikzpicture}
+\caption{For \autoref{lem:comminv}}
+\label{fig:comminv}
+\end{subfigure}
+\caption{The commutations of \autoref{lem:cdpaux} and \autoref{lem:comminv}: blue arrows represent $\longrightarrow^{aux}$, black arrows $\longrightarrow'$}
+\end{figure}
+
 \begin{restatable}[Commutation]{lemma}{cdpaux}
 \label{lem:cdpaux}
 
@@ -318,7 +351,7 @@ s \longrightarrow^*_{\langle prg \rangle} \widetilde{t} \implies s {\longrightar
 \]
 \end{lemma}
 
-Again, we begin by showing a commutation lemma; but this time, we operate on the inverse relations of $\longrightarrow'$ and $\longrightarrow^{aux}$. The commutation of the inverses is different and non-standard, since it has an intermediate sequence of $\longrightarrow^{aux}$-steps, as shown in diagram TODO.
+Again, we begin by showing a commutation lemma; but this time, we operate on the inverse relations of $\longrightarrow'$ and $\longrightarrow^{aux}$. The commutation of the inverses is different and non-standard, since it has an intermediate sequence of $\longrightarrow^{aux}$-steps, as shown in \autoref{fig:comminv}.
 
 \begin{restatable}[Commutation (inverses)]{lemma}{comminv}
 \label{lem:comminv}
