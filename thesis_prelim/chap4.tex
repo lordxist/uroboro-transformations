@@ -231,6 +231,7 @@ Next, we consider important properties of the translation algorithm.
 \textbf{Bisimulation.} Because copattern coverage holds for the translated program, the translated program has no overlapping lhss. Therefore, by the propositions 3.3.1 and 3.3.2, we know that the translation preserves the semantics of the program in the kind of weak bisimulation described in section 3.3.
 
 \section{Core defunctionalization}
+\label{sec:coredefunc}
 
 The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of Rendel et al. for the Codata Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a defunctionalized form after \textsf{Unnest}, virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the syntactic differences between function and destructor calls.\footnote{I.e., the difference between $fun(...)$ and $t.des(...)$. This difference vanishes when changing the syntax of destructor calls to $des(t, ...)$.} The respective transformation for terms is $d$, defined below with the algorithm.
 
@@ -465,6 +466,7 @@ By combining \autoref{lem:sbruld} and \autoref{lem:iso}.
 \end{corollary}
 
 \section{Core refunctionalization}
+\label{sec:corerefunc}
 
 Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of Rendel et al.\cite{rendel15automatic} for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. Unfortunately, and unlike defunctionalization, this algorithm requires some kind of preprocessing, since the actual refunctionalization requires all constructors to be the first pattern of an lhs. We first describe this asymmetry in more detail and illustrate the underlying problem, then consider a possible workaround for our situation, and finally give an example for and formally define the actual refunctionalization and, as with defunctionalization, consider important properties of it.
 
