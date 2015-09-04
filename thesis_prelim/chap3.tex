@@ -36,6 +36,7 @@ for some $\overline{des(\overline{p})}$ possibly depending on the $q$.
 Finally, extraction functions can be defined. More precisely, it is defined what it means to be an extraction projection, and for such an extraction projection $\pi$, a $\pi$-extraction targeting a set of equations $T$. For this, we make use of the notion of lenses, as defined by Foster et al.\cite{foster05combinators}.
 
 \begin{definition}[Extraction projection]
+\label{def:extrproj}
 A function $\pi$ from copatterns to copatterns is called an extraction projection if for every copattern $q$ there exists a (co-)substitution $\sigma^q_\pi$ such that $\sigma^q_\pi(\langle q \rangle^\pi) = q$.
 \end{definition}
 
@@ -85,10 +86,10 @@ the function definition that contains the lhss of $T$.
 & \cup && \{ def \in prg ~ | ~ def \neq def_T \} \span\span\span\span
 \end{alignat*}
 
-\section{Example extractions}
+\section{Prime extractions}
 \label{sec:extrex}
 
-We give a number of example extractions. The two following extractions will be used in the next chapter.
+In this section, we give some example extractions, destructor extraction and those from the family of constructor extractions.They are \textit{prime} extractions, in the sense that all other extractions' extraction projections are compositions of the underlying projections of destructor and constructor extractions.
 
 \subsection{Destructor extraction}
 
@@ -108,7 +109,7 @@ Since copatterns without destructors aren't affected, this extraction is only me
                               q^a &,\text{ otherwise}
                               \end{cases}
 \]
-With $\texttt{get} = \pi$ and $\putback(q^a, q^c) = \sigma^{q^c}_\pi(q^a)$ we have the $\pi$-lens. We would like to illustrate with a little Haskell implementation how straightforward the two parts of the lens fit together.
+With $\texttt{get} = \pi$ and $\texttt{putback}(q^a, q^c) = \sigma^{q^c}_\pi(q^a)$ we have the $\pi$-lens. We would like to illustrate with a little Haskell implementation how straightforward the two parts of the lens fit together.
 
 \begin{lstlisting}
 
@@ -120,27 +121,21 @@ desExtrPutback cop (Des des _ args) = Des des cop args
 
 \end{lstlisting}
 
+All extraction projections that are the counterparts to cosubstitutions can be defined as a composition of the destructor extraction projection: Simply extract the destructors one after the other.
+
 \subsection{Constructor extraction}
 
-We define a family $\textsf{ExtractCon}(p)$ of extractions of single constructors. The parameter $p$ stands for the position of the constructor call to be extracted in the targeted copatterns. For such a position $p$, $\textsf{ExtractCon}(p)$ is defined as the $\pi$-extraction (targeting some $T$) for the extraction projection $\pi$ defined below.
+We define a family $\textsf{ExtractCon}(\ell)$ of extractions of single constructors. The parameter $\ell$ stands for the position of the constructor call to be extracted in the targeted copatterns. We assume that $\ell$ actually points to a constructor call with only variables as arguments. For such a position $\ell$, $\textsf{ExtractCon}(\ell)$ is defined as the $\pi_\ell$-extraction (targeting some $T$) for the extraction projection $\pi_\ell$ defined below.
 
 For a copattern $q$, let $x_q$ be a variable different from all in $q$.
 \[
-\pi(q) = \begin{cases}
-             q[con(\overline{p}) \mapsto x_q]_p &\text{ if } q \text{ has a constructor call at position } p \\
-             q &\text{ otherwise}
-             \end{cases}
+\pi(q) = q[con(\overline{x}) \mapsto x_q]_\ell
 \]
+The bracket notation means that the replacement occurs at position $\ell$.
 
-We now show why $\pi$ is an extraction projection, that is, we give, for each $q$, a substitution $\sigma^q_\pi$ such that $\sigma^q_\pi(\pi(q)) = q$: Set $\sigma^q_\pi := \{x_q \mapsto \overline{p}\}$.
+We now show why $\pi_\ell$ is an extraction projection, that is, we give, for each $q$, a substitution $\sigma^q_{\pi_\ell}$ such that $\sigma^q_{\pi_\ell}(\pi_\ell(q)) = q$: Set $\sigma^q_{\pi_\ell} := \{x_q \mapsto con(\overline{x})\}$.
 
-\subsection{Extracting all patterns out of a single-destructor copattern}
-
-This extraction extracts all patterns, that is, all constructor calls, out of a copattern with only a single destructor. Define this extraction $extract\_patterns$ as the $\pi$-extraction targeting $q$ with the extraction projection $\pi$ defined below.
-
-\[
-\pi(`` fun(\overline{p}).des(\overline{p'}) ") = `` fun(\overline{x}, \overline{x'}) "
-\]
+All extraction projections that are the counterparts to substitutions can be defined as a composition of constructor extraction projections: Simply extract the constructors one after the other, from innermost to outermost.
 
 \section{Bisimulation}
 \label{sec:extrbis}
