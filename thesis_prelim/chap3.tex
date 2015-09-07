@@ -153,12 +153,14 @@ For the definition of this weak bisimulation, we modify the value judgement, usi
 
 From this definition it immediately follows that $\mathcal{E}$ is an evaluation context with respect to this modified value judgement for $\langle prg \rangle$ if and only if $\langle \mathcal{E} \rangle^{aux^{-1}}$ is an evaluation context with respect to the original value judgement for $prg$. It also means that, for a term $t$ with all names declared in $\langle prg \rangle$, the immediate subterms of $t$ are values with this judgement for $\langle prg \rangle$ if and only if the immediate subterms of $\langle t \rangle^{aux^{-1}}$ are values with the original judgement for $prg$.
 
-Write $\longrightarrow'$ for the reduction relation $\longrightarrow$ with its value judgement modified in this way. The weak bisimulation is defined as follows, for every $s,t$ with all of their names declared in $prg$:
+Write $\longrightarrow'$ for the reduction relation $\longrightarrow$ with its value judgement modified in this way. This modified reduction relation can (but doesn't need to) ``sidestep'' reductions which don't change the back-interpretation of a term; as an example, consider a program with a function $fun$, where the extraction creates an auxiliary function $aux$ with an equation $\epsilon = ``fun() = aux()"$: Assume the term $fun().des()$ reduces in one step to some term $t$ with $\longrightarrow_{prg}$. It cannot do so with $\longrightarrow_{\langle prg \rangle}$ because it first has to reduce to $aux().des()$ by the $\epsilon$ equation. But since $\longrightarrow'_{\langle prg \rangle}$ considers $aux()$ a value because $\langle aux() \rangle^{-1} = fun()$ is a value in $prg$, this reduction can ``ignore'' $\epsilon$ and directly go to $t$.
+
+The weak bisimulation is defined as follows, for every $s,t$ with all of their names declared in $prg$:
 \begin{equation}
 \label{eq:bisim1}
 s \longrightarrow_{prg}^* t \iff s {\longrightarrow'}_{\langle prg \rangle}^* t
 \end{equation}
-This statement is now proved using Theorem 4a of Setzer et al.\cite{setzer14unnesting} Their theorem makes use of a set \textsf{Good} which limits the terms of $\langle prg \rangle$ for which there is a back-interpretation, but which is only relevant in a context with first-class functions. We therefore present Theorem 4a in a simplified form -- a special case -- which omits any mention of \textsf{Good}, because in our case \textsf{Good} is simply the entire set of terms of $\langle prg \rangle$.
+In other words, $\longrightarrow'_{\langle prg \rangle}$ is a conservative extension of $\longrightarrow_{prg}$. This statement is now proved using Theorem 4a of Setzer et al.\cite{setzer14unnesting} Their theorem makes use of a set \textsf{Good} which limits the terms of $\langle prg \rangle$ for which there is a back-interpretation, but which is only relevant in a context with first-class functions. We therefore present Theorem 4a in a simplified form -- a special case -- which omits any mention of \textsf{Good}, because in our case \textsf{Good} is simply the entire set of terms of $\langle prg \rangle$.
 
 \begin{theorem}[Setzer et al.]
 \label{thm:setzer4a}
@@ -181,7 +183,7 @@ By \autoref{thm:setzer4a}, it suffices to show the statements (SN1) and (SN2). F
 because $\langle \cdot \rangle^{aux}$ converts to function calls, not destructor calls.
 Further, set $m$ as the number of calls to the function targeted in the transformation, i.e., that of $q_\epsilon$.
 
-(SN 1): We know that $s = \mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]] = t$, for some evaluation context $\mathcal{E}$ of $prg$ and some equation $r$ of $prg$. When $r \not\in T$, i.e., $r$ is taken over unchanged to $\langle prg \rangle$, the reduction $\mathcal{E}[q_r[\sigma]] {\longrightarrow'}_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]]$ can be derived identically to $\mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]]$. When $r \in T$, i.e., $q_r = \sigma^{q_r}_\pi(q_\epsilon)$, the desired reduction sequence is derived as follows.
+(SN 1): We know that $s = \mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]] = t$, for some evaluation context $\mathcal{E}$ of $prg$ and some equation $r$ of $prg$. When $r \not\in T$, i.e., $r$ is taken over unchanged to $\langle prg \rangle$, the reduction $\mathcal{E}[q_r[\sigma]] {\longrightarrow'}_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]]$ can be derived identically to $\mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]]$. When $r \in T$, it is $q_r = \sigma^{q_r}_\pi(q_\epsilon)$ and $t_r = t_{\zeta_r}$, and the desired reduction sequence is derived as follows.
 \begin{flalign*}
 &s = \mathcal{E}[q_r[\sigma]] = \mathcal{E}[\sigma^{q_r}_\pi(q_\epsilon)[\sigma]] \\
 \longrightarrow'_{\langle prg \rangle} ~ &\mathcal{E}[\sigma^{q_r}_\pi(t_\epsilon)[\sigma]] = \mathcal{E}[q_{\zeta_r}[\sigma]] \\
