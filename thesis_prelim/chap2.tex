@@ -154,23 +154,17 @@ Note that we consider the collection of equations in a function definition to be
 
 \begin{figure}
 \begin{prooftree}
-\AxiomC{$q = q'.des(p_1, ..., p_n)$}
-\noLine
-\UnaryInfC{$``\sigma.des(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
-\AxiomC{$(q \vdash_{\Sigma} x : \sigma_x)_{x \in V(q)}$}
-\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q) \} \vdash_{\Sigma} t : \tau$}
+\AxiomC{$``\sigma.des(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q), ~ q \vdash_{\Sigma} x : \sigma_x \} \vdash_{\Sigma} t : \tau$}
 \RightLabel{Des}
-\TrinaryInfC{$\Sigma \vdash q = t \textrm{ ok}$}
+\BinaryInfC{$\Sigma \vdash q'.des(p_1, ..., p_n) = t \textrm{ ok}$}
 \end{prooftree}
 
 \begin{prooftree}
-\AxiomC{$q = fun(p_1, ..., p_n)$}
-\noLine
-\UnaryInfC{$``fun(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
-\AxiomC{$(q \vdash_{\Sigma} x : \sigma_x)_{x \in V(q)}$}
-\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q) \} \vdash_{\Sigma} t : \tau$}
+\AxiomC{$``fun(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q), ~ q \vdash_{\Sigma} x : \sigma_x \} \vdash_{\Sigma} t : \tau$}
 \RightLabel{Fun}
-\TrinaryInfC{$\Sigma \vdash q = t \textrm{ ok}$}
+\BinaryInfC{$\Sigma \vdash fun(p_1, ..., p_n) = t \textrm{ ok}$}
 \end{prooftree}
 \caption{Well-typedness judgement for equations}
 \label{fig:wtjteq}
