@@ -111,7 +111,7 @@ We assume the domains of symbols presented in \autoref{fig:syndomain}. The \text
 
 Note that we consider the collection of equations in a function definition to be a \textit{set}. This means that we establish no order on the equations. We don't consider order-dependent programs in this work; suffice it to say that a variant of Uroboro augmented with order would require a change to the semantics. In general, this is a problem not yet considered for languages with copattern matching; for instance, the language of Abel et al.\cite{abel13copatterns} also doesn't have an order on equations.
 
-\section{Static semantics}
+\section{Typing}
 \label{sec:urostatsem}
 
 \begin{figure}
@@ -228,7 +228,7 @@ In \autoref{fig:wtjteq}, we give the rules for the well-typedness judgement for 
 
 We say that a program with signatures $\Sigma$ is well-typed when it is $\Sigma \vdash eqn \textrm{ ok}$ for all equations $eqn$ of the program.
 
-\section{Dynamic semantics}
+\section{Semantics}
 \label{sec:urosos}
 
 In this section, we formally define the semantics of Uroboro. We present them as small-step operational semantics. Before defining the reduction relation, a few other definitions are in order. In Uroboro, a reduction is a term rewriting that uses one of the equations of the program. Therefore, we need to define what it means for a term to match an lhs, that is, a copattern; we do so in \autoref{ssec:copm}. For languages with codata, there is a special notion of value; we define what values are in Uroboro in \autoref{ssec:val}. Then we define the reduction relation (\autoref{ssec:red}).
