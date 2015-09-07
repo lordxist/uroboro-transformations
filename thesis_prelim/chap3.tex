@@ -164,7 +164,7 @@ In other words, $\longrightarrow'_{\langle prg \rangle}$ is a conservative exten
 
 \begin{theorem}[Setzer et al.]
 \label{thm:setzer4a}
-Let $(\mathcal{A}, \longrightarrow), (\mathcal{A}', \longrightarrow')$ be abstract reduction systems, i.e., it is $\longrightarrow \subseteq \mathcal{A} \times \mathcal{A}$ and $\longrightarrow' \subseteq \mathcal{A}' \times \mathcal{A}'$, such that $\mathcal{A} \subseteq \mathcal{A}'$. Let \textsf{int} be a back-interpretation from $\mathcal{A}'$ into $\mathcal{A}$, $\textsf{m} : \textsf{Good} \to \mathbb{N}$. We define the following conditions for the back-interpretation:\\
+Let $(\mathcal{A}, \longrightarrow), (\mathcal{A}', \longrightarrow')$ be abstract reduction systems, i.e., it is $\longrightarrow \subseteq \mathcal{A} \times \mathcal{A}$ and $\longrightarrow' \subseteq \mathcal{A}' \times \mathcal{A}'$, such that $\mathcal{A} \subseteq \mathcal{A}'$. Let \textsf{int} be a back-interpretation from $\mathcal{A}'$ into $\mathcal{A}$, $\textsf{m} : \mathcal{A}' \to \mathbb{N}$. We define the following conditions for the back-interpretation:\\
 (SN 1) $\forall a, a' \in \mathcal{A}. a \longrightarrow a' \implies a {\longrightarrow'}^{\geq 1} a'$\\
 (SN 2) If $a \in \mathcal{A}, a' \in \mathcal{A}'$ and $a \longrightarrow' a'$ then $\textsf{int}(a) {\longrightarrow}^{\geq 1} \textsf{int}(a')$ or $\textsf{int}(a) = \textsf{int}(a') ~ \land ~ \textsf{m}(a) > \textsf{m}(a')$.
 
@@ -180,13 +180,26 @@ By \autoref{thm:setzer4a}, it suffices to show the statements (SN1) and (SN2). F
 \[
 \langle \mathcal{E}[s'] \rangle^{aux^{-1}} = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}],
 \]
-because $\langle \cdot \rangle^{aux}$ converts to function calls, not destructor calls.
-Further, set $m$ as the number of calls to the function targeted in the transformation, i.e., that of $q_\epsilon$.
+because $\langle \cdot \rangle^{aux}$ converts to function calls, not destructor calls. Analogously, $\langle \cdot \rangle^{aux^{-1}}$ is compatible with substitutions, i.e.,
+\[
+\langle q[\sigma] \rangle^{aux^{-1}} = \langle q \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}],
+\]
+where $\langle \cdot \rangle^{aux^{-1}}$ has been straightforwardly lifted to substitutions by applying it to each right-hand side individually.
+Further, set \textsf{m} as the number of calls to the function targeted in the transformation, i.e., that of $q_\epsilon$.
 
-(SN 1): We know that $s = \mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]] = t$, for some evaluation context $\mathcal{E}$ of $prg$ and some equation $r$ of $prg$. When $r \not\in T$, i.e., $r$ is taken over unchanged to $\langle prg \rangle$, the reduction $\mathcal{E}[q_r[\sigma]] {\longrightarrow'}_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]]$ can be derived identically to $\mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]]$. When $r \in T$, it is $q_r = \sigma^{q_r}_\pi(q_\epsilon)$ and $t_r = t_{\zeta_r}$, and the desired reduction sequence is derived as follows.
+(SN 1): We know that $s = \mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]] = t$, for some evaluation context $\mathcal{E}$ of $prg$ and some equation $r$ of $prg$. When $r \not\in T$, i.e., $r$ is taken over unchanged to $\langle prg \rangle$, the reduction $\mathcal{E}[q_r[\sigma]] {\longrightarrow'}_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]]$ can be derived identically to $\mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]]$. When $r \in T$, it is $q_r = \sigma^{q_r}_\pi(q_\epsilon)$ and $t_r = t_{\zeta_r}$, and we distinguish between whether $\sigma^{q_r}_\pi$ is a substitution or a co-substitution.
+
+When $\sigma^{q_r}_\pi$ is a substitution, it is $\sigma^{q_r}_\pi(q_\epsilon)[\sigma] = q_\epsilon[\sigma \circ \sigma^{q_r}_\pi]$, and we can derive:
 \begin{flalign*}
-&s = \mathcal{E}[q_r[\sigma]] = \mathcal{E}[\sigma^{q_r}_\pi(q_\epsilon)[\sigma]] \\
-\longrightarrow'_{\langle prg \rangle} ~ &\mathcal{E}[\sigma^{q_r}_\pi(t_\epsilon)[\sigma]] = \mathcal{E}[q_{\zeta_r}[\sigma]] \\
+&s = \mathcal{E}[q_r[\sigma]] = \mathcal{E}[q_\epsilon[\sigma \circ \sigma^{q_r}_\pi]] \\
+\longrightarrow'_{\langle prg \rangle} ~ &\mathcal{E}[t_\epsilon[\sigma \circ \sigma^{q_r}_\pi]] = \mathcal{E}[q_{\zeta_r}[\sigma]] \\
+\longrightarrow'_{\langle prg \rangle} ~ &\mathcal{E}[t_{\zeta_r}[\sigma]] = \mathcal{E}[t_r[\sigma]] = t
+\end{flalign*}
+
+When $\sigma^{q_r}_\pi$ is a co-substitution, it is $\sigma^{q_r}_\pi(q_\epsilon) = q_\epsilon.\overline{des(\overline{p})}$, and thus $\mathcal{E}[q_\epsilon.\overline{des(\overline{p})}[\sigma]] = \mathcal{E}[[].\overline{des(\overline{p})}[\sigma]][q_\epsilon[\sigma]]$. Since $\mathcal{E}_{des} := \mathcal{E}[[].\overline{des(\overline{p})}[\sigma]]$ is $\mathcal{E}$ with the hole ``shrunken'' from the right, it is an evaluation context for the same value judgements as $\mathcal{E}$, and thus we can derive:
+\begin{flalign*}
+&s = \mathcal{E}[q_r[\sigma]] = \mathcal{E}_{des}[q_\epsilon[\sigma]] \\
+\longrightarrow'_{\langle prg \rangle} ~ &\mathcal{E}_{des}[t_\epsilon[\sigma]] = \mathcal{E}[q_{\zeta_r}[\sigma]] \\
 \longrightarrow'_{\langle prg \rangle} ~ &\mathcal{E}[t_{\zeta_r}[\sigma]] = \mathcal{E}[t_r[\sigma]] = t
 \end{flalign*}
 
@@ -211,17 +224,18 @@ Further, set $m$ as the number of calls to the function targeted in the transfor
 =~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}] \\
 =~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle q_{\zeta_r} \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]] \\
 =~& \langle \mathcal{E} \rangle^{aux^{-1}}[q_r[\langle \sigma \rangle^{aux^{-1}}]] \\
-\longrightarrow_{prg}~& \langle \mathcal{E} \rangle^{aux^{-1}}[t_r[\langle t_r \rangle^{aux^{-1}}]] \\
+\longrightarrow_{prg}~& \langle \mathcal{E} \rangle^{aux^{-1}}[t_r[\langle \sigma \rangle^{aux^{-1}}]] \\
 =~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}]] \\
 =~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle t_r[\sigma] \rangle^{aux^{-1}}] \\
-=~& \langle \mathcal{E}[t_r[\sigma]] \rangle^{aux^{-1}} = \langle t \rangle^{aux^{-1}}.
+=~& \langle \mathcal{E}[t_r[\sigma]] \rangle^{aux^{-1}} \\
+=~& \langle \mathcal{E}[t_{\zeta_r}[\sigma]] \rangle^{aux^{-1}} = \langle t \rangle^{aux^{-1}}.
 \end{flalign*}
 
 \item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_\epsilon[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_\epsilon[\sigma]] = t$. In this case, instead of giving a reduction sequence, the other side of the disjunction will be shown to hold.
 
 Because $\langle q_\epsilon \rangle^{aux^{-1}} = \langle t_\epsilon \rangle^{aux^{-1}}$, it is $\langle s \rangle^{aux^{-1}} = \langle t \rangle^{aux^{-1}}$.
 
-And because $q_\epsilon$ is of the function that is targeted in the transformation, and $t_\epsilon$ isn't, it is $m(q_\epsilon) > m(t_\epsilon)$, and consequently $m(s) > m(t)$. \qedhere
+And because $q_\epsilon$ is of the function that is targeted in the transformation, and $t_\epsilon$ isn't, it is $\textsf{m}(q_\epsilon) > \textsf{m}(t_\epsilon)$, and consequently $\textsf{m}(s) > \textsf{m}(t)$. \qedhere
 \end{enumerate}
 \end{proof}
 \end{proposition}
