@@ -161,6 +161,7 @@ s \longrightarrow_{prg}^* t \iff s {\longrightarrow'}_{\langle prg \rangle}^* t
 This statement is now proved using Theorem 4a of Setzer et al.\cite{setzer14unnesting} Their theorem makes use of a set \textsf{Good} which limits the terms of $\langle prg \rangle$ for which there is a back-interpretation, but which is only relevant in a context with first-class functions. We therefore present Theorem 4a in a simplified form -- a special case -- which omits any mention of \textsf{Good}, because in our case \textsf{Good} is simply the entire set of terms of $\langle prg \rangle$.
 
 \begin{theorem}[Setzer et al.]
+\label{thm:setzer4a}
 Let $(\mathcal{A}, \longrightarrow), (\mathcal{A}', \longrightarrow')$ be abstract reduction systems, i.e., it is $\longrightarrow \subseteq \mathcal{A} \times \mathcal{A}$ and $\longrightarrow' \subseteq \mathcal{A}' \times \mathcal{A}'$, such that $\mathcal{A} \subseteq \mathcal{A}'$. Let \textsf{int} be a back-interpretation from $\mathcal{A}'$ into $\mathcal{A}$, $\textsf{m} : \textsf{Good} \to \mathbb{N}$. We define the following conditions for the back-interpretation:\\
 (SN 1) $\forall a, a' \in \mathcal{A}. a \longrightarrow a' \implies a {\longrightarrow'}^{\geq 1} a'$\\
 (SN 2) If $a \in \mathcal{A}, a' \in \mathcal{A}'$ and $a \longrightarrow' a'$ then $\textsf{int}(a) {\longrightarrow}^{\geq 1} \textsf{int}(a')$ or $\textsf{int}(a) = \textsf{int}(a') ~ \land ~ \textsf{m}(a) > \textsf{m}(a')$.
@@ -173,7 +174,7 @@ Let $(\mathcal{A}, \longrightarrow), (\mathcal{A}', \longrightarrow')$ be abstra
 The weak bisimulation statement~\ref{eq:bisim1} holds for any transformation defined as $apply(e)$ for some $\pi$-extraction $e$ targeting a $T$.
 
 \begin{proof}
-By Theorem 4a of Setzer et al.\cite{setzer14unnesting}, it suffices to show the statements (SN1) and (SN2). For this, set $\textsf{int} = \langle \cdot \rangle^{aux^{-1}}$. Note that this unconversion is compatible with evaluation contexts, i.e.,
+By \autoref{thm:setzer4a}, it suffices to show the statements (SN1) and (SN2). For this, set $\textsf{int} = \langle \cdot \rangle^{aux^{-1}}$. Note that this unconversion is compatible with evaluation contexts, i.e.,
 \[
 \langle \mathcal{E}[s'] \rangle^{aux^{-1}} = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}],
 \]
