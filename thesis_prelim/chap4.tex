@@ -348,7 +348,7 @@ All function definitions except for \texttt{oneElemArray} are already in a defun
 \langle fun(t_1, ..., t_n) \rangle^d = \langle fun \rangle^d (\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \not\in F^{prg}_d \\
 \langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)
 \end{align*}
-For a symbol, $\langle \cdot \rangle^d$ means that the syntactic domain is changed: $\langle des \rangle^d$ is a function symbol, and for $fun \not\in F^{prg}_d$, $\langle fun \rangle^d$ is a constructor symbol. The name of the new symbol is arbitrary.
+For a symbol, $\langle \cdot \rangle^d$ means that the syntactic domain is changed: $\langle des \rangle^d$ is a function symbol, and for $fun \not\in F^{prg}_d$, $\langle fun \rangle^d$ is a constructor symbol. The transformation for symbols must be invertible, but the name of the new symbol is otherwise arbitrary.
 \caption{Defunctionalization of terms}
 \label{fig:termdefunc}
 \end{figure}
@@ -395,7 +395,7 @@ By induction on the derivation of $\Sigma \vdash `` q = t " \textrm{ ok}$, using
 
 In the definition of \textsf{CoreDefunc} we can see that each equation $eqn = `` q = t "$ in $prg$ corresponds to exactly one equation $`` \langle q \rangle^d = \langle t \rangle^d "$ of $\langle prg \rangle^{\textsf{CoreDefunc}}$. Combine this with \autoref{lem:pwtdefunc} to get $\Sigma_{\langle prg \rangle^{\textsf{CoreDefunc}}} \vdash `` q = t " \textrm{ ok}$ for each equation $eqn$ of $\langle prg \rangle^{\textsf{CoreDefunc}}$. Thus $\langle prg \rangle^{\textsf{CoreDefunc}}$ is well-typed whenever $prg$ is.
 
-\textbf{Bisimulation.} For \textsf{CoreDefunc}, strong bisimulation holds. To show this, we first show a general result that an isomorphism between rule sets of two programs is also an isomorphism between the respective reduction relations of the programs. In the following, $\langle \cdot \rangle$ is some program transformation when applied to programs. When applied to terms it stands for some transformation of terms that only changes symbols, but leaves the structure of the terms unchanged.
+\textbf{Bisimulation.} For \textsf{CoreDefunc}, strong bisimulation holds. To show this, we first show a general result that an isomorphism between rule sets of two programs is also an isomorphism between the respective reduction relations of the programs. In the following, $\langle \cdot \rangle$ is some invertible program transformation when applied to programs. When applied to terms it stands for some invertible transformation of terms that only changes symbols, but leaves the structure of the terms unchanged.
 
 \begin{lemma}[Rules isomorphism is reduction isomorphism]
 \label{lem:iso}
@@ -424,7 +424,7 @@ For any program $prg$, when it is
 \begin{proof}
 $``\Rightarrow"$: By induction on the structure of $t$. By the derivation of $\vdash_{v_{prg}} t$ it is (a) $prg \vdash_v t_i$ for all immediate subterms $t_i$ of $t$ and (b) $t \neq^? q$ for all lhss $q$ of rules of $prg$. By the premiss we know that for all lhss $q'$ of rules of $\langle prg \rangle$, there is a lhs $q$ of $prg$ such that $q' = \langle q \rangle$; thus it is $\langle t \rangle \neq^? q'$ for all lhss $q'$ of rules of $\langle prg \rangle$. By the induction hypothesis, we know that $\langle prg \rangle \vdash_v \langle t_i \rangle$. Since the immediate subterms of $\langle t \rangle^d$ are the $\langle t_i \rangle$ for each $t_i$, we have the derivation for $\langle prg \rangle \vdash_v \langle t \rangle$.
 
-$``\Leftarrow"$: By induction on the structure of $t$. By the derivation of $\langle prg \rangle \vdash_v t$ it is (a) $\langle prg \rangle \vdash_v t'_i$ for all immediate subterms $t'_i$ of $\langle t \rangle$ and (b) $\langle t \rangle \neq^? q'$ for all lhss $q'$ of rules of $\langle prg \rangle$. By the premiss we know that for all lhss $q$ of rules of $prg$, there is a lhs $\langle q \rangle$ of $\langle prg \rangle$; thus it is $t \neq^? q$ for all lhss $q$ of rules of $prg$. By the induction hypothesis, since it is $\langle t_i \rangle = t'_i$ for each immediate subterm $t_i$ of $t$, we know that $prg \vdash_v t_i$. All in all, we have the derivation for $prg \vdash_v t$.
+$``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-1}$.
 \end{proof}
 \end{lemma}
 
@@ -445,7 +445,7 @@ When $\mathcal{E} = []$, then it is $\langle \mathcal{E} \rangle = []$, and this
 
 When $\mathcal{E} \neq []$, all immediate subterms $t_{left}$ of $\mathcal{E}$ to the left of the hole are values under judgement $prg \vdash_v$. The ``middle'' term that follows after all these is again an evaluation context $\mathcal{E}_0$ for $prg$. $\langle \mathcal{E} \rangle$ is $\mathcal{E}$ with each $t_{left}$ replaced by $\langle t_{left} \rangle$, the immediate subterms right of the hole replaced in the same way, and the ``middle'' term replaced by $\langle \mathcal{E}_0 \rangle$. By the induction hypothesis, $\langle \mathcal{E}_0 \rangle$ is an evaluation context for $\langle prg \rangle$ because $\mathcal{E}_0$ is one for $prg$. By \autoref{lem:ivj}, it is $\langle prg \rangle \vdash_v \langle t_{left} \rangle$ for all $t_{left}$ because $prg \vdash_v t_{left}$.
 
-$``\Leftarrow"$: Analogously to $``\Rightarrow"$.
+$``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-1}$.
 \end{proof}
 \end{lemma}
 
@@ -464,17 +464,17 @@ For any program $prg$, when it is
 \begin{proof}
 $``\Rightarrow"$: By the derivation of $s \mapsto_{prg} t$ there is a rule $r := (q_r, t_r) \in \textrm{Rules}(prg)$ and a substitution $\sigma$ such that $s = q_r[\sigma]$ and $t = t_r[\sigma]$ and the right-hand sides of $\sigma$ are values in $prg$. By the premiss we know that there is a rule $\langle r \rangle := (\langle q_r \rangle, \langle t_r \rangle) \in \textrm{Rules}(prg)$, and by \autoref{lem:ivj} we know that, for each term $v$ that is a value in $prg$, $\langle v \rangle$ is a value in $\langle prg \rangle$ and thus the right-hand sides of $\sigma \circ \langle \cdot \rangle$ are values in $\langle prg \rangle$. Consequently, it is $\langle s \rangle = \langle q_r \rangle[\langle \cdot \rangle \circ \sigma] \mapsto \langle t_r \rangle[\langle \cdot \rangle \circ \sigma] = \langle t \rangle$.
 
-$``\Leftarrow"$: By the derivation of $\langle s \rangle \mapsto_{prg} \langle t \rangle$ there is a rule $r' := (q_{r'}, t_{r'}) \in \textrm{Rules}(\langle prg \rangle)$ and a substitution $\sigma'$ such that $\langle s \rangle = q_{r'}[\sigma']$ and $\langle t \rangle = t_{r'}[\sigma']$ and the right-hand sides of $\sigma'$ are values in $prg$. By the premiss we know that there is a rule $r  := (q_r, t_r) \in \textrm{Rules}(prg)$ such that $\langle q_r \rangle = q_{r'}, \langle t_r \rangle = t_{r'}$, and by \autoref{lem:ivj} we know that, for each term $v'$ that is a value in $\langle prg \rangle$, each term $v$ with $v' = \langle v \rangle$ is a value in $prg$ and thus the right-hand sides of $\sigma$ with $\sigma' = \sigma \circ \langle \cdot \rangle$ are values in $prg$. Consequently, it is $s = q_r[\sigma] \mapsto t_r[\sigma] = t$.
+$``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-1}$.
 \end{proof}
 \end{lemma}
 
 \begin{proof}[Proof of \autoref{lem:iso}]
-$``\Rightarrow"$: By the derivation of $s \longrightarrow_{prg} t$ there are terms $s', t'$ and an evaluation context $\mathcal{E}$ for $prg$ such that $s = \mathcal{E}[s'], t = \mathcal{E}[t']$ and $s' \mapsto_{prg} t'$. By \autoref{lem:iec} and \autoref{lem:isoc} we know that $\langle \mathcal{E} \rangle$ is an evaluation context for $\langle prg \rangle$ and that $\langle s' \rangle \mapsto_{\langle prg \rangle} \langle t' \rangle^d$, respectively. Consequently, it is $\langle s \rangle = \langle \mathcal{E} \rangle [\langle s' \rangle] \longrightarrow_{\langle prg \rangle} \langle \mathcal{E} \rangle [\langle t' \rangle] = \langle t \rangle$.
+$``\Rightarrow"$: By the derivation of $s \longrightarrow_{prg} t$ there are terms $s', t'$ and an evaluation context $\mathcal{E}$ for $prg$ such that $s = \mathcal{E}[s'], t = \mathcal{E}[t']$ and $s' \mapsto_{prg} t'$. By \autoref{lem:iec} and \autoref{lem:isoc} we know that $\langle \mathcal{E} \rangle$ is an evaluation context for $\langle prg \rangle$ and that $\langle s' \rangle \mapsto_{\langle prg \rangle} \langle t' \rangle$, respectively. Consequently, it is $\langle s \rangle = \langle \mathcal{E} \rangle [\langle s' \rangle] \longrightarrow_{\langle prg \rangle} \langle \mathcal{E} \rangle [\langle t' \rangle] = \langle t \rangle$.
 
-$``\Leftarrow"$: By the derivation of $\langle s \rangle \longrightarrow_{\langle prg \rangle} \langle t \rangle$ there are terms $\langle s' \rangle, \langle t' \rangle$ and an evaluation context $\langle \mathcal{E} \rangle$ for $prg$ such that $\langle s \rangle = \langle \mathcal{E} \rangle[\langle s' \rangle], \langle t \rangle = \langle \mathcal{E} \rangle [\langle t' \rangle]$ and $\langle s' \rangle \mapsto_{\langle prg \rangle} \langle t' \rangle$. By \autoref{lem:iec} and \autoref{lem:isoc} we know that $\mathcal{E}$ is an evaluation context for $prg$ and that $s' \mapsto_{prg} t'$, respectively. Consequently, it is $s = \mathcal{E}[s'] \longrightarrow_{prg} \mathcal{E}[t'] = t$.
+$``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-1}$.
 \end{proof}
 
-Using \autoref{lem:iso}, we finally prove strong bisimulation for \textsf{CoreDefunc}, by showing that the premiss of the lemma holds.
+Using \autoref{lem:iso}, we finally prove strong bisimulation for \textsf{CoreDefunc}, by showing that the premiss of the lemma holds. Before that, we must make sure that we can use \autoref{lem:iso}: To use this lemma, \textsf{CoreDefunc} and $\langle \cdot \rangle^d$ need to be invertible and $\langle \cdot \rangle^d$ may only change symbols but not the structure. The second point is clear since $\langle \cdot \rangle^d$ was defined in such a way. Inverting the transformations is straightforward: For terms, simply use the defining equations backwards. For programs, since $\langle \cdot \rangle^d$ for symbols is required to be invertible (\autoref{fig:termdefunc}), the origin of each left-hand side and each constructor signature can be traced, and thus the definition of \textsf{CoreDefunc} can also be used backwards: We know which functions originally were destructors, and which weren't, and from this we can reconstruct the original codata and some of the function definitions; we also know which constructors originally were functions, and which weren't, and from this we can reconstruct the remaining original function definitions and the original data definitions.
 
 \begin{lemma}[Strong bisimulation of the rule relations]
 \label{lem:sbruld}
@@ -759,7 +759,7 @@ The only function definitions which are already refunctionalized, in the sense t
 \langle fun(t_1, ..., t_n) \rangle^r = \langle t_1 \rangle^r .\langle fun \rangle^r (\langle t_2 \rangle^r, ..., \langle t_n \rangle^r), \text{ if } fun \not\in F^{prg}_r \\
 \langle con(t_1, ..., t_n) \rangle^r = \langle con \rangle^r (\langle t_1 \rangle^r, ..., \langle t_n \rangle^r)
 \end{align*}
-For a symbol, $\langle \cdot \rangle^r$ means that the syntactic domain is changed: $\langle con \rangle^r$ is a function symbol, and for $fun \not\in F^{prg}_r$, $\langle fun \rangle^r$ is a destructor symbol. The name of the new symbol is arbitrary.
+For a symbol, $\langle \cdot \rangle^r$ means that the syntactic domain is changed: $\langle con \rangle^r$ is a function symbol, and for $fun \not\in F^{prg}_r$, $\langle fun \rangle^r$ is a destructor symbol. The transformation for symbols must be invertible, but the name of the new symbol is otherwise arbitrary.
 \caption{Refunctionalization of terms}
 \label{fig:refuncterm}
 \end{figure}
@@ -806,7 +806,7 @@ By induction on the derivation of $\Sigma \vdash `` q = t " \textrm{ ok}$, using
 
 In the definition of \textsf{CoreRefunc} we can see that each equation $eqn = `` q = t "$ in $prg$ corresponds to exactly one equation $`` \langle q \rangle^r = \langle t \rangle^r "$ of $\langle prg \rangle^{\textsf{CoreRefunc}}$. Combine this with \autoref{lem:pwtrefunc} to get $\Sigma_{\langle prg \rangle^{\textsf{CoreRefunc}}} \vdash `` q = t " \textrm{ ok}$ for each equation $eqn$ of $\langle prg \rangle^{\textsf{CoreRefunc}}$. Thus $\langle prg \rangle^{\textsf{CoreRefunc}}$ is well-typed whenever $prg$ is.
 
-\textbf{Bisimulation.} For \textsf{CoreRefunc}, strong bisimulation holds. Again, this is shown completely analogously to \textsf{CoreDefunc}; we reuse \autoref{lem:iso}.
+\textbf{Bisimulation.} For \textsf{CoreRefunc}, strong bisimulation holds. Again, this is shown completely analogously to \textsf{CoreDefunc}; we reuse \autoref{lem:iso}. To use this lemma, as with \textsf{CoreDefunc}, \textsf{CoreRefunc} and $\langle \cdot \rangle^r$ must be invertible, and $\langle \cdot \rangle^r$ may not change the structure of the terms, only the symbols. The second point follows directly from the definition of $\langle \cdot \rangle^r$. Inverting the transformations is completely analogous to \textsf{CoreDefunc}: Since $\langle \cdot \rangle^r$ for symbols is invertible, the origin of each term, each lhs and each signature can be traced back and thus the definitions of $\langle \cdot \rangle^r$ and \textsf{CoreRefunc} can be used backwards.
 
 \begin{lemma}[Strong bisimulation of the rule relations]
 \label{lem:sbrulr}
