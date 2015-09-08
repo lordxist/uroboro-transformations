@@ -260,7 +260,7 @@ Next, we consider important properties of the translation algorithm.
 \section{Core defunctionalization}
 \label{sec:coredefunc}
 
-The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of Rendel et al. for the Codata Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a defunctionalized form after \textsf{Unnest}, virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the syntactic differences between function and destructor calls.\footnote{I.e., the difference between $fun(...)$ and $t.des(...)$. This difference vanishes when changing the syntax of destructor calls to $des(t, ...)$.} The respective transformation for terms is $d$, defined below with the algorithm.
+The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of Rendel et al. for the Codata Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a defunctionalized form after \textsf{Unnest}, virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the changed syntactic domains of the symbols.
 
 \subsection{Example}
 
@@ -344,15 +344,18 @@ All function definitions except for \texttt{oneElemArray} are already in a defun
 \begin{align*}
 \langle x \rangle^d = x \\
 \langle s.des(t_1, ..., t_n) \rangle^d = \langle des \rangle^d (\langle s \rangle^d, \langle t_1 \rangle^d, ..., \langle t_n \rangle^d) \\
-\langle fun(t_1, ..., t_n) \rangle^d = fun(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \in F_d \\
-\langle fun(t_1, ..., t_n) \rangle^d = \langle fun \rangle^d (\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \not\in F_d \\
+\langle fun(t_1, ..., t_n) \rangle^d = fun(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \in F^{prg}_d \\
+\langle fun(t_1, ..., t_n) \rangle^d = \langle fun \rangle^d (\langle t_1 \rangle^d, ..., \langle t_n \rangle^d), \text{ if } fun \not\in F^{prg}_d \\
 \langle con(t_1, ..., t_n) \rangle^d = con(\langle t_1 \rangle^d, ..., \langle t_n \rangle^d)
 \end{align*}
+For a symbol, $\langle \cdot \rangle^d$ means that the syntactic domain is changed: $\langle des \rangle^d$ is a function symbol, and for $fun \not\in F^{prg}_d$, $\langle fun \rangle^d$ is a constructor symbol. The name of the new symbol is arbitrary.
+\caption{Defunctionalization of terms}
+\label{fig:termdefunc}
 \end{figure}
 
 First, we define the class of function definitions of a program $prg$ which are already defunctionalized. A function definition is already defunctionalized when all of its equations have lhss without destructors. We define the class of already defunctionalized functions $F^{prg}_d$ as those which have already defunctionalized function definitions.
 
-Using this definition, we define defunctionalization of terms in figure ???. This transformation only changes symbols, but leaves the structure of the terms unchanged (disregarding the syntactic sugar for destructor calls). Especially, this means that $\langle q[\sigma] \rangle^d = \langle q \rangle^d [\langle \cdot \rangle^d \circ \sigma]$ for any copattern $q$ and substitution $\sigma$. A property that is important for the definition of \textsf{CoreDefunc} below is that, for any copattern $q$ that is allowed as a lhs in the domain of \textsf{CoreDefunc}, $\langle q \rangle^d$ is also a copattern. This can be easily shown by induction on the structure of $q$.
+Using this definition, we define defunctionalization $\langle \cdot \rangle^d$ of terms in \autoref{fig:termdefunc}; it depends upon $F^{prg}_d$ and therefore on the program $prg$. This transformation only changes symbols, but leaves the structure of the terms unchanged (disregarding the syntactic sugar for destructor calls). Especially, this means that $\langle q[\sigma] \rangle^d = \langle q \rangle^d [\langle \cdot \rangle^d \circ \sigma]$ for any copattern $q$ and substitution $\sigma$. A property that is important for the definition of \textsf{CoreDefunc} below is that, for any copattern $q$ that is allowed as a lhs in the domain of \textsf{CoreDefunc}, $\langle q \rangle^d$ is also a copattern. This can be easily shown by induction on the structure of $q$.
 
 Next, we give the definition for \textsf{CoreDefunc}. Like Rendel et al. do for their de- and refunctionalization, we use set-builder notation.
 
@@ -366,7 +369,7 @@ Next, we give the definition for \textsf{CoreDefunc}. Like Rendel et al. do for 
 & && && && \{ \langle des \rangle^d (\langle fun \rangle^d (\overline{x}), \overline{y}) = \langle t \rangle^d ~ | ~ `` fun(\overline{x}).des(\overline{y}) = t " \in prg \} \\
 & && | && `` \sigma.des(\tau_1, ..., \tau_n) " \in prg \} \span\span\span\span \\
 & \cup && \{ && \textrm{\textbf{data }} ... ~ | ~ `` \textrm{\textbf{data }} ... " \in prg \} \span\span\span\span \\
-& \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ q = \langle t \rangle^d ~ | ~ "q = t" \in eqns \} \span\span\span\span \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ q = \langle t \rangle^d ~ | ~ ``q = t" \in eqns \} \span\span\span\span \\
 & && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \text{ s.t. } fun \in F^{prg}_d \} \span\span\span\span
 \end{align*}
 
@@ -744,21 +747,26 @@ function aux(Nat, Nat): Nat where
 
 Before formally defining \textsf{CoreRefunc}, like with defunctionalization, we continue the example from unnesting, here with the result of applying $\textsf{Unnest}_r$ to it. The auxiliary function $aux$ generated by it has to be subjected to the workaround presented above, since its lhss have constructors at non-initial argument positions. After applying this workaround, the program looks as shown in \autoref{fig:ch4urosampleprerefunc}.
 
-The only function definitions which are already refunctionalized, in the sense that their lhss contain no constructors, are \texttt{oneElemArray} and \texttt{aux}. All other function definitions dispatch on their first argument of type \texttt{Nat}; \textsf{CoreRefunc} turns data type \texttt{Nat} into a codata type with a destructor replacing each of these functions, and produces function definitions replacing the constructors \texttt{Zero()} and \texttt{Succ(Nat)}. These function definitions collect all equations which have the respective constructor on their lhs; the result is shown in figure ???. As desired, all data types and constructor patterns have been eliminated.
+The only function definitions which are already refunctionalized, in the sense that their lhss contain no constructors, are \texttt{oneElemArray} and \texttt{aux}. All other function definitions dispatch on their first argument of type \texttt{Nat}; \textsf{CoreRefunc} turns data type \texttt{Nat} into a codata type with a destructor replacing each of these functions, and produces function definitions replacing the constructors \texttt{Zero()} and \texttt{Succ(Nat)}. These function definitions collect all equations which have the respective constructor on their lhs; the result is shown in \autoref{fig:ch4urosamplepostrefunc}. As desired, all data types and constructor patterns have been eliminated.
 
 \subsubsection{Formal definition}
 
-First, we define the class of function definitions of a program $prg$ which are already refunctionalized. A function definition is already refunctionalized when (a) all of its equations have destructor patterns, or (b) the function has no arguments, or (c) the first argument of every lhs is a variable. We define the class of already refunctionalized functions $F^{prg}_r$ as those which have already defunctionalized function definitions.
-
-Using this definition, we define refunctionalization of terms.
-
+\begin{figure}
 \begin{align*}
 \langle x \rangle^r = x \\
 \langle s.des(t_1, ..., t_n) \rangle^r = \langle s \rangle^r .des(\langle t_1 \rangle^r, ..., \langle t_n \rangle^r) \\
-\langle fun(t_1, ..., t_n) \rangle^r = fun(\langle t_1 \rangle^r, ..., \langle t_n \rangle^r), \text{ if } fun \in F_r \\
-\langle fun(t_1, ..., t_n) \rangle^r = \langle t_1 \rangle^r .\langle fun \rangle^r (\langle t_2 \rangle^r, ..., \langle t_n \rangle^r), \text{ if } fun \not\in F_r \\
+\langle fun(t_1, ..., t_n) \rangle^r = fun(\langle t_1 \rangle^r, ..., \langle t_n \rangle^r), \text{ if } fun \in F^{prg}_r \\
+\langle fun(t_1, ..., t_n) \rangle^r = \langle t_1 \rangle^r .\langle fun \rangle^r (\langle t_2 \rangle^r, ..., \langle t_n \rangle^r), \text{ if } fun \not\in F^{prg}_r \\
 \langle con(t_1, ..., t_n) \rangle^r = \langle con \rangle^r (\langle t_1 \rangle^r, ..., \langle t_n \rangle^r)
 \end{align*}
+For a symbol, $\langle \cdot \rangle^r$ means that the syntactic domain is changed: $\langle con \rangle^r$ is a function symbol, and for $fun \not\in F^{prg}_r$, $\langle fun \rangle^r$ is a destructor symbol. The name of the new symbol is arbitrary.
+\caption{Refunctionalization of terms}
+\label{fig:refuncterm}
+\end{figure}
+
+First, we define the class of function definitions of a program $prg$ which are already refunctionalized. A function definition is already refunctionalized when (a) all of its equations have destructor patterns, or (b) the function has no arguments, or (c) the first argument of every lhs is a variable. We define the class of already refunctionalized functions $F^{prg}_r$ as those which have already defunctionalized function definitions.
+
+Using this definition, in \autoref{fig:refuncterm} we define refunctionalization of terms, dually to defunctionalization of terms.
 
 Next, we give the definition for \textsf{CoreRefunc}.
 
@@ -772,7 +780,7 @@ Next, we give the definition for \textsf{CoreRefunc}.
 & && && && \{ \langle con \rangle^r (\langle fun \rangle^d (\overline{x}), \overline{y}) = \langle t \rangle^d ~ | ~ `` fun(con(\overline{x}), \overline{y}) = t " \in prg \} \\
 & && | && `` con(\tau_1, ..., \tau_n): \tau " \in prg \} \span\span\span\span \\
 & \cup && \{ && \textrm{\textbf{codata }} ... ~ | ~ `` \textrm{\textbf{codata }} ... " \in prg \} \span\span\span\span \\
-& \cup && \{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ q = \langle t \rangle^r ~ | ~ "q = t" \in eqns \} \span\span\span\span \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ q = \langle t \rangle^r ~ | ~ ``q = t" \in eqns \} \span\span\span\span \\
 & && | && `` \textrm{\textbf{function }} fun(\tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \text{ s.t. } fun \in F^{prg}_r \} \span\span\span\span
 \end{align*}
 
