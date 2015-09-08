@@ -415,48 +415,42 @@ In order to prove this, we first show some auxiliary lemmas concerning the value
 \]
 from now on we will simply say that $\langle \cdot \rangle$ is a rule isomorphism.
 
-\begin{lemma}[Isomorphic value judgements]
+\begin{lemma}
 \label{lem:ivj}
 Let $\langle \cdot \rangle$ be a rule isomorphism. Then, for any program $prg$, it holds that
 \[
-\forall t \in \textrm{Term}_{prg}. prg \vdash_v t \iff \langle prg \rangle \vdash_v \langle t \rangle
+\forall t \in \textrm{Term}_{prg}. prg \vdash_v t \implies \langle prg \rangle \vdash_v \langle t \rangle
 \]
 \begin{proof}
-$``\Rightarrow"$: By induction on the structure of $t$. By the derivation of $prg \vdash_v t$ it is (a) $prg \vdash_v t_i$ for all immediate subterms $t_i$ of $t$ and (b) $t \neq^? q$ for all lhss $q$ of rules of $prg$. By the premiss we know that for all lhss $q'$ of rules of $\langle prg \rangle$, there is a lhs $q$ of $prg$ such that $q' = \langle q \rangle$; thus it is $\langle t \rangle \neq^? q'$ for all lhss $q'$ of rules of $\langle prg \rangle$. By the induction hypothesis, we know that $\langle prg \rangle \vdash_v \langle t_i \rangle$. Since the immediate subterms of $\langle t \rangle^d$ are the $\langle t_i \rangle$ for each $t_i$, we have the derivation for $\langle prg \rangle \vdash_v \langle t \rangle$.
-
-$``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-1}$.
+By induction on the structure of $t$. By the derivation of $prg \vdash_v t$ it is (a) $prg \vdash_v t_i$ for all immediate subterms $t_i$ of $t$ and (b) $t \neq^? q$ for all lhss $q$ of rules of $prg$. By the premiss we know that for all lhss $q'$ of rules of $\langle prg \rangle$, there is a lhs $q$ of $prg$ such that $q' = \langle q \rangle$; thus it is $\langle t \rangle \neq^? q'$ for all lhss $q'$ of rules of $\langle prg \rangle$. By the induction hypothesis, we know that $\langle prg \rangle \vdash_v \langle t_i \rangle$. Since the immediate subterms of $\langle t \rangle^d$ are the $\langle t_i \rangle$ for each $t_i$, we have the derivation for $\langle prg \rangle \vdash_v \langle t \rangle$.
 \end{proof}
 \end{lemma}
 
-\begin{lemma}[Isomorphic evaluation contexts]
+\begin{lemma}
 \label{lem:iec}
 Let $\langle \cdot \rangle$ be a rule isomorphism. Then, for any program $prg$, it holds that
 \[
-\forall \mathcal{E}. \mathcal{E} \in \textrm{EC}_{prg} \iff \langle \mathcal{E} \rangle \in \textrm{EC}_{\langle prg \rangle}
+\forall \mathcal{E}. \mathcal{E} \in \textrm{EC}_{prg} \implies \langle \mathcal{E} \rangle \in \textrm{EC}_{\langle prg \rangle}
 \]
 \begin{proof}
-$``\Rightarrow"$: By induction on the structure of $\mathcal{E}$.
+By induction on the structure of $\mathcal{E}$.
 
 When $\mathcal{E} = []$, then it is $\langle \mathcal{E} \rangle = []$, and this is clearly an evaluation context for $\langle prg \rangle$.
 
 When $\mathcal{E} \neq []$, all immediate subterms $t_{left}$ of $\mathcal{E}$ to the left of the hole are values under judgement $prg \vdash_v$. The ``middle'' term that follows after all these is again an evaluation context $\mathcal{E}_0$ for $prg$. $\langle \mathcal{E} \rangle$ is $\mathcal{E}$ with each $t_{left}$ replaced by $\langle t_{left} \rangle$, the immediate subterms right of the hole replaced in the same way, and the ``middle'' term replaced by $\langle \mathcal{E}_0 \rangle$. By the induction hypothesis, $\langle \mathcal{E}_0 \rangle$ is an evaluation context for $\langle prg \rangle$ because $\mathcal{E}_0$ is one for $prg$. By \autoref{lem:ivj}, it is $\langle prg \rangle \vdash_v \langle t_{left} \rangle$ for all $t_{left}$ because $prg \vdash_v t_{left}$.
-
-$``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-1}$.
 \end{proof}
 \end{lemma}
 
-Next, we show that \autoref{lem:iso} holds restricted to contraction, from which the full \autoref{lem:iso} directly follows.
+Next, we show that one direction of \autoref{lem:iso} holds when restricted to contraction, from which the full \autoref{lem:iso} directly follows.
 
-\begin{lemma}[Rules isomorphism is contraction isomorphism]
+\begin{lemma}
 \label{lem:isoc}
 Let $\langle \cdot \rangle$ be a rule isomorphism. Then, for any program $prg$, it holds that
 \[
-\forall s,t \in \textrm{Term}_{prg}. s \mapsto_{prg} t \iff \langle s \rangle \mapsto_{\langle prg \rangle} \langle t \rangle.
+\forall s,t \in \textrm{Term}_{prg}. s \mapsto_{prg} t \implies \langle s \rangle \mapsto_{\langle prg \rangle} \langle t \rangle.
 \]
 \begin{proof}
-$``\Rightarrow"$: By the derivation of $s \mapsto_{prg} t$ there is a rule $r := (q_r, t_r) \in \textrm{Rules}(prg)$ and a substitution $\sigma$ such that $s = q_r[\sigma]$ and $t = t_r[\sigma]$ and the right-hand sides of $\sigma$ are values in $prg$. By the premiss we know that there is a rule $\langle r \rangle := (\langle q_r \rangle, \langle t_r \rangle) \in \textrm{Rules}(prg)$, and by \autoref{lem:ivj} we know that, for each term $v$ that is a value in $prg$, $\langle v \rangle$ is a value in $\langle prg \rangle$ and thus the right-hand sides of $\sigma \circ \langle \cdot \rangle$ are values in $\langle prg \rangle$. Consequently, it is $\langle s \rangle = \langle q_r \rangle[\langle \cdot \rangle \circ \sigma] \mapsto \langle t_r \rangle[\langle \cdot \rangle \circ \sigma] = \langle t \rangle$.
-
-$``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-1}$.
+By the derivation of $s \mapsto_{prg} t$ there is a rule $r := (q_r, t_r) \in \textrm{Rules}(prg)$ and a substitution $\sigma$ such that $s = q_r[\sigma]$ and $t = t_r[\sigma]$ and the right-hand sides of $\sigma$ are values in $prg$. By the premiss we know that there is a rule $\langle r \rangle := (\langle q_r \rangle, \langle t_r \rangle) \in \textrm{Rules}(prg)$, and by \autoref{lem:ivj} we know that, for each term $v$ that is a value in $prg$, $\langle v \rangle$ is a value in $\langle prg \rangle$ and thus the right-hand sides of $\sigma \circ \langle \cdot \rangle$ are values in $\langle prg \rangle$. Consequently, it is $\langle s \rangle = \langle q_r \rangle[\langle \cdot \rangle \circ \sigma] \mapsto \langle t_r \rangle[\langle \cdot \rangle \circ \sigma] = \langle t \rangle$.
 \end{proof}
 \end{lemma}
 
