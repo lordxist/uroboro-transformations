@@ -401,7 +401,7 @@ In the definition of \textsf{CoreDefunc} we can see that each equation $eqn = ``
 \label{lem:iso}
 For any program $prg$, when it is
 \[
-\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(prg).
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(\langle prg \langle).
 \]
 , then it also holds that
 \[
@@ -409,15 +409,15 @@ For any program $prg$, when it is
 \]
 \end{lemma}
 
-In order to prove this, we first show some auxiliary lemmas concerning the value judgement and evaluation contexts.
+In order to prove this, we first show some auxiliary lemmas concerning the value judgement and evaluation contexts. Instead of always writing out
+\[
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(prg),
+\]
+from now on we will simply say that $\langle \cdot \rangle$ is a rule isomorphism.
 
 \begin{lemma}[Isomorphic value judgements]
-For any program $prg$, when it is
-\[
-\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(\langle prg \rangle).
-\]
-, then it also holds that
 \label{lem:ivj}
+Let $\langle \cdot \rangle$ be a rule isomorphism. Then, for any program $prg$, it holds that
 \[
 \forall t \in \textrm{Term}_{prg}. prg \vdash_v t \iff \langle prg \rangle \vdash_v \langle t \rangle
 \]
@@ -430,11 +430,7 @@ $``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-
 
 \begin{lemma}[Isomorphic evaluation contexts]
 \label{lem:iec}
-For any program $prg$, when it is
-\[
-\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(\langle prg \rangle).
-\]
-, then it also holds that
+Let $\langle \cdot \rangle$ be a rule isomorphism. Then, for any program $prg$, it holds that
 \[
 \forall \mathcal{E}. \mathcal{E} \in \textrm{EC}_{prg} \iff \langle \mathcal{E} \rangle \in \textrm{EC}_{\langle prg \rangle}
 \]
@@ -453,11 +449,7 @@ Next, we show that \autoref{lem:iso} holds restricted to contraction, from which
 
 \begin{lemma}[Rules isomorphism is contraction isomorphism]
 \label{lem:isoc}
-For any program $prg$, when it is
-\[
-\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(\langle prg \rangle).
-\]
-, then it also holds that
+Let $\langle \cdot \rangle$ be a rule isomorphism. Then, for any program $prg$, it holds that
 \[
 \forall s,t \in \textrm{Term}_{prg}. s \mapsto_{prg} t \iff \langle s \rangle \mapsto_{\langle prg \rangle} \langle t \rangle.
 \]
