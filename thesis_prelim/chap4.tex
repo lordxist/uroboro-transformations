@@ -414,7 +414,7 @@ In order to prove this, we first show some auxiliary lemmas concerning the value
 \begin{lemma}[Isomorphic value judgements]
 For any program $prg$, when it is
 \[
-\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(prg).
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(\langle prg \rangle).
 \]
 , then it also holds that
 \label{lem:ivj}
@@ -422,7 +422,7 @@ For any program $prg$, when it is
 \forall t \in \textrm{Term}_{prg}. prg \vdash_v t \iff \langle prg \rangle \vdash_v \langle t \rangle
 \]
 \begin{proof}
-$``\Rightarrow"$: By induction on the structure of $t$. By the derivation of $\vdash_{v_{prg}} t$ it is (a) $prg \vdash_v t_i$ for all immediate subterms $t_i$ of $t$ and (b) $t \neq^? q$ for all lhss $q$ of rules of $prg$. By the premiss we know that for all lhss $q'$ of rules of $\langle prg \rangle$, there is a lhs $q$ of $prg$ such that $q' = \langle q \rangle$; thus it is $\langle t \rangle \neq^? q'$ for all lhss $q'$ of rules of $\langle prg \rangle$. By the induction hypothesis, we know that $\langle prg \rangle \vdash_v \langle t_i \rangle$. Since the immediate subterms of $\langle t \rangle^d$ are the $\langle t_i \rangle$ for each $t_i$, we have the derivation for $\langle prg \rangle \vdash_v \langle t \rangle$.
+$``\Rightarrow"$: By induction on the structure of $t$. By the derivation of $prg \vdash_v t$ it is (a) $prg \vdash_v t_i$ for all immediate subterms $t_i$ of $t$ and (b) $t \neq^? q$ for all lhss $q$ of rules of $prg$. By the premiss we know that for all lhss $q'$ of rules of $\langle prg \rangle$, there is a lhs $q$ of $prg$ such that $q' = \langle q \rangle$; thus it is $\langle t \rangle \neq^? q'$ for all lhss $q'$ of rules of $\langle prg \rangle$. By the induction hypothesis, we know that $\langle prg \rangle \vdash_v \langle t_i \rangle$. Since the immediate subterms of $\langle t \rangle^d$ are the $\langle t_i \rangle$ for each $t_i$, we have the derivation for $\langle prg \rangle \vdash_v \langle t \rangle$.
 
 $``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-1}$.
 \end{proof}
@@ -432,7 +432,7 @@ $``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-
 \label{lem:iec}
 For any program $prg$, when it is
 \[
-\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(prg).
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(\langle prg \rangle).
 \]
 , then it also holds that
 \[
@@ -455,7 +455,7 @@ Next, we show that \autoref{lem:iso} holds restricted to contraction, from which
 \label{lem:isoc}
 For any program $prg$, when it is
 \[
-\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(prg).
+\forall s,t \in \textrm{Term}_{prg}. (s, t) \in \textrm{Rules}(prg) \iff (\langle s \rangle, \langle t \rangle) \in \textrm{Rules}(\langle prg \rangle).
 \]
 , then it also holds that
 \[
@@ -474,7 +474,9 @@ $``\Rightarrow"$: By the derivation of $s \longrightarrow_{prg} t$ there are ter
 $``\Leftarrow"$: By the $``\Rightarrow"$ direction for $\langle \cdot \rangle^{-1}$.
 \end{proof}
 
-Using \autoref{lem:iso}, we finally prove strong bisimulation for \textsf{CoreDefunc}, by showing that the premiss of the lemma holds. Before that, we must make sure that we can use \autoref{lem:iso}: To use this lemma, \textsf{CoreDefunc} and $\langle \cdot \rangle^d$ need to be invertible and $\langle \cdot \rangle^d$ may only change symbols but not the structure. The second point is clear since $\langle \cdot \rangle^d$ was defined in such a way. Inverting the transformations is straightforward: For terms, simply use the defining equations backwards. For programs, since $\langle \cdot \rangle^d$ for symbols is required to be invertible (\autoref{fig:termdefunc}), the origin of each left-hand side and each constructor signature can be traced, and thus the definition of \textsf{CoreDefunc} can also be used backwards: We know which functions originally were destructors, and which weren't, and from this we can reconstruct the original codata and some of the function definitions; we also know which constructors originally were functions, and which weren't, and from this we can reconstruct the remaining original function definitions and the original data definitions.
+To use \autoref{lem:iso} for these transformations, \textsf{CoreDefunc} and $\langle \cdot \rangle^d$ need to be invertible and $\langle \cdot \rangle^d$ may only change symbols but not the structure of terms. The second point is clear since $\langle \cdot \rangle^d$ was defined in such a way. Inverting the transformations is straightforward: For terms, simply use the defining equations backwards. For programs, since $\langle \cdot \rangle^d$ for symbols is required to be invertible (\autoref{fig:termdefunc}), the origin of each left-hand side and each constructor signature can be traced, and thus the definition of \textsf{CoreDefunc} can also be used backwards: We know which functions originally were destructors, and which weren't, and from this we can reconstruct the original codata and some of the function definitions; we also know which constructors originally were functions, and which weren't, and from this we can reconstruct the remaining original function definitions and the original data definitions.
+
+Using \autoref{lem:iso}, we finally prove strong bisimulation for \textsf{CoreDefunc}, by showing that the premiss of the lemma holds.
 
 \begin{lemma}[Strong bisimulation of the rule relations]
 \label{lem:sbruld}
