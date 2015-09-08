@@ -518,15 +518,15 @@ This work's evaluation context conservatively extends that for the Data Fragment
 \[
 u, v ::= con(v^*),
 \]
-while the V\textsubscript{CodTFun} can never be applied. This is because a function in the Data Fragment can only have data type unless it doesn't have a type defined in the program at all, as types can only be added by data definitions.
+while the V\textsubscript{CodTFun} can never be applied. This is because, in the Data Fragment, there are no codata type definitions.
 
 \subsection{Codata Fragment}
 \label{ssec:codf}
 
 The Codata Fragment's evaluation context notion is conservatively extended by this work's, as well. And here again, this is why the notion of reduction for all of Uroboro conservatively extends that for the Codata Fragment.
 
-As with the Data Fragment, this conservation for evaluation context notions follows from that of the value notions. In their value rule for the Codata Fragment, a term is a value if and only if it is a function application with argument values. It will be demonstrated why the two directions of the equivalence hold for this work's value judgement, restricted to terms in the Codata Fragment, as well.
+As with the Data Fragment, this conservation for evaluation context notions follows from that of the value notions. In their value rule for the Codata Fragment, a term is a value if and only if it is a function application with argument values. We now show why the two directions of the equivalence hold for this work's value judgement, restricted to terms in the Codata Fragment, as well.
 
-Consider first the ``if'' direction. By the rules of the judgement, a function application with argument values is only a value if it has codata type and doesn't match any rule of the program. Assuming well-typedness, the first constraint is always fulfilled in the Codata Fragment, since there, a type can only be added by a codata definition. That the second constraint is always fulfilled because, in the Codata Fragment, there are no left-hand sides of rules which are hole patterns.
+Consider first the ``if'' direction. By the rules of the judgement, a function application with argument values is only a value if it has codata type and doesn't match any rule of the program. Assuming well-typedness, the first constraint is always fulfilled in the Codata Fragment, since there, a type can only be added by a codata definition. The second constraint is always fulfilled because, in the Codata Fragment, there are no left-hand sides of rules which are hole patterns.
 
-Second, consider the ``only if'' direction. By the rules of the judgement, a value can also be a destructor application if it has codata type and doesn't match any rule of the program. But this case can be excluded in the Codata Fragment for programs with copattern coverage.
+Second, consider the ``only if'' direction. By the rules of the judgement, a value $v$ can also be a destructor application if it has codata type and no subterm of it matches any lhs of the program. But this case can be excluded in the Codata Fragment for programs with copattern coverage, as follows. Since only lhss of the form $fun(\overline{x}).des(\overline{y})$ are allowed in this fragment, coverage for a function can only be established by an application of the C\textsubscript{Head} rule followed by one application of C\textsubscript{Des}. It follows that, for each function $fun$ defined the program, the function definition consists of lhss $fun(\overline{x}).des(\overline{y})$ for each destructor of the return type of $fun$. Thus, when $v$ is a destructor application, it must match an lhs of the respective function definition.
