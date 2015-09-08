@@ -220,17 +220,17 @@ where $\zeta$ is the function in the triple that is \textsf{ExtractCon}(p). It i
 \begin{prooftree}
 \AxiomC{$fun \lhd | ~ Q ~ (q(x^\tau))$}
 \RightLabel{C\textsubscript{Con}}
-\UnaryInfC{$fun \lhd | ~ Q ~ (q[x := con(\overline{y^{con}})])_{con \in Cons_\tau}$}
+\UnaryInfC{$fun \lhd | ~ Q ~ (q[x \mapsto con(\overline{y^{con}})])_{con \in Cons_\tau}$}
 \end{prooftree}
 
 Let $\ell$ be the position of $x$ in $q$. Apply extraction $\textsf{ExtractCon}(\ell)$ targeting the equations with lhss $q[x := con(\overline{y^{con}})]$, for all $con \in Cons_\tau$ to the original function definition for $fun$. From this we obtain the changed function definition $def'_{fun}$ for $fun$ and the auxiliary function definition. The lhss of $def'_{fun}$ are
 \[
-Q \cup \{ \textsf{get}(q[x := con(\overline{y^{con}})]) ~ | ~ con \in Cons_\tau \} = Q \cup \{q\},
+Q \cup \{ \textsf{get}(q[x \mapsto con(\overline{y^{con}})]) ~ | ~ con \in Cons_\tau \} = Q \cup \{q\},
 \]
 where the pair of \textsf{get} and \textsf{putback} is the lens underlying $\textsf{ExtractCon}(\ell)$. This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q)$ from the derivation step above. The lhss of the auxiliary function definition are
 \begin{multline*}
 \{ q_{\zeta_r} ~ | ~ r \in T \} = \{ \textsf{putback}(\langle \textsf{get}(q_r) \rangle^{aux}, q_r) ~ | ~ r \in T \} \\
-= \{ \sigma^{q_r}_\pi(aux(\langle q \rangle^{vars})) ~ | ~ r \in T \} = \{ aux(\langle q \rangle^{vars})[x := con(\overline{y^{con}})] ~ | ~ con \in Cons_\tau \}
+= \{ \sigma^{q_r}_\pi(aux(\langle q \rangle^{vars})) ~ | ~ r \in T \} = \{ aux(\langle q \rangle^{vars})[x \mapsto con(\overline{y^{con}})] ~ | ~ con \in Cons_\tau \}
 \end{multline*}
 where $\zeta$ is the function in the triple that is $\textsf{ExtractCon}(\ell)$. It is clear that each $q_{\zeta_r}$ is simple and that $\{ q_{\zeta_r} ~ | ~ r \in T \}$ covers $aux$:
 \begin{prooftree}
