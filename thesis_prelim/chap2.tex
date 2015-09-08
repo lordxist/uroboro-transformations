@@ -374,11 +374,11 @@ Here, we define what it means for a term to match a copattern. In short, a term 
 
 This section formalizes the notion of value for Uroboro. As is the case with the language of Abel et al.\cite{abel13copatterns}, whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed.
 
-$\vdash_v t$ means that the closed term $t$ is a value. This notation is borrowed from Abel et al.\cite{abel13copatterns}, section 5. Note that only closed terms are considered because only those are relevant for the semantics preservation.
+$prg \vdash_v t$ means that the closed term $t$ is a value with respect to program $prg$. This notation is partially borrowed from Abel et al.\cite{abel13copatterns}, section 5. We omit the program whenever it is clear from the context or unimportant. Note that only closed terms are considered because only those are relevant for the semantics preservation.
 
 The value judgement makes use of a ``no-match'' judgement, presented in \autoref{fig:nmq}. We write $t \neq^? q$ to mean that $t$ doesn't match $q$, i.e., it is $t \neq q[\sigma]$ for all substitutions $\sigma$. This judgement is complementary to the copattern matching judgement of the previous section. In order to define the rules of the ``no-match'' judgement for copatterns, as with the matching judgement, we give the rules of an analogous ``no-match'' judgement for patterns, presented in \autoref{fig:nmp}.
 
-Finally, using this ``no-match'' judgement, we define the rules of the value judgement in figure ???. As said above, this judgement also depends upon the type of the term. In short, a term is a value whenever it is a either (a) constructor applied to values, or (b) a function or destructor applied to values such that the return type of the function or destructor is a negative type, i.e., a type defined by a codata type definition.
+Finally, using this ``no-match'' judgement, we define the rules of the value judgement in figure \autoref{fig:valj} (always meant with respect to a program $prg$). As said above, this judgement also depends upon the type of the term. In short, a term is a value whenever it is a either (a) constructor applied to values, or (b) a function or destructor applied to values such that the return type of the function or destructor is a negative type, i.e., a type defined by a codata type definition.
 
 \subsection{The reduction relation}
 \label{ssec:red}
