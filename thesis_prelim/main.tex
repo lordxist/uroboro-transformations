@@ -81,6 +81,17 @@
 %\def\all{all}
 %\ifx\files\all \typeout{Including all files.} \else \typeout{Including only \files.} \includeonly{\files} \fi
 
+% Autoref configuration (by Tillmann)
+% =====================
+
+\def\sectionautorefname{Section}
+\let\subsectionautorefname=\sectionautorefname
+\def\lemmaautorefname{Lemma}
+
+\let\oldautoref=\autoref
+\renewcommand{\autoref}[1]
+  {\mbox{\oldautoref{#1}}}
+
 \begin{document}
 
 \include{cover}
