@@ -122,9 +122,7 @@ hasSameIdAsEps _ _ = False
 replaceTargetWithEpsilon :: PT -> [PTRule] -> PTRule -> PT
 replaceTargetWithEpsilon pt@(PTFun l id ts t rs) tgt eps = PTFun l id ts t (eps:(rs \\ tgt))
 
-applyExtraction :: ExtractionSpec -> PT -> Writer [PT] PT
-applyExtraction spec pt = do
-    tell [snd eResult]
-    return $ replaceTargetWithEpsilon pt (map fst $ target spec) (fst eResult)
+applyExtraction :: ExtractionSpec -> PT -> (PT, PT)
+applyExtraction spec pt = first (replaceTargetWithEpsilon pt (map fst $ target spec)) eResult
   where
     eResult = runReader extract spec

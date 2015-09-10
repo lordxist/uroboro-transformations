@@ -30,7 +30,7 @@ spec pt@(PTFun _ _ _ _ ((PTRule _ pq _):_)) = do
 extractCon :: PT -> Reader ([PT], Program) ((PT, PT), Int)
 extractCon pt = do
     (sp, n) <- spec pt
-    return $ ((second head $ runWriter (applyExtraction sp pt)), n)
+    return $ ((applyExtraction sp pt), n)
 
 isAffected :: PT -> Bool
 isAffected (PTFun _ _ _ _ ((PTRule _ (PQApp _ _ (_:pps)) _):_)) = any con pps

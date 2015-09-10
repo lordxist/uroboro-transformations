@@ -10,6 +10,8 @@ import Uroboro.Tree
 import Uroboro.Checker
 import Uroboro.Error
 
+import Data.List (deleteBy)
+import Control.Arrow
 import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.State.Lazy
@@ -24,42 +26,43 @@ extractionSpec :: CCTree TQ -> [PT] -> [(PTRule, TQ)] -> ExtractionSpec
 extractionSpec (ResSplit _ _) = ExtractionSpec desExtractionLens
 extractionSpec (VarSplit _ p _) = ExtractionSpec $ conExtractionLens p
 
-oneStepUnnesting :: PT -> StateT (CCTree TQ) (ReaderT [PT] (Writer [PT])) PT
+oneStepUnnesting :: PT -> StateT (CCTree TQ) (State [PT]) (PT, PT) 
 oneStepUnnesting pt = do
   tree <- get
-  pts <- lift ask
+  pts <- lift get
   let lst = lowestSubtree tree
   let tgt = zipCoverageRules (leaves lst) (rulesForFunDef pt)
   let spec = extractionSpec lst pts tgt
-  lift $ lift $ applyExtraction spec pt
+  return $ applyExtraction spec pt
 
-unnesting :: PT -> StateT (CCTree TQ) (ReaderT [PT] (Writer [PT])) PT
-unnesting pt = do
-  tree <- get
-  if isSimpleTree tree
-    then return pt
-    else do
-      pt' <- oneStepUnnesting pt
-      modify cutoffLowestSubtree
-      unnesting pt'
+unnesting :: (PT, [PT]) -> StateT (CCTree TQ) (State [PT]) [PT]
+unnesting (pt, auxs) = do
+    tree <- get
+    if isSimpleTree tree
+      then return (pt:auxs)
+      else do
+        (pt', aux) <- oneStepUnnesting pt
+        modify cutoffLowestSubtree
+        lift $ modify (++[aux])
+        unnesting (pt', (aux:auxs))
 
 ptToSig :: PT -> PTSig
 ptToSig (PTFun l id ts t rs) = (id, (l, ts, t))
 
-unnestingInit :: PT -> ReaderT Program (MaybeT (ReaderT [PT] (Writer [PT]))) PT
+unnestingInit :: PT -> ReaderT Program (State [PT]) (Maybe [PT])
 unnestingInit pt = do
   prog <- ask
   case runReader (checkCoverage (ptToSig pt) pt) prog of
-    Nothing -> lift $ (MaybeT . return) Nothing
-    Just c -> lift $ lift $ evalStateT (unnesting pt) c
+    Nothing -> return Nothing
+    Just c -> lift $ liftM Just $ evalStateT (unnesting (pt, [])) c
 
-programUnnesting :: UnnestPredicate -> [PT] -> Writer [PT] (Maybe [PT])
+programUnnesting :: UnnestPredicate -> [PT] -> Maybe [PT]
 programUnnesting i pts = do
     case betterTypecheck pts of
-      Left _ -> return Nothing
-      Right p -> liftM sequence $ mapM ((flip runReaderT pts).runMaybeT.(flip runReaderT p).unnestingInit) (filter i pts)
+      Left _ -> Nothing
+      Right p -> liftM concat $ sequence $ flip evalState pts $ flip runReaderT p $ mapM unnestingInit (filter i pts)
 
 unnestFor :: UnnestPredicate -> [PT] -> Maybe [PT]
-unnestFor i pts = case runWriter (programUnnesting i pts) of
-  (Nothing, _) -> Nothing
-  (Just pts', aux) -> Just $ pts' ++ (filter (not.i) pts) ++ aux
+unnestFor i pts = case programUnnesting i pts of
+  Nothing -> Nothing
+  Just pts' -> Just $ pts' ++ (filter (not.i) pts)
