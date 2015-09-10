@@ -22,7 +22,7 @@ conExtractionLensGetReader :: PathToSubterm -> TQ -> Reader Int TQ
 conExtractionLensGetReader (p1:p) (TQDes t id tps tq)
   | p1 == 0 = (liftM $ TQDes t id tps) (conExtractionLensGetReader p tq)
   | otherwise = (liftM $ (flip $ TQDes t id) tq) (extractionProjectionTPs ((p1-1):p) tps)
-conExtractionLensGetReader (_:p) (TQApp t id tps) = (liftM $ TQApp t id) (extractionProjectionTPs p tps)
+conExtractionLensGetReader p (TQApp t id tps) = (liftM $ TQApp t id) (extractionProjectionTPs p tps)
 
 conExtractionLensGet :: PathToSubterm -> TQ -> TQ
 conExtractionLensGet p tq = runReader (conExtractionLensGetReader p tq) (newvarIndex tq)

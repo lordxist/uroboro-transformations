@@ -13,12 +13,6 @@ import UroboroTransformations.CopatternCoverage.CCTree
 import System.IO
 import System.Environment
 
-betterTypecheck :: [PT] -> Either Error Program
-betterTypecheck defs = do
-    pre  <- foldM preCheckPT emptyProgram defs
-    prog <- foldM postCheckPT pre defs
-    return prog
-
 main :: IO ()
 main = do
     input <- getContents

@@ -53,12 +53,6 @@ unnestingInit pt = do
     Nothing -> lift $ (MaybeT . return) Nothing
     Just c -> lift $ lift $ evalStateT (unnesting pt) c
 
-betterTypecheck :: [PT] -> Either Error Program
-betterTypecheck defs = do
-  pre  <- foldM preCheckPT emptyProgram defs
-  prog <- foldM postCheckPT pre defs
-  return prog
-
 programUnnesting :: UnnestPredicate -> [PT] -> Writer [PT] (Maybe [PT])
 programUnnesting i pts = do
     case betterTypecheck pts of

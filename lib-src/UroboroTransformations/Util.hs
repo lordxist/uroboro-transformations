@@ -1,11 +1,18 @@
 module UroboroTransformations.Util where
 
+import Uroboro.Checker
 import Uroboro.Tree
 import Uroboro.Error
 
 import Data.Char
 import Data.List(intercalate, isPrefixOf, maximumBy)
 import Control.Monad.State.Lazy
+
+betterTypecheck :: [PT] -> Either Error Program
+betterTypecheck defs = do
+  pre  <- foldM preCheckPT emptyProgram defs
+  prog <- foldM postCheckPT pre defs
+  return prog
 
 type PathToSubterm = [Int]
 
