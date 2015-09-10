@@ -191,6 +191,7 @@ lowestSubtree :: CCTree TQ -> CCTree TQ
 lowestSubtree t = (lowestSubtrees t Initial) !! 0
 
 lowestSubtreeToLeaf :: [CCTree TQ] -> [CCTree TQ]
+lowestSubtreeToLeaf ((t@(Leaf _)):ts) = t:(lowestSubtreeToLeaf ts)
 lowestSubtreeToLeaf (t:ts)
   | all isLeaf (children t) = (Leaf (getTQ t)):ts
   | otherwise = t:(lowestSubtreeToLeaf ts)
