@@ -2,7 +2,9 @@ module UroboroTransformations.Extraction where
 
 import Control.Arrow
 import Control.Monad.Reader
+import Control.Monad.Writer.Lazy
 import Data.List
+import Debug.Trace
 
 import Uroboro.Parser
 import Uroboro.Checker
@@ -117,36 +119,12 @@ hasSameIdAsEps :: PTRule -> PT -> Bool
 hasSameIdAsEps eps (PTFun _ id _ _ _) = id == (getFunIdForRule eps)
 hasSameIdAsEps _ _ = False
 
-instance Eq PP where
-  (PPVar _ id) == (PPVar _ id') = id == id'
-  (PPCon _ id pps) == (PPCon _ id' pps') = (id == id') && (pps == pps')
-  _ == _ = False
+replaceTargetWithEpsilon :: PT -> [PTRule] -> PTRule -> PT
+replaceTargetWithEpsilon pt@(PTFun l id ts t rs) tgt eps = PTFun l id ts t (eps:(rs \\ tgt))
 
-instance Eq PQ where
-  (PQApp _ id pps) == (PQApp _ id' pps') = (id == id') && (pps == pps')
-  (PQDes _ id pps pq) == (PQDes _ id' pps' pq') = (id == id') && (pps == pps') && (pq == pq')
-  _ == _ = False
-
-instance Eq PExp where
-  (PApp _ id pexps) == (PApp _ id' pexps') = (id == id') && (pexps == pexps')
-  (PVar _ id) == (PVar _ id') = id == id'
-  (PDes _ id pexps pexp) == (PDes _ id' pexps' pexp') = (id == id') && (pexps == pexps') && (pexp == pexp')
-  _ == _ = False
-
-instance Eq PTRule where
-  (PTRule _ pq pexp) == (PTRule _ pq' pexp') = (pq == pq') && (pexp == pexp')
-
-replaceTargetWithEpsilonPT :: PT -> [PTRule] -> PTRule -> PT
-replaceTargetWithEpsilonPT pt@(PTFun l id ts t rs) tgt eps = PTFun l id ts t (eps:(rs \\ tgt))
-
-replaceTargetWithEpsilon :: [PT] -> [PTRule] -> PTRule -> [PT]
-replaceTargetWithEpsilon pts tgt eps =
-  (replaceTargetWithEpsilonPT ((fst partitions)!!0) tgt eps):(snd partitions)
-  where
-    partitions = partition (hasSameIdAsEps eps) pts
-
-applyExtraction :: ExtractionSpec -> [PT] -> [PT]
-applyExtraction spec pts = 
-  (replaceTargetWithEpsilon pts (map fst $ target spec) (fst eResult)) ++ [snd eResult]
+applyExtraction :: ExtractionSpec -> PT -> Writer [PT] PT
+applyExtraction spec pt = do
+    tell [snd eResult]
+    return $ replaceTargetWithEpsilon pt (map fst $ target spec) (fst eResult)
   where
     eResult = runReader extract spec

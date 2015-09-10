@@ -141,16 +141,6 @@ leaves (Leaf tq) = [tq]
 leaves (ResSplit _ trees) = concatMap leaves trees
 leaves (VarSplit _ _ trees) = concatMap leaves trees
 
-instance Eq PP where
-  (PPVar _ id) == (PPVar _ id') = True
-  (PPCon _ id pps) == (PPCon _ id' pps') = (id == id') && (pps == pps')
-  _ == _ = False
-
-instance Eq PQ where
-  (PQApp _ id pps) == (PQApp _ id' pps') = (id == id') && (pps == pps')
-  (PQDes _ id pps pq) == (PQDes _ id' pps' pq') = (id == id') && (pps == pps') && (pq == pq')
-  _ == _ = False
-
 leavesEqualPQs :: [PQ] -> CCTree TQ -> Bool
 leavesEqualPQs pqs tree = (fromList (map toPQ (leaves tree))) == (fromList pqs)
 
@@ -182,18 +172,41 @@ zipCoverageRules (tq:tqs) rs
 
 data SubtreeMode = Initial | NonInitial
 
+isLeaf :: CCTree TQ -> Bool
+isLeaf (Leaf _) = True
+isLeaf _ = False
+
+children :: CCTree TQ -> [CCTree TQ]
+children (ResSplit _ ts) = ts
+children (VarSplit _ _ ts) = ts
+
 lowestSubtrees :: CCTree TQ -> SubtreeMode -> [CCTree TQ]
 lowestSubtrees t@(Leaf tq) Initial = [t]
 lowestSubtrees (Leaf _) NonInitial = []
 lowestSubtrees t _
   | all isLeaf (children t) = [t]
   | otherwise = concatMap (flip lowestSubtrees NonInitial) (children t)
-    where
-      isLeaf (Leaf _) = True
-      isLeaf _ = False
-
-      children (ResSplit _ ts) = ts
-      children (VarSplit _ _ ts) = ts
 
 lowestSubtree :: CCTree TQ -> CCTree TQ
 lowestSubtree t = (lowestSubtrees t Initial) !! 0
+
+lowestSubtreeToLeaf :: [CCTree TQ] -> [CCTree TQ]
+lowestSubtreeToLeaf (t:ts)
+  | all isLeaf (children t) = (Leaf (getTQ t)):ts
+  | otherwise = t:(lowestSubtreeToLeaf ts)
+  where
+    getTQ (ResSplit tq _) = tq
+    getTQ (VarSplit tq _ _) = tq
+
+cutoffLowestSubtree :: CCTree TQ -> CCTree TQ
+cutoffLowestSubtree (ResSplit tq ts)
+  | all isLeaf ts = Leaf tq
+  | otherwise = ResSplit tq (lowestSubtreeToLeaf ts)
+cutoffLowestSubtree (VarSplit tq p ts)
+  | all isLeaf ts = Leaf tq
+  | otherwise = VarSplit tq p (lowestSubtreeToLeaf ts)
+
+isSimpleTree :: CCTree TQ -> Bool
+isSimpleTree (Leaf _) = True
+isSimpleTree (ResSplit _ ts) = all isLeaf ts
+isSimpleTree (VarSplit _ _ ts) = all isLeaf ts
