@@ -16,15 +16,10 @@ hasDestrPattern :: PTRule -> Bool
 hasDestrPattern (PTRule _ (PQDes _ _ _ _) _) = True
 hasDestrPattern _ = False
 
-isCodataType :: Type -> [PT] -> Bool
-isCodataType t ((PTNeg _ t' _):pts)
-        | t' == t   = True
-        | otherwise = isCodataType t pts
-isCodataType _ _ = False
-
 isRefunced :: [PT] -> PT -> Bool
 isRefunced _ (PTNeg _ _ _) = True
-isRefunced pts (PTFun _ _ (t:_) _ rs) = (isCodataType t pts) || (all hasDestrPattern rs)
+isRefunced pts (PTFun _ _ (t:_) _ (r:[])) = True
+isRefunced pts (PTFun _ _ (t:_) _ rs) = all hasDestrPattern rs
 isRefunced _ (PTFun _ _ [] _ _) = True
 isRefunced _ _ = False
 
