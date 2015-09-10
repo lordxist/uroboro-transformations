@@ -59,24 +59,6 @@ executable defunc
   build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
   default-language:  Haskell2010
 
-executable elim-multi-des
-  hs-source-dirs:    main-src
-  main-is:           ElimMultiDes.hs
-  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
-  default-language:  Haskell2010
-
-executable unmix-d
-  hs-source-dirs:    main-src
-  main-is:           UnmixD.hs
-  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
-  default-language:  Haskell2010
-
-executable disentangle-d
-  hs-source-dirs:    main-src
-  main-is:           DisentangleD.hs
-  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
-  default-language:  Haskell2010
-
 executable defunc-core
   hs-source-dirs:    main-src
   main-is:           DefuncCore.hs
@@ -86,24 +68,6 @@ executable defunc-core
 executable refunc
   hs-source-dirs:    main-src
   main-is:           Refunc.hs
-  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
-  default-language:  Haskell2010
-
-executable unmix-r
-  hs-source-dirs:    main-src
-  main-is:           UnmixR.hs
-  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
-  default-language:  Haskell2010
-
-executable disentangle-r
-  hs-source-dirs:    main-src
-  main-is:           DisentangleR.hs
-  build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
-  default-language:  Haskell2010
-
-executable split
-  hs-source-dirs:    main-src
-  main-is:           Split.hs
   build-depends:     base >= 4.7 && < 4.8, uroboro, uroboro-transformations, transformers, mtl
   default-language:  Haskell2010
 
