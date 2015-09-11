@@ -152,69 +152,133 @@ Note that we consider the collection of equations in a function definition to be
 \label{fig:typjterm}
 \end{figure}
 
+%
+
 \begin{figure}
 \begin{prooftree}
-\AxiomC{$``\sigma.des(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
-\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q), ~ q \vdash_{\Sigma} x : \sigma_x \} \vdash_{\Sigma} t : \tau$}
-\RightLabel{Des}
-\BinaryInfC{$\Sigma \vdash q'.des(p_1, ..., p_n) = t \textrm{ ok}$}
-\end{prooftree}
-
-\begin{prooftree}
-\AxiomC{$``fun(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
-\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q), ~ q \vdash_{\Sigma} x : \sigma_x \} \vdash_{\Sigma} t : \tau$}
-\RightLabel{Fun}
-\BinaryInfC{$\Sigma \vdash fun(p_1, ..., p_n) = t \textrm{ ok}$}
+\AxiomC{$\Sigma \vdash q : \tau; \Gamma$}
+\AxiomC{$\Gamma \vdash_{\Sigma} t : \tau$}
+\BinaryInfC{$\Sigma \vdash q = t \textrm{ ok}$}
 \end{prooftree}
 \caption{Well-typedness judgement for equations}
 \label{fig:wtjteq}
 \end{figure}
 
+%
+
+%\begin{figure}
+%\begin{prooftree}
+%\AxiomC{$``\sigma.des(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+%\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q), ~ q \vdash_{\Sigma} x : \sigma_x \} \vdash_{\Sigma} t : \tau$}
+%\RightLabel{Des}
+%\BinaryInfC{$\Sigma \vdash q'.des(p_1, ..., p_n) = t \textrm{ ok}$}
+%\end{prooftree}
+%
+%\begin{prooftree}
+%\AxiomC{$``fun(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+%\AxiomC{$\{ x : \sigma_x ~ | ~ x \in V(q), ~ q \vdash_{\Sigma} x : \sigma_x \} \vdash_{\Sigma} t : \tau$}
+%\RightLabel{Fun}
+%\BinaryInfC{$\Sigma \vdash fun(p_1, ..., p_n) = t \textrm{ ok}$}
+%\end{prooftree}
+%\caption{Well-typedness judgement for equations}
+%\label{fig:wtjteq}
+%\end{figure}
+
+%
+
 \begin{figure}
 \begin{subfigure}{\textwidth}
-\begin{center}
-\AxiomC{$x = p_i$}
-\AxiomC{$``con(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
-\RightLabel{Con\textsubscript{Var}}
-\BinaryInfC{$con(p_1, ..., p_n) \vdash_{\Sigma} x : \tau_i$}
-\DisplayProof
-\AxiomC{$x \in V(p_i), x \neq p_i$}
-\AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
-\RightLabel{Con\textsubscript{Con}}
-\BinaryInfC{$con(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
-\DisplayProof
-\end{center}
+\begin{prooftree}
+\AxiomC{$`` fun(\tau_1, ..., \tau_n): \tau " \in \Sigma$}
+\AxiomC{$\tau_1 \vdash_{\Sigma} p_1 : \Gamma_1$}
+\AxiomC{...}
+\AxiomC{$\tau_1 \vdash_{\Sigma} p_1 : \Gamma_1$}
+\RightLabel{Fun}
+\QuaternaryInfC{$\Sigma \vdash fun(p_1, ..., p_n) : \tau; \Gamma_1, ..., \Gamma_n$}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\Sigma \vdash q : \sigma; \Gamma$}
+\AxiomC{$`` \sigma.des(\tau_1, ..., \tau_n): \tau " \in \Sigma$}
+\AxiomC{$\tau_1 \vdash_{\Sigma} p_1 : \Gamma_1$}
+\AxiomC{...}
+\AxiomC{$\tau_1 \vdash_{\Sigma} p_1 : \Gamma_1$}
+\RightLabel{Des}
+\QuinaryInfC{$\Sigma \vdash q.des(p_1, ..., p_n) : \tau; \Gamma, \Gamma_1, ..., \Gamma_n$}
+\end{prooftree}
 \caption{Type inference in patterns}
 \label{fig:typeinfjp}
 \end{subfigure}
 ~\\
-~\\
 \begin{subfigure}{\textwidth}
 \begin{prooftree}
-\AxiomC{$x \in V(p_i)$}
-\AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
-\RightLabel{Fun}
-\BinaryInfC{$fun(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
+\AxiomC{}
+\RightLabel{Var}
+\UnaryInfC{$\tau \vdash_{\Sigma} x : x:\tau$}
 \end{prooftree}
 
-\begin{center}
-\AxiomC{$x \in V(p_i)$}
-\AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
-\RightLabel{Des\textsubscript{P}}
-\BinaryInfC{$q.des(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
-\DisplayProof
-\AxiomC{$x \in V(q)$}
-\AxiomC{$q \vdash_{\Sigma} x : \sigma$}
-\RightLabel{Des\textsubscript{Q}}
-\BinaryInfC{$q.des(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
-\DisplayProof
-\end{center}
+\begin{prooftree}
+\AxiomC{$`` con(\tau_1, ..., \tau_n): \tau " \in \Sigma$}
+\AxiomC{$\tau_1 \vdash_{\Sigma} p_1 : \Gamma_1$}
+\AxiomC{...}
+\AxiomC{$\tau_n \vdash_{\Sigma} p_n : \Gamma_n$}
+\RightLabel{Con}
+\QuaternaryInfC{$\tau \vdash_{\Sigma} con(p_1, ..., p_n) : \Gamma_1, ..., \Gamma_n$}
+\end{prooftree}
 \caption{Type inference in copatterns}
 \label{fig:typeinfjq}
 \end{subfigure}
 
 \caption{Type inference judgements}
 \end{figure}
+
+%
+
+%\begin{figure}
+%\begin{subfigure}{\textwidth}
+%\begin{center}
+%\AxiomC{$x = p_i$}
+%\AxiomC{$``con(\tau_1, ..., \tau_n): \tau" \in \Sigma$}
+%\RightLabel{Con\textsubscript{Var}}
+%\BinaryInfC{$con(p_1, ..., p_n) \vdash_{\Sigma} x : \tau_i$}
+%\DisplayProof
+%\AxiomC{$x \in V(p_i), x \neq p_i$}
+%\AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
+%\RightLabel{Con\textsubscript{Con}}
+%\BinaryInfC{$con(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
+%\DisplayProof
+%\end{center}
+%\caption{Type inference in patterns}
+%\label{fig:typeinfjp}
+%\end{subfigure}
+%~\\
+%~\\
+%\begin{subfigure}{\textwidth}
+%\begin{prooftree}
+%\AxiomC{$x \in V(p_i)$}
+%\AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
+%\RightLabel{Fun}
+%\BinaryInfC{$fun(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
+%\end{prooftree}
+%
+%\begin{center}
+%\AxiomC{$x \in V(p_i)$}
+%\AxiomC{$p_i \vdash_{\Sigma} x : \sigma$}
+%\RightLabel{Des\textsubscript{P}}
+%\BinaryInfC{$q.des(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
+%\DisplayProof
+%\AxiomC{$x \in V(q)$}
+%\AxiomC{$q \vdash_{\Sigma} x : \sigma$}
+%\RightLabel{Des\textsubscript{Q}}
+%\BinaryInfC{$q.des(p_1, ..., p_n) \vdash_{\Sigma} x : \sigma$}
+%\DisplayProof
+%\end{center}
+%\caption{Type inference in copatterns}
+%\label{fig:typeinfjq}
+%\end{subfigure}
+
+%\caption{Type inference judgements}
+%\end{figure}
 
 As is the case with the copattern language of Abel et al.\cite{abel13copatterns}, there are two kinds of types in Uroboro. \textit{Positive types}, which are those defined by data type definitions, and \textit{negative types}, which are those defined by codata type definitions. Like Rendel et al. do for their fragments, we give a type judgement for terms, and one to judge whether equations are well-typed.  Like them, we let $\Sigma$ be the signatures of a program, that is, its function signatures, codata signatures, and data signatures, as defined above, and we let $\Gamma$ be a typing context, i.e., a set of type assignments to variables, and write
 \begin{itemize}
@@ -224,7 +288,9 @@ As is the case with the copattern language of Abel et al.\cite{abel13copatterns}
 \end{itemize}
 We give the rules for the type judgement for terms in \autoref{fig:typjterm}, which extend those of the Data and Codata Fragments. In fact, we simply combine the rules of the Data and Codata Fragments.
 
-In \autoref{fig:wtjteq}, we give the rules for the well-typedness judgement for equations, which generalize the rules for the Data and Codata Fragment. We write $V(q)$ to denote the variables occuring in $q$, and we use an auxiliary judgement, presented in \autoref{fig:typeinfjq}: $q \vdash_{\Sigma} x : \sigma$, for $x \in V(q)$,  means that, within copattern $q$, the variable has type $\sigma$ under signature $\Sigma$. To put it another way, this judgement is a type inference for variables. This judgement, in turn, uses an analogous judgement for patterns, presented in \autoref{fig:typeinfjp}.
+%In \autoref{fig:wtjteq}, we give the rules for the well-typedness judgement for equations, which generalize the rules for the Data and Codata Fragment. We write $V(q)$ to denote the variables occuring in $q$, and we use an auxiliary judgement, presented in \autoref{fig:typeinfjq}: $q \vdash_{\Sigma} x : \sigma$, for $x \in V(q)$,  means that, within copattern $q$, the variable has type $\sigma$ under signature $\Sigma$. To put it another way, this judgement is a type inference for variables. This judgement, in turn, uses an analogous judgement for patterns, presented in \autoref{fig:typeinfjp}.
+
+In \autoref{fig:wtjteq}, we give the rules for the well-typedness judgement for equations, which generalize the rules for the Data and Codata Fragment. We use an auxiliary judgement, presented in \autoref{fig:typeinfjq}: $\Sigma \vdash q : \tau; \Gamma$ means that, under signature $\Sigma$, the variables within copattern $q$ have the types assigned to them in $\Gamma$. To put it another way, this judgement is a type inference for variables. This judgement, in turn, uses a type inference judgement for patterns, presented in \autoref{fig:typeinfjp}: $\tau \vdash_{\Sigma} p : \Gamma$ means that, under signature $\Sigma$, when $p$ is assumed to have type $\tau$, the variables within $p$ have the types assigned to them in $\Gamma$.
 
 We say that a program with signatures $\Sigma$ is well-typed when it is $\Sigma \vdash eqn \textrm{ ok}$ for all equations $eqn$ of the program.
 
@@ -484,7 +550,9 @@ If a program $prg$ with signatures $\Sigma$ is well-typed, the following holds f
 \begin{proof}
 From the derivation of $s \longrightarrow_{prg} t$ we know that there is an evaluation context $\mathcal{E}$ and terms $s_0, t_0$ such that $s = \mathcal{E}[s_0], t = \mathcal{E}[t_0]$ and $s_0 \mapsto t_0$. From the derivation of the contraction, we know that $s_0 = q_r[\sigma], t_0 = t_r[\sigma]$ for some equation $r$ of $prg$ and some $\sigma$.  By its derivation, we know that from $\vdash_{\Sigma} s : \tau$ it follows that $\vdash_{\Sigma} s_0 : \tau_0$ for some type $\tau_0$.
 
-Since $r$ is well-typed, it is $\Sigma \vdash q_r = t_r \textrm{ ok}$. From its derivation we know (a) that for each variable $x$ of $q_r$ there exists a $\tau_x$ such that $q_r \vdash_{\Sigma} x : \tau_x$ (type inference in $q_r$) and (b) that $\{ x : \tau_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma} t_r : \tau'$, with $\tau'$ being the return type of the function or destructor that $q_r$ is a call to. Since $s_0 = q_r[\sigma]$, by the derivation of $\vdash_{\Sigma} s_0 : \tau_0$ we know that $\tau' = \tau_0$. By induction on the derivation of $q_r \vdash_{\Sigma} x : \tau_x$ (the type inference for $x$ in $q_r$), using the fact that $\vdash_{\Sigma} q_r[\sigma]: \tau_0$, we can see that, for all variables $x$ of $q_r$, it is $\vdash_{\Sigma} \sigma(x) : \tau_x$. We combine this with $\{ x : \tau_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma} t_r : \tau_0$ to derive $\vdash_{\Sigma} t_r[\sigma] : \tau_0$. Using this, we derive $\vdash_{\Sigma} \mathcal{E}[t_r[\sigma]] : \tau$, which is the desired typing judgement.
+%Since $r$ is well-typed, it is $\Sigma \vdash q_r = t_r \textrm{ ok}$. From the derivation of the well-typedness of $r$ we know (a) that for each variable $x$ of $q_r$ there exists a $\tau_x$ such that $q_r \vdash_{\Sigma} x : \tau_x$ (type inference in $q_r$) and (b) that $\{ x : \tau_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma} t_r : \tau'$, with $\tau'$ being the return type of the function or destructor that $q_r$ is a call to. Since $s_0 = q_r[\sigma]$, by the derivation of $\vdash_{\Sigma} s_0 : \tau_0$ we know that $\tau' = \tau_0$. By induction on the derivation of $q_r \vdash_{\Sigma} x : \tau_x$ (the type inference for $x$ in $q_r$), using the fact that $\vdash_{\Sigma} q_r[\sigma]: \tau_0$, we can see that, for all variables $x$ of $q_r$, it is $\vdash_{\Sigma} \sigma(x) : \tau_x$. We combine this with $\{ x : \tau_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma} t_r : \tau_0$ to derive $\vdash_{\Sigma} t_r[\sigma] : \tau_0$. Using this, we derive $\vdash_{\Sigma} \mathcal{E}[t_r[\sigma]] : \tau$, which is the desired typing judgement.
+
+Since $r$ is well-typed, it is $\Sigma \vdash q_r = t_r \textrm{ ok}$. From the derivation of the well-typedness of $r$ we know that $\Sigma \vdash q_r : \tau', \Gamma$ and $\Gamma \vdash_{\Sigma} t_r : \tau'$ for some typing context $\Gamma$, where $\tau'$ is the return type of the function or destructor that $q_r$ is a call to. Since $s_0 = q_r[\sigma]$, by the derivation of $\vdash_{\Sigma} s_0 : \tau_0$ we know that $\tau' = \tau_0$. By induction on the derivation of $\Sigma \vdash q_r : \tau_0, \Gamma$, using the fact that $\vdash_{\Sigma} q_r[\sigma] : \tau_0$, we can see that, for all variables $x$ of $q_r$, it is $\vdash_{\Sigma} \sigma(x) : \Gamma(x)$. Using this fact, by induction on the derivation of $\Gamma \vdash_{\Sigma} t_r : \tau_0$ we can derive $\vdash_{\Sigma} t_r[\sigma] : \tau_0$. Using this, we derive $\vdash_{\Sigma} \mathcal{E}[t_r[\sigma]] : \tau$, which is the desired typing judgement.
 \end{proof}
 \end{lemma}
 

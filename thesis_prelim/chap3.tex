@@ -465,22 +465,32 @@ By assumption, we know that $\Sigma_{prg} \vdash eqn \textrm{ ok}$. By \autoref{
 \end{lemma}
 
 \begin{lemma}
+\label{lem:wtpeps}
 Assuming that $prg$ is well-typed, the equation $\epsilon$ of $\langle prg \rangle$, as specified in the definition of extractions, is well-typed.
 
 \begin{proof}
-We want to show that $\Sigma \vdash `` q_\epsilon = t_\epsilon " \textrm{ ok}$. By the judgement for well-typedness of equations this means that we have to show the following.
+We want to show that $\Sigma_{\langle prg \rangle} \vdash `` q_\epsilon = t_\epsilon " \textrm{ ok}$. By the judgement for well-typedness of equations this means that we have to show the following.
+%\begin{enumerate}
+%\item $q_\epsilon$ is either a function or destructor call, with the respective function or destructor signature present in $\Sigma_{\langle prg \rangle}$; let the return type given in this signature be $\sigma$.
+%
+%\item For each variable $x$ in $q_\epsilon$ it is $q_\epsilon \vdash_{\Sigma_{\langle prg \rangle}} x : \sigma_x$ for some type $\sigma_x$.
+%
+%\item It is $\{ x : \sigma_x ~ | ~ x \in V(q_\epsilon) \} \vdash_{\Sigma_{\langle prg \rangle}} t_\epsilon : \sigma$.
+%\end{enumerate}
+%The first point is easy to see. Since there is at least one left-hand side $q \in T$ (part of the extraction target) of $prg$, that we know is the result of applying a (co-)substitution to $q_\epsilon$, and $prg$ is well-typed, there must be a signature in $\Sigma_{prg}$ which holds the return type $\sigma$ for the destructor or function call that $q_\epsilon$ is. Consequently, since $\Sigma_{prg} \subseteq \Sigma_{\langle prg \rangle}$, we also have the return type $\sigma$ for the destructor or function call $q_\epsilon$ in the signature set $\Sigma_{\langle prg \rangle}$ of $\langle prg \rangle$.
+%
+%For the second point, again consider an lhs $q \in T$. Because it is possible to infer, using $\Sigma_{prg}$, a type for all variables in $q$, which results from applying a (co-)substitution to $q_\epsilon$, it also is possible to infer a type for all variables in $q_\epsilon$ using $\Sigma_{prg}$, and, by \autoref{fac:wtpfac}, also using $\Sigma_{\langle prg \rangle}$.
+%
+%The third point follows immediately from the definition of the signature of $aux$, as it is $t_\epsilon = aux(x_1, ..., x_n)$, with the $x_i$ being the variables of $q_\epsilon$, and the argument types of $aux$ are defined to be the types inferred for the variables of $q_\epsilon$, and the return type of $aux$ is defined to be the type $\sigma$ inferred for $q_\epsilon$.
+
 \begin{enumerate}
-\item $q_\epsilon$ is either a function or destructor call, with the respective function or destructor signature present in $\Sigma_{\langle prg \rangle}$; let the return type given in this signature be $\sigma$.
+\item $\Sigma_{\langle prg \rangle} \vdash q_\epsilon : \tau, \Gamma$ for some type $\tau$ and some typing context $\Gamma$, and
 
-\item For each variable $x$ in $q_\epsilon$ it is $q_\epsilon \vdash_{\Sigma_{\langle prg \rangle}} x : \sigma_x$ for some type $\sigma_x$.
-
-\item It is $\{ x : \sigma_x ~ | ~ x \in V(q_\epsilon) \} \vdash_{\Sigma_{\langle prg \rangle}} t_\epsilon : \sigma$.
+\item $\Gamma \vdash_{\Sigma} t_\epsilon : \tau$.
 \end{enumerate}
-The first point is easy to see. Since there is at least one left-hand side $q \in T$ (part of the extraction target) of $prg$, that we know is the result of applying a (co-)substitution to $q_\epsilon$, and $prg$ is well-typed, there must be a signature in $\Sigma_{prg}$ which holds the return type $\sigma$ for the destructor or function call that $q_\epsilon$ is. Consequently, since $\Sigma_{prg} \subseteq \Sigma_{\langle prg \rangle}$, we also have the return type $\sigma$ for the destructor or function call $q_\epsilon$ in the signature set $\Sigma_{\langle prg \rangle}$ of $\langle prg \rangle$.
+First, consider the first point. There is at least one left-hand side $q \in T$ (part of the extraction target) of $prg$, that we know is the result of applying a (co-)substitution to $q_\epsilon$. Since $prg$ is well-typed, it is $\Sigma_{prg} \vdash q : \tau'; \Gamma'$, and by \autoref{fac:wtpfac} also $\Sigma_{\langle prg \rangle} \vdash q : \tau'; \Gamma'$. We can rebuild this derivation into a derivation for $\Sigma_{\langle prg \rangle} \vdash q_\epsilon : \tau, \Gamma$. When $q_\epsilon$ results from $q$ by a co-substitution, cut off the ``Des'' steps of the derivation until arriving at the statement concerning $q_\epsilon$. When $q_\epsilon$ results from $q$ by a substitution, we rebuild the derivations of the auxiliary judgements used for type inference of variables in patterns. Replace each such derivation for a statement $\tau \vdash_{\Sigma} p : \Gamma$, that concerns a pattern $p$ in $q$ which is replaced by some variable $x$ in $q_\epsilon$, with a derivation for $\tau \vdash_{\Sigma} x : x:\tau$ by the ``Var'' rule. Then adapt the (typing contexts in the) derivation steps following this accordingly.
 
-For the second point, again consider an lhs $q \in T$. Because it is possible to infer, using $\Sigma_{prg}$, a type for all variables in $q$, which results from applying a (co-)substitution to $q_\epsilon$, it also is possible to infer a type for all variables in $q_\epsilon$ using $\Sigma_{prg}$, and, by \autoref{fac:wtpfac}, also using $\Sigma_{\langle prg \rangle}$.
-
-The third point follows immediately from the definition of the signature of $aux$, as it is $t_\epsilon = aux(x_1, ..., x_n)$, with the $x_i$ being the variables of $q_\epsilon$, and the argument types of $aux$ are defined to be the types inferred for the variables of $q_\epsilon$, and the return type of $aux$ is defined to be the type $\sigma$ inferred for $q_\epsilon$.
+Now, consider the second point. $t_\epsilon$ was defined as $aux(x_1, ..., x_n)$, with the $x_i$ being exactly the variables of $q_\epsilon$. The signature of $aux$ is defined as $`` aux(\tau_1, ..., \tau_n): \tau "$ with $\tau_i$ being precisely defined to be the types inferred for the $x_i$ in $q_\epsilon$, i.e., those that $\Gamma$ assigns to the $x_i$. Thus we can derive $\Gamma \vdash_{\Sigma} t_\epsilon : \tau$ using the ``Var'' rule for these variables, followed by the ``Fun'' rule for $aux$.
 \end{proof}
 \end{lemma}
 
@@ -489,17 +499,33 @@ Assuming that $prg$ is well-typed, the equations $\zeta_r$, as specified in the 
 
 \begin{proof}
 First, note that by definition $aux$ is the function definition that $\zeta_r$ is a part of. We want to show that $\Sigma \vdash `` q_{\zeta_r} = t_{\zeta_r} " \textrm{ ok}$. By the judgement for well-typedness of equations this means that we have to show the following.
+%\begin{enumerate}
+%\item $q_{\zeta_r}$ is either a function or destructor call, with the respective function or destructor signature present in $\Sigma_{\langle prg \rangle}$; let the return type given in this signature be $\sigma$.
+%
+%\item For each variable $x$ in $q_{\zeta_r}$ it is $q_{\zeta_r} \vdash_{\Sigma_{\langle prg \rangle}} x : \sigma_x$ for some type $\sigma_x$.
+%
+%\item It is $\{ x : \sigma_x ~ | ~ x \in V(q_{\zeta_r}) \} \vdash_{\Sigma_{\langle prg \rangle}} t_{\zeta_r} : \sigma$.
+%\end{enumerate}
+%For the first point, we distinguish between the possible forms of $q_{\zeta_r}$. It can either be a function call, then we infer its type as the return type $\sigma$ of $aux$, given in the signature for $aux$, which is present in $\Sigma_{\langle prg \rangle}$. Or it can be a destructor call; by definition, $q_{\zeta_r}$ is the result of a (co-)substitution applied to $t_\epsilon$, and since $q_{\zeta_r}$ contains a destructor call and $t_\epsilon$ doesn't, the destructor must be a part of the co-substitution. Since $q_r \in T$ results from $q_\epsilon$ by applying this co-substitution to it, and $prg$ is well-typed, we know that the respective destructor signature is present in $\Sigma_{prg}$, and thus in $\Sigma_{\langle prg \rangle}$.
+%
+%Concerning the second point, first note that the variables of $q_{\zeta_r}$ are exactly those of $q_r$. The types inferred for the variables in $q_{\zeta_r}$ are identical to the types inferred for them in $q_r$. To see this, combine the facts that the argument types of $aux$ are defined to be the types inferred for the variables of $q_\epsilon$, the return type of $aux$ is defined to be the type inferred for $q_\epsilon$, and that $q_r$ is the result of applying a (co-)substitution to $q_\epsilon$. Thus we know the following. For each variable $x$ of $q_r$ and $q_{\zeta_r}$, let $\sigma_x$ be the type inferred for it in $prg$, i.e., it is $q_r \vdash_{\Sigma_{prg}} x : \sigma_x$. Since the types inferred for the variables in $q_{\zeta_r}$ are identical to the types inferred for them in $q_r$, it also is $q_{\zeta_r} \vdash_{\Sigma_{\langle prg \rangle}} x : \sigma_x$.
+%
+%For the third point, we use the fact that the types inferred for the variables of $q_{\zeta_r}$ and $q_r$ are identical in $prg$ and $\langle prg \rangle$, as established for the second point. Since $prg$ is well-typed, and thus it is $\Sigma_{prg} \vdash `` q_r = t_r " \textrm{ ok}$, it also is $\{ x : \sigma_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma_{prg}} t_r$, and by \autoref{fac:wtpfac} it is $\{ x : \sigma_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma_{\langle prg \rangle}} t_r$.
+
 \begin{enumerate}
-\item $q_{\zeta_r}$ is either a function or destructor call, with the respective function or destructor signature present in $\Sigma_{\langle prg \rangle}$; let the return type given in this signature be $\sigma$.
+\item $\Sigma_{\langle prg \rangle} \vdash q_{\zeta_r} : \tau; \Gamma$ for some type $\tau$ and some typing context $\Gamma$, and
 
-\item For each variable $x$ in $q_{\zeta_r}$ it is $q_{\zeta_r} \vdash_{\Sigma_{\langle prg \rangle}} x : \sigma_x$ for some type $\sigma_x$.
-
-\item It is $\{ x : \sigma_x ~ | ~ x \in V(q_{\zeta_r}) \} \vdash_{\Sigma_{\langle prg \rangle}} t_{\zeta_r} : \sigma$.
+\item $\Gamma \vdash_{\Sigma_{\langle prg \rangle}} t_{\zeta_r} : \tau$.
 \end{enumerate}
-For the first point, we distinguish between the possible forms of $q_{\zeta_r}$. It can either be a function call, then we infer its type as the return type $\sigma$ of $aux$, given in the signature for $aux$, which is present in $\Sigma_{\langle prg \rangle}$. Or it can be a destructor call; by definition, $q_{\zeta_r}$ is the result of a (co-)substitution applied to $t_\epsilon$, and since $q_{\zeta_r}$ contains a destructor call and $t_\epsilon$ doesn't, the destructor must be a part of the co-substitution. Since $q_r \in T$ results from $q_\epsilon$ by applying this co-substitution to it, and $prg$ is well-typed, we know that the respective destructor signature is present in $\Sigma_{prg}$, and thus in $\Sigma_{\langle prg \rangle}$.
+Since $prg$ is well-typed, by the derivation of the well-typedness for $r$ we know that $\Sigma_{prg} \vdash q_r : \tau'; \Gamma'$ for some type $\tau'$ and some typing context $\Gamma'$ with a type assignment for each variable in $q_r$; the same holds for $\Sigma_{\langle prg \rangle}$ by \autoref{fac:wtpfac}. Now, we consider the two points above in turn: We will show that they hold for $\Gamma = \Gamma'$ and $\tau = \tau'$.
 
-Concerning the second point, first note that the variables of $q_{\zeta_r}$ are exactly those of $q_r$. The types inferred for the variables in $q_{\zeta_r}$ are identical to the types inferred for them in $q_r$. To see this, combine the facts that the argument types of $aux$ are defined to be the types inferred for the variables of $q_\epsilon$, the return type of $aux$ is defined to be the type inferred for $q_\epsilon$, and that $q_r$ is the result of applying a (co-)substitution to $q_\epsilon$. Thus we know the following. For each variable $x$ of $q_r$ and $q_{\zeta_r}$, let $\sigma_x$ be the type inferred for it in $prg$, i.e., it is $q_r \vdash_{\Sigma_{prg}} x : \sigma_x$. Since the types inferred for the variables in $q_{\zeta_r}$ are identical to the types inferred for them in $q_r$, it also is $q_{\zeta_r} \vdash_{\Sigma_{\langle prg \rangle}} x : \sigma_x$.
+For the first point, we note that it is $q_{\zeta_r} = \textsf{putback}(t_\epsilon, q_r) = \sigma^{q_r}_\pi(t_\epsilon)$, and we distinguish whether $\sigma^{q_r}_\pi$, from now on shortened to $\sigma$, is a substitution or a co-substitution.
+\begin{itemize}
+\item When $\sigma$ is a substitution, it is $q_{\zeta_r} = aux(\sigma(x_1), ..., \sigma(x_n))$. Since, by definition, $t_\epsilon$ has the same variables as $q_\epsilon$, and it is $\sigma(q_\epsilon) = q_r$, we know that each $\sigma(x_i)$ is a subterm of $q_r$ and that the variables of $q_{\zeta_r}$ are exactly those of $q_r$. From the derivation of $\Sigma_{\langle prg \rangle} \vdash q_r : \tau'; \Gamma'$ we know that it is $\tau_i \vdash_{\Sigma_{\langle prg \rangle}} \sigma(x_i) : \Gamma_i$ for some type $\tau_i$ and some typing context $\Gamma_i$. Each $\tau_i$ is the $i$-th argument type of $aux$ because these argument types were defined to be the types inferred for the variables in $q_\epsilon$ and it is $q_r = \sigma(q_\epsilon)$. Since the variables of $q_{\zeta_r} = \sigma(x_1), ..., \sigma(x_n)$ are exactly those of $q_r$, we know that any variable of $q_r$ is contained in some $\sigma(x_i)$, and thus it must be $\Gamma' = \Gamma_1, ..., \Gamma_n$. The function $aux$ has return type $\tau'$ since its return type is defined to be the return type of whatever function or destructor $q_\epsilon$ is a call to and $q_r = \sigma(q_\epsilon)$ is also a call to this same function or destructor. Apply the ``Fun'' rule for $aux$ on top of the derivations for the $\tau_i \vdash_{\Sigma_{prg}} \sigma(x_i) : \Gamma_i$ to derive $\Sigma_{\langle prg \rangle} \vdash q_{\zeta_r} : \tau'; \Gamma'$.
 
-For the third point, we use the fact that the types inferred for the variables of $q_{\zeta_r}$ and $q_r$ are identical in $prg$ and $\langle prg \rangle$, as established for the second point. Since $prg$ is well-typed, and thus it is $\Sigma_{prg} \vdash `` q_r = t_r " \textrm{ ok}$, it also is $\{ x : \sigma_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma_{prg}} t_r$, and by \autoref{fac:wtpfac} it is $\{ x : \sigma_x ~ | ~ x \in V(q_r) \} \vdash_{\Sigma_{\langle prg \rangle}} t_r$.
+\item When $\sigma$ is a co-substitution, it is $q_{\zeta_r} = aux(x_1, ..., x_n).\overline{des(\overline{p})}$ and $q_r = q_\epsilon.\overline{des(\overline{p})}$. Derive $\Sigma_{\langle prg \rangle} \vdash q_{\zeta_r} : \tau'; \Gamma'$ as follows. Start with the ``Var'' rules for each $x_i$ to derive $\tau_i \vdash_{\Sigma_{\langle prg \rangle}} x_i : x_i:\tau_i$, where $\tau_i$ is the $i$-th argument type of $aux$; note that the argument types of $aux$ were defined to be the types inferred for the variables in $q_\epsilon$ and are thus identical to the types inferred for these variables by $\Sigma_{\langle prg \rangle} \vdash q_r : \tau'; \Gamma'$ (1). Then use the ``Fun'' rule and follow it up with the ``Des'' rule steps at the end of the derivation of $\Sigma_{\langle prg \rangle} \vdash q_r : \tau'; \Gamma'$. This infers the types for the rest of the variables in $q_r$ (i.e., those not in $\{x_1, ..., x_n\}$) identically to $\Sigma_{\langle prg \rangle} \vdash q_r : \tau'; \Gamma'$ (2). Combining (1) and (2) we know that we have derived $\Sigma_{\langle prg \rangle} \vdash q_{\zeta_r} : \tau'; \Gamma'$.
+\end{itemize}
+
+Now, consider the second point. From the derivation of the well-typedness of $r$ we also know that $\Gamma \vdash_{\Sigma_{prg}} t_r : \tau$; by \autoref{fac:wtpfac} it follows that $\Gamma \vdash_{\Sigma_{\langle prg \rangle}} t_r : \tau$. Since $t_{\zeta_r}$ was defined to be $t_r$, we have the desired statement.
 \end{proof}
 \end{lemma}
