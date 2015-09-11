@@ -27,6 +27,7 @@ library
     , UroboroTransformations.CoreDR.MoveCon
     , UroboroTransformations.CoreDR.CoreDefunc
     , UroboroTransformations.CoreDR.CoreRefunc
+    , UroboroTransformations.CoreDR.FragmentTests
   build-depends:     base >= 4.7 && < 4.8, uroboro, transformers, mtl, containers
   default-language:  Haskell2010
 
