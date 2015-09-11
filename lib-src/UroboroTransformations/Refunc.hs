@@ -2,6 +2,8 @@ module UroboroTransformations.Refunc where
 
 import Uroboro.Tree
 
+-- old version
+{-
 import UroboroTransformations.Util.HelperFuns
 import UroboroTransformations.Util.DesExtraction
 
@@ -34,3 +36,15 @@ elimDesFromMixeds pts = uncurry (++) $ first (extractHelperFuns extractAllDesCal
 -- |Refunctionalize an Uroboro program
 refunc :: [PT] -> Maybe [PT]
 refunc pts = EntangledR.refuncLegal $ elimDesFromMixeds pts
+-}
+
+import UroboroTransformations.Unnest.ForRefunc (unnestForRefunc)
+import UroboroTransformations.MoveCon (moveConFront)
+import UroboroTransformations.CoDataDefsDisj.Refunc (refuncLegal)
+
+-- | Refunctionalize an Uroboro program
+refunc :: [PT] -> Maybe [PT]
+refunc pts = do
+    pts' <- unnestForRefunc pts
+    pts'' <- moveConFront pts'
+    refuncLegal pts''
