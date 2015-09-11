@@ -16,14 +16,6 @@ library
     , UroboroTransformations.CoDataFragments
     , UroboroTransformations.CoDataFragments.Defunc
     , UroboroTransformations.CoDataFragments.Refunc
-    , UroboroTransformations.CoDataDefsDisj.FragmentTest
-    , UroboroTransformations.CoDataDefsDisj.Defunc
-    , UroboroTransformations.CoDataDefsDisj.Refunc
-    , UroboroTransformations.FragmentsForDefunc.Entangled.FragmentTest
-    , UroboroTransformations.FragmentsForDefunc.Entangled.Defunc
-    , UroboroTransformations.FragmentsForDefunc.MixedDefs.FragmentTest
-    , UroboroTransformations.FragmentsForDefunc.MixedDefs.Defunc
-    , UroboroTransformations.FragmentsForRefunc.Entangled.Refunc
     , UroboroTransformations.Util
     , UroboroTransformations.Util.HelperFuns
     , UroboroTransformations.Util.DesExtraction

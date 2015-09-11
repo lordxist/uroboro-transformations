@@ -6,7 +6,7 @@ import Uroboro.Tree
 import Uroboro.Error
 import Uroboro.Checker
 
-import UroboroTransformations.CoDataDefsDisj.Defunc
+import UroboroTransformations.CoreDefunc
 
 import System.IO
 import System.Environment
@@ -24,7 +24,7 @@ main = do
         Right pts -> case typecheck pts of
             Left e -> hPutStrLn stderr $ unlines ["Typecheck Error: ", show e]
             Right _p -> do
-                case defuncLegal pts of
+                case defunc pts of
                     Nothing -> hPutStrLn stderr $ "Transform Error: Not in correct Fragment"
                     Just t -> case typecheck t of
                         Left e -> hPutStrLn stderr $ unlines ["Typecheck Error in transformed program: ", show e]
