@@ -17,8 +17,6 @@ library
     , UroboroTransformations.CoDataFragments.Defunc
     , UroboroTransformations.CoDataFragments.Refunc
     , UroboroTransformations.Util
-    , UroboroTransformations.Util.HelperFuns
-    , UroboroTransformations.Util.DesExtraction
     , UroboroTransformations.CopatternCoverage.CCTree
     , UroboroTransformations.Extraction
     , UroboroTransformations.Extraction.DesExtraction
