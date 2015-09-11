@@ -6,7 +6,7 @@ import Uroboro.Tree
 import Uroboro.Error
 import Uroboro.Checker
 
-import UroboroTransformations.CoreDefunc
+import UroboroTransformations.CoreDR.CoreDefunc
 
 import System.IO
 import System.Environment

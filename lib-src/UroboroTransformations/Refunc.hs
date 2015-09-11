@@ -39,8 +39,8 @@ refunc pts = EntangledR.refuncLegal $ elimDesFromMixeds pts
 -}
 
 import UroboroTransformations.Unnest.ForRefunc (unnestForRefunc)
-import UroboroTransformations.MoveCon (moveConFront)
-import qualified UroboroTransformations.CoreRefunc as CoreRefunc (refunc)
+import UroboroTransformations.CoreDR.MoveCon (moveConFront)
+import qualified UroboroTransformations.CoreDR.CoreRefunc as CoreRefunc (refunc)
 
 -- | Refunctionalize an Uroboro program
 refunc :: [PT] -> Maybe [PT]

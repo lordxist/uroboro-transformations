@@ -32,7 +32,7 @@ defunc pts = EntangledD.defuncLegal $ MixedDefsD.desExtract $ elimMultiDes pts
 -}
 
 import UroboroTransformations.Unnest.ForDefunc (unnestForDefunc)
-import qualified UroboroTransformations.CoreDefunc as CoreDefunc (defunc)
+import qualified UroboroTransformations.CoreDR.CoreDefunc as CoreDefunc (defunc)
 
 -- | Defunctionalize an Uroboro program
 defunc :: [PT] -> Maybe [PT]

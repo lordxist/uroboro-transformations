@@ -1,4 +1,4 @@
-module UroboroTransformations.CoreDefunc where
+module UroboroTransformations.CoreDR.CoreDefunc where
 
 import Uroboro.Tree
 

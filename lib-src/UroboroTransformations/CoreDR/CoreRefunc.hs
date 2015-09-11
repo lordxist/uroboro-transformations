@@ -1,4 +1,4 @@
-module UroboroTransformations.CoreRefunc where
+module UroboroTransformations.CoreDR.CoreRefunc where
 
 import Uroboro.Tree
 import Uroboro.Error

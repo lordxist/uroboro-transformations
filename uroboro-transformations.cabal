@@ -24,9 +24,9 @@ library
     , UroboroTransformations.Unnest
     , UroboroTransformations.Unnest.ForDefunc
     , UroboroTransformations.Unnest.ForRefunc
-    , UroboroTransformations.MoveCon
-    , UroboroTransformations.CoreDefunc
-    , UroboroTransformations.CoreRefunc
+    , UroboroTransformations.CoreDR.MoveCon
+    , UroboroTransformations.CoreDR.CoreDefunc
+    , UroboroTransformations.CoreDR.CoreRefunc
   build-depends:     base >= 4.7 && < 4.8, uroboro, transformers, mtl, containers
   default-language:  Haskell2010
 

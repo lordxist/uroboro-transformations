@@ -1,4 +1,4 @@
-module UroboroTransformations.MoveCon (moveConFront) where
+module UroboroTransformations.CoreDR.MoveCon (moveConFront) where
 
 import UroboroTransformations.Extraction
 import UroboroTransformations.Extraction.ConExtraction

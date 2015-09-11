@@ -5,7 +5,7 @@ import Uroboro.Checker
 import Uroboro.Tree
 import Uroboro.Error
 
-import UroboroTransformations.MoveCon
+import UroboroTransformations.CoreDR.MoveCon
 
 import PrettyPrint
 
