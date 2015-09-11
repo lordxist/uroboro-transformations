@@ -16,7 +16,7 @@ illegalRule (PTRule _ (PQDes _ _ pps pq) _) = (any con pps) || (illegalPQ pq)
 
 defuncExp :: PExp -> PExp
 defuncExp v@(PVar _ _) = v
-defuncExp (PApp l id es) = PApp l id (map defuncExp es)
+defuncExp (PApp l id es) = PApp l id (map defuncExp es) -- PApp doesn't distinguish cons and funs
 defuncExp (PDes l id es e) = PApp l id (map defuncExp (e:es))
 
 defuncFunSig :: (Location, Identifier, [Type], Type) -> PTCon
@@ -43,7 +43,10 @@ funForDes :: [PTRule] -> PTDes -> PT
 funForDes rs (PTDes l t id ts t') = PTFun l id (t':ts) t (defuncRules id rs)
 
 -- |Defunctionalize a program in the Codata Fragment
--- Fails when not in the fragment
+-- Fails when not in the fragment, with one exception:
+-- constructors on right-hand sides are allowed.
+-- Such programs don't typecheck, but this exception is
+-- used in CoreDefunc.defunc
 defunc :: [PT] -> Maybe [PT]
 defunc pts = do
     cs <- mapM (defuncDef (funSigs pts)) (filter (not . isFun) pts)
