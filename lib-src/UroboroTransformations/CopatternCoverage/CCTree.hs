@@ -64,7 +64,7 @@ splitVarTPs ((tp@(TPVar t id)):tps) id' p
   | id == id' = do
     ((BetterProgram _ cs _ _ _), n) <- ask
     return ((map (:tps) (map (ptConToTP n) (fromJust (lookup t cs)))), p)
-  | otherwise = liftM (first (liftM (tp:))) (splitVarTPs tps id (nextOnSameLevel p))
+  | otherwise = liftM (first (liftM (tp:))) (splitVarTPs tps id' (nextOnSameLevel p))
 splitVarTPs ((TPCon l cid tps):tps') id p
   | any (containsVarTP id) tps = liftM (first $ liftM ((:tps').(TPCon l cid))) (splitVarTPs tps id (p++[0]))
   | otherwise = liftM (first $ liftM ((TPCon l cid tps):)) (splitVarTPs tps' id (nextOnSameLevel p))
