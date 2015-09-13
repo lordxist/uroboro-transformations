@@ -1,6 +1,7 @@
 module UroboroTransformations.CopatternCoverage.CCTree where
 
 import Control.Arrow
+import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.State.Lazy
 import Data.Maybe
@@ -125,8 +126,16 @@ splittingDepth :: PQ -> Int
 splittingDepth (PQApp _ _ pps) = sum $ map splittingDepthPP pps
 splittingDepth (PQDes _ _ pps pq) = 1 + (sum $ map splittingDepthPP pps) + (splittingDepth pq)
 
+forgetInPP :: PP -> PP
+forgetInPP (PPVar _ _) = PPVar dummyLocation ""
+forgetInPP (PPCon _ id pps) = PPCon dummyLocation id (map forgetInPP pps)
+
+forgetLocationAndVarNames :: PQ -> PQ
+forgetLocationAndVarNames (PQDes _ id pps pq) = PQDes dummyLocation id (map forgetInPP pps) (forgetLocationAndVarNames pq)
+forgetLocationAndVarNames (PQApp _ id pps) = PQApp dummyLocation id (map forgetInPP pps)
+
 instance Ord PQ where
-  pq <= pq' = (splittingDepth pq) <= (splittingDepth pq')
+  (<=) = curry ((uncurry (<=)) . (join (***) (show . forgetLocationAndVarNames)))
 
 toPP :: TP -> PP
 toPP (TPVar _ id) = PPVar dummyLocation id
