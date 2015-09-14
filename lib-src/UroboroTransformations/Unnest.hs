@@ -5,6 +5,7 @@ import UroboroTransformations.Extraction (ExtractionSpec(ExtractionSpec), applyE
 import UroboroTransformations.Extraction.ConExtraction
 import UroboroTransformations.Extraction.DesExtraction
 import UroboroTransformations.Util
+import qualified UroboroTransformations.Util.VariableSchema as Schema
 
 import Uroboro.Tree
 import Uroboro.Checker
@@ -63,6 +64,6 @@ programUnnesting i pts = do
       Right p -> liftM concat $ sequence $ flip evalState pts $ flip runReaderT p $ mapM unnestingInit (filter i pts)
 
 unnestFor :: UnnestPredicate -> [PT] -> Maybe [PT]
-unnestFor i pts = case programUnnesting i pts of
+unnestFor i pts = case programUnnesting i (map Schema.renameVariables pts) of
   Nothing -> Nothing
   Just pts' -> Just $ pts' ++ (filter (not.i) pts)
