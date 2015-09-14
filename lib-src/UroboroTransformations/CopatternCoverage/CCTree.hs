@@ -200,10 +200,11 @@ lowestSubtree :: CCTree TQ -> CCTree TQ
 lowestSubtree t = (lowestSubtrees t Initial) !! 0
 
 lowestSubtreeToLeaf :: [CCTree TQ] -> [CCTree TQ]
+lowestSubtreeToLeaf [] = []
 lowestSubtreeToLeaf ((t@(Leaf _)):ts) = t:(lowestSubtreeToLeaf ts)
 lowestSubtreeToLeaf (t:ts)
   | all isLeaf (children t) = (Leaf (getTQ t)):ts
-  | otherwise = t:(lowestSubtreeToLeaf ts)
+  | otherwise = (cutoffLowestSubtree t):ts
   where
     getTQ (ResSplit tq _) = tq
     getTQ (VarSplit tq _ _) = tq
