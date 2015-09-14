@@ -13,7 +13,7 @@ import Uroboro.Checker
 import Uroboro.Tree
 import Uroboro.Error
 
-import UroboroTransformations.Util (dummyLocation, PathToSubterm, nextOnSameLevel, largestVarIndex, collectVarsTQ, containsVar, containsVarTP, newvarIndex)
+import UroboroTransformations.Util (dummyLocation, PathToSubterm, nextOnSameLevel, largestVarIndex, collectVarsTQ, containsVar, containsVarTP, newvarIndex, forgetLocationAndVarNames)
 
 data CCTree a = VarSplit a PathToSubterm [CCTree a] | ResSplit a [CCTree a] | Leaf a deriving (Show)
 
@@ -125,17 +125,6 @@ splittingDepthPP (PPCon _ _ pps) = 1 + (sum $ map splittingDepthPP pps)
 splittingDepth :: PQ -> Int
 splittingDepth (PQApp _ _ pps) = sum $ map splittingDepthPP pps
 splittingDepth (PQDes _ _ pps pq) = 1 + (sum $ map splittingDepthPP pps) + (splittingDepth pq)
-
-forgetInPP :: PP -> PP
-forgetInPP (PPVar _ _) = PPVar dummyLocation ""
-forgetInPP (PPCon _ id pps) = PPCon dummyLocation id (map forgetInPP pps)
-
-forgetLocationAndVarNames :: PQ -> PQ
-forgetLocationAndVarNames (PQDes _ id pps pq) = PQDes dummyLocation id (map forgetInPP pps) (forgetLocationAndVarNames pq)
-forgetLocationAndVarNames (PQApp _ id pps) = PQApp dummyLocation id (map forgetInPP pps)
-
-instance Ord PQ where
-  (<=) = curry ((uncurry (<=)) . (join (***) (show . forgetLocationAndVarNames)))
 
 toPP :: TP -> PP
 toPP (TPVar _ id) = PPVar dummyLocation id

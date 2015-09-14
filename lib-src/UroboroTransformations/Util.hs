@@ -6,6 +6,9 @@ import Uroboro.Error
 
 import Data.Char
 import Data.List(intercalate, isPrefixOf, maximumBy)
+import Data.Set(fromList)
+import Control.Arrow
+import Control.Monad
 import Control.Monad.State.Lazy
 
 betterTypecheck :: [PT] -> Either Error Program
@@ -34,6 +37,57 @@ instance Eq PExp where
 
 instance Eq PTRule where
   (PTRule _ pq pexp) == (PTRule _ pq' pexp') = (pq == pq') && (pexp == pexp')
+
+instance Eq PTCon where
+  (PTCon _ t id ts) == (PTCon _ t' id' ts') = (t == t') && (id == id') && (ts == ts')
+
+instance Eq PTDes where
+  (PTDes _ t id ts dt) == (PTDes _ t' id' ts' dt') = (t == t') && (id == id') && (ts == ts') && (dt == dt')
+
+-- used for tests
+instance Ord Type where
+  t <= t' = (show t) <= (show t')
+
+-- used for tests
+instance Ord PTCon where
+  (PTCon _ _ id _) <= (PTCon _ _ id' _) = id <= id'
+
+-- used for tests
+instance Ord PTDes where
+  (PTDes _ _ id _ _) <= (PTDes _ _ id' _ _) = id <= id'
+
+instance Eq PT where
+  (PTFun _ id ts t rs) == (PTFun _ id' ts' t' rs') = (id == id') && (ts == ts') && (t == t') && ((fromList rs) == (fromList rs'))
+  (PTPos _ t cs) == (PTPos _ t' cs') = (t == t') && ((fromList cs) == (fromList cs'))
+  (PTNeg _ t ds) == (PTNeg _ t' ds') = (t == t') && ((fromList ds) == (fromList ds'))
+  _ == _ = False
+
+forgetLocationAndVarNames :: PQ -> PQ
+forgetLocationAndVarNames (PQDes _ id pps pq) = PQDes dummyLocation id (map forgetInPP pps) (forgetLocationAndVarNames pq)
+forgetLocationAndVarNames (PQApp _ id pps) = PQApp dummyLocation id (map forgetInPP pps)
+
+forgetInPP :: PP -> PP
+forgetInPP (PPVar _ _) = PPVar dummyLocation ""
+forgetInPP (PPCon _ id pps) = PPCon dummyLocation id (map forgetInPP pps)
+
+instance Ord PQ where
+  (<=) = curry ((uncurry (<=)) . (join (***) (show . forgetLocationAndVarNames)))
+
+-- used for tests
+instance Ord PTRule where
+  (PTRule _ pq _) <= (PTRule _ pq' _) = pq <= pq'
+
+-- used for tests
+instance Ord PT where
+  (PTFun _ id _ _ rs) <= (PTFun _ id' _ _ rs') = id <= id'
+  (PTFun _ id _ _ _) <= (PTPos _ t' _) = id <= (show t')
+  (PTFun _ id _ _ _) <= (PTNeg _ t' _) = id <= (show t')
+  (PTPos _ t _) <= (PTFun _ id' _ _ _) = (show t) <= id'
+  (PTPos _ t _) <= (PTPos _ t' _) = t <= t'
+  (PTPos _ t _) <= (PTNeg _ t' _) = t <= t'
+  (PTNeg _ t _) <= (PTFun _ id' _ _ _) = (show t) <= id'
+  (PTNeg _ t _) <= (PTPos _ t' _) = t <= t'
+  (PTNeg _ t _) <= (PTNeg _ t' _) = t <= t'
 
 rulesForFunDef :: PT -> [PTRule]
 rulesForFunDef (PTFun _ _ _ _ rs) = rs
