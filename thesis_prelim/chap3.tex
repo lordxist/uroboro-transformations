@@ -118,16 +118,17 @@ desExtrPutback cop (Des des _ args) = Des des cop args
 All extraction projections that are the counterparts to cosubstitutions can be defined as a composition of the destructor extraction projection: Simply extract the destructors one after the other.
 
 \subsection{Constructor extraction}
+\label{ssec:conextr}
 
 We define a family $\textsf{ExtractCon}(\ell)$ of extractions of single constructors. The parameter $\ell$ stands for the position of the constructor call to be extracted in the targeted copatterns. We assume that $\ell$ actually points to a constructor call with only variables as arguments. For such a position $\ell$, $\textsf{ExtractCon}(\ell)$ is defined as the $\pi_\ell$-extraction (targeting some $T$) for the extraction projection $\pi_\ell$ defined below.
 
-For a copattern $q$, let $x_q$ be a variable different from all in $q$.
+We assume that, in all copatterns, any variable is named according to its position. This can be  achieved by renaming variables according to a naming schema. For instance, the variables $fun(m, n)$ might be renamed such that the resulting term is $fun(x0, x1)$, where the position of each variable can be identified by its name. This approach is easily extended to destructor copatterns; for constructor calls, the schema needs to be applied recursively. Write $\textsf{name}(\ell)$ for the name given to a variable at position $\ell$ under such a naming schema. Using this, we define $\pi_\ell$ for any copattern $q$ which satisfies our assumptions that (a) $\ell$ points to a constructor call with only variables as arguments and (b) $q$ is named according to the schema used in \textsf{name}.
 \[
-\pi(q) = q[con(\overline{x}) \mapsto x_q]_\ell
+\pi_\ell(q) := q[con(\overline{x}) \mapsto \textsf{name}(\ell)]_\ell
 \]
 The bracket notation means that the replacement occurs at position $\ell$.
 
-We now show why $\pi_\ell$ is an extraction projection, that is, we give, for each $q$, a substitution $\sigma^q_{\pi_\ell}$ such that $\sigma^q_{\pi_\ell}(\pi_\ell(q)) = q$: Set $\sigma^q_{\pi_\ell} := \{x_q \mapsto con(\overline{x})\}$.
+We now show why $\pi_\ell$ is an extraction projection, that is, we give, for each $q$, a substitution $\sigma^q_{\pi_\ell}$ such that $\sigma^q_{\pi_\ell}(\pi_\ell(q)) = q$: Set $\sigma^q_{\pi_\ell} := \{\textsf{name}(\ell) \mapsto con(\overline{x})\}$.
 
 All extraction projections that are the counterparts to substitutions can be defined as a composition of constructor extraction projections: Simply extract the constructors one after the other, from innermost to outermost.
 

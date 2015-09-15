@@ -173,7 +173,7 @@ Now, all lhss of the program are sufficiently simple for refunctionalization, th
 
 \subsubsection{Formal description}
 
-Now, we semi-formally describe the algorithm for $\textsf{Unnest}_i$, adapted from section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro, as lined out above.
+Now, we semi-formally describe the algorithm for $\textsf{Unnest}_i$, adapted from section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro, as lined out above. We assume that all copatterns in the program to be transformed comply with some variable naming schema as described in \autoref{ssec:conextr}; if this is not yet the case, simply rename the variables according to the schema before applying $\textsf{Unnest}_i$.
 
 \begin{algorithm}[$\textsf{Unnest}_i$]
 
@@ -223,14 +223,17 @@ where $\zeta$ is the function in the triple that is \textsf{ExtractCon}(p). It i
 \UnaryInfC{$fun \lhd | ~ Q ~ (q[x \mapsto con(\overline{y^{con}})])_{con \in Cons_\tau}$}
 \end{prooftree}
 
-Let $\ell$ be the position of $x$ in $q$. Apply extraction $\textsf{ExtractCon}(\ell)$ targeting the equations with lhss $q[x := con(\overline{y^{con}})]$, for all $con \in Cons_\tau$ to the original function definition for $fun$. From this we obtain the changed function definition $def'_{fun}$ for $fun$ and the auxiliary function definition. The lhss of $def'_{fun}$ are
-\[
-Q \cup \{ \textsf{get}(q[x \mapsto con(\overline{y^{con}})]) ~ | ~ con \in Cons_\tau \} = Q \cup \{q\},
-\]
+Let $\ell$ be the position of $x$ in $q$. Since we assume that $q$ complies with some variable naming schema as described in \autoref{ssec:conextr}, the name of $x$ is $\textsf{name}(\ell)$, where \textsf{name} is the naming function according to the schema. Apply extraction $\textsf{ExtractCon}(\ell)$ targeting the equations with lhss $q[\textsf{name}(\ell) \mapsto con(\overline{y^{con}})]$, for all $con \in Cons_\tau$ to the original function definition for $fun$. From this we obtain the changed function definition $def'_{fun}$ for $fun$ and the auxiliary function definition. The lhss of $def'_{fun}$ are
+\begin{multline*}
+Q \cup \{ \textsf{get}(q[\textsf{name}(\ell) \mapsto con(\overline{y^{con}})]) ~ | ~ con \in Cons_\tau \} \\
+= Q \cup \{ q[\textsf{name}(\ell) \mapsto con(\overline{y^{con}})][con(\overline{y^{con}}) \mapsto \textsf{name}(\ell)]_\ell \} \\
+= Q \cup \{q\},
+\end{multline*}
 where the pair of \textsf{get} and \textsf{putback} is the lens underlying $\textsf{ExtractCon}(\ell)$. This set of lhss is the same as that in $fun \lhd | ~ Q ~ (q)$ from the derivation step above. The lhss of the auxiliary function definition are
 \begin{multline*}
 \{ q_{\zeta_r} ~ | ~ r \in T \} = \{ \textsf{putback}(\langle \textsf{get}(q_r) \rangle^{aux}, q_r) ~ | ~ r \in T \} \\
-= \{ \sigma^{q_r}_\pi(aux(\langle q \rangle^{vars})) ~ | ~ r \in T \} = \{ aux(\langle q \rangle^{vars})[x \mapsto con(\overline{y^{con}})] ~ | ~ con \in Cons_\tau \}
+= \{ \sigma^{q_r}_\pi(aux(\langle q \rangle^{vars})) ~ | ~ r \in T \} \\
+= \{ aux(\langle q \rangle^{vars})[\textsf{name}(\ell) \mapsto con(\overline{y^{con}})] ~ | ~ con \in Cons_\tau \}
 \end{multline*}
 where $\zeta$ is the function in the triple that is $\textsf{ExtractCon}(\ell)$. It is clear that each $q_{\zeta_r}$ is simple and that $\{ q_{\zeta_r} ~ | ~ r \in T \}$ covers $aux$:
 \begin{prooftree}
