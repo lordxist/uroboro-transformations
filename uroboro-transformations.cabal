@@ -13,12 +13,12 @@ library
       PrettyPrint
     , UroboroTransformations.Defunc
     , UroboroTransformations.Refunc
-    , UroboroTransformations.CoDataFragments
     , UroboroTransformations.CoDataFragments.Defunc
     , UroboroTransformations.CoDataFragments.Refunc
     , UroboroTransformations.Util
     , UroboroTransformations.Util.ForTesting
     , UroboroTransformations.Util.VariableSchema
+    , UroboroTransformations.CopatternCoverage
     , UroboroTransformations.CopatternCoverage.CCTree
     , UroboroTransformations.Extraction
     , UroboroTransformations.Extraction.DesExtraction

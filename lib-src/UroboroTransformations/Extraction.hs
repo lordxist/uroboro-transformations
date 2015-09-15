@@ -1,4 +1,8 @@
-module UroboroTransformations.Extraction where
+module UroboroTransformations.Extraction (
+    ExtractionLens (ExtractionLens, get, putback)
+  , ExtractionSpec (ExtractionSpec, lens, fullProg, target)
+  , applyExtraction
+) where
 
 import Control.Arrow
 import Control.Monad.Reader

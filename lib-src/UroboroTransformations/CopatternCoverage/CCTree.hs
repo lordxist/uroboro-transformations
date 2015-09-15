@@ -1,4 +1,15 @@
-module UroboroTransformations.CopatternCoverage.CCTree where
+module UroboroTransformations.CopatternCoverage.CCTree (
+    CCTree (Leaf, VarSplit, ResSplit)
+  , PTSig
+  , possibleTrees
+  , splittingDepth
+  , lowestSubtree
+  , cutoffLowestSubtree
+  , isSimpleTree
+  , leaves
+  , BetterProgram (ts, cs, ds, fs, rs)
+  , betterProgram
+) where
 
 import Control.Arrow
 import Control.Monad
@@ -13,52 +24,21 @@ import Uroboro.Checker
 import Uroboro.Tree
 import Uroboro.Error
 
-import UroboroTransformations.Util (dummyLocation, PathToSubterm, nextOnSameLevel, largestVarIndex, collectVarsTQ, containsVar, containsVarTP, newvarIndex, forgetLocationAndVarNames)
+import UroboroTransformations.Util
 
 data CCTree a = VarSplit a PathToSubterm [CCTree a] | ResSplit a [CCTree a] | Leaf a deriving (Show)
 
-type PTSig = (Identifier, (Location, [Type], Type))
-
-data BetterProgram = BetterProgram {
-      ts :: [Type]
-    , cs :: [(Type, [PTCon])]
-    , ds :: [(Type, [PTDes])]
-    , fs :: [PTSig]
-    , rs :: Rules
-}
-
-class Typed a where
-  getType :: a -> Type
-
-instance Typed PTCon where
-  getType (PTCon _ t _ _) = t
-
-instance Typed PTDes where
-  getType (PTDes _ _ _ _ t) = t
-
-instance Typed TQ where
-  getType (TQApp t _ _) = t
-  getType (TQDes t _ _ _) = t
-
-hasType :: Typed a => Type -> a -> Bool
-hasType t tpd = t == (getType tpd)
-
-betterProgram :: Program -> BetterProgram
-betterProgram (Program ts cs ds fs rs) = BetterProgram ts (assocWithType cs) (assocWithType ds) fs rs
-  where
-    assocWithType xs = [(t, filter (hasType t) xs) | t <- ts]
-
-convertToVar :: Type -> State Int TP
-convertToVar t = do
+convertToTypedVar :: Type -> State Int TP
+convertToTypedVar t = do
     n <- get
     modify (+1)
     return $ TPVar t ("x"++(show n))
 
 tqForDes :: TQ -> PTDes -> TQ
-tqForDes tq (PTDes l t id ts _) = TQDes t id (evalState (mapM convertToVar ts) (newvarIndex tq)) tq
+tqForDes tq (PTDes l t id ts _) = TQDes t id (evalState (mapM convertToTypedVar ts) (newvarIndex tq)) tq
 
 ptConToTP :: Int -> PTCon -> TP
-ptConToTP n (PTCon _ t id ts) = TPCon t id (evalState (mapM convertToVar ts) n)
+ptConToTP n (PTCon _ t id ts) = TPCon t id (evalState (mapM convertToTypedVar ts) n)
 
 splitVarTPs :: [TP] -> Identifier -> PathToSubterm -> Reader (BetterProgram, Int) ([[TP]], PathToSubterm)
 splitVarTPs ((tp@(TPVar t id)):tps) id' p
@@ -110,7 +90,7 @@ possibleTreesWithRoot d tq = do
     return $ (Leaf tq):((map (ResSplit tq) (sequence trees1))++(concat trees2))
 
 headTQ :: PTSig -> TQ
-headTQ (id, (_, ts, t)) = TQApp t id (evalState (mapM convertToVar ts) 0)
+headTQ (id, (_, ts, t)) = TQApp t id (evalState (mapM convertToTypedVar ts) 0)
 
 possibleTreesBProg :: PTSig -> Int -> Reader BetterProgram [CCTree TQ]
 possibleTreesBProg sig d = possibleTreesWithRoot d (headTQ sig)
@@ -126,47 +106,10 @@ splittingDepth :: PQ -> Int
 splittingDepth (PQApp _ _ pps) = sum $ map splittingDepthPP pps
 splittingDepth (PQDes _ _ pps pq) = 1 + (sum $ map splittingDepthPP pps) + (splittingDepth pq)
 
-toPP :: TP -> PP
-toPP (TPVar _ id) = PPVar dummyLocation id
-toPP (TPCon _ id tps) = PPCon dummyLocation id (map toPP tps)
-
-toPQ :: TQ -> PQ
-toPQ (TQApp _ id tps) = PQApp dummyLocation id (map toPP tps)
-toPQ (TQDes _ id tps tq) = PQDes dummyLocation id (map toPP tps) (toPQ tq)
-
 leaves :: CCTree TQ -> [TQ]
 leaves (Leaf tq) = [tq]
 leaves (ResSplit _ trees) = concatMap leaves trees
 leaves (VarSplit _ _ trees) = concatMap leaves trees
-
-leavesEqualPQs :: [PQ] -> CCTree TQ -> Bool
-leavesEqualPQs pqs tree = (fromList (map toPQ (leaves tree))) == (fromList pqs)
-
-checkCoverage :: PTSig -> PT -> Reader Program (Maybe (CCTree TQ))
-checkCoverage sig (PTFun _ _ _ _ rs) = (liftM $ find (leavesEqualPQs (map lhs rs))) searchSpace
-  where
-    searchSpace = possibleTrees sig (maximum $ map (splittingDepth . lhs) rs)
-
-    lhs (PTRule _ pq _) = pq
-
-fitVariablesTP :: TP -> PP -> TP
-fitVariablesTP (TPVar t _) (PPVar _ id) = TPVar t id
-fitVariablesTP (TPCon t id tps) (PPCon _ _ pps) = TPCon t id (map (uncurry fitVariablesTP) (zip tps pps))
-
-fitVariablesTQ :: TQ -> PQ -> TQ
-fitVariablesTQ (TQDes t id tps tq) (PQDes _ _ pps pq) =
-  TQDes t id (map (uncurry fitVariablesTP) (zip tps pps)) (fitVariablesTQ tq pq)
-fitVariablesTQ (TQApp t id tps) (PQApp _ _ pps) =
-  TQApp t id (map (uncurry fitVariablesTP) (zip tps pps))
-
-zipCoverageRules :: [TQ] -> [PTRule] -> [(PTRule, TQ)]
-zipCoverageRules [] _ = []
-zipCoverageRules (tq:tqs) rs
-    = (fitVariables ((fromJust $ find fitsWithTQ rs),tq)):(zipCoverageRules tqs rs)
-  where
-    fitsWithTQ (PTRule _ pq _) = (toPQ tq) == pq
-
-    fitVariables (r@(PTRule _ pq _), tq) = (r, (fitVariablesTQ tq pq))
 
 data SubtreeMode = Initial | NonInitial
 

@@ -1,4 +1,4 @@
-module UroboroTransformations.Extraction.ConExtraction where
+module UroboroTransformations.Extraction.ConExtraction (conExtractionLens) where
 
 import Control.Monad
 import Control.Monad.Reader

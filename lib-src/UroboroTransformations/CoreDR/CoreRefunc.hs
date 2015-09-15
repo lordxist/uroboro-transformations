@@ -5,7 +5,7 @@ import Uroboro.Error
 
 import qualified UroboroTransformations.CoDataFragments.Refunc as CoDataR
 
-import UroboroTransformations.CoDataFragments
+import UroboroTransformations.Util
 
 hasDestrPattern :: PTRule -> Bool
 hasDestrPattern (PTRule _ (PQDes _ _ _ _) _) = True

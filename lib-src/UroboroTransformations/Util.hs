@@ -11,6 +11,37 @@ import Control.Arrow
 import Control.Monad
 import Control.Monad.State.Lazy
 
+data BetterProgram = BetterProgram {
+      ts :: [Type]
+    , cs :: [(Type, [PTCon])]
+    , ds :: [(Type, [PTDes])]
+    , fs :: [PTSig]
+    , rs :: Rules
+}
+
+class Typed a where
+  getType :: a -> Type
+
+instance Typed PTCon where
+  getType (PTCon _ t _ _) = t
+
+instance Typed PTDes where
+  getType (PTDes _ _ _ _ t) = t
+
+instance Typed TQ where
+  getType (TQApp t _ _) = t
+  getType (TQDes t _ _ _) = t
+
+hasType :: Typed a => Type -> a -> Bool
+hasType t tpd = t == (getType tpd)
+
+betterProgram :: Program -> BetterProgram
+betterProgram (Program ts cs ds fs rs) = BetterProgram ts (assocWithType cs) (assocWithType ds) fs rs
+  where
+    assocWithType xs = [(t, filter (hasType t) xs) | t <- ts]
+
+type PTSig = (Identifier, (Location, [Type], Type))
+
 betterTypecheck :: [PT] -> Either Error Program
 betterTypecheck defs = do
   pre  <- foldM preCheckPT emptyProgram defs
@@ -198,4 +229,22 @@ getDestructorForId id (PTNeg l t ((des@(PTDes _ _ id' _ _)):dess))
         | otherwise = getDestructorForId id (PTNeg l t dess)
 getDestructorForId id _ = []
 
+isFun :: PT -> Bool
+isFun (PTFun _ _ _ _ _) = True
+isFun _ = False
 
+funSigs :: [PT] -> [(Location, Identifier, [Type], Type)]
+funSigs = (map sig) . (filter isFun)
+  where
+    sig (PTFun l id ts t _) = (l, id, ts, t)
+    sig _ = undefined
+
+-- |Retrieves all rules from the parse trees.
+-- |Fails when a rule is illegal according to the supplied predicate.
+funRulesLegal :: [PT] -> (PTRule -> Bool) -> Maybe [[PTRule]]
+funRulesLegal pts ill = (mapM rules (filter isFun pts))
+  where
+    rules (PTFun _ _ _ _ rs)
+        | any ill rs = Nothing
+        | otherwise          = Just rs
+    rules _ = undefined

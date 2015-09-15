@@ -1,4 +1,4 @@
-module UroboroTransformations.Extraction.DesExtraction where
+module UroboroTransformations.Extraction.DesExtraction (desExtractionLens) where
 
 import Uroboro.Tree
 

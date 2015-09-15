@@ -1,11 +1,9 @@
-module UroboroTransformations.CoDataFragments.Defunc where
+module UroboroTransformations.CoDataFragments.Defunc (defunc, defuncExp) where
 
 import Uroboro.Tree
 import Uroboro.Error
 
 import UroboroTransformations.Util
-
-import UroboroTransformations.CoDataFragments
 
 illegalRule :: PTRule -> Bool
 illegalRule (PTRule _ (PQApp l _ _) _) = True
@@ -50,7 +48,7 @@ funForDes rs (PTDes l t id ts t') = PTFun l id (t':ts) t (defuncRules id rs)
 defunc :: [PT] -> Maybe [PT]
 defunc pts = do
     cs <- mapM (defuncDef (funSigs pts)) (filter (not . isFun) pts)
-    rs <- funRules pts illegalRule
+    rs <- funRulesLegal pts illegalRule
     let fs = map (funForDes (concat rs)) (concatMap dess pts)
     return $ cs ++ fs
   where

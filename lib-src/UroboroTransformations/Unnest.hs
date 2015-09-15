@@ -1,5 +1,6 @@
-module UroboroTransformations.Unnest where
+module UroboroTransformations.Unnest (unnestFor) where
 
+import UroboroTransformations.CopatternCoverage
 import UroboroTransformations.CopatternCoverage.CCTree
 import UroboroTransformations.Extraction (ExtractionSpec(ExtractionSpec), applyExtraction)
 import UroboroTransformations.Extraction.ConExtraction

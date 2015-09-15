@@ -8,6 +8,7 @@ import Uroboro.Tree
 import Uroboro.Error
 
 import UroboroTransformations.Util
+import UroboroTransformations.CopatternCoverage
 import UroboroTransformations.CopatternCoverage.CCTree
 
 import System.IO

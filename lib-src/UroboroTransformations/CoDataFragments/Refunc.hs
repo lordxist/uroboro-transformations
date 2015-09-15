@@ -1,9 +1,9 @@
-module UroboroTransformations.CoDataFragments.Refunc where
+module UroboroTransformations.CoDataFragments.Refunc (refunc, refuncExp) where
 
 import Uroboro.Tree
 import Uroboro.Error
 
-import UroboroTransformations.CoDataFragments
+import UroboroTransformations.Util
 
 import Debug.Trace
 
@@ -61,7 +61,7 @@ refunc :: [PT] -> Maybe [PT]
 refunc pts = do
     let fsigs = funSigs pts
     ds <- mapM (refuncDef fsigs) (filter (not . isFun) pts)
-    rs <- funRules pts illegalRule
+    rs <- funRulesLegal pts illegalRule
     let fs = map (funForCon (concat rs) fsigs) (concatMap cons pts)
     return $ ds ++ fs
   where
