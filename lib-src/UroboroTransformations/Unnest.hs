@@ -12,7 +12,9 @@ import Uroboro.Tree
 import Uroboro.Checker
 import Uroboro.Error
 
-import Data.List (deleteBy)
+import Data.Functor.Identity
+import Data.List (deleteBy, partition)
+import qualified Data.Traversable
 import Control.Arrow
 import Control.Monad
 import Control.Monad.Reader
@@ -37,8 +39,8 @@ oneStepUnnesting pt = do
   let spec = extractionSpec lst pts tgt
   return $ applyExtraction spec pt
 
-unnesting :: (PT, [PT]) -> StateT (CCTree TQ) (State [PT]) [PT]
-unnesting (pt, auxs) = do
+unnestingWithCoverage :: (PT, [PT]) -> StateT (CCTree TQ) (State [PT]) [PT]
+unnestingWithCoverage (pt, auxs) = do
     tree <- get
     if isSimpleTree tree
       then return (pt:auxs)
@@ -46,25 +48,20 @@ unnesting (pt, auxs) = do
         (pt', aux) <- oneStepUnnesting pt
         modify cutoffLowestSubtree
         lift $ modify (++[aux])
-        unnesting (pt', (aux:auxs))
+        unnestingWithCoverage (pt', (aux:auxs))
 
 ptToSig :: PT -> PTSig
 ptToSig (PTFun l id ts t rs) = (id, (l, ts, t))
 
-unnestingInit :: PT -> ReaderT Program (State [PT]) (Maybe [PT])
-unnestingInit pt = do
-  prog <- ask
-  case runReader (checkCoverage (ptToSig pt) pt) prog of
-    Nothing -> return Nothing
-    Just c -> lift $ liftM Just $ evalStateT (unnesting (pt, [])) c
-
-programUnnesting :: UnnestPredicate -> [PT] -> Maybe [PT]
-programUnnesting i pts = do
-    case betterTypecheck pts of
-      Left _ -> Nothing
-      Right p -> liftM concat $ sequence $ flip evalState pts $ flip runReaderT p $ mapM unnestingInit (filter i pts)
+unnesting :: Program -> PT -> State [PT] (Maybe [PT])
+unnesting prog pt = Data.Traversable.sequence $ do
+  c <- runReader (checkCoverage (ptToSig pt) pt) prog
+  return $ evalStateT (unnestingWithCoverage (pt, [])) c
 
 unnestFor :: UnnestPredicate -> [PT] -> Maybe [PT]
-unnestFor i pts = case programUnnesting i (map Schema.renameVariables pts) of
-  Nothing -> Nothing
-  Just pts' -> Just $ pts' ++ (filter (not.i) pts)
+unnestFor i pts = do
+  p <- hush $ betterTypecheck pts
+  let (ptsI, ptsNotI) = partition i pts
+  let ptsI' = map Schema.renameVariables ptsI
+  ptsI'' <- liftM concat $ sequence $ flip evalState pts $ mapM (unnesting p) ptsI'
+  return $ ptsI'' ++ ptsNotI

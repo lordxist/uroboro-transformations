@@ -48,6 +48,11 @@ betterTypecheck defs = do
   prog <- foldM postCheckPT pre defs
   return prog
 
+-- | Suppress the 'Left' value of an 'Either'
+-- | Stolen from Control.Error.Util (errors-2.0.0)
+hush :: Either a b -> Maybe b
+hush = either (const Nothing) Just
+
 type PathToSubterm = [Int]
 
 instance Eq PP where
