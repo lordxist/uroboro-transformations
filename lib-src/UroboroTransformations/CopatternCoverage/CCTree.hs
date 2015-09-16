@@ -27,7 +27,7 @@ import Uroboro.Error
 import UroboroTransformations.Util
 import UroboroTransformations.Util.Typed
 
-data CCTree a = VarSplit a PathToSubterm [CCTree a] | ResSplit a [CCTree a] | Leaf a deriving (Show)
+data CCTree = VarSplit TQ PathToSubterm [CCTree] | ResSplit TQ [CCTree] | Leaf TQ deriving (Show)
 
 convertToTypedVar :: Type -> State Int TP
 convertToTypedVar t = do
@@ -76,12 +76,12 @@ splitRes tq = do
     BetterProgram _ _ ds _ _ <- ask
     return $ map (tqForDes tq) (fromJust (lookup (getType tq) ds))
 
-possibleVarSplitTrees :: Int -> TQ -> ([TQ], PathToSubterm) -> Reader BetterProgram [CCTree TQ]
+possibleVarSplitTrees :: Int -> TQ -> ([TQ], PathToSubterm) -> Reader BetterProgram [CCTree]
 possibleVarSplitTrees d tq (tqs, p) = do
     trees <- mapM (possibleTreesWithRoot (d-1)) tqs
     return $ map (VarSplit tq p) (sequence trees)
 
-possibleTreesWithRoot :: Int -> TQ -> Reader BetterProgram [CCTree TQ]
+possibleTreesWithRoot :: Int -> TQ -> Reader BetterProgram [CCTree]
 possibleTreesWithRoot 0 tq = return [Leaf tq]
 possibleTreesWithRoot d tq = do
     tqs1 <- splitRes tq
@@ -93,10 +93,10 @@ possibleTreesWithRoot d tq = do
 headTQ :: PTSig -> TQ
 headTQ (id, (_, ts, t)) = TQApp t id (evalState (mapM convertToTypedVar ts) 0)
 
-possibleTreesBProg :: PTSig -> Int -> Reader BetterProgram [CCTree TQ]
+possibleTreesBProg :: PTSig -> Int -> Reader BetterProgram [CCTree]
 possibleTreesBProg sig d = possibleTreesWithRoot d (headTQ sig)
 
-possibleTrees :: PTSig -> Int -> Reader Program [CCTree TQ]
+possibleTrees :: PTSig -> Int -> Reader Program [CCTree]
 possibleTrees sig d = withReader betterProgram (possibleTreesBProg sig d)
 
 splittingDepthPP :: PP -> Int
@@ -107,32 +107,32 @@ splittingDepth :: PQ -> Int
 splittingDepth (PQApp _ _ pps) = sum $ map splittingDepthPP pps
 splittingDepth (PQDes _ _ pps pq) = 1 + (sum $ map splittingDepthPP pps) + (splittingDepth pq)
 
-leaves :: CCTree TQ -> [TQ]
+leaves :: CCTree -> [TQ]
 leaves (Leaf tq) = [tq]
 leaves (ResSplit _ trees) = concatMap leaves trees
 leaves (VarSplit _ _ trees) = concatMap leaves trees
 
 data SubtreeMode = Initial | NonInitial
 
-isLeaf :: CCTree TQ -> Bool
+isLeaf :: CCTree -> Bool
 isLeaf (Leaf _) = True
 isLeaf _ = False
 
-children :: CCTree TQ -> [CCTree TQ]
+children :: CCTree -> [CCTree]
 children (ResSplit _ ts) = ts
 children (VarSplit _ _ ts) = ts
 
-lowestSubtrees :: CCTree TQ -> SubtreeMode -> [CCTree TQ]
+lowestSubtrees :: CCTree -> SubtreeMode -> [CCTree]
 lowestSubtrees t@(Leaf tq) Initial = [t]
 lowestSubtrees (Leaf _) NonInitial = []
 lowestSubtrees t _
   | all isLeaf (children t) = [t]
   | otherwise = concatMap (flip lowestSubtrees NonInitial) (children t)
 
-lowestSubtree :: CCTree TQ -> CCTree TQ
+lowestSubtree :: CCTree -> CCTree
 lowestSubtree t = (lowestSubtrees t Initial) !! 0
 
-lowestSubtreeToLeaf :: [CCTree TQ] -> [CCTree TQ]
+lowestSubtreeToLeaf :: [CCTree] -> [CCTree]
 lowestSubtreeToLeaf [] = []
 lowestSubtreeToLeaf ((t@(Leaf _)):ts) = t:(lowestSubtreeToLeaf ts)
 lowestSubtreeToLeaf (t:ts)
@@ -142,7 +142,7 @@ lowestSubtreeToLeaf (t:ts)
     getTQ (ResSplit tq _) = tq
     getTQ (VarSplit tq _ _) = tq
 
-cutoffLowestSubtree :: CCTree TQ -> CCTree TQ
+cutoffLowestSubtree :: CCTree -> CCTree
 cutoffLowestSubtree (ResSplit tq ts)
   | all isLeaf ts = Leaf tq
   | otherwise = ResSplit tq (lowestSubtreeToLeaf ts)
@@ -150,7 +150,7 @@ cutoffLowestSubtree (VarSplit tq p ts)
   | all isLeaf ts = Leaf tq
   | otherwise = VarSplit tq p (lowestSubtreeToLeaf ts)
 
-isSimpleTree :: CCTree TQ -> Bool
+isSimpleTree :: CCTree -> Bool
 isSimpleTree (Leaf _) = True
 isSimpleTree (ResSplit _ ts) = all isLeaf ts
 isSimpleTree (VarSplit _ _ ts) = all isLeaf ts

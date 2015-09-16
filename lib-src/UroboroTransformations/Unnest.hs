@@ -26,11 +26,11 @@ import Debug.Trace
 
 type UnnestPredicate = PT -> Bool
 
-extractionSpec :: CCTree TQ -> [PT] -> [(PTRule, TQ)] -> ExtractionSpec
+extractionSpec :: CCTree -> [PT] -> [(PTRule, TQ)] -> ExtractionSpec
 extractionSpec (ResSplit _ _) = ExtractionSpec desExtractionLens
 extractionSpec (VarSplit _ p _) = ExtractionSpec $ conExtractionLens p
 
-oneStepUnnesting :: PT -> ReaderT [PT] (StateT (CCTree TQ) (State [PT])) (PT, PT)
+oneStepUnnesting :: PT -> ReaderT [PT] (StateT CCTree (State [PT])) (PT, PT)
 oneStepUnnesting pt = do
   pts <- ask
   tree <- lift get
@@ -40,7 +40,7 @@ oneStepUnnesting pt = do
   let spec = extractionSpec lst (pts++auxs) tgt
   return $ applyExtraction spec pt
 
-unnestingWithCoverage :: PT -> ReaderT [PT] (StateT (CCTree TQ) (State [PT])) PT
+unnestingWithCoverage :: PT -> ReaderT [PT] (StateT CCTree (State [PT])) PT
 unnestingWithCoverage pt = do
   tree <- get
   if isSimpleTree tree

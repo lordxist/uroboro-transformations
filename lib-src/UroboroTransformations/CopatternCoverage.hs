@@ -22,10 +22,10 @@ toPQ :: TQ -> PQ
 toPQ (TQApp _ id tps) = PQApp dummyLocation id (map toPP tps)
 toPQ (TQDes _ id tps tq) = PQDes dummyLocation id (map toPP tps) (toPQ tq)
 
-leavesEqualPQs :: [PQ] -> CCTree TQ -> Bool
+leavesEqualPQs :: [PQ] -> CCTree -> Bool
 leavesEqualPQs pqs tree = (fromList (map toPQ (leaves tree))) == (fromList pqs)
 
-checkCoverage :: PTSig -> PT -> Reader Program (Maybe (CCTree TQ))
+checkCoverage :: PTSig -> PT -> Reader Program (Maybe CCTree)
 checkCoverage sig (PTFun _ _ _ _ rs) = (liftM $ find (leavesEqualPQs (map lhs rs))) searchSpace
   where
     searchSpace = possibleTrees sig (maximum $ map (splittingDepth . lhs) rs)
