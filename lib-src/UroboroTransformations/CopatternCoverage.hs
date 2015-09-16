@@ -13,17 +13,10 @@ import Uroboro.Checker
 
 import UroboroTransformations.CopatternCoverage.CCTree
 import UroboroTransformations.Util
-
-toPP :: TP -> PP
-toPP (TPVar _ id) = PPVar dummyLocation id
-toPP (TPCon _ id tps) = PPCon dummyLocation id (map toPP tps)
-
-toPQ :: TQ -> PQ
-toPQ (TQApp _ id tps) = PQApp dummyLocation id (map toPP tps)
-toPQ (TQDes _ id tps tq) = PQDes dummyLocation id (map toPP tps) (toPQ tq)
+import UroboroTransformations.Util.Conversion
 
 leavesEqualPQs :: [PQ] -> CCTree -> Bool
-leavesEqualPQs pqs tree = (fromList (map toPQ (leaves tree))) == (fromList pqs)
+leavesEqualPQs pqs tree = (fromList (map tqToPQ (leaves tree))) == (fromList pqs)
 
 checkCoverage :: PTSig -> PT -> Reader Program (Maybe CCTree)
 checkCoverage sig (PTFun _ _ _ _ rs) = (liftM $ find (leavesEqualPQs (map lhs rs))) searchSpace
@@ -47,6 +40,6 @@ zipCoverageRules [] _ = []
 zipCoverageRules (tq:tqs) rs
     = (fitVariables ((fromJust $ find fitsWithTQ rs),tq)):(zipCoverageRules tqs rs)
   where
-    fitsWithTQ (PTRule _ pq _) = (toPQ tq) == pq
+    fitsWithTQ (PTRule _ pq _) = (tqToPQ tq) == pq
 
     fitVariables (r@(PTRule _ pq _), tq) = (r, (fitVariablesTQ tq pq))
