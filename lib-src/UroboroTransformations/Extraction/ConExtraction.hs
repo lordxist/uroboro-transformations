@@ -11,7 +11,7 @@ import UroboroTransformations.Extraction
 
 extractionProjectionTP :: PathToSubterm -> TP -> Reader PathToSubterm TP
 extractionProjectionTP _ (TPVar _ _) = undefined
-extractionProjectionTP [] (TPCon t id tps) = reader $ (TPVar t).("x"++).nameForPath
+extractionProjectionTP [] (TPCon t id tps) = reader $ (TPVar t).varNameForPath
 extractionProjectionTP p@(_:_) (TPCon t id tps) = (liftM $ TPCon t id) (extractionProjectionTPs p tps)
 
 extractionProjectionTPs :: PathToSubterm -> [TP] -> Reader PathToSubterm [TP]
@@ -39,15 +39,15 @@ walkToConstructor (n:p) (TQApp t id tps) = walkToConstructorTP p (tps !! n)
 
 putbackTP :: PathToSubterm -> TQ -> TP -> TP
 putbackTP p tq tpcon@(TPCon t id tps)
-  | any (containsVarTP ("x"++(nameForPath p))) tps = TPCon t id (map (putbackTP p tq) tps)
+  | any (containsVarTP (varNameForPath p)) tps = TPCon t id (map (putbackTP p tq) tps)
   | otherwise = tpcon
 putbackTP p tq tpvar@(TPVar t id)
-  | id == ("x"++(nameForPath p)) = walkToConstructor p tq
+  | id == (varNameForPath p) = walkToConstructor p tq
   | otherwise = tpvar
 
 conExtractionLensPutback :: PathToSubterm -> TQ -> TQ -> TQ
 conExtractionLensPutback p tq (TQDes t id tps tq')
-  | containsVar tq' ("x"++(nameForPath p)) = TQDes t id tps (conExtractionLensPutback p tq tq')
+  | containsVar tq' (varNameForPath p) = TQDes t id tps (conExtractionLensPutback p tq tq')
   | otherwise = TQDes t id (map (putbackTP p tq) tps) tq'
 conExtractionLensPutback p tq (TQApp t id tps) = TQApp t id (map (putbackTP p tq) tps)
 

@@ -1,4 +1,4 @@
-module UroboroTransformations.Util.VariableSchema (nameForPath, renameVariables) where
+module UroboroTransformations.Util.VariableSchema (varNameForPath, renameVariables) where
 
 import Uroboro.Tree
 
@@ -13,8 +13,11 @@ nameForPath (n:p)
   | otherwise = (show n) ++ "_" ++ (nameForPath p)
 nameForPath [] = error "empty path"
 
+varNameForPath :: PathToSubterm -> String
+varNameForPath = ("x"++) . nameForPath
+
 varMapPP :: PathToSubterm -> (Int, PP) -> [(Identifier, Identifier)]
-varMapPP p (i, (PPVar l id)) = [(id, ("x" ++ (nameForPath (p++[i]))))]
+varMapPP p (i, (PPVar l id)) = [(id, (varNameForPath (p++[i])))]
 varMapPP p (i, (PPCon l id pps)) = concatMap (varMapPP (p++[i])) (zip [0..] pps)
 
 varMap :: PathToSubterm -> PQ -> [(Identifier, Identifier)]
