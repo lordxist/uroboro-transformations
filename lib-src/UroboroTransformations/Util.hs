@@ -11,6 +11,8 @@ import Control.Arrow
 import Control.Monad
 import Control.Monad.State.Lazy
 
+import UroboroTransformations.Util.Typed
+
 data BetterProgram = BetterProgram {
       ts :: [Type]
     , cs :: [(Type, [PTCon])]
@@ -18,22 +20,6 @@ data BetterProgram = BetterProgram {
     , fs :: [PTSig]
     , rs :: Rules
 }
-
-class Typed a where
-  getType :: a -> Type
-
-instance Typed PTCon where
-  getType (PTCon _ t _ _) = t
-
-instance Typed PTDes where
-  getType (PTDes _ _ _ _ t) = t
-
-instance Typed TQ where
-  getType (TQApp t _ _) = t
-  getType (TQDes t _ _ _) = t
-
-hasType :: Typed a => Type -> a -> Bool
-hasType t tpd = t == (getType tpd)
 
 betterProgram :: Program -> BetterProgram
 betterProgram (Program ts cs ds fs rs) = BetterProgram ts (assocWithType cs) (assocWithType ds) fs rs

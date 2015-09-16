@@ -16,6 +16,7 @@ import Uroboro.Tree
 import Uroboro.Error
 
 import UroboroTransformations.Util
+import UroboroTransformations.Util.Typed
 
 data ExtractionLens = ExtractionLens {
       get     :: TQ -> TQ

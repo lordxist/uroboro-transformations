@@ -18,6 +18,7 @@ library
     , UroboroTransformations.Util
     , UroboroTransformations.Util.ForTesting
     , UroboroTransformations.Util.VariableSchema
+    , UroboroTransformations.Util.Typed
     , UroboroTransformations.CopatternCoverage
     , UroboroTransformations.CopatternCoverage.CCTree
     , UroboroTransformations.Extraction
