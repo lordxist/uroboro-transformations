@@ -20,6 +20,7 @@ library
     , UroboroTransformations.Util.VariableSchema
     , UroboroTransformations.Util.Typed
     , UroboroTransformations.Util.Conversion
+    , UroboroTransformations.Util.Equality
     , UroboroTransformations.CopatternCoverage
     , UroboroTransformations.CopatternCoverage.CCTree
     , UroboroTransformations.Extraction
