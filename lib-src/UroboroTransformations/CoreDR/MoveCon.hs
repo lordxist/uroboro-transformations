@@ -3,6 +3,7 @@ module UroboroTransformations.CoreDR.MoveCon (moveConFront) where
 import UroboroTransformations.Extraction
 import UroboroTransformations.Extraction.ConExtraction
 import UroboroTransformations.Util
+import UroboroTransformations.Util.UroboroEnhanced
 
 import Uroboro.Checker
 import Uroboro.Tree

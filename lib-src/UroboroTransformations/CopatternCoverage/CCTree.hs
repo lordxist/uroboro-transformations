@@ -26,6 +26,7 @@ import Uroboro.Error
 
 import UroboroTransformations.Util
 import UroboroTransformations.Util.Typed
+import UroboroTransformations.Util.UroboroEnhanced
 
 data CCTree = VarSplit TQ PathToSubterm [CCTree] | ResSplit TQ [CCTree] | Leaf TQ deriving (Show)
 

@@ -6,6 +6,7 @@ import UroboroTransformations.Extraction (ExtractionSpec(ExtractionSpec), applyE
 import UroboroTransformations.Extraction.ConExtraction
 import UroboroTransformations.Extraction.DesExtraction
 import UroboroTransformations.Util
+import UroboroTransformations.Util.UroboroEnhanced
 import qualified UroboroTransformations.Util.VariableSchema as Schema
 
 import Uroboro.Tree

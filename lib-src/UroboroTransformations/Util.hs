@@ -14,27 +14,6 @@ import Control.Monad.State.Lazy
 import UroboroTransformations.Util.Typed
 import UroboroTransformations.Util.Equality
 
-data BetterProgram = BetterProgram {
-      ts :: [Type]
-    , cs :: [(Type, [PTCon])]
-    , ds :: [(Type, [PTDes])]
-    , fs :: [PTSig]
-    , rs :: Rules
-}
-
-betterProgram :: Program -> BetterProgram
-betterProgram (Program ts cs ds fs rs) = BetterProgram ts (assocWithType cs) (assocWithType ds) fs rs
-  where
-    assocWithType xs = [(t, filter (hasType t) xs) | t <- ts]
-
-type PTSig = (Identifier, (Location, [Type], Type))
-
-betterTypecheck :: [PT] -> Either Error Program
-betterTypecheck defs = do
-  pre  <- foldM preCheckPT emptyProgram defs
-  prog <- foldM postCheckPT pre defs
-  return prog
-
 -- | Suppress the 'Left' value of an 'Either'
 -- | Stolen from Control.Error.Util (errors-2.0.0)
 hush :: Either a b -> Maybe b

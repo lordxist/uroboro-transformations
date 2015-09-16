@@ -21,6 +21,7 @@ library
     , UroboroTransformations.Util.Typed
     , UroboroTransformations.Util.Conversion
     , UroboroTransformations.Util.Equality
+    , UroboroTransformations.Util.UroboroEnhanced
     , UroboroTransformations.CopatternCoverage
     , UroboroTransformations.CopatternCoverage.CCTree
     , UroboroTransformations.Extraction
