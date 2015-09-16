@@ -6,5 +6,6 @@ data T where
 function f(T) : T where
   f(a(a(x))) = f(x)
   f(a(b(y))) = a(b(f(y)))
+  f(a(c())) = a(c())
   f(b(z)) = b(f(z))
   f(c()) = c()
