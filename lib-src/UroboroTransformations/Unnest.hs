@@ -30,38 +30,41 @@ extractionSpec :: CCTree TQ -> [PT] -> [(PTRule, TQ)] -> ExtractionSpec
 extractionSpec (ResSplit _ _) = ExtractionSpec desExtractionLens
 extractionSpec (VarSplit _ p _) = ExtractionSpec $ conExtractionLens p
 
-oneStepUnnesting :: PT -> StateT (CCTree TQ) (State [PT]) (PT, PT) 
+oneStepUnnesting :: PT -> ReaderT [PT] (StateT (CCTree TQ) (State [PT])) (PT, PT)
 oneStepUnnesting pt = do
-  tree <- get
-  pts <- lift get
+  pts <- ask
+  tree <- lift get
+  auxs <- lift $ lift get
   let lst = lowestSubtree tree
   let tgt = zipCoverageRules (leaves lst) (rulesForFunDef pt)
-  let spec = extractionSpec lst pts tgt
+  let spec = extractionSpec lst (pts++auxs) tgt
   return $ applyExtraction spec pt
 
-unnestingWithCoverage :: (PT, [PT]) -> StateT (CCTree TQ) (State [PT]) [PT]
-unnestingWithCoverage (pt, auxs) = do
-    tree <- get
-    if isSimpleTree tree
-      then return (pt:auxs)
-      else do
-        (pt', aux) <- oneStepUnnesting pt
-        modify cutoffLowestSubtree
-        lift $ modify (++[aux])
-        unnestingWithCoverage (pt', (aux:auxs))
+unnestingWithCoverage :: PT -> ReaderT [PT] (StateT (CCTree TQ) (State [PT])) PT
+unnestingWithCoverage pt = do
+  tree <- get
+  if isSimpleTree tree
+    then return pt
+    else do
+      (pt', aux) <- oneStepUnnesting pt
+      lift $ modify cutoffLowestSubtree
+      lift $ lift $ modify (++[aux])
+      unnestingWithCoverage pt'
 
 ptToSig :: PT -> PTSig
 ptToSig (PTFun l id ts t rs) = (id, (l, ts, t))
 
-unnesting :: Program -> PT -> State [PT] (Maybe [PT])
-unnesting prog pt = Data.Traversable.sequence $ do
-  c <- runReader (checkCoverage (ptToSig pt) pt) prog
-  return $ evalStateT (unnestingWithCoverage (pt, [])) c
+unnesting :: Program -> [PT] -> PT -> State [PT] (Maybe PT)
+unnesting prog pts pt = Data.Traversable.sequence $ do
+    c <- runReader (checkCoverage (ptToSig pt) pt) prog
+    return $ evalStateT (flip runReaderT pts $ unnestingWithCoverage pt) c
 
 unnestFor :: UnnestPredicate -> [PT] -> Maybe [PT]
 unnestFor i pts = do
   p <- hush $ betterTypecheck pts
   let (ptsI, ptsNotI) = partition i pts
   let ptsI' = map Schema.renameVariables ptsI
-  ptsI'' <- liftM concat $ sequence $ flip evalState pts $ mapM (unnesting p) ptsI'
-  return $ ptsI'' ++ ptsNotI
+  let u = mapM (unnesting p pts) ptsI'
+  ptsI'' <- sequence $ flip evalState [] u
+  let auxs = execState u []
+  return $ ptsI'' ++ auxs ++ ptsNotI
