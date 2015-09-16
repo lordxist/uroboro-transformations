@@ -17,6 +17,7 @@ import Uroboro.Error
 
 import UroboroTransformations.Util
 import UroboroTransformations.Util.Typed
+import UroboroTransformations.Util.Conversion
 
 data ExtractionLens = ExtractionLens {
       get     :: TQ -> TQ
@@ -35,9 +36,7 @@ auxName = do
   return $ autogen "aux" prog
 
 auxify :: TQ -> Reader ExtractionSpec TExp
-auxify tq = liftM (flip (TApp (getType tq)) (map tpToTExp (collectVarsTQ tq))) auxName
-  where
-    tpToTExp (TPVar t id) = TVar t id
+auxify tq = liftM (flip (TApp (getType tq)) (map tpToTExp (collectVarsTQ tq))) auxName    
 
 epsilonLhs :: Reader ExtractionSpec TQ
 epsilonLhs = do
@@ -46,15 +45,7 @@ epsilonLhs = do
     return $ (get lens) tq
 
 epsilonRhs :: Reader ExtractionSpec TExp
-epsilonRhs = epsilonLhs >>= auxify
-
-tpToPP :: TP -> PP
-tpToPP (TPVar t id) = PPVar dummyLocation id
-tpToPP (TPCon t id tps) = PPCon dummyLocation id (map tpToPP tps)
-
-tqToPQ :: TQ -> PQ
-tqToPQ (TQApp t id tps) = PQApp dummyLocation id (map tpToPP tps)
-tqToPQ (TQDes t id tps tq) = PQDes dummyLocation id (map tpToPP tps) (tqToPQ tq)    
+epsilonRhs = epsilonLhs >>= auxify   
 
 extractEpsilon :: Reader ExtractionSpec PTRule
 extractEpsilon = do
@@ -62,11 +53,6 @@ extractEpsilon = do
     lhs <- epsilonLhs
     rhs <- epsilonRhs
     return $ PTRule l (tqToPQ lhs) (tExpToPExp rhs)
-  where
-    tExpToPExp (TApp t id tExps) = PApp dummyLocation id (map tExpToPExp tExps)
-    tExpToPExp (TDes t id tExps tExp) = PDes dummyLocation id (map tExpToPExp tExps) (tExpToPExp tExp)
-    tExpToPExp (TVar t id) = PVar dummyLocation id
-    tExpToPExp (TCon t id tExps) = PApp dummyLocation id (map tExpToPExp tExps)
 
 extractZetaRules :: Reader ExtractionSpec [PTRule]
 extractZetaRules = do
@@ -75,12 +61,6 @@ extractZetaRules = do
     return $ map (replacePQ . (second (tqToPQ . ((flip $ putback lens) (tExpToTQ lhs))))) target
   where
     replacePQ ((PTRule l  _ pexp), pq) = PTRule l pq pexp
-
-    tExpToTQ (TApp t id tExps) = TQApp t id (map tExpToTP tExps)
-    tExpToTQ (TDes t id tExps tExp) = TQDes t id (map tExpToTP tExps) (tExpToTQ tExp)
-
-    tExpToTP (TVar t id) = TPVar t id
-    tExpToTP (TCon t id tExps) = TPCon t id (map tExpToTP tExps)
 
 extractZetaSig :: Reader ExtractionSpec ([PTRule] -> PT)
 extractZetaSig = do
