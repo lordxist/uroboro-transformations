@@ -66,13 +66,9 @@ extractZetaSig :: Reader ExtractionSpec ([PTRule] -> PT)
 extractZetaSig = do
     texp <- epsilonRhs
     id <- auxName
-    return $ PTFun dummyLocation id (argTs texp) (resT texp)
+    return $ PTFun dummyLocation id (argTs texp) (getType texp)
   where
-    argTs (TApp _ _ texps) = map varT texps
-
-    varT (TVar t _) = t
-
-    resT (TApp t _ _) = t
+    argTs (TApp _ _ texps) = map getType texps
 
 extractZeta :: Reader ExtractionSpec PT
 extractZeta = do
