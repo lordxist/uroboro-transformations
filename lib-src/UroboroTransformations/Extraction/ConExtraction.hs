@@ -5,7 +5,7 @@ import Control.Monad.Reader
 
 import Uroboro.Tree
 
-import UroboroTransformations.Util (PathToSubterm, largestVarIndex, tqVarIds, containsVar, containsVarTP, newvarIndex)
+import UroboroTransformations.Util
 import UroboroTransformations.Util.VariableSchema
 import UroboroTransformations.Extraction
 
