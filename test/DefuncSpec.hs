@@ -119,6 +119,81 @@ function des2(N): N where
 
 |]
 
+fibonacci :: String
+fibonacci = [str|
+-- Fibonacci stream example
+-- from paper "Copatterns" (Abel et al.)
+-- adapted for Uroboro
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+codata List where
+  List.head(): Nat
+  List.tail(): List
+
+codata FunOfFunOfNatsAndListsToList where
+  FunOfFunOfNatsAndListsToList.apply1(FunOfNats,List,List): List
+
+function zipWith(): FunOfFunOfNatsAndListsToList where
+  zipWith().apply1(f, l1, l2).head() = f.apply2(l1.head(), l2.head())
+  zipWith().apply1(f, l1, l2).tail() = zipWith().apply1(f, l1.tail(), l2.tail())
+
+codata FunOfNats where
+  FunOfNats.apply2(Nat,Nat): Nat
+
+function add(): FunOfNats where
+  add().apply2(zero(), n) = n
+  add().apply2(succ(n), m) = succ(add().apply2(n, m))
+
+function fib(): List where
+  fib().head() = zero()
+  fib().tail().head() = succ(zero())
+  fib().tail().tail() = zipWith().apply1(add(), fib(), fib().tail())
+
+|]
+
+fibonacci_result :: String
+fibonacci_result = [str|
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+data List where
+  autogen0_aux(FunOfNats, List, List): List
+  fib(): List
+  autogen2_aux(): List
+
+function head(List): Nat where
+  head(autogen0_aux(f, l1, l2)) = apply2(f, head(l1), head(l2))
+  head(fib()) = zero()
+  head(autogen2_aux()) = succ(zero())
+
+function tail(List): List where
+  tail(autogen0_aux(f, l1, l2)) = apply1(zipWith(), f, tail(l1), tail(l2))
+  tail(fib()) = autogen2_aux()
+  tail(autogen2_aux()) = apply1(zipWith(), add(), fib(), tail(fib()))
+
+data FunOfFunOfNatsAndListsToList where
+  zipWith(): FunOfFunOfNatsAndListsToList
+
+function apply1(FunOfFunOfNatsAndListsToList, FunOfNats, List, List): List where
+  apply1(zipWith(), f, l1, l2) = autogen0_aux(f, l1, l2)
+
+data FunOfNats where
+  add(): FunOfNats
+
+function apply2(FunOfNats, Nat, Nat): Nat where
+  apply2(add(), n, m) = autogen1_aux(n, m)
+
+function autogen1_aux(Nat, Nat): Nat where
+  autogen1_aux(zero(), n) = n
+  autogen1_aux(succ(n), m) = succ(apply2(add(), n, m))
+
+|]
+
 spec :: Spec
 spec = do
     describe "defunc" $ do
@@ -126,3 +201,5 @@ spec = do
             (standardize $ fromJust (defunc $ parse eval1)) `shouldBe` (standardize $ parse eval1_result)
         it "transforms test_multi_des.uro into test_multi_des_result.uro" $ do
             (standardize $ fromJust (defunc $ parse test_multi_des)) `shouldBe` (standardize $ parse test_multi_des_result)
+        it "transforms fibonacci.uro into fibonacci_result.uro" $ do
+            (standardize $ fromJust (defunc $ parse fibonacci)) `shouldBe` (standardize $ parse fibonacci_result)

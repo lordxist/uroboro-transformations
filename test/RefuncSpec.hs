@@ -113,6 +113,77 @@ function succ(Nat): Nat where
 
 |]
 
+fibonacci :: String
+fibonacci = [str|
+-- Fibonacci stream example
+-- from paper "Copatterns" (Abel et al.)
+-- adapted for Uroboro
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+codata List where
+  List.head(): Nat
+  List.tail(): List
+
+codata FunOfFunOfNatsAndListsToList where
+  FunOfFunOfNatsAndListsToList.apply1(FunOfNats,List,List): List
+
+function zipWith(): FunOfFunOfNatsAndListsToList where
+  zipWith().apply1(f, l1, l2).head() = f.apply2(l1.head(), l2.head())
+  zipWith().apply1(f, l1, l2).tail() = zipWith().apply1(f, l1.tail(), l2.tail())
+
+codata FunOfNats where
+  FunOfNats.apply2(Nat,Nat): Nat
+
+function add(): FunOfNats where
+  add().apply2(zero(), n) = n
+  add().apply2(succ(n), m) = succ(add().apply2(n, m))
+
+function fib(): List where
+  fib().head() = zero()
+  fib().tail().head() = succ(zero())
+  fib().tail().tail() = zipWith().apply1(add(), fib(), fib().tail())
+
+|]
+
+fibonacci_result :: String
+fibonacci_result = [str|
+
+codata Nat where
+  Nat.autogen0_aux(Nat): Nat
+
+function zero(): Nat where
+  zero().autogen0_aux(n) = n
+
+function succ(Nat): Nat where
+  succ(n).autogen0_aux(m) = succ(add().apply2(n, m))
+
+codata List where
+  List.head(): Nat
+  List.tail(): List
+
+codata FunOfFunOfNatsAndListsToList where
+  FunOfFunOfNatsAndListsToList.apply1(FunOfNats,List,List): List
+
+function zipWith(): FunOfFunOfNatsAndListsToList where
+  zipWith().apply1(f, l1, l2).head() = f.apply2(l1.head(), l2.head())
+  zipWith().apply1(f, l1, l2).tail() = zipWith().apply1(f, l1.tail(), l2.tail())
+
+codata FunOfNats where
+  FunOfNats.apply2(Nat,Nat): Nat
+
+function add(): FunOfNats where
+  add().apply2(m, n) = autogen0_aux(m, n)
+
+function fib(): List where
+  fib().head() = zero()
+  fib().tail().head() = succ(zero())
+  fib().tail().tail() = zipWith().apply1(add(), fib(), fib().tail())
+
+|]
+
 spec :: Spec
 spec = do
     describe "refunc" $ do
