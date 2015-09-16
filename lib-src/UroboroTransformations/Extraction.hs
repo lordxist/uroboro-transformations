@@ -28,21 +28,13 @@ data ExtractionSpec = ExtractionSpec {
     , target   :: [(PTRule, TQ)]
 }
 
-type Extraction = Reader ExtractionSpec (PTRule, PT)
-
-typeOfTQ :: TQ -> Type
-typeOfTQ (TQApp t _ _) = t
-typeOfTQ (TQDes t _ _ _) = t
-
 auxName :: Reader ExtractionSpec Identifier
 auxName = do
   ExtractionSpec _ prog _ <- ask
   return $ autogen "aux" prog
 
 auxify :: TQ -> Reader ExtractionSpec TExp
-auxify tq = do
-    id <- auxName
-    return $ TApp (typeOfTQ tq) id (map tpToTExp (collectVarsTQ tq))
+auxify tq = liftM (flip (TApp (getType tq)) (map tpToTExp (collectVarsTQ tq))) auxName
   where
     tpToTExp (TPVar t id) = TVar t id
 
@@ -53,7 +45,7 @@ epsilonLhs = do
     return $ (get lens) tq
 
 epsilonRhs :: Reader ExtractionSpec TExp
-epsilonRhs = epsilonLhs >>=  auxify
+epsilonRhs = epsilonLhs >>= auxify
 
 tpToPP :: TP -> PP
 tpToPP (TPVar t id) = PPVar dummyLocation id
@@ -107,24 +99,14 @@ extractZeta = do
   rules <- extractZetaRules
   return $ sig rules
 
-extract :: Extraction
+extract :: Reader ExtractionSpec (PTRule, PT)
 extract = do
   epsilon <- extractEpsilon
   zeta <- extractZeta
   return (epsilon, zeta)
 
-getFunIdForRule :: PTRule -> Identifier
-getFunIdForRule (PTRule _ pq _) = getFunIdForPQ pq
-  where
-    getFunIdForPQ (PQApp _ id _) = id
-    getFunIdForPQ (PQDes _ _ _ pq) = getFunIdForPQ pq
-
-hasSameIdAsEps :: PTRule -> PT -> Bool
-hasSameIdAsEps eps (PTFun _ id _ _ _) = id == (getFunIdForRule eps)
-hasSameIdAsEps _ _ = False
-
 replaceTargetWithEpsilon :: PT -> [PTRule] -> PTRule -> PT
-replaceTargetWithEpsilon pt@(PTFun l id ts t rs) tgt eps = PTFun l id ts t (eps:(rs \\ tgt))
+replaceTargetWithEpsilon (PTFun l id ts t rs) tgt eps = PTFun l id ts t (eps:(rs \\ tgt))
 
 applyExtraction :: ExtractionSpec -> PT -> (PT, PT)
 applyExtraction spec pt = first (replaceTargetWithEpsilon pt (map fst $ target spec)) eResult
