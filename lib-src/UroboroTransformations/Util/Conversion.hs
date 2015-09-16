@@ -10,7 +10,7 @@ tpToPP (TPCon t id tps) = PPCon dummyLocation id (map tpToPP tps)
 
 tqToPQ :: TQ -> PQ
 tqToPQ (TQApp t id tps) = PQApp dummyLocation id (map tpToPP tps)
-tqToPQ (TQDes t id tps tq) = PQDes dummyLocation id (map tpToPP tps) (tqToPQ tq) 
+tqToPQ (TQDes t id tps tq) = PQDes dummyLocation id (map tpToPP tps) (tqToPQ tq)
 
 tExpToPExp :: TExp -> PExp
 tExpToPExp (TApp t id tExps) = PApp dummyLocation id (map tExpToPExp tExps)
