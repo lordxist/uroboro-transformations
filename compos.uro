@@ -1,0 +1,10 @@
+data T where
+  a(T) : T
+  b(T) : T
+  c() : T
+
+function f(T) : T where
+  f(a(a(x))) = f(x)
+  f(a(b(y))) = a(b(f(y)))
+  f(b(z)) = b(f(z))
+  f(c()) = c()
