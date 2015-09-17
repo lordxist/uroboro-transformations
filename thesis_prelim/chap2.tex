@@ -534,9 +534,31 @@ For any two contexts $\mathcal{C}, \mathcal{C}_0$ and any evaluation context $\m
 
 In general, when a language enjoys type soundness, for programs with \textit{coverage} it is guaranteed that no term is stuck. We adapt the judgement for \textit{copattern coverage} from Abel et al.\cite{abel13copatterns} for Uroboro. $fun \lhd | ~ Q$ means that the set of copatterns $Q$ \textit{covers} the function $fun$. Intuitively, when this set $Q$ is the set of left-hand sides of the function definition for $fun$, this function is fully specified. One can regard the consecutive application of the rules of the coverage judgement as a way of step-wise refining the specification of the function. The rule C\textsubscript{Head} stands for the start point, where the only left-hand side of the function neither has destructor nor constructor calls. The other two rules refine the specification of $fun$ by variable splitting (C\textsubscript{Con}), that is, refining based upon the input, or by result splitting (C\textsubscript{Des}), that is, refining based upon the output (or result). The terminology ``variable splitting'' and ``result splitting'' is also borrowed from Abel et al. and will become relevant in chapter 4.
 
-These rules for the judgement are defined in \autoref{fig:cc}. We assume a program and write $Dess_\tau$ for the set of destructors for codata type $\tau$, and $Cons_\tau$ for the set of constructors for data type $\tau$. We also write $q^\tau$ and $x^\tau$ to indicate that the type of the copattern $q$ or the variable $x$, respectively, has been inferred to be $\tau$. \autoref{sec:urostatsem} provides a way to infer types for variables, the type of a copattern is found out by looking it up in the respective function or destructor signature.
+These rules for the judgement are defined in \autoref{fig:cc}. We assume a program and write $Dess_\tau$ for the set of destructors for codata type $\tau$, and $Cons_\tau$ for the set of constructors for data type $\tau$. We also write $q^\tau$ and $x^\tau$ to indicate that the type of the copattern $q$ or the variable $x$, respectively, has been inferred to be $\tau$. \autoref{sec:urostatsem} provides a way to infer types for variables, the type of a copattern is found out by looking it up in the respective function or destructor signature. What is written to the right of the $\lhd |$ separator is written as a list but meant to represent set of copatterns, i.e., they aren't ordered and any copattern can be chosen for variable or result splitting. To denote the lists representing the sets, we use tuples with whitespace separation $(a1 a2 ... an)$ instead of comma separation, and we write $Q Q'$ to mean the concatenation of two lists.
 
-A program has copattern coverage whenever all of its function definitions have coverage, that is, it is $fun \lhd | ~ Q$ for each function $fun$ and its set of left-hand sides $Q$.
+As an example, consider the following function definition.
+\begin{lstlisting}
+function fun(A, B): C where
+  fun(a1(), b1(x)) = bar1(x)
+  fun(a1(), b2()) = bar2()
+  fun(a2(x), y).d1() = bar3(x, y)
+  fun(a2(x), y).d2(z) = bar4(x, y, z)
+\end{lstlisting}
+These equations cover $fun$, which means that it is possible to derive a coverage tree using the coverage judgement such that the leaves of the tree are exactly the lhss of the equations. The tree is derived as follows.
+
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{\scriptsize C\textsubscript{Head}}
+\UnaryInfC{$fun \lhd | ~ (fun(x, y))$}
+\RightLabel{\scriptsize C\textsubscript{Con}}
+\UnaryInfC{$fun \lhd | ~ (fun(a1(), y) ~ fun(a2(x), y))$}
+\RightLabel{\scriptsize C\textsubscript{Con}}
+\UnaryInfC{$fun \lhd | ~ (fun(a1(), b1(x)) ~ fun(a1(), b2()) ~ fun(a2(x), y))$}
+\RightLabel{\scriptsize C\textsubscript{Des}}
+\UnaryInfC{$fun \lhd | ~ (fun(a1(), b1(x)) ~ fun(a1(), b2()) ~ fun(a2(x), y).d1() ~ fun(a2(x), y).d2(z))$}
+\end{prooftree}
+
+A program has copattern coverage, or alternatively, is coverage complete, whenever all of its function definitions have coverage, that is, it is $fun \lhd | ~ Q$ for each function $fun$ and its set of left-hand sides $Q$.
 
 In chapter 4, we will rely not only upon copattern coverage, but also on knowing how the coverage was derived by consecutive result and variable splitting. In other words, we need an algorithm for the judgement. Abel et al.\cite{abel13copatterns} hint, for their judgement, at a possible way to adapt other coverage algorithms for copatterns; to our knowledge, there currently is no such algorithm for copattern coverage checking, either by Abel et al. or others. For the time being, an exponential-time algorithm that goes through all derivation trees of a maximum depth will have to suffice. The maximum depth is the maximal number of constructors and destructors, added together, of all lhss of the function definition.
 
