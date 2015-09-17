@@ -561,6 +561,7 @@ Here $x$ was chosen to be observed. But, unlike with outputs, this isn't the onl
 The problem is directly related to the difference between natural deduction and arbitrary sequent calculus. In natural deduction, the left-hand side sequence consists of many elements, while the right-hand side sequence consists of only one element. Similarly, the many sets of constructors for each type of the variables allow many ``dimensions'' of the input to be observed, while the set of destructors for the codata type of a function only allows one ``dimension'' of the output to be observed.
 
 \subsubsection{A workaround}
+\label{sssec:workaround}
 
 Since solving the underlying problem presented above is beyond the scope of our work, we will just present a workaround for the problem at hand, which is, transforming a program in the fragment $\mathbf{U}_{cc}[fdef_{un,r}]$ to a semantically equivalent program in fragment $\mathbf{U}_{cc}[fdef_{un,r'}]$. We start with a naive approach, which doesn't preserve the semantics, and then refine this approach using an extraction.
 

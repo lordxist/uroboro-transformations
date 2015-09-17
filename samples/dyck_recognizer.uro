@@ -1,0 +1,25 @@
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+data Bool where
+  true(): Bool
+  false(): Bool
+
+data Parenthesis where
+  l(): Parenthesis
+  r(): Parenthesis
+
+data Word where
+  empty(): Word
+  cons(Parenthesis, Word): Word
+
+function run(Word, Nat): Bool where
+  run(empty(), zero()) = true()
+  run(empty(), succ(n)) = false()
+  run(cons(l(), ps), c) = run(ps, succ(c))
+  run(cons(r(), ps), zero()) = false()
+  run(cons(r(), ps), succ(c)) = run(ps, c)
+
+function recognize(Word): Bool where
+  recognize(ps) = run(ps, zero())

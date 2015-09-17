@@ -1,12 +1,29 @@
 % !TEX root = main.tex
-\chapter{Related and future work}
+\chapter{Implementation and applications}
 
-In this chapter, we consider related and future work. We begin with several applications for our transformations, as they have been considered by previous authors (\autoref{sec:relappl}). Then we review work that our thesis builds upon: the unnesting algorithm of Setzer et al. (\autoref{sec:relunn}), and the (principal idea for the) language Uroboro (\autoref{sec:reluro}). Finally, we talk about avenues for future research (\autoref{sec:futr}).
+We have implemented the application of extractions to programs and, based on this, the de- and refunctionalization algorithms in Haskell.\footnote{The source code is found at \url{http://github.com/lordxist/uroboro-transformations}.} Using this implementation, we have automatically transformed an example for defunctionalization and one for refunctionalization known from the literature.
+
+In \autoref{sec:impl}, we describe our implementation, focusing on the organization of its modules and design choices not dictated by the formal description of the algorithms. We then consider applications of our transformations to examples from the literature. In \autoref{ssec:mci} we show how Reynolds' classic example, the meta-circular interpreter for the lambda calculus, can be translated to Uroboro and then automatically defunctionalized using our implementation, In \autoref{ssec:dyck} we apply our transformations to a refunctionalization example from Danvy and Millikin.
+
+\section{Implementation}
+\label{sec:impl}
+
+We have implemented the various algorithms formally described in this work as a Haskell library; we have added some simple executables for defunctionalization, refunctionalization, core defunctionalization, core refunctionalization, unnesting for defunctionalization, and unnesting for refunctionalization. Our library makes use of the representations for Uroboro parse trees and typechecked programs developed by Tobias Weber.\footnote{Our Haskell package \texttt{uroboro-transformations} depends on our fork of his project, found at \url{http://github.com/lordxist/uroboro}. His original repository is found at \url{http://github.com/tewe/uroboro}.} The library is organized in several modules, which we now detail.
+
+At the heart is module \texttt{Extraction}, which exposes a function \texttt{applyExtraction} that allows a user to apply an extraction to a function definition, yielding the changed function definition and the auxiliary function definition. The user has to specify the extraction to be applied; for this, a data type \texttt{ExtractionSpec} is provided, which has fields for the extraction target, the lens underlying the extraction, and the whole program the function definition is a part of. The last of these is needed to avoid name collisions when generating the name for the auxiliary function. The lens underlying the extraction is captured by a data type \texttt{ExtractionLens} with field \texttt{get} and \texttt{putback}.
+
+In the modules \texttt{Extraction.DesExtraction} and \texttt{Extraction.ConExtraction} lenses for  destructor extraction and the family of constructor extractions are provided. Implementing \texttt{get} and \texttt{putback} for destructor extraction was straightforward, in fact, we have already shown it in \autoref{}. Constructor extraction is more difficult, since it has a parameter, namely, the position of the constructor to be extracted. We have implemented this parameter as a list of non-negative integers representing the path to the position, and used this list in the two parts of the lens to find the correct variable or the correct constructor position, respectively.
+
+The module \texttt{Unnest} implements the parametrized algorithm $\textsf{Unnest}_i$ as a function \texttt{unnestFor}, unnesting each function definition in turn. The function responsible for one function definition is basically implemented as a recursive loop over the coverage tree derived for the function definition, just as it is formally described, but using monadic computations, in order to not clutter the arguments of the functions that make up the implementation. We use a stack of monad transformers, with a \texttt{ReaderT} transformer for the typechecked program and \texttt{StateT} transformers for the coverage tree and the collected auxiliary function definitions. The destructor and constructor extractions used in the implementation are those provided by \texttt{Extraction.DesExtraction} and \texttt{Extraction.ConExtraction}. Coverage is derived once per function definition, before starting to unnest it; the functionality needed to derive the coverage and to deal with the coverage tree is provided by another module \texttt{CopatternCoverage} and its sub-module \texttt{CopatternCoverage.CCTree}. The unnesting stops when the coverage tree has depth zero or one. Function definitions which are already sufficiently unnested for the respective purpose $i$ are not unnested at all, especially, coverage isn't derived for these. The parameter of \texttt{unnestFor} is a predicate that determines whether a function definition is not yet sufficiently unnested for $i$, i.e., core defunctionalization or core refunctionalization.
+
+The modules \texttt{Unnest.ForDefunc} and \texttt{Unnest.ForRefunc} provide predicates \texttt{isDNestedFunDef} and \texttt{isRNestedFunDef} that determine whether a function definition is not yet sufficiently unnested for core defunctionalization and core refunctionalization, respectively. Module \texttt{Unnest.ForDefunc} also provides a convenience function for unnesting for defunctionalization, \texttt{unnestForDefunc}, defined as \texttt{unnestFor isDNestedFunDef}; module \texttt{Unnest.ForRefunc} provides an analogous convenience function.
+
+The modules \texttt{CoDataFragments.Defunc} and \texttt{CoDataFragments.Refunc} implement the defunctionalization of programs in the Codata Fragment of Uroboro and the refunctionalization of programs in the Data Fragment, respectively. Actually, the implementation extends the transformations to a slightly larger fragment; the Codata Fragment is extended by allowing constructors on the right-hand sides of equations, and the Data Fragment is extended by allowing destructors on the right-hand sides. The transformations just leave these unchanged. The benefit of this extension is that core defunctionalization and core refunctionalization, as provided by \texttt{CoreDR.CoreDefunc} and \texttt{CoreDR.Refunc}, can then be implemented straightforwardly: The function definitions are partitioned into those which are already defunctionalized (refunctionalized) and those which aren't, and the latter are then passed to the defunctionalization (refunctionalization) of \texttt{CoDataFragments.Defunc} ( \texttt{CoDataFragments.Refunc}).
+
+Modules \texttt{Defunc} and \texttt{Refunc} implement the complete defunctionalization and refunctionalization algorithm, by subsequently using \texttt{Unnest.ForDefunc} (\texttt{Unnest.ForRefunc}) and \texttt{CoreDR.CoreDefunc} (\texttt{CoreDR.Refunc}). \texttt{Refunc} uses another step after unnesting and before core refunctionalization, which is to move the constructors to the first argument position, as described in \autoref{sssec:workaround}. This is implemented in module \texttt{CoreDR.MoveCon} using function \texttt{applyExtraction} from module \texttt{Extraction}.
 
 \section{Applications}
-\label{sec:relappl}
-
-As already hinted at in the introduction, authors like Reynolds and Danvy have shown how de- and refunctionalization, along with other transformations like CPS transformation, can be used to automatically transform programs of a more (human-) understandable form into semantically equivalent programs with certain desirable properties with regards to computation, and the other way around. In this section, we flesh this out somewhat and connect it to our automatic transformations. First, we talk about how our transformations apply to Reynolds' meta-circular interpreter example (\autoref{ssec:mci}). Then we consider some other applications for defunctionalization, as presented by Danvy and Nielsen\cite{danvy01defunctionalization} (\autoref{ssec:defuncex}). Finally, we consider some example applications for refunctionalization as given by Danvy and Millikin\cite{danvy09refunctionalization} (\autoref{ssec:refuncex}).
+\label{sec:appl}
 
 \subsection{The meta-circular interpreter}
 \label{ssec:mci}
@@ -15,13 +32,13 @@ As already hinted at in the introduction, authors like Reynolds and Danvy have s
 \begin{lstlisting}
 
 data Nat where
-  Zero() : Nat
-  Succ(Nat) : Nat
+  zero() : Nat
+  succ(Nat) : Nat
 
 data Exp where
-  Var(Nat) : Exp
-  App(Exp, Exp) : Exp
-  Abs(Exp) : Exp
+  var(Nat) : Exp
+  app(Exp, Exp) : Exp
+  fun(Exp) : Exp
 
 codata Val where
   Val.apply(Val) : Val
@@ -30,16 +47,16 @@ codata Env where
   Env.lookup(Nat) : Val
 
 function nil() : Env where
-  nil().lookup(x) = error -- may never be called
+  nil().lookup(x) = nil().lookup(x) -- may never be called
 
 function cons(Val, Env) : Env where
   cons(val, env).lookup(zero()) = val
   cons(val, env).lookup(succ(n)) = env.lookup(n)
 
 function eval(Exp, Env) : Val where
-  eval(Var(n), env) = env.lookup(n)
-  eval(App(exp1, exp2), env) = eval(exp1, env).apply(eval(exp2, env))
-  eval(Abs(exp), env).apply(val) = eval(exp, cons(val, env))
+  eval(var(n), env) = env.lookup(n)
+  eval(app(exp1, exp2), env) = eval(exp1, env).apply(eval(exp2, env))
+  eval(fun(exp), env).apply(val) = eval(exp, cons(val, env))
 
 function interpret(Exp) : Val where
   interpret(exp) = eval(exp, nil())
@@ -49,181 +66,152 @@ function interpret(Exp) : Val where
 \label{fig:mci}
 \end{figure}
 
-Reynolds' classical example is the ``meta-circular'' interpreter for the lambda calculus: Instead of writing an interpreter in a first-order language from scratch, he first straightforwardly translates the intuitive understanding of the semantics of the lambda calculus into a higher-order program, then mechanically defunctionalizes this program. The other direction, refunctionalization into a program that can be better understood than its first-order counterpart, has first been considered by Danvy and Millikin\cite{danvy09refunctionalization}; more details follow in \autoref{ssec:refuncex}.
+\begin{figure}
 
-Rendel et al.\cite{rendel15automatic} have already shown how Uroboro facilitates both the defunctionalization direction and the refunctionalization direction; they have also done so specifically for the meta-circular interpreter example. But their approach still required manual, even though mechanical, work to bring arbitrary Uroboro programs into either the form required by their defunctionalization or their refunctionalization, i.e., into the Codata or Data Fragment, respectively. Our work fully automatizes these pretransformations; all in all, we give an algorithm to defunctionalize any Uroboro program with copattern coverage, and one that refunctionalizes any such program. Our transformations can now be implemented in an IDE such that a programmer can start with an easier to understand higher-order program, like Reynolds\cite{reynolds72definitional} did with the meta-circular interpreter, and then literally ``press a button'' to get the corresponding first-order program. This higher-order program can use the full expressiveness of Uroboro, not just that of either the Data or Codata Fragment. To illustrate this, in \autoref{fig:mci}, we give an Uroboro definition of Reynolds' meta-circular interpreter that we think is as straightforward as one might wish for.\footnote{Except for the way environments are defined and used; this is due to Uroboro not supporting parametric polymorphism. We get back to this point in \autoref{sec:reluro}.} By this we mean that anybody with an intuitive understanding of lambda calculus (and the knowledge on how to read functional programs with data and codata types) should be able to comprehend it without thinking deeply about it (one shouldn't need to ``run an interpreter'' in their mind).
+\begin{lstlisting}
+function eval(Exp, Env): Val where
+  eval(fun(x0_0_0), x0_1) = autogen1_aux(x0_0_0, x0_1)
+  eval(app(x0_0, x0_1), x1) = apply(eval(x0_0, x1), eval(x0_1, x1))
+  eval(var(x0_0), x1) = lookup(x1, x0_0)
+
+function autogen0_aux(Val, Env, Nat): Val where
+  autogen0_aux(x0_0, x0_1, zero()) = x0_0
+  autogen0_aux(x0_0, x0_1, succ(x1_0)) = lookup(x0_1, x1_0)
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+data Exp where
+  app(Exp, Exp): Exp
+  fun(Exp): Exp
+  var(Nat): Exp
+
+function interpret(Exp): Val where
+  interpret(exp) = eval(exp, nil())
+
+data Val where
+  autogen1_aux(Exp, Env): Val
+
+data Env where
+  cons(Val, Env): Env
+  nil(): Env
+
+function apply(Val, Val): Val where
+  apply(autogen1_aux(x0_0_0, x0_1), x1) = eval(x0_0_0, cons(x1, x0_1))
+
+function lookup(Env, Nat): Val where
+  lookup(cons(x0_0, x0_1), x1) = autogen0_aux(x0_0, x0_1, x1)
+  lookup(nil(), x) = lookup(nil(), x)
+\end{lstlisting}
+\caption{Meta-circular interpreter, defunctionalized}
+\label{fig:mcidefunced}
+\end{figure}
+
+Reynolds' classical example for defunctionalization is the ``meta-circular'' interpreter for the lambda calculus: Instead of writing an interpreter in a first-order language from scratch, he first straightforwardly translates the intuitive understanding of the semantics of the lambda calculus into a higher-order program, then mechanically defunctionalizes this program.
+
+Rendel et al.\cite{rendel15automatic} have already shown how Uroboro facilitates both the defunctionalization direction and the refunctionalization direction; they have also done so specifically for the meta-circular interpreter example. But their approach still required manual, even though mechanical, work to bring arbitrary Uroboro programs into either the form required by their defunctionalization or their refunctionalization, i.e., into the Codata or Data Fragment, respectively. Our work fully automatizes these pretransformations; all in all, we give an algorithm to defunctionalize any Uroboro program with copattern coverage, and one that refunctionalizes any such program. An implementation of our transformations, for instance, the one we provide in our Haskell library \texttt{uroboro-transformations}, can now be used in an IDE such that a programmer can start with an easier to understand higher-order program, like Reynolds\cite{reynolds72definitional} did with the meta-circular interpreter, and then literally ``press a button'' to get the corresponding first-order program. This higher-order program can use the full expressiveness of Uroboro, not just that of either the Data or Codata Fragment. To illustrate this, in \autoref{fig:mci}, we give an Uroboro definition of Reynolds' meta-circular interpreter that we think is as straightforward as one might wish for.\footnote{Except for the way environments are defined and used; this is due to Uroboro not supporting parametric polymorphism. We get back to this point in \autoref{sec:reluro}.} By this we mean that anybody with an intuitive understanding of lambda calculus (and the knowledge on how to read functional programs with data and codata types) should be able to comprehend it without thinking deeply about it (one shouldn't need to ``run an interpreter'' in their mind).
 
 Note especially the equation
 
 \begin{lstlisting}
-  eval(Abs(exp), env).apply(val) = eval(exp, cons(val, env)),
+  eval(fun(exp), env).apply(val) = eval(exp, cons(val, env)),
 \end{lstlisting}
 
 which is allowed neither in the Data nor in the Codata Fragment, since it has both a constructor and a destructor in its lhs. This is a point where the full expressiveness of Uroboro is helpful, as it allows to directly express the intuitive fact that, in the lambda calculus, abstractions evaluate to functions which can then be applied to another value $v$ by evaluating the body of the abstraction in a changed environment which binds $v$ to a variable.\footnote{As stated before, in this example, environments aren't as easily understood as the rest, due to the (current) limitations of Uroboro. The interpreter relies upon a naming scheme for variables that isn't immediately obvious, in order to bind $v$ to the correct variable; specifically, the natural number corresponding to the variable must be the next free, i.e., not corresponding to any variable, in the environment. Ideally, we would like to define environments using higher-order concepts involving parametric polymorphism, which Uroboro doesn't support (yet).}
 
-\subsection{Other defunctionalization examples}
-\label{ssec:defuncex}
+Automatically defunctionalizing the interpreter shown in \autoref{fig:mci} using the executable \texttt{defunc} provided in our Haskell package \texttt{uroboro-transformations} yields the program shown in \autoref{fig:mcidefunced}. (The main module for \texttt{defunc} basically consists of a call to \texttt{Defunc.defunc}; this function can also be used when implementing automatic defunctionalization in an IDE.) The auto-generated constructor \texttt{autogen1\_aux} for \texttt{Val}, which is now a data type, corresponds to what is called a \textit{closure}. Using \texttt{defunc}, we have been able to automatically transform the meta-circular interpreter to a program where all values are represented by closures, and where function abstractions are directly evaluated to the corresponding closure, as described by the equation
 
-Danvy and Nielsen\cite{danvy01defunctionalization} explore other applications of defunctionalization, among them defunctionalization of programs processing lists, and of CPS transformed programs. Here, we would just like to pick out a result of their work that concerns a relation between CPS transformations and defunctionalization, which motivates future work on automatic transformations for Uroboro. As Danvy and Nielsen succinctly put it:
+\begin{lstlisting}
+  eval(fun(x0_0_0), x0_1) = autogen1_aux(x_0_0, x0_1),
+\end{lstlisting}
 
-\blockcquote[20]{danvy01defunctionalization}{Defunctionalizing a CPS-transformed first-order program provides a systematic way to construct an iterative version of this program that uses a push-down accumulator. One can then freely change the representation of this accumulator.}
-
-In a toolbox for transforming Uroboro programs, one might therefore want to have automatic CPS transformations to compliment the automatic de- and refunctionalization of this work.
-
-\subsection{Refunctionalization examples}
-\label{ssec:refuncex}
-
-Danvy and Millikin\cite{danvy09refunctionalization} present two worked-out applications for refunctionalization, a recognizer for Dyck words and Dijktra's shunting yard algorithm; in addition, they point to three more applications for it without giving details. First, we exemplarily consider the recognizer for Dyck words, i.e., well-matched words over the alphabet of two parentheses. We concentrate on how refunctionalization brings the recognizer into a higher-level form that is easier understood by humans, which is a purpose dual to that of defunctionalization. Afterwards, we relate one of the preprocessings used by Danvy and Millikin to our transformations.
-
-The recognizer for Dyck words, as presented by Danvy and Millikin, is an implementation of a tail-recursive push-down automaton. The stack of this push-down automaton, where ``open brace'' symbols increase the stack and ``close brace'' symbols decrease the stack, is not explicitly present anymore after refunctionalization. This is because the language processor of the higher-order language (in Danvy and Millikin's example, ML) deals with this stack in the background. This demonstrates that the purpose of refunctionalization is dual to that of defunctionalization: Refunctionalization turns programs which are closer to the representation used by the machine, e.g., by explicitly using a stack, into a form which abstracts away such low-level concepts. Note also that after the refunctionalization, the recognizer for Dyck words of Danvy and Millikin is in continuation-passing style. To make it even more human-readable, a transformation to direct style can be helpful. One logical next step in the development of the Uroboro toolbox therefore is, along with the addition of CPS transformations, the addition of direct style transformations.
-
-All of the applications have in common that some preprocessing is necessary to bring them into the form required by their actual refunctionalization.\footnote{As already outlined in the introduction, this refunctionalization eliminates the data types for what are intended to be first-class functions and the apply function by replacing these data type definitions with abstractions that take their content from the respective equations of the apply function, and by replacing calls to the apply function with calls to the first-class function.} One of these preprocessings is called ``disentangling'', and it is used to split up a function that dispatches over more than one of its parameters. In our work, the transformation that corresponds to this is constructor extraction. The following \autoref{sec:relunn} goes into more detail how ``disentangling'' is dealt with in our work. At the end of \autoref{sec:relunn} we give some more consideration to what we contribute with the general notion of extractions.
-
-\section{Unnesting}
-\label{sec:relunn}
-
-Our de- and refunctionalization is basically just the de- and refunctionalization of Rendel et al.\cite{rendel15automatic} together with a preprocessing. This preprocessing is the ``unnesting'' algorithm of Setzer et al.\cite{setzer14unnesting} for their copattern language, adapted for Uroboro. We first consider general properties of the unnesting algorithm, and then consider its adaptation to Uroboro.
-
-Setzer et al.'s\cite{setzer14unnesting} unnesting operates on the copattern coverage trees of the function definitions. It is the natural counterpart to the interactive construction of a coverage-complete function definition by refinement, as can be done, e.g., in Agda. ``Unnesting'' essentially means undoing the steps of the derivation of the copattern coverage; the algorithm proceeds step-wise and distinguishes a case for each rule the final derivation step could have used. In this way, it can be guaranteed that an unnesting step always leads to a program with copattern coverage and without overlaps.
-
-The drawback of the unnesting algorithm is that it requires a derivation for the copattern coverage. This has to be established in some way; as already mentioned in \autoref{sec:cc}, we aren't aware of any algorithm for copattern coverage that has better than exponential worst-case time complexity. We have also given some consideration to how to unnest function definitions without knowing the derivation of their copattern coverage. But this always lead us to the problem of how to avoid introducing overlaps; we were only able to avoid these at the cost of exponential worst-case time complexity. Thus, in the end, we decided to adapt the algorithm of Setzer et al.; it is natural in the sense described in the previous paragraph and therefore, in our view, the best algorithm for the task when one presupposes that the derivation of the copattern coverage is known. Our tentative suggestion is that, at least in more cases than is the case today, programmers could construct their programs interactively; this way, the programmer itself would provide the unnesting algorithm with the coverage derivation it needs. As interactive program construction can help avoid simple mistakes, this approach also need not necessarily be to the disadvantage of the programmer.
-
-When we say that we adapted the unnesting algorithm to Uroboro, we mean that we simplified the algorithm from a language with first-class functions to a language without first-class functions. Because Uroboro isn't ``truly'' higher-order, the coverage derivation rules dealing with such higher-order concepts are not needed here, and consequently the corresponding cases of the unnesting algorithm are also unnecessary. Two coverage derivation rules remain to be considered: the result splitting and the variable splitting. For the first, the corresponding ``undo'' transformation is destructor extraction, and for the second it is constructor extraction. Destructor and constructor extraction are special cases of the general concept which we presented as ``extractions'' in chapter 3. With the notion of extraction, we have identified and generalized a concept which was previously known, but had appeared in various places and under various names, e.g. as two of the cases of the unnesting algorithm of Setzer et al.\cite{setzer14unnesting} or as ``disentangling'' in Danvy and Millikin\cite{danvy09refunctionalization}. The form of the definition of extractions we presented is specific to Uroboro, but the underlying idea is not. We believe that consolidating the knowledge of a topic, as opposed to having it pop up in several contexts where it isn't clear that the underlying concept is the same, is useful for its further exploration. Therefore, concerning the topic of what we decided to call extractions, we think that our work contributes at least the impulse towards such a consolidation.
-
-\section{Uroboro}
-\label{sec:reluro}
+\subsection{Recognizer for Dyck words}
+\label{ssec:dyck}
 
 \begin{figure}
+
 \begin{lstlisting}
-  
 data Nat where
-  Zero: Nat
-  Succ: Nat -> Nat
+  zero(): Nat
+  succ(Nat): Nat
 
-codata Stream where
-  Stream.head: Nat
-  Stream.tail: Stream
+data Bool where
+  true(): Bool
+  false(): Bool
 
-def zipWith: ((Nat, Nat) -> Nat, Stream, Stream) -> Stream where
-  (zipWith (f, s1, s2)).head = f (s1.head, s2.head)
-  (zipWith (f, s1, s2)).tail = zipWith (f, s1.tail, s2.tail)
+data Parenthesis where
+  l(): Parenthesis
+  r(): Parenthesis
 
-def add: (Nat, Nat) -> Nat where
-  add (a, Zero) = a
-  add (a, Succ b) = Succ (add (a, b))
+data Word where
+  empty(): Word
+  cons(Parenthesis, Word): Word
 
-def fib: Stream where
-  fib.head = Zero
-  fib.tail.head = Succ Zero
-  fib.tail.tail = zipWith (add, fib, fib.tail)
+function run(Word, Nat): Bool where
+  run(empty(), zero()) = true()
+  run(empty(), succ(n)) = false()
+  run(cons(l(), ps), c) = run(ps, succ(c))
+  run(cons(r(), ps), zero()) = false()
+  run(cons(r(), ps), succ(c)) = run(ps, c)
 
+function recognize(Word): Bool where
+  recognize(ps) = run(ps, zero())
 \end{lstlisting}
-\caption{Uroboro-like higher-order program}
-\label{fig:ch5uro1}
+\caption{Dyck word recognizer in Uroboro}
+\label{fig:dyck}
 \end{figure}
 
 \begin{figure}
 \begin{lstlisting}
+function autogen1_aux(Word, Nat): Bool where
+  autogen1_aux(x0_1, x1) = x1.autogen3_aux(x0_1)
 
-data Nat where
-  Zero(): Nat
-  Succ(Nat): Nat
+function recognize(Word): Bool where
+  recognize(ps) = ps.run(zero())
 
-codata Stream where
-  Stream.head(): Nat
-  Stream.tail(): Stream
+codata Nat where
+  Nat.autogen3_aux(Word): Bool
+  Nat.autogen0_aux(): Bool
 
-codata Fun1 where
-  Fun1.apply(Nat, Nat): Nat
+codata Parenthesis where
+  Parenthesis.autogen2_aux(Word, Nat): Bool
 
-codata Fun2 where
-  Fun2.apply(Fun1, Stream, Stream): Stream
+codata Word where
+  Word.run(Nat): Bool
 
-function zipWith(): Fun2 where
-  zipWith.apply(f, s1, s2).head() = f.apply(s1.head(), s2.head())
-  zipWith.apply(f, s1, s2).tail() =
-    zipWith.apply(f, s1.tail(), s2.tail())
+function zero(): Nat where
+  zero().autogen3_aux(x0_1) = false()
+  zero().autogen0_aux() = true()
 
-function add(): Fun1 where
-  add().apply(a, Zero()) = a
-  add().apply(a, Succ(b)) = Succ(add().apply(a, b))
+function succ(Nat): Nat where
+  succ(x1_0).autogen3_aux(x0_1) = x0_1.run(x1_0)
+  succ(x1_0).autogen0_aux() = false()
 
-function fib(): Stream where
-  fib().head() = Zero()
-  fib().tail().head() = Succ(Zero())
-  fib().tail().tail() = zipWith(add(), fib(), fib().tail())
+function l(): Parenthesis where
+  l().autogen2_aux(x0_1, x1) = x0_1.run(succ(x1))
 
+function r(): Parenthesis where
+  r().autogen2_aux(x0_1, x1) = autogen1_aux(x0_1, x1)
+
+function empty(): Word where
+  empty().run(x1) = x1.autogen0_aux()
+
+function cons(Parenthesis, Word): Word where
+  cons(x0_0, x0_1).run(x1) = x0_0.autogen2_aux(x0_1, x1)
 \end{lstlisting}
-\caption{Codata conversion of \autoref{fig:ch5uro1}}
-\label{fig:ch5uro2}
+\caption{Dyck word recognizer, refunctionalized}
+\label{fig:dyckrefunced}
 \end{figure}
 
-\begin{figure}
-\begin{lstlisting}
+Danvy and Millikin\cite{danvy09refunctionalization} give a number of examples for refunctionalization, one of which is a recognizer for Dyck words, which they present in ML; \autoref{fig:dyck} shows the recognizer translated to Uroboro. Danvy and Millikin refunctionalize the recognizer with respect to the counter, which is the second argument of function \texttt{run}. Using the executable \texttt{refunc} provided in our Haskell package \texttt{uroboro-transformations} to automatically refunctionalize the recognizer yields the program shown in \autoref{fig:dyckrefunced}; we omit the empty codata type definition for \texttt{Bool} and the empty function definitions for \texttt{true()} and \texttt{false()}, for the following reason.
 
-codata Fun<A, B> where
-  Fun<A, B>.apply(A): B
+Our transformation refunctionalizes \textit{everything}, which is not what Danvy and Millikin do; especially, we are not interested in how \texttt{Bool} is refunctionalized. It might be desirable to be able to detect which parts of a program can be de- or refunctionalized independently; in the present case, \texttt{Bool} clearly can be excluded from the refunctionalization, since its constructors don't appear in any patterns. Similarly, \texttt{Word} and \texttt{Parenthesis} have also been refunctionalized; excluding them from the refunctionalization is not as simple as with \texttt{Bool}, since their constructors do appear in patterns.
 
-data Nat where
-  Zero(): Nat
-  Succ(Nat): Nat
+Leaving this problem aside, we concentrate on recognizing the similarity between our transformation result, and the result of Danvy and Millikin's manual refunctionalization, which they present in Figure 3 of their work. Danvy and Millikin refunctionalize the program with respect to the counter. For this reason, first-class function terms in their transformation result -- which are always continuations -- should correspond to terms of codata type \texttt{Nat} in our transformation result. We will now show that this is actually the case.
 
-codata Stream where
-  Stream.head(): Nat
-  Stream.tail(): Stream
+The arguments of their \texttt{run} function are words and functions from optional words  (i.e., they use ML's option type) to booleans. Where do we find this signature in our transformation result? Look at the signature of our \texttt{run}, which in the refunctionalized form of the program is a destructor of \texttt{Word}. It has one argument with type \texttt{Nat}. Let us look at the codata type definition for \texttt{Nat}: Two destructors are defined, both of which have result type \texttt{Bool}, and one of them has no arguments while the other has exactly one argument with type \texttt{Word}. The reason for there being two destructors instead of only one using an option type is that we didn't introduce any arguments with option types, in contrast to Danvy and Millikin, who, during their manual preprocessing of the program, introduce such arguments in order to merge several functions.
 
-function zipWith():
-    Fun<(Fun<(Nat, Nat), Nat>, Stream, Stream), Stream> where
-  zipWith().apply((f, s1, s2)).head() =
-    f.apply((s1.head(), s2.head()))
-  zipWith().apply((f, s1, s2)).tail() =
-    zipWith().apply((f, s1.tail(), s2.tail()))
+Looking at both the signatures \texttt{Word.run(Nat): Bool} and the signatures of the two destructors \texttt{Nat.autogen3\_aux(Word): Bool} and \texttt{Nat.autogen0\_aux(): Bool} for \texttt{Nat}, we can thus see the similarity of our \texttt{Word.run(Nat): Bool} to their \texttt{run : ord * (word option -> bool) -> bool} in their types. This is reinforced by comparing the equations defined for the two destructors of \texttt{Nat} with the continuation that is passed to \texttt{run} in the second to last line in Figure 3 of Danvy and Millikin. When given \texttt{NONE}, the continuation's result is defined as \texttt{true}, when given \texttt{SOME ps}, it is defined as \texttt{false}. Since this continuation is used at the initial call to \texttt{run}, where the stack is empty, we look at our function definition for \texttt{zero()}. Applying destructor \texttt{autogen0\_aux(): Bool} to \texttt{zero()}, which corresponds to passing \texttt{NONE} to the continuation in the initial call of \texttt{run}, yields \texttt{true()}, applying destructor \texttt{autogen3\_aux(Word): Bool} to \texttt{zero()}, which corresponds to passing \texttt{SOME ps} to the continuation in the initial call of \texttt{run}, yields \texttt{false()}. The other call to \texttt{run} in Danvy and Millikin's refunctionalized program likewise corresponds to our function definition for \texttt{succ(Nat)}.
 
-function add(): Fun1 where
-  add().apply((a, Zero())) = a
-  add().apply((a, Succ(b))) = Succ(add().apply((a, b)))
-
-function fib(): Stream where
-  fib().head() = Zero()
-  fib().tail().head() = Succ(Zero())
-  fib().tail().tail() = zipWith().apply((add(), fib(), fib().tail()))
-
-\end{lstlisting}
-\caption{Parametric polymorphism for \autoref{fig:ch5uro2}}
-\label{fig:ch5uro3}
-\end{figure}
-
-In the introduction, we have already considered the Data Fragment and Codata Fragment of Uroboro and how they relate to re- and defunctionalization, respectively. We also have already talked about why Uroboro is interesting for the purpose of automatic program transformations. In this section, we examine why Uroboro is interesting beyond that: As already outlined in the introduction, we think that Uroboro is a potential replacement for certain higher-order languages; in the following we illustrate this point.
-
-As an example, consider the definition of Fibonacci streams, borrowed from Abel et al.\cite{abel13copatterns}. In \autoref{fig:ch5uro1}, we present this in a hypothetical higher-order language meant to resemble Uroboro.
-
-We will desugar this to a form which only uses codata type definitions, but no first-class functions. To achieve this, we do the following:
-\begin{itemize}
-\item Add codata type definitions \texttt{Fun1} and \texttt{Fun2} with one destructor \texttt{apply} for each. The argument and result types of \texttt{apply} correspond to the respective function type that is replaced by the codata type in the next step.
-
-\item Replace function types \texttt{(Nat, Nat) -> Nat} and \texttt{((Nat, Nat) -> Nat, Stream, Stream) -> Stream} with codata types \texttt{Fun1} and \texttt{Fun2}, respectively.
-
-\item Desugar the calls to a function of type \texttt{Fun1} or \texttt{Fun2} to calls to the respective destructor \texttt{apply}.
-\end{itemize}
-We also change the concrete syntax of the original program, removing higher-order constructs such that the resulting program, shown in figure \autoref{fig:ch5uro2}, is valid Uroboro. This is possible because there are no more function types and first-class functions.
-
-For this simple example, it is not much of a problem that we need to introduce two codata types for two different function types. However, since we don't have parametric polymorphism, we would have to introduce a codata type for \textit{every} concrete function type. The lack of parametric polymorphism therefore is a rather severe limitation. Rendel et al. are currently working on bringing parametric polymorphism to Uroboro. We imagine a version of the above program using parametric polymorphism to look similar what is shown in figure \autoref{fig:ch5uro2}; we use arrow brackets to indicate type parameters. We also implicitly use a tuple type, but this is just for simplicity, as we could also just curry all uses of the codata type for functions.
-
-The definition of the parametric codata type \texttt{Fun<A, B>} for functions from \texttt{A} to \texttt{B} could then be moved to a standard library and reused. Consider the usual higher-order syntax for function calls and the arrow syntax for function types as syntactic sugar for a call to the \texttt{apply} destructors and the respective instance of the parametric codata type \texttt{Fun<A, B>} (recursively), respectively. When desugaring the program in this way, we arrive back at the original program from the start (in the hypothetical higher-order language with copatterns).
-
-Our example is straightforwardly generalized. Thus, when parametric polymorphism can be successfully brought to Uroboro, this variant of Uroboro would have the same expressiveness as many of the usual higher-order programming languages with parametric polymorphism.
-
-\section{Future research}
-\label{sec:futr}
-
-Finally, we consider possible future research avenues. Uroboro is intended to not just be yet another language, but rather a programme with the goal of bringing useful automatic refactorings to higher-order programs. This programme has both theoretical and practical aspects to it. For both, we give some ideas where future research, starting from our work, could lead to.
-
-On the practical side, our transformations can be implemented in an IDE. We believe that many of the concepts underlying integrated refactoring, as already successfully applied for many years, e.g., in the Eclipse IDE\footnote{\url{http://eclipse.org}}, can be carried over to Uroboro. Bäumer et al.\cite{baumer2001integrating} outline the three key steps when implementing a refactoring for Eclipse: detecting affected code, structural analysis of the program, and the actual changes to the code.
-
-In an Uroboro IDE, on the one hand, the user might be able to interactively carry out individual extraction refactorings. Speaking in the terminology we developed in chapter 3, the user can select a target set of equations, then, just like in other IDEs, he can be informed whether the extraction can be carried out without problems. Such problems can be the introduction of overlaps, or that the selected equations aren't actually a target set in the sense of chapter 3. The user might also wish to determine the name of the auxiliary function created by the extraction.\footnote{Going one step further, as suggested by Klaus Ostermann, one might want to annotate those auxiliary functions, e.g., with the circumstances of their creation.} Compared with the steps described by Bäumer et al., the detection of affected code falls away since this is done manually by the user, and some structural analysis is needed to detect introduced overlaps or to verify the validity of the target.
-
-On the other hand, the user might also request to de- or refunctionalize the program or some of its function definitions. In this case, as described in chapter 4, the extractions necessary for preprocessing are automatically chosen by the IDE. It might also be useful to display to the user whether the program is in a certain desired fragment of Uroboro, like the defunctionalized or refunctionalized fragment, or whether it is coverage complete. Again comparing this with the implementation steps of Bäumer et al., the detection of affected code needs to be done for each unnesting step, using the coverage derivation, while some structural analysis is necessary before the unnesting starts, to check whether unnesting and/or core de- or refunctionalization is even necessary, to derive the coverage\footnote{As suggested in \autoref{sec:relunn}, instead of this one might want to provide interactive program construction (as a feature of the IDE).} (if possible), and to determine whether a valid transformation is possible, which may not be the case when the program isn't coverage complete.
-
-On the theoretical side, it might be desirable to automatize further already known transformations, to add to the toolbox of Uroboro transformations we started with this work. Examples of such transformations are CPS transformation and its converse, direct style transformation, as motivated in \autoref{ssec:defuncex} and \autoref{ssec:refuncex}, respectively.
-
-We also have shone a light on the asymmetry between constructors and destructors in Uroboro in \autoref{sssec:asym}. The underlying problem directly relates to the difference between natural deduction and arbitrary sequent calculus, and it is not exclusive to Uroboro, but rather affects all current languages with copattern matching. Thus it might be beyond the principal scope of the Uroboro programme, at least in the short term, but nonetheless an interesting research problem.
+All in all, it can be seen that refunctionalizing the counter as done manually by Danvy and Millikin is essentially the same as the part of our automatic refunctionalizing concerning the type \texttt{Nat}. The differences between our refunctionalization result and theirs are due to the merging of functions they perform and our unrestricted refunctionalization of all types.
