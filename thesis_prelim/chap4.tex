@@ -82,7 +82,7 @@ The rest of this chapter is organized as follows. The first section describes th
 \section{Unnesting}
 \label{sec:unn}
 
-We adapt the translation algorithm from section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro. Their algorithm translates equations step-by-step depending upon the derivation of the copattern coverage of their lhss. Our adaptation only has steps which concern patterns that have a counterpart in Uroboro\footnote{I.e., not those for applications, units, and pairs. In the adapted algorithm for Uroboro, the last one is merged into the steps for destructors and constructors, while the others are irrelevant because Uroboro doesn't have the corresponding higher-order constructs.}. Each such translation step can be considered an extraction as defined in chapter 3.
+We adapt the translation algorithm from section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro. Their algorithm translates equations step-by-step depending upon the derivation of the copattern coverage of their lhss. Our adaptation only has steps which concern patterns that have a counterpart in Uroboro\footnote{I.e., not those for applications, units, and pairs. In the adapted algorithm for Uroboro, the last two are merged into the steps for destructors and constructors, while application is irrelevant because Uroboro doesn't have function types.}. Each such translation step can be considered an extraction as defined in chapter 3.
 
 \subsection{Simple patterns}
 
