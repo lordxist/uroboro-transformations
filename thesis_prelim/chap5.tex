@@ -204,11 +204,28 @@ function cons(Parenthesis, Word): Word where
 \label{fig:dyckrefunced}
 \end{figure}
 
+\begin{figure}
+\begin{lstlisting}
+fun recognize_refunctionalized ps
+  = let (* run : word * (word option -> bool) -> bool *)
+       fun run ([], c) 
+           = c NONE
+         | run (L :: ps, c)
+           = run (ps, fn NONE => false | SOME ps => run (ps, c))
+         | run (R :: ps, c)
+           = c (SOME ps)
+    in run (ps, fn NONE => true | SOME ps => false)
+    end
+\end{lstlisting}
+\caption{Refunctionalized Dyck word recognizer of Danvy and Millikin}
+\label{fig:danvydyckrefunced}
+\end{figure}
+
 Danvy and Millikin\cite{danvy09refunctionalization} give a number of examples for refunctionalization, one of which is a recognizer for Dyck words, which they present in ML; \autoref{fig:dyck} shows the recognizer translated to Uroboro. Danvy and Millikin refunctionalize the recognizer with respect to the counter, which is the second argument of function \texttt{run}. Using the executable \texttt{refunc} provided in our Haskell package \texttt{uroboro-transformations} to automatically refunctionalize the recognizer yields the program shown in \autoref{fig:dyckrefunced}; we omit the empty codata type definition for \texttt{Bool} and the empty function definitions for \texttt{true()} and \texttt{false()}, for the following reason.
 
 Our transformation refunctionalizes \textit{everything}, which is not what Danvy and Millikin do; especially, we are not interested in how \texttt{Bool} is refunctionalized. It might be desirable to be able to detect which parts of a program can be de- or refunctionalized independently; in the present case, \texttt{Bool} clearly can be excluded from the refunctionalization, since its constructors don't appear in any patterns. Similarly, \texttt{Word} and \texttt{Parenthesis} have also been refunctionalized; excluding them from the refunctionalization is not as simple as with \texttt{Bool}, since their constructors do appear in patterns.
 
-Leaving this problem aside, we concentrate on recognizing the similarity between our transformation result, and the result of Danvy and Millikin's manual refunctionalization, which they present in Figure 3 of their work. Danvy and Millikin refunctionalize the program with respect to the counter. For this reason, first-class function terms in their transformation result -- which are always continuations -- should correspond to terms of codata type \texttt{Nat} in our transformation result. We will now show that this is actually the case.
+Leaving this problem aside, we concentrate on recognizing the similarity between our transformation result, and the result of Danvy and Millikin's manual refunctionalization, which they present in Figure 3 of their work; we repeat this figure in \autoref{fig:danvydyckrefunced}. Danvy and Millikin refunctionalize the program with respect to the counter. For this reason, first-class function terms in their transformation result -- which are always continuations -- should correspond to terms of codata type \texttt{Nat} in our transformation result. We will now show that this is actually the case.
 
 The arguments of their \texttt{run} function are words and functions from optional words  (i.e., they use ML's option type) to booleans. Where do we find this signature in our transformation result? Look at the signature of our \texttt{run}, which in the refunctionalized form of the program is a destructor of \texttt{Word}. It has one argument with type \texttt{Nat}. Let us look at the codata type definition for \texttt{Nat}: Two destructors are defined, both of which have result type \texttt{Bool}, and one of them has no arguments while the other has exactly one argument with type \texttt{Word}. The reason for there being two destructors instead of only one using an option type is that we didn't introduce any arguments with option types, in contrast to Danvy and Millikin, who, during their manual preprocessing of the program, introduce such arguments in order to merge several functions.
 
