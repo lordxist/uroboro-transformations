@@ -60,6 +60,8 @@ unnesting prog pts pt = Data.Traversable.sequence $ do
     c <- runReader (checkCoverage (ptToSig pt) pt) prog
     return $ evalStateT (flip runReaderT pts $ unnestingWithCoverage pt) c
 
+-- |Unnest any Uroboro program with copattern coverage
+-- |Fails when the program doesn't have copattern coverage.
 unnestFor :: UnnestPredicate -> [PT] -> Maybe [PT]
 unnestFor i pts = do
   p <- hush $ betterTypecheck pts

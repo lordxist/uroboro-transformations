@@ -11,9 +11,7 @@ import UroboroTransformations.CoreDR.CoreRefunc
 import System.IO
 import System.Environment
 
--- |At the moment this is just a test: 
--- parses, typechecks, applies the core of refunc. the input, then typechecks and pretty-prints result
--- For this to work, uroboro.cabal needs to be edited to expose Uroboro.PrettyPrint
+-- |Applies core refunc. to the input
 main :: IO ()
 main = do
     input <- getContents
