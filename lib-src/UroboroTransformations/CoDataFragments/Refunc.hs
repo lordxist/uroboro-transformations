@@ -20,13 +20,7 @@ refuncExp (PDes l id es e) fsigs = PDes l id (map (flip refuncExp fsigs) es) (re
 illegalRule :: PTRule -> Bool
 illegalRule (PTRule _ (PQDes l _ _ _) _) = True
 illegalRule (PTRule _ (PQApp l _ []) _) = True
-illegalRule (PTRule _ (PQApp l _ (pp:pps)) _) = (any (not . var) pps) || ((not . con) pp)
-  where
-    con (PPCon _ _ _) = True
-    con _             = False
-
-    var (PPVar _ _) = True
-    var _           = False
+illegalRule (PTRule _ (PQApp l _ (pp:pps)) _) = (any con pps) || ((not . con) pp)
 
 refuncFunSig :: (Location, Identifier, [Type], Type) -> PTDes
 refuncFunSig (l, id, t':ts, t) = PTDes l t id ts t'
