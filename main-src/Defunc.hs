@@ -25,7 +25,7 @@ main = do
             Left e -> hPutStrLn stderr $ unlines ["Typecheck Error: ", show e]
             Right _p -> do
                 case defunc pts of
-                    Nothing -> hPutStrLn stderr $ "Transform Error: Not in correct Fragment"
+                    Nothing -> hPutStrLn stderr $ "Transform Error: No copattern coverage"
                     Just t -> case typecheck t of
                         Left e -> hPutStrLn stderr $ unlines ["Typecheck Error in transformed program: ", show e]
                         Right _ -> putStrLn $ renderProgram t

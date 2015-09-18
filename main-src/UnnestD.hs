@@ -24,5 +24,5 @@ main = do
     case ptsOrError of
         Left e -> hPutStrLn stderr $ unlines ["Parse Error: ", show e]
         Right pts -> case unnestForDefunc pts of
-            Nothing -> hPutStrLn stderr $ "Error during unnesting."
+            Nothing -> hPutStrLn stderr $ "Transform Error: No copattern coverage"
             Just pts' -> putStrLn $ renderProgram pts'
