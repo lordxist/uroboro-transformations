@@ -184,6 +184,40 @@ function fib(): List where
 
 |]
 
+compos :: String
+compos = [str|
+data T where
+  a(T) : T
+  b(T) : T
+  c() : T
+
+function f(T) : T where
+  f(a(a(x))) = f(x)
+  f(a(b(y))) = a(b(f(y)))
+  f(a(c())) = a(c())
+  f(b(z)) = b(f(z))
+  f(c()) = c()
+|]
+
+compos_result :: String
+compos_result = [str|
+codata T where
+  T.f(): T
+  T.autogen0_aux(): T
+
+function a(T): T where
+  a(x).f() = x.autogen0_aux()
+  a(x).autogen0_aux() = x.f()
+
+function b(T): T where
+  b(x).f() = b(x.f())
+  b(x).autogen0_aux() = a(b(x.f()))
+
+function c(): T where
+  c().f() = c()
+  c().autogen0_aux() = a(c())
+|]
+
 spec :: Spec
 spec = do
     describe "refunc" $ do
@@ -191,3 +225,5 @@ spec = do
             (standardize $ fromJust (refunc $ parse simple_refunc_test)) `shouldBe` (standardize $ parse simple_refunc_test_result)
         it "transforms entangled_test.uro into entangled_test_result.uro" $ do
             (standardize $ fromJust (refunc $ parse entangled_test)) `shouldBe` (standardize $ parse entangled_test_result)
+        it "transforms compos.uro into compos_result.uro" $ do
+            (standardize $ fromJust (refunc $ parse compos)) `shouldBe` (standardize $ parse compos_result)
