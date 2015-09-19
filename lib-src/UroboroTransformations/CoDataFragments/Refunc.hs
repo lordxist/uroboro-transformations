@@ -47,7 +47,7 @@ refuncRules id rs fsigs = map (flip refuncRule fsigs) (filter hasSameId rs)
 funForCon :: [PTRule] -> [(Location, Identifier, [Type], Type)] -> PTCon -> PT
 funForCon rs fsigs (PTCon l t id ts) = PTFun l id ts t (refuncRules id rs fsigs)
 
--- |Refunctionalize a program in the Data Fragment
+-- |Refunctionalize a program in the Data Fragment.
 -- Fails when not in the fragment, with one exception:
 -- destructors on right-hand sides are allowed.
 -- Such programs don't typecheck, but this exception is

@@ -20,7 +20,7 @@ defuncRuleExps :: PT -> PT
 defuncRuleExps (PTFun l id ts t rs) = PTFun l id ts t (map defuncExpInRule rs)
 defuncRuleExps pt = pt
 
--- | Defunctionalize a sufficiently unnested program
+-- | Defunctionalize a sufficiently unnested program.
 -- Fails when not in the sufficiently unnested for defunc. fragment
 defunc :: [PT] -> Maybe [PT]
 defunc pts = do

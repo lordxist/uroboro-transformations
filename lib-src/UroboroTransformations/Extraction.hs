@@ -110,8 +110,8 @@ replaceTargetWithEpsilon :: PT -> [PTRule] -> PTRule -> PT
 replaceTargetWithEpsilon (PTFun l id ts t rs) tgt eps = PTFun l id ts t (eps:(rs \\ tgt))
 
 -- |Apply the extraction as represented by the given ExtractionSpec to the given function definition.
--- |Returns a pair of function definitions, the first is the changed original definition, the other
--- |is the generated auxiliary definition.
+-- Returns a pair of function definitions, the first is the changed original definition, the other
+-- is the generated auxiliary definition.
 applyExtraction :: ExtractionSpec -> PT -> (PT, PT)
 applyExtraction spec pt = first (replaceTargetWithEpsilon pt (map fst $ target spec)) eResult
   where

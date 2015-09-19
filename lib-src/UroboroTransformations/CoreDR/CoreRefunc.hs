@@ -25,7 +25,7 @@ refuncRuleExps :: [(Location, Identifier, [Type], Type)] -> PT -> PT
 refuncRuleExps fsigs (PTFun l id ts t rs) = PTFun l id ts t (map (refuncExpInRule fsigs) rs)
 refuncRuleExps _ pt = pt
 
--- | Refunctionalize a sufficiently unnested program
+-- | Refunctionalize a sufficiently unnested program.
 -- Fails when not in the sufficiently unnested for refunc. fragment
 refunc :: [PT] -> Maybe [PT]
 refunc pts = do

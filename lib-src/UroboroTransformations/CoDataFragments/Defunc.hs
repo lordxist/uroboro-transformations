@@ -41,7 +41,7 @@ defuncRules id rs = map defuncRule (filter (hasId id) rs)
 funForDes :: [PTRule] -> PTDes -> PT
 funForDes rs (PTDes l t id ts t') = PTFun l id (t':ts) t (defuncRules id rs)
 
--- |Defunctionalize a program in the Codata Fragment
+-- |Defunctionalize a program in the Codata Fragment.
 -- Fails when not in the fragment, with one exception:
 -- constructors on right-hand sides are allowed.
 -- Such programs don't typecheck, but this exception is
