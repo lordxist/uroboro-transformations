@@ -86,8 +86,11 @@ possibleTreesWithRoot d tq = do
     tqs1 <- splitRes tq
     trees1 <- mapM (possibleTreesWithRoot (d-1)) tqs1
     tqss <- splitVars tq
-    trees2 <- mapM (possibleVarSplitTrees d tq) tqss
-    return $ (Leaf tq):((map (ResSplit tq) (sequence trees1))++(concat trees2))
+    trees2 <- mapM (possibleVarSplitTrees d tq) (filter ((not.null).fst) tqss)
+    return $ (Leaf tq):((map (ResSplit tq) (flattenEmpty $ sequence trees1))++(concat trees2))
+  where
+    flattenEmpty [[]] = []
+    flattenEmpty xs   = xs
 
 headTQ :: PTSig -> TQ
 headTQ (id, (_, ts, t)) = TQApp t id (evalState (mapM convertToTypedVar ts) 0)
