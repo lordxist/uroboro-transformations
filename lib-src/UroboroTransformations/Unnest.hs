@@ -2,7 +2,7 @@ module UroboroTransformations.Unnest (unnestFor) where
 
 import UroboroTransformations.CopatternCoverage
 import UroboroTransformations.CopatternCoverage.CCTree
-import UroboroTransformations.Extraction (ExtractionSpec(ExtractionSpec), applyExtraction)
+import UroboroTransformations.Extraction (ExtractionSpec(ExtractionSpec), zipCoverageRules, applyExtraction)
 import UroboroTransformations.Extraction.ConExtraction
 import UroboroTransformations.Extraction.DesExtraction
 import UroboroTransformations.Util
@@ -25,6 +25,7 @@ import Control.Monad.Trans.Maybe
 
 import Debug.Trace
 
+-- |Describes whether the function definition is not sufficiently unnested for some purpose.
 type UnnestPredicate = PT -> Bool
 
 extractionSpec :: CCTree -> [PT] -> [(PTRule, TQ)] -> ExtractionSpec

@@ -12,6 +12,7 @@ illegalRule (PTRule _ (PQDes _ _ pps pq) _) = (any con pps) || (illegalPQ pq)
     illegalPQ (PQDes l _ _ _) = True
     illegalPQ (PQApp _ _ pps)   = any con pps
 
+-- |Defunctionalize the given term
 defuncExp :: PExp -> PExp
 defuncExp v@(PVar _ _) = v
 defuncExp (PApp l id es) = PApp l id (map defuncExp es) -- PApp doesn't distinguish cons and funs

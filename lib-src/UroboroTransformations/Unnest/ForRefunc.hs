@@ -7,6 +7,7 @@ import Uroboro.Tree
 
 import Data.List
 
+-- |Is the given function definition not sufficiently unnested for refunctionalization?
 isRNestedFunDef :: PT -> Bool
 isRNestedFunDef (PTFun _ _ _ _ rs) = any isRNestedRule rs
   where
@@ -22,5 +23,6 @@ isRNestedFunDef (PTFun _ _ _ _ rs) = any isRNestedRule rs
     numCons (PPVar _ _) = 0
 isRNestedFunDef _ = False
 
+-- |Unnest any Uroboro program with copattern coverage, with purpose refunctionalization.
 unnestForRefunc :: [PT] -> Maybe [PT]
 unnestForRefunc = unnestFor isRNestedFunDef

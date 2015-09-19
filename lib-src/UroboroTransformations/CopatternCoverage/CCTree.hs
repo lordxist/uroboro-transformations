@@ -1,14 +1,11 @@
 module UroboroTransformations.CopatternCoverage.CCTree (
     CCTree (Leaf, VarSplit, ResSplit)
-  , PTSig
   , possibleTrees
   , splittingDepth
   , lowestSubtree
   , cutoffLowestSubtree
   , isSimpleTree
   , leaves
-  , BetterProgram (ts, cs, ds, fs, rs)
-  , betterProgram
 ) where
 
 import Control.Arrow
@@ -28,6 +25,7 @@ import UroboroTransformations.Util
 import UroboroTransformations.Util.Typed
 import UroboroTransformations.Util.UroboroEnhanced
 
+-- |Coverage derivation tree
 data CCTree = VarSplit TQ PathToSubterm [CCTree] | ResSplit TQ [CCTree] | Leaf TQ deriving (Show)
 
 convertToTypedVar :: Type -> State Int TP
@@ -97,6 +95,7 @@ headTQ (id, (_, ts, t)) = TQApp t id (evalState (mapM convertToTypedVar ts) 0)
 possibleTreesBProg :: PTSig -> Int -> Reader BetterProgram [CCTree]
 possibleTreesBProg sig d = possibleTreesWithRoot d (headTQ sig)
 
+-- |Produces all possible coverage derivation trees of the given depth for the given function signature
 possibleTrees :: PTSig -> Int -> Reader Program [CCTree]
 possibleTrees sig d = withReader betterProgram (possibleTreesBProg sig d)
 
@@ -104,10 +103,13 @@ splittingDepthPP :: PP -> Int
 splittingDepthPP (PPVar _ _) = 0
 splittingDepthPP (PPCon _ _ pps) = 1 + (sum $ map splittingDepthPP pps)
 
+-- |The splitting depth of the given copattern, i.e., the number of its constructors plus that of its
+-- |destructors.
 splittingDepth :: PQ -> Int
 splittingDepth (PQApp _ _ pps) = sum $ map splittingDepthPP pps
 splittingDepth (PQDes _ _ pps pq) = 1 + (sum $ map splittingDepthPP pps) + (splittingDepth pq)
 
+-- |The list of copatterns at the leaves of the given coverage derivation tree.
 leaves :: CCTree -> [TQ]
 leaves (Leaf tq) = [tq]
 leaves (ResSplit _ trees) = concatMap leaves trees
@@ -130,6 +132,7 @@ lowestSubtrees t _
   | all isLeaf (children t) = [t]
   | otherwise = concatMap (flip lowestSubtrees NonInitial) (children t)
 
+-- |Returns the last split in the given derivation tree.
 lowestSubtree :: CCTree -> CCTree
 lowestSubtree t = (lowestSubtrees t Initial) !! 0
 
@@ -143,6 +146,7 @@ lowestSubtreeToLeaf (t:ts)
     getTQ (ResSplit tq _) = tq
     getTQ (VarSplit tq _ _) = tq
 
+-- |Cuts off the last split from the given derivation tree.
 cutoffLowestSubtree :: CCTree -> CCTree
 cutoffLowestSubtree (ResSplit tq ts)
   | all isLeaf ts = Leaf tq
@@ -151,6 +155,7 @@ cutoffLowestSubtree (VarSplit tq p ts)
   | all isLeaf ts = Leaf tq
   | otherwise = VarSplit tq p (lowestSubtreeToLeaf ts)
 
+-- |Is the tree simple, i.e., does it consist of at maximum one split?
 isSimpleTree :: CCTree -> Bool
 isSimpleTree (Leaf _) = True
 isSimpleTree (ResSplit _ ts) = all isLeaf ts

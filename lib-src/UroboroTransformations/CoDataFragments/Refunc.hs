@@ -7,6 +7,7 @@ import UroboroTransformations.Util
 
 import Debug.Trace
 
+-- |Refunctionalize the given term using the given list of function signatures
 refuncExp :: PExp -> [(Location, Identifier, [Type], Type)] -> PExp
 refuncExp v@(PVar _ _) _ = v
 refuncExp (PApp l id es) fsigs
