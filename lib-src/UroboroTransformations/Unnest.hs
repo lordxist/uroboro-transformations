@@ -1,4 +1,4 @@
-module UroboroTransformations.Unnest (unnestFor) where
+module UroboroTransformations.Unnest (unnestFor, UnnestPredicate) where
 
 import UroboroTransformations.CopatternCoverage
 import UroboroTransformations.CopatternCoverage.CCTree
