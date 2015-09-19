@@ -10,7 +10,17 @@ Another important feature of many functional programming languages is that they 
 
 Sometimes, a first-order specification of some function can be beneficial over an equivalent higher-order specification, and sometimes it is the other way around. This can depend upon whether human understandability or a certain property advantageous for machine processing is desired. For this reason, researchers are interested in finding and automatizing transformations which can bring a higher-order program into a semantically equivalent first-order form, or the other way around. Transforming a higher-order program (with first-class functions) into an equivalent first-order program (without first-class functions) is called defunctionalization, the opposite direction is called refunctionalization.
 
-In this work, we develop automatic program transformations for a specific language with copattern matching, called \textit{Uroboro}. One major goal is to support automatic de- and refunctionalization for all of Uroboro. Uses for these kinds of transformations have been presented by Reynolds and Danvy, among others. Uroboro is interesting for the purpose of automatizing such transformations, because, as Rendel et al.\cite{rendel15automatic} have shown, copatterns and refunctionalization are related. We have developed and/or adapted the necessary transformation steps for de- and refunctionalization. For some of the steps, we have identified a generalization; we call such transformations \textit{extractions}. We intend the transformations of this work to be a foundation for an entire toolbox of automatic transformations for Uroboro.
+In this work, we develop automatic program transformations for a specific language with copattern matching, called \textit{Uroboro}. One major goal is to support automatic de- and refunctionalization for all of Uroboro. Uses for these kinds of transformations have been presented by Reynolds and Danvy, among others. Uroboro is interesting for the purpose of automatizing such transformations, because, as Rendel et al.\cite{rendel15automatic} have shown, copatterns and refunctionalization are related. Rendel et al. have already developed automatic de- and refunctionalization between two fragments of Uroboro, called the Data and Codata Fragment. Based on their work, we contribute the following.
+\begin{itemize}
+\item We formally define the full language Uroboro, which is an extension of both the Data and the Codata Fragment.
+
+\item We have developed and/or adapted the necessary transformation steps, such that one can now automatically de- and refunctionalize all of Uroboro.
+
+\item For some of the steps, we have identified a generalization; we call such transformations \textit{extractions}.
+
+\item When developing automatic refunctionalization, we have encountered a complication which doesn't have an analogue in defunctionalization; we have identified the general problem underlying this, shining a light on an asymmetry between patterns and copatterns.
+\end{itemize}
+We intend the transformations of this work to be a foundation for an entire toolbox of automatic transformations for Uroboro.
 
 In this introduction, we first give an informal overview of de- and refunctionalization. Next, we briefly describe copatterns. We then outline how Uroboro relates these two concepts and why we consider this language interesting. Finally, we sum up the contents of this thesis.
 
