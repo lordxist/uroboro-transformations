@@ -59,7 +59,7 @@ ptToSig (PTFun l id ts t rs) = (id, (l, ts, t))
 unnesting :: Program -> [PT] -> PT -> State [PT] (Maybe PT)
 unnesting prog pts pt = Data.Traversable.sequence $ do
     c <- runReader (checkCoverage (ptToSig pt) pt) prog
-    return $ evalStateT (flip runReaderT pts $ unnestingWithCoverage pt) c
+    return $ evalStateT (flip runReaderT pts $ unnestingWithCoverage pt) (trace (show c) c)
 
 -- |Unnest any Uroboro program with copattern coverage.
 -- Fails when the program doesn't have copattern coverage.

@@ -21,13 +21,13 @@ import UroboroTransformations.Util
 import UroboroTransformations.Util.Typed
 import UroboroTransformations.Util.Conversion
 
--- The lens underlying the extraction.
+-- |The lens underlying the extraction.
 data ExtractionLens = ExtractionLens {
       get     :: TQ -> TQ
     , putback :: TQ -> TQ -> TQ
 }
 
--- |Describes an extraction.
+-- |Describes an extraction. The target is assumed to be non-empty.
 data ExtractionSpec = ExtractionSpec {
       lens     :: ExtractionLens -- the underlying lens
     , fullProg :: [PT] -- the whole program (needed for autogenerating function names)
@@ -60,7 +60,7 @@ auxName = do
   return $ autogen "aux" prog
 
 auxify :: TQ -> Reader ExtractionSpec TExp
-auxify tq = liftM (flip (TApp (getType tq)) (map tpToTExp (collectVarsTQ tq))) auxName    
+auxify tq = liftM (flip (TApp (getType tq)) (map tpToTExp (collectVarsTQ tq))) auxName
 
 epsilonLhs :: Reader ExtractionSpec TQ
 epsilonLhs = do

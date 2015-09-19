@@ -19,7 +19,7 @@ data BetterProgram = BetterProgram {
 betterProgram :: Program -> BetterProgram
 betterProgram (Program ts cs ds fs rs) = BetterProgram ts (assocWithType cs) (assocWithType ds) fs rs
   where
-    assocWithType xs = [(t, filter (hasType t) xs) | t <- ts]
+    assocWithType xs = [(t, filter (belongsToType t) xs) | t <- ts]
 
 type PTSig = (Identifier, (Location, [Type], Type))
 
