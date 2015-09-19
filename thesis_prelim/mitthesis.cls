@@ -460,10 +460,13 @@ reserved.\par\permission}}
 \def\maketitle{\begin{titlepage}
 \large
 {\def\baselinestretch{1.2}\Large\bf \choosecase{\@title} \par}
+\vskip 3\baselineskip
 by\par
+\vskip 3\baselineskip
 {\Large  \choosecase{\@author}}
-\par
-\@prevdegrees
+%\par
+%\@prevdegrees
+\vskip 3\baselineskip
 \par
 \choosecase{Submitted to the} \choosecase{\@department} \\
 \choosecase{in partial fulfillment of the requirements for the}
@@ -473,7 +476,9 @@ by\par
 \choosecase{\@degree}
 \par
 at the
+\vskip 3\baselineskip
 \par\EKUT\par
+\vskip 3\baselineskip
 \@degreemonth\ \@degreeyear
 %\par
 %\@copyrightnotice
@@ -486,7 +491,7 @@ at the
 %\par
 %\vfill
 %\signature{Accepted by}{\@chairmanname \\ \@chairmantitle}
-%\vfill
+\vfill
 \end{titlepage}}
 
 % this environment should probably be called abstract,
