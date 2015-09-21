@@ -194,6 +194,28 @@ function autogen1_aux(Nat, Nat): Nat where
 
 |]
 
+-- doesn't have copattern coverage
+failure :: String
+failure = [str|
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+data Bool where
+  true(): Bool
+  false(): Bool
+
+codata List where
+  List.elemAt(Nat): Nat
+  List.isEmpty(): Bool
+
+function repeat(Nat): List where
+  repeat(zero()).elemAt(n) = zero()
+  repeat(succ(m)).elemAt(n) = succ(m)
+
+|]
+
 spec :: Spec
 spec = do
     describe "defunc" $ do
@@ -203,3 +225,5 @@ spec = do
             (standardize $ fromJust (defunc $ parse test_multi_des)) `shouldBe` (standardize $ parse test_multi_des_result)
         it "transforms fibonacci.uro into fibonacci_result.uro" $ do
             (standardize $ fromJust (defunc $ parse fibonacci)) `shouldBe` (standardize $ parse fibonacci_result)
+        it "fails with Nothing when trying to transform failure.uro" $ do
+            (defunc $ parse failure) `shouldBe` Nothing
