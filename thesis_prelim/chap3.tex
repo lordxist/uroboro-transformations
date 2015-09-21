@@ -108,13 +108,11 @@ Since copatterns without destructors aren't affected, this extraction is only me
 With $\texttt{get} = \pi$ and $\texttt{putback}(q^a, q^c) = \sigma^{q^c}_\pi(q^a)$ we have the $\pi$-lens. We would like to illustrate with a little Haskell implementation how straightforward the two parts of the lens fit together.
 
 \begin{lstlisting}
-
 desExtrGet :: Cop -> Cop
 desExtrGet (Des _ cop _) = cop
 
 desExtrPutback :: Cop -> Cop -> Cop
 desExtrPutback cop (Des des _ args) = Des des cop args
-
 \end{lstlisting}
 
 All extraction projections that are the counterparts to cosubstitutions can be defined as a composition of the destructor extraction projection: Simply extract the destructors one after the other.

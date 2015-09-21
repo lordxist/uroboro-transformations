@@ -45,7 +45,6 @@ Destructor and constructor extraction are special cases of the general concept w
 
 \begin{figure}
 \begin{lstlisting}
-  
 data Nat where
   Zero: Nat
   Succ: Nat -> Nat
@@ -66,7 +65,6 @@ def fib: Stream where
   fib.head = Zero
   fib.tail.head = Succ Zero
   fib.tail.tail = zipWith (add, fib, fib.tail)
-
 \end{lstlisting}
 \caption{Uroboro-like higher-order program}
 \label{fig:ch5uro1}
@@ -74,7 +72,6 @@ def fib: Stream where
 
 \begin{figure}
 \begin{lstlisting}
-
 data Nat where
   Zero(): Nat
   Succ(Nat): Nat
@@ -102,7 +99,6 @@ function fib(): Stream where
   fib().head() = Zero()
   fib().tail().head() = Succ(Zero())
   fib().tail().tail() = zipWith(add(), fib(), fib().tail())
-
 \end{lstlisting}
 \caption{Codata conversion of \autoref{fig:ch5uro1}}
 \label{fig:ch5uro2}
@@ -110,7 +106,6 @@ function fib(): Stream where
 
 \begin{figure}
 \begin{lstlisting}
-
 codata Fun<A, B> where
   Fun<A, B>.apply(A): B
 
@@ -137,7 +132,6 @@ function fib(): Stream where
   fib().head() = Zero()
   fib().tail().head() = Succ(Zero())
   fib().tail().tail() = zipWith().apply((add(), fib(), fib().tail()))
-
 \end{lstlisting}
 \caption{Parametric polymorphism for \autoref{fig:ch5uro2}}
 \label{fig:ch5uro3}

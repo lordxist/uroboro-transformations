@@ -103,11 +103,9 @@ To illustrate what the algorithms $\textsf{Unnest}_d$ and $\textsf{Unnest}_r$ ar
 \textbf{Unnesting for defunc.} We begin with $\textsf{Unnest}_d$, and first consider the function definition for \texttt{oneElemArray}.
 
 \begin{lstlisting}
-
 function oneElemArray(Nat): Array where
   oneElemArray(n).get(Zero()) = n
   oneElemArray(n).get(Succ(m)) = Zero()
-
 \end{lstlisting}
 
 The goal is to make the lhss of the function definition sufficiently simple for defunctionalization. As both lhss have both destructors and constructors, this isn't the case yet. Unnesting works on the derivation tree for copattern coverage, thus we first need this derivation tree. By trying all possible derivation trees of depth two (maximal number of constructors plus number of destructors in any lhs), we get the following derivation tree.
@@ -123,14 +121,12 @@ The goal is to make the lhss of the function definition sufficiently simple for 
 The last step in the derivation is a variable split, i.e., introduction of constructor calls, at the single argument of the destructor \texttt{get}. Therefore, we simplify the lhss of the program by extracting these constructor calls into an auxiliary function definition, resulting in the following program.
 
 \begin{lstlisting}
-
 function oneElemArray(Nat): Array where
   oneElemArray(n).get(m) = aux(n, m)
 
 function aux(Nat, Nat): Array where
   aux(n, Zero()) = n
   aux(n, Succ(m)) = Zero()
-
 \end{lstlisting}
 
 Now, \texttt{oneElemArray} has only one lhs, and this is sufficiently simple for defunctionalization since it has only one destructor and no constructors. The auxiliary function $aux$ also has only sufficiently simple lhss; in fact, this is the case for all auxiliary functions introduced by the unnesting. The remaining function definitions are sufficiently simple for unnesting, as well, thus we are done.
@@ -138,12 +134,10 @@ Now, \texttt{oneElemArray} has only one lhs, and this is sufficiently simple for
 \textbf{Unnesting for refunc.} Next, we use $\textsf{Unnest}_r$ on the example. We first consider \texttt{oneElemArray}, and again use the coverage derivation tree from above. The same constructor extraction as with $\textsf{Unnest}_d$ is carried out; the resulting function definitions are also sufficiently simple for refunctionalization. Next, we turn to \texttt{isOne}: it's lhss are sufficiently simple for defunctionalization, but not for refunctionalization, since it contains nested constructor calls.
 
 \begin{lstlisting}
-
 function isOne(Nat): Nat where
   isOne(Zero()) = Zero()
   isOne(Succ(Zero())) = Succ(Zero())
   isOne(Succ(Succ(n))) = Zero()
-
 \end{lstlisting}
 
 We try all possible derivation trees of depth two, and get the following derivation tree.
@@ -159,7 +153,6 @@ We try all possible derivation trees of depth two, and get the following derivat
 The last step in the derivation is a variable split; we ``undo'' this by extracting the respective constructor calls into an auxiliary function. In the terminology developed in \autoref{ch:extr}, we target the last two lhss in the function definition for constructor extraction; the position to be targeted is the (only) argument position of the constructor call that is the first argument of the function call in both lhss.
 
 \begin{lstlisting}
-
 function isOne(Nat): Nat where
   isOne(Zero()) = Zero()
   isOne(Succ(n)) = aux2(n)
@@ -167,7 +160,6 @@ function isOne(Nat): Nat where
 function aux2(Nat): Nat where
   aux2(Zero()) = Succ(Zero())
   aux2(Succ(n)) = Zero()
-
 \end{lstlisting}
 
 Now, all lhss of the program are sufficiently simple for refunctionalization, thus we are done.
@@ -569,7 +561,6 @@ Since solving the underlying problem presented above is beyond the scope of our 
 Consider the following program. It is in fragment $\mathbf{U}_{cc}[fdef_{un,r}]$, but not in $\mathbf{U}_{cc}[fdef_{un,r'}]$, since the constructors in the function definition for $f$ are not at the first argument position.
 
 \begin{lstlisting}
-
 data P where
   c1(P): P
   c2(): P
@@ -589,13 +580,11 @@ function f(N, P): P where
 
 function main(): P where
   main() = f(g(), c1(h()))
-
 \end{lstlisting}
 
 What is the easiest way to bring this to the form required by $\mathbf{U}_{cc}[fdef_{un,r'}]$? Arguably, the approach that requires the minimal amount of syntactic change is to simply switch the arguments of $f$, in the signature and equations of the function definition and at the call sites. The resulting program looks as follows (we omit the unchanged data and codata type definitions).
 
 \begin{lstlisting}
-
 function g(): N where
   g() = g()
 
@@ -608,7 +597,6 @@ function f(P, N): P where
 
 function main(): P where
   main() = f(c1(h()), g())
-
 \end{lstlisting}
 
 However, this also changes the semantics of the program. For instance, consider the term \texttt{main()}. In the original program, this term reduces as follows:
@@ -624,7 +612,6 @@ Eventually, we again have an infinite reduction sequence, but before that, the e
 How to fix this? By first extracting the constructor, and then switching the arguments of the auxiliary function. Under this approach, the transformed program looks as follows (again omitting the unchanged (co)data type definitions):
 
 \begin{lstlisting}
-
 function g(): N where
   g() = g()
 
@@ -640,7 +627,6 @@ function aux(P, N): P where
 
 function main(): P where
   main() = f(g(), c1(h()))
-
 \end{lstlisting}
 
 How about reducing \texttt{main()} in this program? The reduction sequence we get is no different from that of the original program.
@@ -695,7 +681,6 @@ function isOne(Nat): Nat where
 function aux2(Nat): Nat where
   aux2(Zero()) = Succ(Zero())
   aux2(Succ(n)) = Zero()
-
 \end{lstlisting}
 \caption{Uroboro sample before core refunctionalization}
 \label{fig:ch4urosampleprerefunc}
@@ -732,7 +717,6 @@ function oneElemArray(Nat): Array where
 
 function aux(Nat, Nat): Nat where
   aux(n, m) = m.aux3(n)
-
 \end{lstlisting}
 \caption{Uroboro sample after core refunctionalization}
 \label{fig:ch4urosamplepostrefunc}

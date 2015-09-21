@@ -31,7 +31,6 @@ Modules \texttt{Defunc} and \texttt{Refunc} implement the complete defunctionali
 
 \begin{figure}
 \begin{lstlisting}
-
 data Nat where
   zero() : Nat
   succ(Nat) : Nat
@@ -61,7 +60,6 @@ function eval(Exp, Env) : Val where
 
 function interpret(Exp) : Val where
   interpret(exp) = eval(exp, nil())
-
 \end{lstlisting}
 \caption{Meta-circular interpreter in Uroboro}
 \label{fig:mci}
