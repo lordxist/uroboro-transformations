@@ -83,7 +83,7 @@ the function definition that contains the lhss of $T$.
 \section{Prime extractions}
 \label{sec:extrex}
 
-In this section, we give some example extractions, destructor extraction and those from the family of constructor extractions.They are \textit{prime} extractions, in the sense that all other extractions' extraction projections are compositions of the underlying projections of destructor and constructor extractions.
+In this section, we give some example extractions, destructor extraction and those from the family of constructor extractions. They are \textit{prime} extractions, in the sense that all other extractions' extraction projections are compositions of the underlying projections of destructor and constructor extractions.
 
 \subsection{Destructor extraction}
 \label{sec:desextr}
@@ -118,6 +118,23 @@ desExtrPutback cop (Des des _ args) = Des des cop args
 
 All extraction projections that are the counterparts to cosubstitutions can be defined as a composition of the destructor extraction projection: Simply extract the destructors one after the other.
 
+As an example for destructor extraction, consider the function definition for \texttt{oneElemArray} from the program of \autoref{fig:ch2uroex}.
+\begin{lstlisting}
+function oneElemArray(Nat): Array where
+  oneElemArray(n).get(Zero()) = n
+  oneElemArray(n).get(Succ(m)) = Zero()
+\end{lstlisting}
+Targeting both equations for extraction of destructor \texttt{get} leads to the changed function definition for \texttt{oneElemArray} and an auxiliary function definition.
+\begin{lstlisting}
+function oneElemArray(Nat): Array where
+  oneElemArray(n) = aux(n)
+
+function aux(Nat): Array
+  aux(n).get(Zero()) = n
+  aux(n).get(Succ(m)) = Zero()
+\end{lstlisting}
+Note that this transformation didn't decrease the overall syntactic complexity of the program, since the complexity of \texttt{oneElemArray}, where the lhss contained one constructor and one destructor each, is simply transferred over to \texttt{aux}. One way to actually decrease the syntactic complexity of this example is the extraction of the constructor calls \texttt{Zero()} and \texttt{Succ(m)}; constructor extraction is defined in the next section.
+
 \subsection{Constructor extraction}
 \label{ssec:conextr}
 
@@ -132,6 +149,23 @@ The bracket notation means that the replacement occurs at position $\ell$.
 We now show why $\pi_\ell$ is an extraction projection, that is, we give, for each $q$, a substitution $\sigma^q_{\pi_\ell}$ such that $\sigma^q_{\pi_\ell}(\pi_\ell(q)) = q$: Set $\sigma^q_{\pi_\ell} := \{\textsf{name}(\ell) \mapsto con(\overline{x})\}$.
 
 All extraction projections that are the counterparts to substitutions can be defined as a composition of constructor extraction projections: Simply extract the constructors one after the other, from innermost to outermost.
+
+As an example for constructor extraction, consider again the function definition for \texttt{oneElemArray} from the program of \autoref{fig:ch2uroex}.
+\begin{lstlisting}
+function oneElemArray(Nat): Array where
+  oneElemArray(n).get(Zero()) = n
+  oneElemArray(n).get(Succ(m)) = Zero()
+\end{lstlisting}
+Targeting both equations for extraction of the constructor calls at the argument position of \texttt{get} leads to the changed function definition for \texttt{oneElemArray} and an auxiliary function definition.
+\begin{lstlisting}
+function oneElemArray(Nat): Array where
+  oneElemArray(n).get(m) = aux(n, m)
+
+function aux(Nat, Nat): Array
+  aux(n, Zero()) = n
+  aux(n, Succ(m)) = Zero()
+\end{lstlisting}
+Note than in this example, other than destructor extraction, this transformation actually decreased the overall syntactic complexity of the program. The original definition for \texttt{oneElemArray} contained lhss with both destructor and constructor calls; the new definition has one lhs with one destructor, but no constructor call, and the auxiliary definition has two lhss which both have one constructor, but no destructor. Of course, the opposite case also exists, i.e., there are programs which cannot be syntactically simplified by constructor extraction, but by destructor extraction.
 
 \section{Bisimulation}
 \label{sec:extrbis}
