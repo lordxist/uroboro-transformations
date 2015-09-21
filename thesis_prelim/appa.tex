@@ -42,7 +42,7 @@ By induction on the structure of $p$.
 Then it is $y = x$ and $\mathcal{E}'[a] = \sigma(x)$. Thus simply choose $\mathcal{E}'_0 = \mathcal{E}'$.
 
 \item $p = con(p_1, ..., p_n)$ for some $n$-ary constructor $con$ and some patterns $p_1, ..., p_n$.
-Then it is $\mathcal{E}'[a] = con(p_1, ..., p_n)[\sigma]$. When $\mathcal{E}' = []$, it would be $a = con(p^i_1, ..., p^i_{i_n})[\sigma]$, contradicting the premiss that $a$ isn't a constructor call. Thus it must be $\mathcal{E}' = con(\sigma(p_1), ..., \mathcal{E}'_{0'} ..., \sigma(p_n))$ for some $\mathcal{E}'_{0'} \in \mathcal{EC}[\vdash'_v]$, with $\mathcal{E}'_{0'}[a] = p_j$ for a $j \in \{1, ..., n\}$. By the induction hypothesis, there is a variable $x$ in $p_j$ and thus in $p$ such that $\sigma(x) = \mathcal{E}'_1$ for some $\mathcal{E}'_1 \in \mathbf{EC}[\vdash'_v]$.
+Then it is $\mathcal{E}'[a] = con(p_1, ..., p_n)[\sigma]$. When $\mathcal{E}' = []$, it would be $a = con(p^i_1, ..., p^i_{i_n})[\sigma]$, contradicting the premiss that $a$ isn't a constructor call. Thus it must be $\mathcal{E}' = con(\sigma(p_1), ..., \mathcal{E}'_{0'} ..., \sigma(p_n))$ for some $\mathcal{E}'_{0'} \in \mathbf{EC}[\vdash'_v]$, with $\mathcal{E}'_{0'}[a] = p_j$ for a $j \in \{1, ..., n\}$. By the induction hypothesis, there is a variable $x$ in $p_j$ and thus in $p$ such that $\sigma(x) = \mathcal{E}'_1$ for some $\mathcal{E}'_1 \in \mathbf{EC}[\vdash'_v]$.
 \end{itemize}
 \end{proof}
 \end{fact}
@@ -117,7 +117,7 @@ and
 c = \mathcal{E}^{aux}[c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0][c^0] = \mathcal{E}'[\mathcal{E}^{aux}_0[c^0]] \longrightarrow' \mathcal{E}'[d_0] = d.
 \]
 
-\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{C} \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{C}]$. By fact \autoref{fac:chp21}, it follows that $\mathcal{E}^{aux} \in \textrm{EC}[\vdash'_v]$. Further, it follows that $\mathcal{C}[a'_0] = a^{aux}_0$. By \autoref{lem:app2} we have a $d_0$ with $c_0 \longrightarrow' d_0$ and $\mathcal{C}[b_0] \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}^{aux}[d_0]$; the property holds since
+\item The hole of $\mathcal{E}^{aux}$ properly contains that of $\mathcal{E}'$, i.e., there is a context $\mathcal{C} \neq []$ such that $\mathcal{E}' = \mathcal{E}^{aux}[\mathcal{C}]$. By fact \autoref{fac:chp21}, it follows that $\mathcal{E}^{aux} \in \mathbf{EC}[\vdash'_v]$. Further, it follows that $\mathcal{C}[a'_0] = a^{aux}_0$. By \autoref{lem:app2} we have a $d_0$ with $c_0 \longrightarrow' d_0$ and $\mathcal{C}[b_0] \longrightarrow^{aux} d_0$. Choose $d = \mathcal{E}^{aux}[d_0]$; the property holds since
 \[
 b = \mathcal{E}'[b_0] = \mathcal{E}^{aux}[\mathcal{C}][b_0] = \mathcal{E}^{aux}[\mathcal{C}[b_0]] \longrightarrow^{aux} \mathcal{E}^{aux}[d_0] = d
 \]
@@ -190,7 +190,7 @@ Consequently, we have the desired term as $t' = \mathcal{E}[t'_k]$ and reduction
 \compl*
 \begin{proof}
 
-There is an evaluation context $\mathcal{E} \in \textrm{EC}[\vdash'_v]$, with $\mathcal{E} \not\in \textrm{EC}$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \textrm{EC}$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Construct an $\mathcal{E}' \in \mathbf{EC}$ from $\mathcal{E}$ by replacing $t$ with $[]$ and the original hole with $a^0$. By \autoref{lem:app3}, we have a term $t_{aux}$ and reductions
+There is an evaluation context $\mathcal{E} \in \mathbf{EC}[\vdash'_v]$, with $\mathcal{E} \not\in \mathbf{EC}$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \mathbf{EC}$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Construct an $\mathcal{E}' \in \mathbf{EC}$ from $\mathcal{E}$ by replacing $t$ with $[]$ and the original hole with $a^0$. By \autoref{lem:app3}, we have a term $t_{aux}$ and reductions
 \begin{flalign*}
 &t \longrightarrow t_{aux}, \\
 &t \longrightarrow^{aux} t_{aux},
