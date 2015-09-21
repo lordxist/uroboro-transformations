@@ -1,5 +1,6 @@
 % !TEX root = main.tex
 \chapter{Automatic de- and refunctionalization}
+\label{ch:derefunc}
 
 \begin{figure}
 \begin{subfigure}{\textwidth}
@@ -82,7 +83,7 @@ The rest of this chapter is organized as follows. The first section describes th
 \section{Unnesting}
 \label{sec:unn}
 
-We adapt the translation algorithm from section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro. Their algorithm translates equations step-by-step depending upon the derivation of the copattern coverage of their lhss. Our adaptation only has steps which concern patterns that have a counterpart in Uroboro\footnote{I.e., not those for applications, units, and pairs. In the adapted algorithm for Uroboro, the last two are merged into the steps for destructors and constructors, while application is irrelevant because Uroboro doesn't have function types.}. Each such translation step can be considered an extraction as defined in chapter 3.
+We adapt the translation algorithm from section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro. Their algorithm translates equations step-by-step depending upon the derivation of the copattern coverage of their lhss. Our adaptation only has steps which concern patterns that have a counterpart in Uroboro\footnote{I.e., not those for applications, units, and pairs. In the adapted algorithm for Uroboro, the last two are merged into the steps for destructors and constructors, while application is irrelevant because Uroboro doesn't have function types.}. Each such translation step can be considered an extraction as defined in \autoref{ch:extr}.
 
 \subsection{Simple patterns}
 
@@ -155,7 +156,7 @@ We try all possible derivation trees of depth two, and get the following derivat
 \UnaryInfC{$fun \lhd | ~ \texttt{isOne(Zero())} ~ \texttt{isOne(Succ(Zero()))} ~ \texttt{isOne(Succ(Succ(n)))} $}
 \end{prooftree}
 
-The last step in the derivation is a variable split; we ``undo'' this by extracting the respective constructor calls into an auxiliary function. In the terminology developed in chapter 3, we target the last two lhss in the function definition for constructor extraction; the position to be targeted is the (only) argument position of the constructor call that is the first argument of the function call in both lhss.
+The last step in the derivation is a variable split; we ``undo'' this by extracting the respective constructor calls into an auxiliary function. In the terminology developed in \autoref{ch:extr}, we target the last two lhss in the function definition for constructor extraction; the position to be targeted is the (only) argument position of the constructor call that is the first argument of the function call in both lhss.
 
 \begin{lstlisting}
 
@@ -185,7 +186,7 @@ The algorithm is applied to an individual function definition; to transform the 
 \UnaryInfC{$fun \lhd | ~ Q ~ (q_i)_{i \in I}$}
 \end{prooftree}
 
-Also like Setzer et al., we then introduce a fresh auxiliary function and translate the program depending on \textbf{C}. As stated before, these translations are slightly adapted to fit the framework of Uroboro, such that two remain, one for destructors and one for constructors. More importantly, both of those are in fact extractions as defined in chapter 3, namely destructor and constructor extraction. 
+Also like Setzer et al., we then introduce a fresh auxiliary function and translate the program depending on \textbf{C}. As stated before, these translations are slightly adapted to fit the framework of Uroboro, such that two remain, one for destructors and one for constructors. More importantly, both of those are in fact extractions as defined in \autoref{ch:extr}, namely destructor and constructor extraction. 
 
 \begin{enumerate}
 \item \textbf{C} is C\textsubscript{Des}, and the last derivation step looks as follows.
@@ -648,7 +649,7 @@ How about reducing \texttt{main()} in this program? The reduction sequence we ge
 \]
 And this is no surprise, since we didn't change the order of the arguments of $f$, but rather those of $aux$. In general, this approach preserves the semantics of a program in the weak bisimilarity presented for extractions, for the following reasons.
 \begin{enumerate}
-\item Extracting the constructor preserves the semantics in this weak bisimilarity, as proven in chapter 3, as long as both the original and the transformed program have no overlapping equations. For the original program, this holds since it has copattern coverage by assumption. The transformed program again has copattern coverage, for the same reasons as presented for the variable splitting case of the unnesting algorithm.
+\item Extracting the constructor preserves the semantics in this weak bisimilarity, as proven in \autoref{ch:extr}, as long as both the original and the transformed program have no overlapping equations. For the original program, this holds since it has copattern coverage by assumption. The transformed program again has copattern coverage, for the same reasons as presented for the variable splitting case of the unnesting algorithm.
 
 \item Switching the arguments of the auxiliary function doesn't change the semantics, when one only considers reductions starting with terms of the original program.
 \end{enumerate}

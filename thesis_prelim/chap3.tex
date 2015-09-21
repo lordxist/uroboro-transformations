@@ -1,9 +1,10 @@
 % !TEX root = main.tex
 \chapter{Extraction transformations}
+\label{ch:extr}
 
-The automatic de- and refunctionalization algorithms presented in chapter 4 are made up of several ingredients, some of which are part of the motivation for the contents of this chapter. In the preprocessing phase of either algorithm, there are steps which eliminate destructors or constructors from copatterns. In this chapter, we generalize this concept to arbitrary \textit{extractions}.
+The automatic de- and refunctionalization algorithms presented in \autoref{ch:derefunc} are made up of several ingredients, some of which are part of the motivation for the contents of this chapter. In the preprocessing phase of either algorithm, there are steps which eliminate destructors or constructors from copatterns. In this chapter, we generalize this concept to arbitrary \textit{extractions}.
 
-Extractions are (a way to describe) transformations, that roughly speaking, decrease, in some way, the syntactic complexity of the program, while preserving its semantics to some degree. We think that this might also be interesting independent of its application for automatic de- and refunctionalization in chapter 4. For instance, the user might want to decrease the syntactic complexity, e.g., by reducing the maximum number of destructors appearing in any lhs, in order to better understand the program. This situation is comparable to certain refactorings in object-oriented programming, like moving methods or extracting classes.
+Extractions are (a way to describe) transformations, that roughly speaking, decrease, in some way, the syntactic complexity of the program, while preserving its semantics to some degree. We think that this might also be interesting independent of its application for automatic de- and refunctionalization in \autoref{ch:derefunc}. For instance, the user might want to decrease the syntactic complexity, e.g., by reducing the maximum number of destructors appearing in any lhs, in order to better understand the program. This situation is comparable to certain refactorings in object-oriented programming, like moving methods or extracting classes.
 
 As an example, consider the extraction of a destructor out of the following program fragment.
 \begin{lstlisting}
@@ -16,7 +17,7 @@ aux().des() = t
 \end{lstlisting}
 The resulting program fragment doesn't contain any copatterns with two destructors, unlike the original, thus the transformation has decreased the syntactic complexity in this way. The transformation preserves the semantics because, roughly, in the transformed program there is a way to go from the original equation's lhs to its rhs: $\mathtt{fun().des().des()} \longrightarrow \mathtt{aux().des()} \longrightarrow \mathtt{t}$.
 
-In the next section, we formally define extractions and how they are applied to programs (\autoref{sec:extrdef}). We give some example extractions, two of which are used in chapter 4 (\autoref{sec:extrex}). Then we show how extractions preserve the semantics of a program in a weak bisimulation (\autoref{sec:extrbis}). The preservation of the semantics depends upon the absence of overlapping equations both in the original and in the resulting program; therefore, the section that follows shows under which circumstances extractions don't introduce overlaps (\autoref{sec:extrovl}). Then we show that extractions preserve the well-typedness of programs (\autoref{sec:extrpwt}).
+In the next section, we formally define extractions and how they are applied to programs (\autoref{sec:extrdef}). We give some example extractions, two of which are used in \autoref{ch:derefunc} (\autoref{sec:extrex}). Then we show how extractions preserve the semantics of a program in a weak bisimulation (\autoref{sec:extrbis}). The preservation of the semantics depends upon the absence of overlapping equations both in the original and in the resulting program; therefore, the section that follows shows under which circumstances extractions don't introduce overlaps (\autoref{sec:extrovl}). Then we show that extractions preserve the well-typedness of programs (\autoref{sec:extrpwt}).
 
 \section{Extractions}
 \label{sec:extrdef}
