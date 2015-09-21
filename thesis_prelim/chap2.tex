@@ -37,7 +37,7 @@ In this chapter we formally define the language Uroboro. It is a more or less st
 
 In this chapter, we start with some notational preliminaries (\autoref{sec:uronotp}). Then we define the syntax of Uroboro (\autoref{sec:urosyn}), then its typing (\autoref{sec:urostatsem}), and finally its dynamic semantics (\autoref{sec:urosos}), which we present as small-step operational semantics. Afterwards, we define copattern coverage for Uroboro (\autoref{sec:cc}), which is analogous to coverage in functional programming languages with pattern matching. Then we show type soundness for Uroboro (\autoref{sec:urots}). We conclude the chapter by showing how the reduction semantics of Uroboro extends those of either the Data or Codata Fragment (\autoref{sec:codfragext}).
 
-In the introduction, we have already shown example programs from the Data and Codata Fragments. Before we start with the definitions, we give an example Uroboro program, shown in \autoref{fig:ch2uroex}, that is neither in the Data nor in the Codata Fragments, i.e., it contains both data and codata types. We start with the example program for the Data Fragment of the introduction, which consisted of a data type for natural numbers and function definitions for addition and multiplication, and add (a) a codata type for infinite arrays, (b) a function that, given a natural number $n$, returns such an array with $n$ as its first element and all other elements $0$, and (c) a predicate that determines whether the input is $1$ (we use \texttt{Succ(Zero())} and \texttt{Zero()} and in the place of true and false, respectively). We will carry this example along in this chapter, and at the end we will have both de- and refunctionalized it to a semantically equivalent program.
+In the introduction, we have already shown example programs from the Data and Codata Fragments. Before we start with the definitions, we give an example Uroboro program, shown in \autoref{fig:ch2uroex}, that is neither in the Data nor in the Codata Fragments, i.e., it contains both data and codata types. We start with the example program for the Data Fragment of the introduction, which consisted of a data type for natural numbers and function definitions for addition and multiplication, and add (a) a codata type for infinite arrays, (b) a function that, given a natural number $n$, returns such an array with $n$ as its first element and all other elements $0$, and (c) a predicate that determines whether the input is $1$ (we use \texttt{Succ(Zero())} and \texttt{Zero()} and in the place of true and false, respectively). We will carry this example along, and by the end of chapter 4 we will have both de- and refunctionalized it to a semantically equivalent program.
 
 \section{Notational preliminaries}
 \label{sec:uronotp}
@@ -280,7 +280,9 @@ Note that we consider the collection of equations in a function definition to be
 %\caption{Type inference judgements}
 %\end{figure}
 
-As is the case with the copattern language of Abel et al.\cite{abel13copatterns}, there are two kinds of types in Uroboro. \textit{Positive types}, which are those defined by data type definitions, and \textit{negative types}, which are those defined by codata type definitions. Like Rendel et al. do for their fragments, we give a type judgement for terms, and one to judge whether equations are well-typed.  Like them, we let $\Sigma$ be the signatures of a program, that is, its function signatures, codata signatures, and data signatures, as defined above, and we let $\Gamma$ be a typing context, i.e., a set of type assignments to variables, and write
+As is the case with the copattern language of Abel et al.\cite{abel13copatterns}, there are two kinds of types in Uroboro. \textit{Positive types}, which are those defined by data type definitions, and \textit{negative types}, which are those defined by codata type definitions; we get back to this point when we discuss values in \autoref{ssec:val}. The labels ``positive'' and ``negative'' are from Abel et al., who motivate them by analogy to focusing proofs.
+
+Like Rendel et al. do for their fragments, we give a type judgement for terms, and one to judge whether equations are well-typed.  Like them, we let $\Sigma$ be the signatures of a program, that is, its function signatures, codata signatures, and data signatures, as defined above, and we let $\Gamma$ be a typing context, i.e., a set of type assignments to variables, and write
 \begin{itemize}
 \item $\Gamma \vdash_{\Sigma} t : \tau$ to mean that term $t$ is well-typed with type $\tau$ under typing context $\Gamma$ and signature $\Sigma$, and
 
@@ -438,7 +440,13 @@ Here, we define what it means for a term to match a copattern. In short, a term 
 \label{fig:valj}
 \end{figure}
 
-This section formalizes the notion of value for Uroboro. As is the case with the language of Abel et al.\cite{abel13copatterns}, whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed.
+This section formalizes the notion of value for Uroboro. As is the case with the language of Abel et al.\cite{abel13copatterns}, whether a term is a value depends upon its type. Thus for the following judgement rules a type for every term will be presupposed. Usually, in languages without codata, values are terms which are built up using only constructors. In Uroboro, like in the copattern language of Abel et al., terms can also be values when they have a negative (codata) type. Unlike in the language of Abel et al., negatively typed terms aren't always values in Uroboro. Instead, a term is only considered a value if it is in fact irreducible, i.e., it doesn't match any lhs of the program. To sum this up, in Uroboro, a term is a value when it is either 
+\begin{itemize}
+\item built up using only constructors, or
+
+\item has negative type and doesn't match any lhs of the program.
+\end{itemize}
+Now, we formalize this idea.
 
 $prg \vdash_v t$ means that the closed term $t$ is a value with respect to program $prg$. This notation is partially borrowed from Abel et al.\cite{abel13copatterns}, section 5. We omit the program whenever it is clear from the context or unimportant. Note that only closed terms are considered because only those are relevant for the semantics preservation.
 
@@ -460,7 +468,7 @@ Finally, using this ``no-match'' judgement, we define the rules of the value jud
 
 $\longrightarrow$ is the one-step reduction relation for closed terms, which is assumed to be used with respect to the rules $\textrm{Rules}(prg)$ of a program $prg$, where a rule $(q, t)$ consists of a copattern $q$ (left-hand side of the rule) and a term $t$ (right-hand side of the rule). The reduction depends upon a set of terms $\textrm{Val}$ which are considered to be values. Standardly, $\textrm{Val}$ is assumed to be the set of terms which are judged to be values by $\vdash_v t$. Sometimes, an alternative reduction judgement will be used, which will only differ in the underlying value set $\textrm{Val}$. This alternative reduction will then be defined by giving the alternative $\textrm{Val}$.
 
-In figure \autoref{fig:uroevalc}, we define evaluation contexts for left-to-right, call-by-value evaluation. We let $\mathbf{EC}$ denote the set of evaluation contexts for the standard value judgement $\vdash'_v$, and we let $\mathbf{EC}[V]$ denote the set of evaluation contexts for other value sets (or their respective judgements).
+In figure \autoref{fig:uroevalc}, we define evaluation contexts for left-to-right, call-by-value evaluation. We let $\mathbf{EC}$ denote the set of evaluation contexts for the standard value judgement $\vdash_v$, and we let $\mathbf{EC}[V]$ denote the set of evaluation contexts for other value sets (or their respective judgements).
 
 Contraction $\mapsto$ of terms using equations is defined as follows.
 
@@ -534,28 +542,24 @@ For any two contexts $\mathcal{C}, \mathcal{C}_0$ and any evaluation context $\m
 
 In general, when a language enjoys type soundness, for programs with \textit{coverage} it is guaranteed that no term is stuck. We adapt the judgement for \textit{copattern coverage} from Abel et al.\cite{abel13copatterns} for Uroboro. $fun \lhd | ~ Q$ means that the set of copatterns $Q$ \textit{covers} the function $fun$. Intuitively, when this set $Q$ is the set of left-hand sides of the function definition for $fun$, this function is fully specified. One can regard the consecutive application of the rules of the coverage judgement as a way of step-wise refining the specification of the function. The rule C\textsubscript{Head} stands for the start point, where the only left-hand side of the function neither has destructor nor constructor calls. The other two rules refine the specification of $fun$ by variable splitting (C\textsubscript{Con}), that is, refining based upon the input, or by result splitting (C\textsubscript{Des}), that is, refining based upon the output (or result). The terminology ``variable splitting'' and ``result splitting'' is also borrowed from Abel et al. and will become relevant in chapter 4.
 
-These rules for the judgement are defined in \autoref{fig:cc}. We assume a program and write $Dess_\tau$ for the set of destructors for codata type $\tau$, and $Cons_\tau$ for the set of constructors for data type $\tau$. We also write $q^\tau$ and $x^\tau$ to indicate that the type of the copattern $q$ or the variable $x$, respectively, has been inferred to be $\tau$. \autoref{sec:urostatsem} provides a way to infer types for variables, the type of a copattern is found out by looking it up in the respective function or destructor signature. What is written to the right of the $\lhd |$ separator is written as a list but meant to represent set of copatterns, i.e., they aren't ordered and any copattern can be chosen for variable or result splitting. To denote the lists representing the sets, we use tuples with whitespace separation $(a1 a2 ... an)$ instead of comma separation, and we write $Q Q'$ to mean the concatenation of two lists.
+These rules for the judgement are defined in \autoref{fig:cc}. We assume a program and write $Dess_\tau$ for the set of destructors for codata type $\tau$, and $Cons_\tau$ for the set of constructors for data type $\tau$. We also write $q^\tau$ and $x^\tau$ to indicate that the type of the copattern $q$ or the variable $x$, respectively, has been inferred to be $\tau$. \autoref{sec:urostatsem} provides a way to infer types for variables, the type of a copattern is found out by looking it up in the respective function or destructor signature. What is written to the right of the $\lhd |$ separator is written as a list but meant to represent set of copatterns, i.e., they aren't ordered and any copattern can be chosen for variable or result splitting. To denote the lists representing the sets, we use tuples with whitespace separation $(a1 ~ a2 ~  ... ~ an)$ instead of comma separation, and we write $Q Q'$ to mean the concatenation of two lists.
 
-As an example, consider the following function definition.
+As an example, consider the following function definition, which is part of the program from \autoref{fig:ch2uroex}.
 \begin{lstlisting}
-function fun(A, B): C where
-  fun(a1(), b1(x)) = bar1(x)
-  fun(a1(), b2()) = bar2()
-  fun(a2(x), y).d1() = bar3(x, y)
-  fun(a2(x), y).d2(z) = bar4(x, y, z)
+function oneElemArray(Nat): Array where
+  oneElemArray(n).get(Zero()) = n
+  oneElemArray(n).get(Succ(m)) = Zero()
 \end{lstlisting}
-These equations cover $fun$, which means that it is possible to derive a coverage tree using the coverage judgement such that the leaves of the tree are exactly the lhss of the equations. The tree is derived as follows.
+These equations cover $oneElemArray$, which means that it is possible to derive a coverage tree using the coverage judgement such that the leaves of the tree are exactly the lhss of the equations. The tree is derived as follows.
 
 \begin{prooftree}
 \AxiomC{}
 \RightLabel{\scriptsize C\textsubscript{Head}}
-\UnaryInfC{$fun \lhd | ~ (fun(x, y))$}
-\RightLabel{\scriptsize C\textsubscript{Con}}
-\UnaryInfC{$fun \lhd | ~ (fun(a1(), y) ~ fun(a2(x), y))$}
-\RightLabel{\scriptsize C\textsubscript{Con}}
-\UnaryInfC{$fun \lhd | ~ (fun(a1(), b1(x)) ~ fun(a1(), b2()) ~ fun(a2(x), y))$}
+\UnaryInfC{$oneElemArray \lhd | ~ (oneElemArray(n))$}
 \RightLabel{\scriptsize C\textsubscript{Des}}
-\UnaryInfC{$fun \lhd | ~ (fun(a1(), b1(x)) ~ fun(a1(), b2()) ~ fun(a2(x), y).d1() ~ fun(a2(x), y).d2(z))$}
+\UnaryInfC{$oneElemArray \lhd | ~ (oneElemArray(n).get(m))$}
+\RightLabel{\scriptsize C\textsubscript{Con}}
+\UnaryInfC{$oneElemArray \lhd | ~ (oneElemArray(n).get(Zero()) ~ oneElemArray(n).get(Succ(m)))$}
 \end{prooftree}
 
 A program has copattern coverage, or alternatively, is coverage complete, whenever all of its function definitions have coverage, that is, it is $fun \lhd | ~ Q$ for each function $fun$ and its set of left-hand sides $Q$.
