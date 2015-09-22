@@ -30,7 +30,7 @@ All of the applications have in common that some preprocessing is necessary to b
 \section{Unnesting}
 \label{sec:relunn}
 
-Our de- and refunctionalization is basically just the de- and refunctionalization of Rendel et al.\cite{rendel15automatic} together with a preprocessing. This preprocessing is the ``unnesting'' algorithm of Setzer et al.\cite{setzer14unnesting} for their copattern language, adapted for Uroboro. We first consider general properties of the unnesting algorithm, and then consider its adaptation to Uroboro.
+Our de- and refunctionalization is basically just the de- and refunctionalization of Rendel et al.\cite{rendel15automatic} together with a preprocessing. This preprocessing is the ``unnesting'' algorithm of Setzer et al.\cite{setzer14unnesting}, adapted from the copattern language of Abel et al.\cite{abel13copatterns}, which Setzer et al. use, to Uroboro. We first consider general properties of the unnesting algorithm, and then consider its adaptation to Uroboro.
 
 Setzer et al.'s\cite{setzer14unnesting} unnesting operates on the copattern coverage trees of the function definitions. It is the natural counterpart to the interactive construction of a coverage-complete function definition by refinement, as can be done, e.g., in Agda. ``Unnesting'' essentially means undoing the steps of the derivation of the copattern coverage; the algorithm proceeds step-wise and distinguishes a case for each rule the final derivation step could have used. In this way, it can be guaranteed that an unnesting step always leads to a program with copattern coverage and without overlaps.
 
