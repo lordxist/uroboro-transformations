@@ -338,6 +338,8 @@ In this section, we formally define the semantics of Uroboro. We present them as
 
 Here, we define what it means for a term to match a copattern. In short, a term $t$ matches a copattern $q$ when there is a substitution $\sigma$ such that $t = q[\sigma]$. We give a judgement for this, which orients itself on and borrows notations from Abel et al.\cite{abel13copatterns}, section 4. In order to do so, we also give an analogous judgement for patterns in \autoref{fig:pm}. In terms of the judgement for patterns, $t =^? p \searrow \sigma$ means that term t matches with pattern $p$ under substitution $\sigma$ (i.e. it is equivalent to $t = p[\sigma]$). The meaning of $t =^? q \searrow \sigma$, for copatterns $q$, is defined analogously in \autoref{fig:copm}.
 
+We say that two copatterns \textit{overlap} when there is at least one term which matches both. 
+
 \subsection{Values}
 \label{ssec:val}
 
