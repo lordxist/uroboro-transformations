@@ -11,9 +11,13 @@ hasDestrPattern :: PTRule -> Bool
 hasDestrPattern (PTRule _ (PQDes _ _ _ _) _) = True
 hasDestrPattern _ = False
 
+hasNoCons :: PTRule -> Bool
+hasNoCons (PTRule _ (PQDes _ _ _ _) _) = True
+hasNoCons (PTRule _ (PQApp _ _ pps) _) = all (not.con) pps
+
 isRefunced :: [PT] -> PT -> Bool
 isRefunced _ (PTNeg _ _ _) = True
-isRefunced pts (PTFun _ _ (t:_) _ (r:[])) = True
+isRefunced pts (PTFun _ _ (t:_) _ (r:[])) = hasNoCons r
 isRefunced pts (PTFun _ _ (t:_) _ rs) = all hasDestrPattern rs
 isRefunced _ (PTFun _ _ [] _ _) = True
 isRefunced _ _ = False
