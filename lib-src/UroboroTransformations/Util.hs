@@ -14,8 +14,8 @@ import Control.Monad.State.Lazy
 import UroboroTransformations.Util.Typed
 import UroboroTransformations.Util.Equality
 
--- | Suppress the 'Left' value of an 'Either'
--- | Stolen from Control.Error.Util (errors-2.0.0)
+-- | Suppress the 'Left' value of an 'Either'.
+-- Stolen from Control.Error.Util (errors-2.0.0).
 hush :: Either a b -> Maybe b
 hush = either (const Nothing) Just
 
@@ -148,7 +148,7 @@ funSigs = (map sig) . (filter isFun)
     sig _ = undefined
 
 -- |Retrieves all rules from the parse trees.
--- |Fails when a rule is illegal according to the supplied predicate.
+-- Fails when a rule is illegal according to the supplied predicate.
 funRulesLegal :: [PT] -> (PTRule -> Bool) -> Maybe [[PTRule]]
 funRulesLegal pts ill = (mapM rules (filter isFun pts))
   where
