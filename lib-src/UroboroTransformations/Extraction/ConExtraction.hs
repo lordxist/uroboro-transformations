@@ -51,5 +51,6 @@ conExtractionLensPutback p tq (TQDes t id tps tq')
   | otherwise = TQDes t id (map (putbackTP p tq) tps) tq'
 conExtractionLensPutback p tq (TQApp t id tps) = TQApp t id (map (putbackTP p tq) tps)
 
+-- |Extraction lens for constructor extraction at the position specified by the given path.
 conExtractionLens :: PathToSubterm -> ExtractionLens
 conExtractionLens p = ExtractionLens {get = (conExtractionLensGet p), putback = (conExtractionLensPutback p)}
