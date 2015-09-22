@@ -175,7 +175,7 @@ codata FunOfNats where
   FunOfNats.apply2(Nat,Nat): Nat
 
 function add(): FunOfNats where
-  add().apply2(m, n) = autogen0_aux(m, n)
+  add().apply2(m, n) = m.autogen0_aux(n)
 
 function fib(): List where
   fib().head() = zero()
@@ -218,6 +218,28 @@ function c(): T where
   c().autogen0_aux() = a(c())
 |]
 
+-- doesn't have copattern coverage
+failure :: String
+failure = [str|
+
+data Nat where
+  zero(): Nat
+  succ(Nat): Nat
+
+data Bool where
+  true(): Bool
+  false(): Bool
+
+codata List where
+  List.elemAt(Nat): Nat
+  List.isEmpty(): Bool
+
+function repeat(Nat): List where
+  repeat(zero()).elemAt(n) = zero()
+  repeat(succ(m)).elemAt(n) = succ(m)
+
+|]
+
 spec :: Spec
 spec = do
     describe "refunc" $ do
@@ -227,3 +249,7 @@ spec = do
             (standardize $ fromJust (refunc $ parse entangled_test)) `shouldBe` (standardize $ parse entangled_test_result)
         it "transforms compos.uro into compos_result.uro" $ do
             (standardize $ fromJust (refunc $ parse compos)) `shouldBe` (standardize $ parse compos_result)
+        it "fails with Nothing when trying to transform failure.uro" $ do
+            (refunc $ parse failure) `shouldBe` Nothing
+        it "transforms fibonacci.uro into fibonacci_result.uro" $ do
+            (standardize $ fromJust (refunc $ parse fibonacci)) `shouldBe` (standardize $ parse fibonacci_result)
