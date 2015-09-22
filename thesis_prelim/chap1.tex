@@ -142,7 +142,7 @@ Rendel et al. intend the Data Fragment and the Codata Fragment to be fragments o
 
 In our opinion, Uroboro is well suited for automatic program transformations which are related to the conversion between first-order and higher-order programs. There are two major reasons for this:
 \begin{itemize}
-\item Uroboro isn't truly ``higher-order'', i.e., it has no first-class functions. Especially, this means that typing is easier, since there are no recursively built-up function types. Further, the number of arguments on left-hand sides of equations is fixed, i.e., there can be no ``underapplication''.
+\item Uroboro isn't truly ``higher-order'', i.e., it has no first-class functions and no function types. Functions and destructors have fixed-length argument lists, i.e., there can be no ``underapplication'' (but this can be emulated with destructors). Destructors in Uroboro are thus somewhat similar to methods in object-oriented programming languages.
 
 \item Uroboro is symmetric in the sense that it has both data type definitions and its dual codata type definition, along with patterns and its dual copatterns. This is interesting for automatic transformations, since, as described before, the Data Fragment and the Codata Fragment of Uroboro are connected by refunctionalization and defunctionalization.
 \end{itemize}
