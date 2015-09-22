@@ -75,6 +75,8 @@ movingConFront = do
   where
     ptFunId (PTFun _ id _ _ _) = id
 
+-- | Move all constructors to the front, by extracting them and switching the arguments
+-- in the auxiliary function definition. Fails when the program doesn't typecheck.
 moveConFront :: [PT] -> Maybe [PT]
 moveConFront pts = case betterTypecheck pts of
                      Left _ -> Nothing
