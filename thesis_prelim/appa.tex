@@ -93,6 +93,7 @@ t_\epsilon[\sigma^{aux}] = aux(x_1, ..., x_k)[\sigma^{aux}] = aux(\sigma(x_1), .
 
 \cdpaux*
 \begin{proof}
+\label{prf:cdpaux}
 By the derivation of the two one-step reductions, we know the following:
 \begin{itemize}
 \item From $a \longrightarrow' b$: $a = \mathcal{E}'[a'_0], b = \mathcal{E}'[b_0]$ for an $\mathcal{E} \in \mathbf{EC}[\vdash'_v]$ and terms $a'_0, b_0$ with $a'_0 \longrightarrow' b_0$ and $a'_0 = q_r[\sigma'], b_0 = t_r[\sigma']$ for some equation $r$.
@@ -189,7 +190,7 @@ Consequently, we have the desired term as $t' = \mathcal{E}[t'_k]$ and reduction
 
 \compl*
 \begin{proof}
-
+\label{prf:compl}
 There is an evaluation context $\mathcal{E} \in \mathbf{EC}[\vdash'_v]$, with $\mathcal{E} \not\in \mathbf{EC}$, and terms $a^0, b^0$, such that $a = \mathcal{E}[a^0], b = \mathcal{E}[b^0]$. Because $\mathcal{E} \not\in \mathbf{EC}$, there has to be a subterm $t$ of $\mathcal{E}$ with $\not\vdash_v t$. Construct an $\mathcal{E}' \in \mathbf{EC}$ from $\mathcal{E}$ by replacing $t$ with $[]$ and the original hole with $a^0$. By \autoref{lem:app3}, we have a term $t_{aux}$ and reductions
 \begin{flalign*}
 &t \longrightarrow t_{aux}, \\
@@ -304,7 +305,7 @@ The reduction can be derived because $q_\epsilon[x \mapsto \mathcal{C}][\sigma^{
 
 \comminv*
 \begin{proof}
-
+\label{prf:comminv}
 By the derivation of the two one-step reductions, we know the following:
 \begin{itemize}
 \item From $c \longrightarrow' d$: $c = \mathcal{E}'[c_0], d = \mathcal{E}'[d'_0]$ for an $\mathcal{E}' \in \mathbf{EC}[\vdash'_v]$ and terms $c_0, d'_0$ with $c_0 \mapsto' d'_0$.
