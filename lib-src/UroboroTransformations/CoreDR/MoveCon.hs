@@ -1,6 +1,6 @@
 module UroboroTransformations.CoreDR.MoveCon (moveConFront) where
 
-import UroboroTransformations.Extraction
+import qualified UroboroTransformations.Extraction as Extr
 import UroboroTransformations.Extraction.ConExtraction
 import UroboroTransformations.Util
 import UroboroTransformations.Util.UroboroEnhanced
@@ -10,6 +10,7 @@ import Uroboro.Tree
 
 import Control.Arrow
 import Control.Monad.Reader
+import Control.Monad.State
 import Control.Monad.Writer.Lazy
 import Data.Maybe
 
@@ -22,16 +23,18 @@ pathToCon (PQApp _ _ pps) = argNumOfCon pps
     argNumOfCon ((PPCon _ _ _):pps) = 0
     argNumOfCon (_:pps) = 1 + (argNumOfCon pps)
 
-spec :: PT -> Reader ([PT], Program) (ExtractionSpec, Int)
+spec :: PT -> State ([PT], Program) (Extr.ExtractionSpec, Int)
 spec pt@(PTFun _ _ _ _ ((PTRule _ pq _):_)) = do
-    (pts, prog) <- ask
+    (pts, prog) <- get
     let n = pathToCon pq
-    return ((ExtractionSpec (conExtractionLens [n]) pts (moveConTarget pt prog)), n)
+    return ((Extr.ExtractionSpec (conExtractionLens [n]) pts (moveConTarget pt prog)), n)
 
-extractCon :: PT -> Reader ([PT], Program) ((PT, PT), Int)
+extractCon :: PT -> State ([PT], Program) ((PT, PT), Int)
 extractCon pt = do
     (sp, n) <- spec pt
-    return $ ((applyExtraction sp pt), n)
+    let (pt', aux) = Extr.applyExtraction sp pt
+    modify (first (++[aux]))
+    return ((pt', aux), n)
 
 isAffected :: PT -> Bool
 isAffected (PTFun _ _ _ _ ((PTRule _ (PQApp _ _ (_:pps)) _):_)) = any con pps
@@ -63,9 +66,9 @@ moveToFrontInCallSites :: [(Identifier, Int)] -> PT -> PT
 moveToFrontInCallSites ids (PTFun l id ts t rs) = PTFun l id ts t (map (moveToFrontInCallSitesPTRule ids) rs)
 moveToFrontInCallSites _ pt = pt
 
-movingConFront :: Reader ([PT], Program) [PT]
+movingConFront :: State ([PT], Program) [PT]
 movingConFront = do
-    (pts, _) <- ask
+    (pts, _) <- get
     ptsWithAuxs <- mapM extractCon (filter isAffected pts)
     let (pts', auxs) = unzip (map fst ptsWithAuxs)
     let ns = map snd ptsWithAuxs
@@ -80,5 +83,5 @@ movingConFront = do
 moveConFront :: [PT] -> Maybe [PT]
 moveConFront pts = case betterTypecheck pts of
                      Left _ -> Nothing
-                     Right prog -> Just $ runReader movingConFront (pts, prog)
+                     Right prog -> Just $ evalState movingConFront (pts, prog)
 
