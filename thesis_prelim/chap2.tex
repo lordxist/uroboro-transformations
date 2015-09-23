@@ -565,6 +565,13 @@ These equations cover $oneElemArray$, which means that it is possible to derive 
 
 A program has copattern coverage, or alternatively, is coverage complete, whenever all of its function definitions have coverage, that is, it is $fun \lhd | ~ Q$ for each function $fun$ and its set of left-hand sides $Q$.
 
+From the definition of the copattern coverage rules it is clear that a split results in non-overlapping copatterns. Further, regarding copatterns created by C\textsubscript{Des} compared to the copatterns taken over unchanged in the derivation step, we note the following: When it is $q.des(\overline{p}) = q'.\overline{des(\overline{p})}.des(\overline{p})$, then it is $q = q'.\overline{des(\overline{p})}$. Using these facts, by induction on the derivation of the judgement one can easily show that, for any two lhss $q, q'$ in function definitions with copattern coverage, it is $q \neq q'.\overline{des(\overline{p})}$ for any $\overline{des(\overline{p})}$. Especially, it is $q \neq q'$, which we state again below for easy reference.
+
+\begin{fact}
+\label{fac:ccnooverlap}
+Function definitions with copattern coverage don't have overlapping lhss.
+\end{fact}
+
 In \autoref{ch:derefunc}, we will rely not only upon copattern coverage, but also on knowing how the coverage was derived by consecutive result and variable splitting. In other words, we need an algorithm for the judgement. Abel et al.\cite{abel13copatterns} hint, for their judgement, at a possible way to adapt other coverage algorithms for copatterns; to our knowledge, there currently is no such algorithm for copattern coverage checking, either by Abel et al. or others. For the time being, an exponential-time algorithm that goes through all derivation trees of a maximum depth will have to suffice. The maximum depth is the maximal number of constructors and destructors, added together, of all lhss of the function definition.
 
 \section{Type soundness}

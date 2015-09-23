@@ -251,7 +251,7 @@ Next, we consider important properties of the translation algorithm.
 
 \textbf{Preservation of well-typedness.} The only changes made to the program are a series of extractions (each is either constructor or destructor extraction). All extractions preserve the well-typedness of a program, therefore well-typedness is also preserved by $\texttt{Unnest}_i$.
 
-\textbf{Bisimulation.} Because copattern coverage holds for the translated program, the translated program has no overlapping lhss. Therefore, by the propositions 3.3.1 and 3.3.2, we know that the translation preserves the semantics of the program in the kind of weak bisimulation described in section 3.3.
+\textbf{Bisimulation.} Because copattern coverage holds for the translated program, by \autoref{fac:ccnooverlap}, the translated program has no overlapping lhss. Therefore, by the propositions 3.3.1 and 3.3.2, we know that the translation preserves the semantics of the program in the kind of weak bisimulation described in section 3.3.
 
 \section{Core defunctionalization}
 \label{sec:coredefunc}
