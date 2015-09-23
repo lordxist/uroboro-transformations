@@ -1,15 +1,13 @@
 \chapter{Introduction}
 \label{ch:intro}
 
-Functional programming seeks to bring the benefits of mathematical functions over to the world of programming. In mathematics, a function's return value can only depend on the input, not on when -- or more generally, under which ``circumstances'' -- the function was called. This is in sharp contrast to imperative programming languages, which have a concept of \textit{mutable} state. For instance, a variable might be assigned different values at different times during the execution of a program, and a function might depend upon the value of this variable. A purely functional programming language doesn't allow the programmer to work with mutable state, which means that functions defined in such a language can be understood in the same way a mathematical function can. This clarity makes (purely) functional languages potentially less error-prone than imperative languages, since the programmer doesn't need to consider the mutable state, e.g., of variables.
+Functional programming seeks to bring the benefits of mathematical functions over to the world of programming. In functional programming languages, the main language construct is the function definition which---ideally---can be understood in the same way a mathematical function definition can. In addition to this, many functional programming languages, in particular, languages with static type-checking, have the language construct of \textit{data type definitions}. When type-checking is performed statically, that is, before the execution of a program, the type-checker must be able to assign a type to each expression that appears in the program. Types can be regarded as sets of values; looking at it the other way around, values which are of a given type are said to \textit{inhabit} the type. With data type definitions, the programmer can specify which values are to inhabit the thus defined type. This is done by declaring a number of \textit{constructors} for the type. For instance, a type for natural numbers can be defined by giving a constructor for the zero value, and one for successors, which takes an argument---the predecessor---which is itself a natural number. In symbols, one might declare a data type \texttt{Nat} with constructors \texttt{zero()} and \texttt{succ(Nat)}.
 
-Many functional programming languages, in particular, languages with static type-checking, have the language construct of \textit{data type definitions}. When type-checking is performed statically, i.e., before the execution of a program, the type-checker must be able to assign a type to each expression that appears in the program. Types can be regarded as sets of values; looking at it the other way around, values which are of a given type are said to \textit{inhabit} the type. With data type definitions, the programmer can specify -- or rather postulate -- which values are to inhabit the thus defined type. This is done by giving a number of \textit{constructors} for the type. For instance, a type for natural numbers can be defined by giving a constructor for the zero value, and one for successors, which takes an argument -- the predecessor -- which is itself a natural number.
-
-In functional programming, a function definition often consists of a number of equations. This is strongly analogous to mathematics; a left-hand side (lhs) of such an equation specifies which inputs are to be considered, and the right-hand side specifies the corresponding output. Thus, there needs to be a way to introspect inputs. This brings us back to the data type definitions and their constructors. On the lhs of some equation for, e.g., a function $fun(\mathbb{N})$ with a natural number as input, the programmer can specify that he wishes the equation to define the output corresponding to, e.g., the zero value, or a successor, by using the respective constructor of the data type for $\mathbb{N}$, possibly together with variables or further constructors for its arguments. In symbols, for constructors $zero()$ and $succ(\mathbb{N})$, the lhs that captures the zero value input of $fun$ is $fun(zero())$, and the one that captures the input of a successor, with the predecessor argument left unspecified, it $fun(succ(x))$, where $x$ is a variable. This concept is called \textit{pattern matching}, and the constructors and variables used in this way to introspect the input are called \textit{patterns}. For many concepts, it is interesting to also explore their \textit{dual}. The dual of patterns are the so-called copatterns. Basically, they allow to introspect, or observe, the output of a function; more on this later.
+In functional programming, a function definition often consists of a number of equations. This is analogous to mathematics; a left-hand side (lhs) of such an equation specifies which inputs are to be considered, and the right-hand side specifies the corresponding output. Thus, there needs to be a way to inspect inputs. This brings us back to the data type definitions and their constructors. Suppose we have a function \texttt{fun} with one argument of type \texttt{Nat}, then the lhs that captures the zero value input of \texttt{fun} is \texttt{fun(zero())}, and the one that captures the input of a successor, with the predecessor argument left unspecified, it \texttt{fun(succ(x))}, where \texttt{x} is a variable. This concept is called \textit{pattern matching}, and the constructors and variables used in this way to inspect the input are called \textit{patterns}. For many concepts, it is interesting to also explore their \textit{dual}. A dual of patterns are the so-called copatterns. Basically, they allow to specify how the output of a function is used; more on this later.
 
 Another important feature of many functional programming languages is that they have \textit{first-class functions}. This is to say that functions can be used just like other objects, e.g., a function can be passed as an argument to another function. This can be very useful, e.g., to define filters or maps over collections. A language with first-class functions is also called \textit{higher-order}, in contrast to languages lacking this feature, which are called \textit{first-order}.
 
-Sometimes, a first-order specification of some function can be beneficial over an equivalent higher-order specification, and sometimes it is the other way around. This can depend upon whether human understandability or a certain property advantageous for machine processing is desired. For this reason, researchers are interested in finding and automatizing transformations which can bring a higher-order program into a semantically equivalent first-order form, or the other way around. Transforming a higher-order program (with first-class functions) into an equivalent first-order program (without first-class functions) is called defunctionalization, the opposite direction is called refunctionalization.
+Sometimes, a first-order specification of some functional program can be beneficial over an equivalent higher-order specification, and sometimes it is the other way around. This can depend upon whether human understandability or a certain property advantageous for machine processing is desired. For this reason, researchers are interested in finding and automatizing transformations which can bring a higher-order program into a semantically equivalent first-order form, or the other way around. Transforming a higher-order program (with first-class functions) into an equivalent first-order program (without first-class functions) is called defunctionalization\cite{reynolds72definitional}, the opposite direction is called refunctionalization\cite{danvy09refunctionalization}.
 
 In this work, we develop automatic program transformations for a specific language with copattern matching, called \textit{Uroboro}. One major goal is to support automatic de- and refunctionalization for all of Uroboro. Uses for these kinds of transformations have been presented by Reynolds and Danvy, among others. Uroboro is interesting for the purpose of automatizing such transformations, because, as Rendel et al.\cite{rendel15automatic} have shown, copatterns and refunctionalization are related. Rendel et al. have already developed automatic de- and refunctionalization between two fragments of Uroboro, called the Data and Codata Fragment. Based on their work, we contribute the following.
 \begin{itemize}
@@ -25,7 +23,7 @@ We intend the transformations of this work to be a foundation for an entire tool
 
 In this introduction, we first give an informal overview of de- and refunctionalization. Next, we briefly describe copatterns. We then outline how Uroboro relates these two concepts and why we consider this language interesting. Finally, we sum up the contents of this thesis.
 
-\textit{Defunctionalization} is a technique to transform higher-order programs into semantically equivalent first-order programs. It was first described by Reynolds\cite{reynolds72definitional}, who uses it as one of several tools to compile interpreters. We illustrate defunctionalization with the following example program, presented in a Haskell-like pseudocode.
+\textit{Defunctionalization} is a technique to transform higher-order programs into semantically equivalent first-order programs. It was first described by Reynolds\cite{reynolds72definitional}, who uses it as one of several tools to bring interpreters to another form intended for machine processing. We illustrate defunctionalization with the following example program, presented in a Haskell-like pseudocode.
 
 \begin{lstlisting}
 
@@ -39,6 +37,10 @@ even :: Nat -> Bool
 even Zero = True
 even Succ(n) = not (even n)
 
+odd :: Nat -> Bool
+odd Zero = False
+odd Succ(n) = not (odd n)
+
 main :: [Nat]
 main = filterNats (even, [1, 2, 3, 4, 5])
 
@@ -46,20 +48,22 @@ main = filterNats (even, [1, 2, 3, 4, 5])
 
 This program is higher-order because the first argument of \texttt{filterNats} has a function type (\texttt{Nat -> Bool}). Defunctionalization does the following:
 \begin{enumerate}
-\item  A data type \texttt{NatBoolFun} for this function type is introduced, with a constructor \texttt{Even} for \texttt{even}.
-\item A function \texttt{apply :: (NatBoolFun, Nat) -> Bool} is introduced, which has an equation for every equation in \texttt{even}. The left-hand side \texttt{even $p$}, where $p$ is some pattern, of an equation of \texttt{even} is replaced by \texttt{apply (Even, $p$)}, and the respective right-hand sides are identical (preliminarily).
-\item Each call to \texttt{even} is replaced by the corresponding call to \texttt{apply}, and each occurrence of \texttt{even} in an argument position is replaced by \texttt{Even}.
-\item The function definition for \texttt{even} is removed.
+\item  A data type \texttt{NatBoolFun} for this function type is introduced, with a constructor \texttt{Even} for \texttt{even} and a constructor \texttt{Odd} for \texttt{odd}.
+\item A function \texttt{apply :: (NatBoolFun, Nat) -> Bool} is introduced, which has an equation for every equation in \texttt{even} and an equation for every equation in \texttt{odd}. The left-hand side \texttt{even $p$}, where $p$ is some pattern, of an equation of \texttt{even} is replaced by \texttt{apply (Even, $p$)}, and the respective right-hand sides are identical (preliminarily); the same is done for the equations of \texttt{odd}.
+\item Each call to \texttt{even} or \texttt{odd }is replaced by the corresponding call to \texttt{apply}, and each occurrence of \texttt{even} in an argument position is replaced by \texttt{Even}, just as each occurrence of \texttt{odd} in an argument position is replaced by \texttt{Odd}.
+\item The function definitions for \texttt{even} and \texttt{odd} are removed.
 \end{enumerate}
 The result is presented below.
 
 \begin{lstlisting}
 
-data NatBoolFun = Even
+data NatBoolFun = Even | Odd
 
 apply :: (NatBoolFun, Nat) -> Bool
 apply (Even, Zero) = True
 apply (Even, Succ(n)) = not (apply (Even, n))
+apply (Odd, Zero) = False
+apply (Odd, Succ(n)) = not (apply (Odd, n))
 
 filterNats :: (NatBoolFun, [Nat]) -> [Nat]
 filterNats (f, x:xs)
@@ -72,13 +76,13 @@ main = filterNats (Even, [1, 2, 3, 4, 5])
 
 \end{lstlisting}
 
-This transformation is easily automatized. In general, the procedure described above is applied to all occurrences of function types in the program.
+This transformation is easily automatized. In general, the procedure described above is applied to all occurrences of function types in the program; note that it is necessarily a whole program transformation, since the data type which is the first argument type of \texttt{apply} (here: \texttt{NatBoolFun}) has a constructor for every function of the respective function type (here: \texttt{Nat -> Bool}).
 
-\textit{Refunctionalization} is the left inverse of defunctionalization, first described by Danvy and Millikin\cite{danvy09refunctionalization}. Its goal is to undo defunctionalization. When one knows where to find the function that serves the role of \texttt{apply} in the example above, this is easily done by just reverting the steps described above. However, in general there can be multiple functions which have the correct form for this, and could all possibly be \texttt{apply} functions. In its originally described form, refunctionalization therefore only works on programs which are the result of the defunctionalization of some other program.
+\textit{Refunctionalization} is the left inverse of defunctionalization, first described by Danvy and Millikin\cite{danvy09refunctionalization}. Its goal is to undo defunctionalization. When there is only one function that can serve the role of \texttt{apply} in the example above, this is done by just reverting the steps described above. However, in general there can be multiple functions which have the correct form for this, and could all possibly be \texttt{apply} functions. In its originally described form, refunctionalization therefore can only be applied to programs which are the in the image of defunctionalization.
 
 However, it would be desirable to have a transformation that transforms \textit{all} first-order programs into semantically equivalent higher-order programs, like defunctionalization does it the other way around. This is where another concept comes into play: copatterns and codata.
 
-\textit{Copatterns} are the dual to patterns, in the following sense. Where patterns allow one to distinguish between different inputs to a function, with copatterns one can observe the output. The need to observe output arises naturally when describing infinite structures. Copatterns are thus connected to \textit{codata}. Where data type definitions are used for finite structures like natural numbers, codata type definitions are used for infinite structures like streams. Consider the following example program:
+\textit{Copatterns} are dual to patterns, in the sense that, where patterns allow one to distinguish between different inputs to a function, with copatterns one can observe how the output is used. The need to observe how the output is used arises naturally when describing infinite structures. Copatterns are thus connected to \textit{codata}. Where data type definitions are used for finite structures like natural numbers, codata type definitions are used for infinite structures like streams. Consider the following example program:
 
 \begin{lstlisting}
 
@@ -90,11 +94,11 @@ tail (repeat n) = repeat n
 
 \end{lstlisting}
 
-The codata type definition for \texttt{Stream} gives the ways, called \textit{destructors}, in which a stream can be observed, or \textit{destructed}. One is fetching its head, which is a natural number, the other is fetching the tail, which again is a stream. The function \texttt{repeat} describes a stream that always returns the same number when fetching its head. For this, the left-hand sides of the definition for \texttt{repeat} use copatterns; one applies the destructor \texttt{head}, the other the destructor \texttt{tail}.
+The codata type definition for \texttt{Stream} specifies that a stream can be observed in two ways: the destructor \texttt{head} fetches its initial element, which is a natural number, while destructor \texttt{tail} fetches the rest of the stream, which is again a stream. The function \texttt{repeat} describes a stream that always returns the same number when fetching its head. For this, the left-hand sides of the definition for \texttt{repeat} use copatterns; one applies the destructor \texttt{head}, the other the destructor \texttt{tail}.
 
-Uroboro is a functional programming language. Instead of first-class functions, Uroboro has its generalization, codata types, and copattern matching. We first show how two fragments of Uroboro relate codata and copatterns with refunctionalization. Then we motivate why Uroboro is interesting -- in general, and in particular for our purpose of automatic program transformations.
+Uroboro is a functional programming language. Instead of first-class functions, Uroboro has its generalization, codata types, and copattern matching. We first show how two fragments of Uroboro relate codata and copatterns with refunctionalization. Then we motivate why Uroboro is interesting---in general, and in particular for our purpose of automatic program transformations.
 
-How do copatterns and codata relate to refunctionalization? Rendel et al.\cite{rendel15automatic} show how a program in a certain first-order language -- which they call the Data Fragment -- can be automatically transformed to a language -- which they call the Codata Fragment -- with copattern matching, and vice versa. The authors intend these two languages to be fragments of Uroboro. The key idea of Rendel et al. is that codata can be regarded as a generalization of first-class functions. This solves the problem of the multiple apply functions described above. Consider the following example program in the Data Fragment.
+How do copatterns and codata relate to refunctionalization? Rendel et al.\cite{rendel15automatic} show how a program in a certain first-order language---which they call the Data Fragment---can be automatically transformed to a language---which they call the Codata Fragment---with copattern matching, and vice versa. The authors intend these two languages to be fragments of Uroboro. The key idea of Rendel et al. is that codata can be regarded as a generalization of first-class functions. This solves the problem of the multiple apply functions described above. Consider the following example program in the Data Fragment.
 
 \begin{lstlisting}
 
@@ -134,15 +138,15 @@ function Succ(Nat): Nat where
   Succ(m).multiply(n) = m.multiply(n).add(n)
 
 \end{lstlisting}
-The Codata Fragment's syntax for destructors, \texttt{fun(s).des} is taken from Abel et al.\cite{abel13copatterns} and is syntactical sugar for the form \texttt{des(fun(s))} used above.
+The Codata Fragment's syntax for destructors, \texttt{fun(s).des} is taken from Abel et al.\cite{abel13copatterns} and is just another notation for the form \texttt{des(fun(s))} used above.
 
-Rendel et al.s\cite{rendel15automatic} refunctionalization for the Data Fragment finds its reverse in their defunctionalization for the Codata Fragment. As an example, consider the result of refunctionalization of the example program above. Defunctionalizing this program leads back to the original program. Rendel et al. show that, when one views programs as two-dimensional matrices, defunctionalizing the Codata Fragment and refunctionalizing the Data Fragment can be regarded as one and the same function, namely matrix transposition.
+Rendel et al.'s\cite{rendel15automatic} refunctionalization for the Data Fragment is inverse to their defunctionalization for the Codata Fragment. As an example, consider the result of refunctionalization of the example program above. Defunctionalizing this program leads back to the original program. Rendel et al. show that, when one views programs as two-dimensional matrices, defunctionalizing the Codata Fragment and refunctionalizing the Data Fragment can be regarded as one and the same function, namely matrix transposition.
 
 Rendel et al. intend the Data Fragment and the Codata Fragment to be fragments of a common language, called Uroboro. In the \hyperref[ch:uro]{following chapter}, we formally define this language in full for the first time. Here, we motivate why we think Uroboro is interesting in general and for our purpose, automatic program transformations.
 
 In our opinion, Uroboro is well suited for automatic program transformations which are related to the conversion between first-order and higher-order programs. There are two major reasons for this:
 \begin{itemize}
-\item Uroboro isn't truly ``higher-order'', i.e., it has no first-class functions and no function types. Functions and destructors have fixed-length argument lists, i.e., there can be no ``underapplication'' (but this can be emulated with destructors). Destructors in Uroboro are thus somewhat similar to methods in object-oriented programming languages.
+\item Uroboro isn't truly ``higher-order'', that is, it has no first-class functions and no function types. Functions and destructors have fixed-length argument lists, that is, there can be no ``underapplication'' (but this can be emulated with destructors). Destructors in Uroboro are thus somewhat similar to methods in object-oriented programming languages.
 
 \item Uroboro is symmetric in the sense that it has both data type definitions and its dual codata type definition, along with patterns and its dual copatterns. This is interesting for automatic transformations, since, as described before, the Data Fragment and the Codata Fragment of Uroboro are connected by refunctionalization and defunctionalization.
 \end{itemize}
