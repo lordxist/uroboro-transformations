@@ -1,0 +1,74 @@
+-- Interpreter for Uroboro written in Uroboro
+-- (incomplete, currently able to match terms against copatterns)
+
+data Cop where
+  AppCop(Name, PList): Cop
+  DesCop(Name, Cop, PList): Cop
+
+data P where
+  Con(Name, PList): P
+  Var(Name): P
+
+data PList where
+  nullPList(): PList
+  consPList(P, PList): PList
+
+data Term where
+  App(Name, TList): Term
+  Des(Name, Term, TList): Term
+
+data TList where
+  nullTList(): TList
+  consTList(Term, TList): TList
+
+data Name where
+  empty(): Name
+  consName(Char, Name): Name
+
+data Char where
+  a(): Char
+  b(): Char
+  c(): Char
+
+data Bool where
+  true(): Bool
+  false(): Bool
+
+function and(Bool, Bool): Bool where
+  and(true(), true()) = true()
+  and(true(), false()) = false()
+  and(false(), x) = false()
+
+function charEq(Char, Char): Bool where
+  charEq(a(), a()) = true()
+  charEq(a(), b()) = false()
+  charEq(a(), c()) = false()
+  charEq(b(), a()) = false()
+  charEq(b(), b()) = true()
+  charEq(b(), c()) = false()
+  charEq(c(), a()) = false()
+  charEq(c(), b()) = false()
+  charEq(c(), c()) = true()
+
+function nameEq(Name, Name): Bool where
+  nameEq(empty(), empty()) = true()
+  nameEq(empty(), consName(c,n)) = false()
+  nameEq(consName(c,n), empty()) = false()
+  nameEq(consName(c,n), consName(c',n')) = and(charEq(c,c'), nameEq(n,n'))
+
+function matchP(Term, P): Bool where
+  matchP(App(id,ts), Con(id',ps)) = and(nameEq(id, id'),matchPTLists(ps,ts))
+  matchP(App(id,ts), Var(id')) = true()
+  matchP(Des(id,t,ts), Con(id',ps)) = false()
+  matchP(Des(id,t,ts), Var(id')) = true()
+
+function matchPTLists(PList, TList): Bool where
+  matchPTLists(nullPList(), nullTList()) = true()
+  matchPTLists(nullPList(), consTList(t,ts)) = false()
+  matchPTLists(consPList(p,ps), nullTList()) = false()
+  matchPTLists(consPList(p,ps),consTList(t,ts)) = and(matchP(t,p),matchPTLists(ps,ts))
+
+function match(Term, Cop): Bool where
+  match(App(id, ts), AppCop(id', ps)) = and(nameEq(id, id'),matchPTLists(ps,ts))  match(App(id, ts), DesCop(id', cop, ps)) = false()
+  match(Des(id, t, ts), AppCop(id', ps)) = false()
+  match(Des(id, t, ts), DesCop(id', cop, ps)) = and(nameEq(id, id'), and(match(t, cop), matchPTLists(ps, ts)))
