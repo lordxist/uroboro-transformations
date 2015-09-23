@@ -577,7 +577,7 @@ In \autoref{ch:derefunc}, we will rely not only upon copattern coverage, but als
 \section{Type soundness}
 \label{sec:urots}
 
-We show that Uroboro enjoys type soundness. As usual, we do so by showing preservation and progress for the reduction relation $\longrightarrow$.\footnote{This approach was formulated by Wright and Felleisen\cite{wright94syntactic}. The form used here is usual nowadays; in \textit{Types and Programming Languages} (MIT Press, 2002) Pierce attributes the slogan ``safety is progress plus preservation'' to Harper (p.95).} The notion of completeness used in the progress lemma is the copattern coverage defined in the previous section; the value notion is that of the judgement $\vdash_v$ defined in \autoref{ssec:val}.
+We show that Uroboro enjoys type soundness. As usual, we do so by showing preservation and progress for the reduction relation $\longrightarrow$.\footnote{This approach was formulated by Wright and Felleisen\cite{wright94syntactic}. The form used here is usual nowadays; in \textit{Types and Programming Languages} (MIT Press, 2002) Pierce attributes the slogan ``safety is progress plus preservation'' to Harper (p.95).} The notion of completeness used in the progress lemma is the copattern coverage defined in the \hyperref[sec:cc]{previous section}; the value notion is that of the judgement $\vdash_v$ defined in \autoref{ssec:val}.
 
 \begin{lemma}[Type preservation]
 If a program $prg$ with signatures $\Sigma$ is well-typed, the following holds for any two terms $s, t$: When $\vdash_{\Sigma} s : \tau$ and $s \longrightarrow_{prg} t$, then $\vdash_{\Sigma} t : \tau$.

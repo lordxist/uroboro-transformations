@@ -78,12 +78,12 @@ A well-typed Uroboro program is in the refunctionalized fragment $\mathbf{U}^{re
 
 For each algorithm it will be shown, in its respective section, that it actually has the range specified above. In total, four important properties will be shown for each algorithm: Termination, correct range, preservation of well-typedness, and preservation of semantics in a (weak) bisimulation.
 
-The rest of this chapter is organized as follows. The first section describes the unnesting algorithm and shows why the four properties hold. Sections 2 and 3 do the same for the core de- and refunctionalization, respectively.
+The rest of this chapter is organized as follows. The \hyperref[sec:unn]{first section} describes the unnesting algorithm and shows why the four properties hold. Sections \hyperref[sec:coredefunc]{2} and \hyperref[sec:corerefunc]{3} do the same for the core de- and refunctionalization, respectively.
 
 \section{Unnesting}
 \label{sec:unn}
 
-We adapt the translation algorithm from section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro. Their algorithm translates equations step-by-step depending upon the derivation of the copattern coverage of their lhss. Our adaptation only has steps which concern patterns that have a counterpart in Uroboro\footnote{I.e., not those for applications, units, and pairs. In the adapted algorithm for Uroboro, the last two are merged into the steps for destructors and constructors, while application is irrelevant because Uroboro doesn't have function types.}. Each such translation step can be considered an extraction as defined in \autoref{ch:extr}.
+We adapt the translation algorithm from Section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro. Their algorithm translates equations step-by-step depending upon the derivation of the copattern coverage of their lhss. Our adaptation only has steps which concern patterns that have a counterpart in Uroboro\footnote{I.e., not those for applications, units, and pairs. In the adapted algorithm for Uroboro, the last two are merged into the steps for destructors and constructors, while application is irrelevant because Uroboro doesn't have function types.}. Each such translation step can be considered an extraction as defined in \autoref{ch:extr}.
 
 \subsection{Simple patterns}
 
@@ -166,7 +166,7 @@ Now, all lhss of the program are sufficiently simple for refunctionalization, th
 
 \subsubsection{Formal description}
 
-Now, we semi-formally describe the algorithm for $\textsf{Unnest}_i$, adapted from section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro, as lined out above. We assume that all copatterns in the program to be transformed comply with some variable naming schema as described in \autoref{ssec:conextr}; if this is not yet the case, simply rename the variables according to the schema before applying $\textsf{Unnest}_i$.
+Now, we semi-formally describe the algorithm for $\textsf{Unnest}_i$, adapted from Section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro, as lined out above. We assume that all copatterns in the program to be transformed comply with some variable naming schema as described in \autoref{ssec:conextr}; if this is not yet the case, simply rename the variables according to the schema before applying $\textsf{Unnest}_i$.
 
 \begin{algorithm}[$\textsf{Unnest}_i$]
 
@@ -251,7 +251,7 @@ Next, we consider important properties of the translation algorithm.
 
 \textbf{Preservation of well-typedness.} The only changes made to the program are a series of extractions (each is either constructor or destructor extraction). All extractions preserve the well-typedness of a program, therefore well-typedness is also preserved by $\texttt{Unnest}_i$.
 
-\textbf{Bisimulation.} Because copattern coverage holds for the translated program, by \autoref{fac:ccnooverlap}, the translated program has no overlapping lhss. Therefore, by the propositions 3.3.1 and 3.3.2, we know that the translation preserves the semantics of the program in the kind of weak bisimulation described in section 3.3.
+\textbf{Bisimulation.} Because copattern coverage holds for the translated program, by \autoref{fac:ccnooverlap}, the translated program has no overlapping lhss. Therefore, by the propositions~\ref{eq:bisim1} and~\ref{eq:bisim2}, we know that the translation preserves the semantics of the program in the kind of weak bisimulation described in \autoref{sec:extrbis}.
 
 \section{Core defunctionalization}
 \label{sec:coredefunc}
@@ -528,7 +528,7 @@ eqn_{nr'} &::= fun(con(x^*), y^*) = t \\
 
 The two fragments $\mathbf{U}_{cc}[fdef_{un,d}]$ and $\mathbf{U}_{cc}[fdef_{un,r'}]$ are the Data and Codata fragment from Rendel et al., extended to allow arbitrary lhss, as long as they are already defunctionalized or refunctionalized, i.e., they contain no destructors or no constructors, respectively. This allows us to extend their de- and refunctionalization transformations for the Codata and Data Fragments, to our core de- and refunctionalization for$\mathbf{U}_{cc}[fdef_{un,r'}]$ and $\mathbf{U}_{cc}[fdef_{un,d}]$, respectively. The Data and Codata Fragment are symmetric to each other, as de- and refunctionalization can switch between them; as Rendel et al.\cite{rendel15automatic} describe it, for these fragments, de- and refunctionalization is the same transformation, namely a matrix transposition for a two-dimensional matrix representation of programs.
 
-All this would be good and well, were it not for the fact that unnesting to prepare for refunctionalization doesn't arrive at $\mathbf{U}_{cc}[fdef_{un,r'}]$. A somewhat ad-hoc workaround is presented in the section following the next. More importantly, however, this situation shines a light on the asymmetry between destructors and constructors -- in Uroboro and elsewhere, as this difference is not one exclusive to Uroboro. This underlying problem is illustrated in the next section.
+All this would be good and well, were it not for the fact that unnesting to prepare for refunctionalization doesn't arrive at $\mathbf{U}_{cc}[fdef_{un,r'}]$. A somewhat ad-hoc workaround is presented in the \hyperref[sssec:workaround]{section} following the next. More importantly, however, this situation shines a light on the asymmetry between destructors and constructors -- in Uroboro and elsewhere, as this difference is not one exclusive to Uroboro. This underlying problem is illustrated in the next section.
 
 \subsubsection{The general problem}
 
