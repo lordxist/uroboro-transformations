@@ -309,10 +309,10 @@ where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle
       (3,0) node(b) {}
       (0,-3) node(c) {}
       (3,-3) node(d) {};
-\draw[->] (a) -- (b);
-\draw[->,color=blue] (a) -- (c);
-\draw[->,dashed,color=blue] (b) -- (d) node [midway, above, sloped] () {$*$};
-\draw[->,dashed] (c) -- (d) node [midway, above, sloped] () {$=$};
+\draw[->,ultra thick] (a) -- (b);
+\draw[->,color=red] (a) -- (c);
+\draw[->,dashed,color=red] (b) -- (d) node [midway, above, sloped] () {$*$};
+\draw[->,dashed,ultra thick] (c) -- (d) node [midway, above, sloped] () {$=$};
 \end{tikzpicture}
 \caption{For \autoref{lem:cdpaux}}
 \end{subfigure}
@@ -323,16 +323,16 @@ where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle
       (3,0) node(b) {}
       (0,-3) node(c) {}
       (3,-3) node(d) {};
-\draw[->,dashed] (a) -- (a') node [midway, above, sloped] () {$=$};
-\draw[->,dashed,color=blue] (a') -- (b) node [midway, above, sloped] () {$*$};
-\draw[->,dashed,color=blue] (a) -- (c) node [midway, above, sloped] () {$*$};
-\draw[->,color=blue] (b) -- (d);
-\draw[->] (c) -- (d);
+\draw[->,dashed,ultra thick] (a) -- (a') node [midway, above, sloped] () {$=$};
+\draw[->,dashed,color=red] (a') -- (b) node [midway, above, sloped] () {$*$};
+\draw[->,dashed,color=red] (a) -- (c) node [midway, above, sloped] () {$*$};
+\draw[->,color=red] (b) -- (d);
+\draw[->,ultra thick] (c) -- (d);
 \end{tikzpicture}
 \caption{For \autoref{lem:comminv}}
 \label{fig:comminv}
 \end{subfigure}
-\caption{The commutations of \autoref{lem:cdpaux} and \autoref{lem:comminv}: blue arrows represent $\longrightarrow^{aux}$, black arrows $\longrightarrow'$}
+\caption{The commutations of \autoref{lem:cdpaux} and \autoref{lem:comminv}: thin vertical arrows represent $\longrightarrow^{aux}$, thick horizontal or diagonal arrows $\longrightarrow'$}
 \end{figure}
 
 \begin{restatable}[Commutation]{lemma}{cdpaux}
