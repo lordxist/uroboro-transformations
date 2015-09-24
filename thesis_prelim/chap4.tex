@@ -532,21 +532,21 @@ All this would be good and well, were it not for the fact that unnesting to prep
 
 \subsubsection{The general problem}
 
-The general problem is that destructors allow one to ``observe'' the result in only one way at a time, i.e., the next destructor in the stack already observes the result of the previous, while constructors allow one to observe input in different ways. As an example, consider the function $fun$ with two arguments $x, y$.
+The general problem is that destructors allow one to specify how to observe the result in only one way at a time, that is, the next destructor in the stack already specifies how to observe the result of the previous, while constructors allow one to inspect input in different ways. As an example, consider the function $fun$ with two arguments $x, y$.
 \[
 fun(x, y) = ?
 \]
-In order to refine the definition of $fun$, one might choose to observe its output by destructing it. Suppose there are two destructors that fit the type of $fun$, a coverage complete definition thus would be:
+In order to refine the definition of $fun$, one might choose to specify how its output is observed. Suppose there are two destructors that fit the type of $fun$, a coverage complete definition thus would be:
 \begin{align*}
 & fun(x, y).des1 = x \\
 & fun(x, y).des2 = y
 \end{align*}
-Instead of stopping here, this might be refined further, but, when starting refinement with output observation, the refinement will always invariantly start with this step as long as coverage completeness is desired. On the other hand, one might choose to observe the input of $fun$ by replacing a variable with the constructor calls that fit its type.
+Instead of stopping here, this might be refined further, but, when starting refinement with specifying output observation, the refinement will always invariantly start with this step as long as coverage completeness is desired. On the other hand, one might choose to inspect the input of $fun$ by replacing a variable with the constructor calls that fit its type.
 \begin{align*}
 & fun(con1(), y) = con1() \\
 & fun(con2(), y) = y
 \end{align*}
-Here $x$ was chosen to be observed. But, unlike with outputs, this isn't the only way to start the refinement, since we could have instead chosen to observe $y$.
+Here $x$ was chosen to be inspected. But, unlike with outputs, this isn't the only way to start the refinement, since we could have instead chosen to inspect $y$.
 \begin{align*}
 & fun(x, con()) = con() \\
 \end{align*}
