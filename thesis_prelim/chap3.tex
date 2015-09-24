@@ -303,7 +303,8 @@ In order to prove this, we define a counterpart to the $\longrightarrow'$ reduct
 where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle$ whose underlying value set is the set of all terms, that is, the reduction is allowed to choose any redex. Where $\longrightarrow'$ can ``sidestep'' reductions which don't change the back-interpretation of a term, $\longrightarrow^{aux}$ is purely ``interpretative'', that is, it only allows reductions to terms with equal back-interpretation. This is expressed formally in the following lemmas relating $\longrightarrow'$ and $\longrightarrow^{aux}$, one concerning their commutation, the other what we call their complementarity. The $`` \Rightarrow "$ direction of~\ref{eq:bisim2} follows from these, as shown below.
 
 \begin{figure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}[b]{0.5\textwidth}
+\centering
 \begin{tikzpicture}
 \path (0,0) node(a) {} 
       (3,0) node(b) {}
@@ -316,7 +317,8 @@ where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle
 \end{tikzpicture}
 \caption{For \autoref{lem:cdpaux}}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}[b]{0.5\textwidth}
+\centering
 \begin{tikzpicture}
 \path (0,0) node(a) {}
       (3,1) node (a') {}

@@ -63,19 +63,21 @@ We think that this notation is especially useful for such cases where length par
 \label{sec:urosyn}
 
 \begin{figure}
-\begin{subfigure}{0.5\textwidth}
+\begin{subfigure}[b]{0.5\textwidth}
+\centering
 \begin{align*}
 \sigma, \tau ~&= \textrm{type names}&\\
 con ~&= \textrm{constructor names}&\\
 des ~&= \textrm{destructor names}&\\
 fun ~&= \textrm{function names}&\\
-x, y ~&= \textrm{variable names}&\\
+x, y ~&= \textrm{variable names}&
 \end{align*}
 \caption{Syntactic domains}
 \label{fig:syndomain}
 \end{subfigure}
 ~
-\begin{subfigure}{0.5\textwidth}
+\begin{subfigure}[b]{0.5\textwidth}
+\centering
 \begin{align*}
 s, t ~&::= x ~ | ~ fun(t^*) ~ | ~ con(t^*) ~ | ~ s.des(t^*) &\\
 q ~&::= fun(p^*) ~ | ~ q.des(p^*) &\\
