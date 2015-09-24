@@ -435,17 +435,23 @@ reserved.\par\permission}}
 \newbox\@titlesupervisor 	\newbox\@abstractsupervisor
 
 \def\supervisor#1{\setbox\@titlesupervisor\vbox
-  {\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
+  %{\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
+  %\def\baselinestretch{1}\large
+  %\signature{Certified by}{#1 \\ Thesis Supervisor}}
+  {\unvbox\@titlesupervisor \vskip\baselineskip
   \def\baselinestretch{1}\large
-  \signature{Certified by}{#1 \\ Thesis Supervisor}}
+  Thesis Supervisor: #1}
   \setbox\@abstractsupervisor\vbox{\unvbox\@abstractsupervisor
   \vskip\baselineskip \def\baselinestretch{1}\@normalsize 
   \par\noindent Thesis Supervisor: #1}}
 
 \def\secondexaminer#1{\setbox\@titlesupervisor\vbox
-  {\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
+  %{\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
+  %\def\baselinestretch{1}\large
+  %\signature{Certified by}{#1 \\ Second Examiner}}
+  {\unvbox\@titlesupervisor \vskip\baselineskip
   \def\baselinestretch{1}\large
-  \signature{Certified by}{#1 \\ Second Examiner}}
+  Second Examiner: #1}
   \setbox\@abstractsupervisor\vbox{\unvbox\@abstractsupervisor
   \vskip\baselineskip \def\baselinestretch{1}\@normalsize 
   \par\noindent Second Examiner: #1}}
@@ -460,13 +466,13 @@ reserved.\par\permission}}
 \def\maketitle{\begin{titlepage}
 \large
 {\def\baselinestretch{1.2}\Large\bf \choosecase{\@title} \par}
-\vskip 3\baselineskip
+\vskip 2\baselineskip
 by\par
-\vskip 3\baselineskip
+\vskip 2\baselineskip
 {\Large  \choosecase{\@author}}
 %\par
 %\@prevdegrees
-\vskip 3\baselineskip
+\vskip 2\baselineskip
 \par
 \choosecase{Submitted to the} \choosecase{\@department} \\
 \choosecase{in partial fulfillment of the requirements for the}
@@ -476,17 +482,18 @@ by\par
 \choosecase{\@degree}
 \par
 at the
-\vskip 3\baselineskip
+\vskip 2\baselineskip
 \par\EKUT\par
-\vskip 3\baselineskip
+\vskip 2\baselineskip
 \@degreemonth\ \@degreeyear
 %\par
 %\@copyrightnotice
 %\par
 %\vskip 3\baselineskip
 %\signature{Author}{\@department \\ \@thesisdate}
-%\par
-%\vfill
+\par
+\vskip 3\baselineskip
+\unvbox\@titlesupervisor
 %\unvbox\@titlesupervisor
 %\par
 %\vfill
