@@ -40,7 +40,7 @@
 \label{fig:ch4domrng}
 \end{figure}
 
-Defunctionalization and refunctionalization have already been outlined in the introduction. In this chapter, we build upon the works of Rendel et al.\cite{rendel15automatic} and Setzer et al.\cite{setzer14unnesting} to automatize defunctionalization and refunctionalization for Uroboro. 
+Defunctionalization and refunctionalization have already been outlined in the introduction. In this chapter, we build upon the works of \citet{rendel15automatic} and \citet{setzer14unnesting} to automatize defunctionalization and refunctionalization for Uroboro. 
 
 We present an algorithm that defunctionalizes arbitrary Uroboro programs with copattern coverage, and an algorithm that refunctionalizes such programs. Both algorithms are made up of two phases, in order:
 \begin{enumerate}
@@ -50,7 +50,7 @@ We present an algorithm that defunctionalizes arbitrary Uroboro programs with co
 
 In short, the entire process can be described as follows. By unnesting them as far as necessary, the preprocessing phase brings the lhss of the program to the form accepted by the core de-/refunctionalization, which is essentially the two-way transformation of Rendel et al.; their transformations are repeated in \autoref{fig:ch4rendelderefunc} for the convenience of the reader.
 
-The unnesting is done by a parameterized algorithm $\textsf{Unnest}_i$, where the parameter $i$ can be either $d$ or $r$, standing for defunctionalization and refunctionalization, respectively. The parameter determines when the algorithm may stop, such that its results are legal inputs for de- or refunctionalization. The unnesting algorithm is essentially the copattern unnesting algorithm of Setzer et al.\cite{setzer14unnesting}, adapted to Uroboro.
+The unnesting is done by a parameterized algorithm $\textsf{Unnest}_i$, where the parameter $i$ can be either $d$ or $r$, standing for defunctionalization and refunctionalization, respectively. The parameter determines when the algorithm may stop, such that its results are legal inputs for de- or refunctionalization. The unnesting algorithm is essentially the copattern unnesting algorithm of \citet{setzer14unnesting}, adapted to Uroboro.
 
 In \autoref{fig:ch4domrng}, we give the intended domain and range for each of the algorithms, all of which are specific fragments of Uroboro. We call the set of all Uroboro programs with copattern coverage $\mathbf{U}_{cc}$; the other fragments are defined below.
 
@@ -83,7 +83,7 @@ The rest of this chapter is organized as follows. The \hyperref[sec:unn]{first s
 \section{Unnesting}
 \label{sec:unn}
 
-We adapt the translation algorithm from Section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro. Their algorithm translates equations step-by-step depending upon the derivation of the copattern coverage of their lhss. Our adaptation only has steps which concern patterns that have a counterpart in Uroboro\footnote{I.e., not those for applications, units, and pairs. In the adapted algorithm for Uroboro, the last two are merged into the steps for destructors and constructors, while application is irrelevant because Uroboro doesn't have function types.}. Each such translation step can be considered an extraction as defined in \autoref{ch:extr}.
+We adapt the translation algorithm of \citet[Section 3.3]{setzer14unnesting} to Uroboro. Their algorithm translates equations step-by-step depending upon the derivation of the copattern coverage of their lhss. Our adaptation only has steps which concern patterns that have a counterpart in Uroboro\footnote{I.e., not those for applications, units, and pairs. In the adapted algorithm for Uroboro, the last two are merged into the steps for destructors and constructors, while application is irrelevant because Uroboro doesn't have function types.}. Each such translation step can be considered an extraction as defined in \autoref{ch:extr}.
 
 \subsection{Simple patterns}
 
@@ -166,11 +166,11 @@ Now, all lhss of the program are sufficiently simple for refunctionalization, th
 
 \subsubsection{Formal description}
 
-Now, we semi-formally describe the algorithm for $\textsf{Unnest}_i$, adapted from Section 3.3 of Setzer et al.\cite{setzer14unnesting} to Uroboro, as lined out above. We assume that all copatterns in the program to be transformed comply with some variable naming schema as described in \autoref{ssec:conextr}; if this is not yet the case, simply rename the variables according to the schema before applying $\textsf{Unnest}_i$.
+Now, we semi-formally describe the algorithm for $\textsf{Unnest}_i$, adapted from \citet[Section 3.3]{setzer14unnesting} to Uroboro, as lined out above. We assume that all copatterns in the program to be transformed comply with some variable naming schema as described in \autoref{ssec:conextr}; if this is not yet the case, simply rename the variables according to the schema before applying $\textsf{Unnest}_i$.
 
 \begin{algorithm}[$\textsf{Unnest}_i$]
 
-The algorithm is applied to an individual function definition; to transform the entire program, simply apply it to each of them in arbitrary order. Like Setzer et al., we consider the last step in the derivation of the copattern coverage for the lhss of a function definition. Just like them, we are not interested in the case where the last step is C\textsubscript{Head}, since that means the lhs is already simple, and we terminate. When the last step isn't C\textsubscript{Head}, but the lhss are all sufficiently simple for $i$ nonetheless, we also terminate.
+The algorithm is applied to an individual function definition; to transform the entire program, simply apply it to each of them in arbitrary order. Like \citeauthor{setzer14unnesting}, we consider the last step in the derivation of the copattern coverage for the lhss of a function definition. Just like them, we are not interested in the case where the last step is C\textsubscript{Head}, since that means the lhs is already simple, and we terminate. When the last step isn't C\textsubscript{Head}, but the lhss are all sufficiently simple for $i$ nonetheless, we also terminate.
 
 \begin{prooftree}
 \AxiomC{$fun \lhd | ~ Q ~ (q)$}
@@ -178,7 +178,7 @@ The algorithm is applied to an individual function definition; to transform the 
 \UnaryInfC{$fun \lhd | ~ Q ~ (q_i)_{i \in I}$}
 \end{prooftree}
 
-Also like Setzer et al., we then introduce a fresh auxiliary function and translate the program depending on \textbf{C}. As stated before, these translations are slightly adapted to fit the framework of Uroboro, such that two remain, one for destructors and one for constructors. More importantly, both of those are in fact extractions as defined in \autoref{ch:extr}, namely destructor and constructor extraction. 
+Also like \citeauthor{setzer14unnesting}, we then introduce a fresh auxiliary function and translate the program depending on \textbf{C}. As stated before, these translations are slightly adapted to fit the framework of Uroboro, such that two remain, one for destructors and one for constructors. More importantly, both of those are in fact extractions as defined in \autoref{ch:extr}, namely destructor and constructor extraction. 
 
 \begin{enumerate}
 \item \textbf{C} is C\textsubscript{Des}, and the last derivation step looks as follows.
@@ -245,7 +245,7 @@ As shown for each of the two cases, after the extractions copattern coverage sti
 
 Next, we consider important properties of the translation algorithm.
 
-\textbf{Termination.} To show that the algorithm terminates, we can basically repeat the argument of Setzer et al. Each translation results in a changed function definition $def'_{fun}$ for $fun$ and a new function definition $def_{aux}$ for the auxiliary function. The lhss of $def'_{fun}$ are $Q \cup \{q\}$, which means that they cover $fun$ in the same way $fun$ is covered via $fun \lhd | ~ Q ~ (q)$ in the derivation step above. This means that the translation reduces the depth of the derivation tree for the coverage of $fun$, thus eventually arriving at sufficiently simple patterns. The added auxiliary function definitions already have simple lhss, thus they are not translated, and eventually the algorithm terminates.
+\textbf{Termination.} To show that the algorithm terminates, we can basically repeat the argument of \citet[Section 3.3]{setzer14unnesting} Each translation results in a changed function definition $def'_{fun}$ for $fun$ and a new function definition $def_{aux}$ for the auxiliary function. The lhss of $def'_{fun}$ are $Q \cup \{q\}$, which means that they cover $fun$ in the same way $fun$ is covered via $fun \lhd | ~ Q ~ (q)$ in the derivation step above. This means that the translation reduces the depth of the derivation tree for the coverage of $fun$, thus eventually arriving at sufficiently simple patterns. The added auxiliary function definitions already have simple lhss, thus they are not translated, and eventually the algorithm terminates.
 
 \textbf{Range.} The algorithm only stops when all lhss are sufficiently simple for $i$ and works on the coverage derivation trees, thus we have the desired range $\mathbf{U}_{cc}[fdef_{un,i}]$ if it terminates in all cases, which it does, as shown above.
 
@@ -256,7 +256,7 @@ Next, we consider important properties of the translation algorithm.
 \section{Core defunctionalization}
 \label{sec:coredefunc}
 
-The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of Rendel et al. for the Codata Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a defunctionalized form after \textsf{Unnest}, virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the changed syntactic domains of the symbols.
+The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of \citet{rendel15automatic} for the Codata Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a defunctionalized form after \textsf{Unnest}, virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the changed syntactic domains of the symbols.
 
 \subsection{Example}
 
@@ -353,7 +353,7 @@ First, we define the class of function definitions of a program $prg$ which are 
 
 Using this definition, we define defunctionalization $\langle \cdot \rangle^d$ of terms in \autoref{fig:termdefunc}; it depends upon $F^{prg}_d$ and therefore on the program $prg$. This transformation only changes symbols, but leaves the structure of the terms unchanged (disregarding the syntactic sugar for destructor calls). Especially, this means that $\langle q[\sigma] \rangle^d = \langle q \rangle^d [\langle \cdot \rangle^d \circ \sigma]$ for any copattern $q$ and substitution $\sigma$. A property that is important for the definition of \textsf{CoreDefunc} below is that, for any copattern $q$ that is allowed as a lhs in the domain of \textsf{CoreDefunc}, $\langle q \rangle^d$ is also a copattern. This can be easily shown by induction on the structure of $q$.
 
-Next, we define \textsf{CoreDefunc}. Like Rendel et al. do for their de- and refunctionalization, we use set-builder notation.
+Next, we define \textsf{CoreDefunc}. Like \citet{rendel15automatic} do for their de- and refunctionalization, we use set-builder notation.
 
 \begin{algorithm}[\textsf{CoreDefunc}]
 
@@ -482,7 +482,7 @@ By combining \autoref{lem:sbruld} and \autoref{lem:iso}.
 \section{Core refunctionalization}
 \label{sec:corerefunc}
 
-Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of Rendel et al.\cite{rendel15automatic} for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. Unfortunately, and unlike defunctionalization, this algorithm requires some kind of preprocessing, since the actual refunctionalization requires all constructors to be the first pattern of an lhs. We first describe this asymmetry in more detail and illustrate the underlying problem, then consider a possible workaround for our situation, and finally present an example for and formally define the actual refunctionalization and, as with defunctionalization, consider important properties of it.
+Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of \citet{rendel15automatic} for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. Unfortunately, and unlike defunctionalization, this algorithm requires some kind of preprocessing, since the actual refunctionalization requires all constructors to be the first pattern of an lhs. We first describe this asymmetry in more detail and illustrate the underlying problem, then consider a possible workaround for our situation, and finally present an example for and formally define the actual refunctionalization and, as with defunctionalization, consider important properties of it.
 
 \subsection{An asymmetry}
 
@@ -526,7 +526,7 @@ eqn_{nr'} &::= fun(con(x^*), y^*) = t \\
 \end{align*}
 \end{definition}
 
-The two fragments $\mathbf{U}_{cc}[fdef_{un,d}]$ and $\mathbf{U}_{cc}[fdef_{un,r'}]$ are the Data and Codata fragment from Rendel et al., extended to allow arbitrary lhss, as long as they are already defunctionalized or refunctionalized, i.e., they contain no destructors or no constructors, respectively. This allows us to extend their de- and refunctionalization transformations for the Codata and Data Fragments, to our core de- and refunctionalization for$\mathbf{U}_{cc}[fdef_{un,r'}]$ and $\mathbf{U}_{cc}[fdef_{un,d}]$, respectively. The Data and Codata Fragment are symmetric to each other, as de- and refunctionalization can switch between them; as Rendel et al.\cite{rendel15automatic} describe it, for these fragments, de- and refunctionalization is the same transformation, namely a matrix transposition for a two-dimensional matrix representation of programs.
+The two fragments $\mathbf{U}_{cc}[fdef_{un,d}]$ and $\mathbf{U}_{cc}[fdef_{un,r'}]$ are the Data and Codata fragment from Rendel et al., extended to allow arbitrary lhss, as long as they are already defunctionalized or refunctionalized, i.e., they contain no destructors or no constructors, respectively. This allows us to extend their de- and refunctionalization transformations for the Codata and Data Fragments, to our core de- and refunctionalization for$\mathbf{U}_{cc}[fdef_{un,r'}]$ and $\mathbf{U}_{cc}[fdef_{un,d}]$, respectively. The Data and Codata Fragment are symmetric to each other, as de- and refunctionalization can switch between them; as \citet{rendel15automatic} describe it, for these fragments, de- and refunctionalization is the same transformation, namely a matrix transposition for a two-dimensional matrix representation of programs.
 
 All this would be good and well, were it not for the fact that unnesting to prepare for refunctionalization doesn't arrive at $\mathbf{U}_{cc}[fdef_{un,r'}]$. A somewhat ad-hoc workaround is presented in the \hyperref[sssec:workaround]{section} following the next. More importantly, however, this situation shines a light on the asymmetry between destructors and constructors -- in Uroboro and elsewhere, as this difference is not one exclusive to Uroboro. This underlying problem is illustrated in the next section.
 

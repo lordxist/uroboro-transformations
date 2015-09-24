@@ -7,9 +7,9 @@ In functional programming, a function definition often consists of a number of e
 
 Another important feature of many functional programming languages is that they have \textit{first-class functions}. This is to say that functions can be used just like other objects, e.g., a function can be passed as an argument to another function. This can be very useful, e.g., to define filters or maps over collections. A language with first-class functions is also called \textit{higher-order}, in contrast to languages lacking this feature, which are called \textit{first-order}.
 
-Sometimes, a first-order specification of some functional program can be beneficial over an equivalent higher-order specification, and sometimes it is the other way around. This can depend upon whether human understandability or a certain property advantageous for machine processing is desired. For this reason, researchers are interested in finding and automatizing transformations which can bring a higher-order program into a semantically equivalent first-order form, or the other way around. Transforming a higher-order program (with first-class functions) into an equivalent first-order program (without first-class functions) is called defunctionalization\cite{reynolds72definitional}, the opposite direction is called refunctionalization\cite{danvy09refunctionalization}.
+Sometimes, a first-order specification of some functional program can be beneficial over an equivalent higher-order specification, and sometimes it is the other way around. This can depend upon whether human understandability or a certain property advantageous for machine processing is desired. For this reason, researchers are interested in finding and automatizing transformations which can bring a higher-order program into a semantically equivalent first-order form, or the other way around. Transforming a higher-order program (with first-class functions) into an equivalent first-order program (without first-class functions) is called defunctionalization\citep{reynolds72definitional}, the opposite direction is called refunctionalization\citep{danvy09refunctionalization}.
 
-In this work, we develop automatic program transformations for a specific language with copattern matching, called \textit{Uroboro}. One major goal is to support automatic de- and refunctionalization for all of Uroboro. Uses for these kinds of transformations have been presented by Reynolds and Danvy, among others. Uroboro is interesting for the purpose of automatizing such transformations, because, as Rendel et al.\cite{rendel15automatic} have shown, copatterns and refunctionalization are related. Rendel et al. have already developed automatic de- and refunctionalization between two fragments of Uroboro, called the Data and Codata Fragment. Based on their work, we contribute the following.
+In this work, we develop automatic program transformations for a specific language with copattern matching, called \textit{Uroboro}. One major goal is to support automatic de- and refunctionalization for all of Uroboro. Uses for these kinds of transformations have been presented by Reynolds and Danvy, among others. Uroboro is interesting for the purpose of automatizing such transformations, because, as \citet{rendel15automatic} have shown, copatterns and refunctionalization are related. \citeauthor{rendel15automatic} have already developed automatic de- and refunctionalization between two fragments of Uroboro, called the Data and Codata Fragment. Based on their work, we contribute the following.
 \begin{itemize}
 \item We formally define the full language Uroboro, which is an extension of both the Data and the Codata Fragment.
 
@@ -23,7 +23,7 @@ We intend the transformations of this work to be a foundation for an entire tool
 
 In this introduction, we first give an informal overview of de- and refunctionalization. Next, we briefly describe copatterns. We then outline how Uroboro relates these two concepts and why we consider this language interesting. Finally, we sum up the contents of this thesis.
 
-\textit{Defunctionalization} is a technique to transform higher-order programs into semantically equivalent first-order programs. It was first described by Reynolds\cite{reynolds72definitional}, who uses it as one of several tools to bring interpreters to another form intended for machine processing. We illustrate defunctionalization with the following example program, presented in a Haskell-like pseudocode in \autoref{fig:defuncex}.
+\textit{Defunctionalization} is a technique to transform higher-order programs into semantically equivalent first-order programs. It was first described by \citet{reynolds72definitional}, who uses it as one of several tools to bring interpreters to another form intended for machine processing. We illustrate defunctionalization with the following example program, presented in a Haskell-like pseudocode in \autoref{fig:defuncex}.
 
 \begin{figure}
 \begin{lstlisting}
@@ -104,7 +104,7 @@ multiply :: (Nat, Nat) -> Nat where
 \label{fig:refuncfailex}
 \end{figure}
 
-\textit{Refunctionalization} is the left inverse of defunctionalization, first described by Danvy and Millikin\cite{danvy09refunctionalization}. Its goal is to undo defunctionalization. When there is only one function that can serve the role of \texttt{apply} in the example above, this is done by just reverting the steps described above. However, in general there can be multiple functions which have the correct form for this, and could all possibly be \texttt{apply} functions for some type. As an example, consider the program in \autoref{fig:refuncfailex}. For refunctionalization, \textit{both} function definitions in the program somehow need to be regarded as apply functions for \texttt{Nat}; intuitively, this is not possible because there is only one way to apply functions. In its originally described form, refunctionalization therefore can only be applied to programs which are the in the image of defunctionalization.
+\textit{Refunctionalization} is the left inverse of defunctionalization, first described by \citet{danvy09refunctionalization}. Its goal is to undo defunctionalization. When there is only one function that can serve the role of \texttt{apply} in the example above, this is done by just reverting the steps described above. However, in general there can be multiple functions which have the correct form for this, and could all possibly be \texttt{apply} functions for some type. As an example, consider the program in \autoref{fig:refuncfailex}. For refunctionalization, \textit{both} function definitions in the program somehow need to be regarded as apply functions for \texttt{Nat}; intuitively, this is not possible because there is only one way to apply functions. In its originally described form, refunctionalization therefore can only be applied to programs which are the in the image of defunctionalization.
 
 However, it would be desirable to have a transformation that transforms \textit{all} first-order programs into semantically equivalent higher-order programs, like defunctionalization does it the other way around. This is where another concept comes into play: copatterns and codata.
 
@@ -143,7 +143,7 @@ function bar(): Y where
 
 Uroboro is a functional programming language. Instead of first-class functions, Uroboro has its generalization, codata types, and copattern matching. A representation of functions using codata is shown in \autoref{fig:codatafun}, presented in Uroboro; note that in Uroboro, destructors have argument lists, facilitating this representation of functions. We first show how two fragments of Uroboro relate codata and copatterns with refunctionalization. Then we motivate why Uroboro is interesting---in general, and in particular for our purpose of automatic program transformations.
 
-How do copatterns and codata relate to refunctionalization? Rendel et al.\cite{rendel15automatic} show how a program in a certain first-order language---which they call the Data Fragment---can be automatically transformed to a language---which they call the Codata Fragment---with copattern matching, and vice versa. The authors intend these two languages to be fragments of Uroboro. The key idea of Rendel et al. is that codata can be regarded as a generalization of first-class functions. This solves the problem of the multiple apply functions described above. Consider the example program in the Data Fragment shown in \autoref{fig:datafragex}, translated from \autoref{fig:refuncfailex}.
+How do copatterns and codata relate to refunctionalization? \citet{rendel15automatic} show how a program in a certain first-order language---which they call the Data Fragment---can be automatically transformed to a language---which they call the Codata Fragment---with copattern matching, and vice versa. The authors intend these two languages to be fragments of Uroboro. The key idea of \citeauthor{rendel15automatic} is that codata can be regarded as a generalization of first-class functions. This solves the problem of the multiple apply functions described above. Consider the example program in the Data Fragment shown in \autoref{fig:datafragex}, translated from \autoref{fig:refuncfailex}.
 
 \begin{figure}
 \begin{lstlisting}
@@ -165,7 +165,7 @@ function multiply(Nat, Nat): Nat where
 \label{fig:datafragex}
 \end{figure}
 
-Here, both \texttt{add} and \texttt{multiply} could possibly play the role of apply functions. The refunctionalization of Rendel et al. does the following:
+Here, both \texttt{add} and \texttt{multiply} could possibly play the role of apply functions. The refunctionalization of \citeauthor{rendel15automatic} does the following:
 \begin{enumerate}
 \item The data type definition \texttt{Nat} is replaced by a codata type definition which has a destructor for each function whose first argument has type \texttt{Nat}.
 \item For each constructor of \texttt{Nat}, a function definition is added, the equations of which correspond to the equations of all function definitions (here, both \texttt{add} and \texttt{multiply}) where the first argument of the left-hand side pattern is this constructor. Instead of a pattern with a constructor, the left-hand sides of these are now copatterns with the corresponding destructor. The right-hand sides are likewise transformed.
@@ -192,9 +192,9 @@ function Succ(Nat): Nat where
 \label{fig:datafragexrefunced}
 \end{figure}
 
-The Codata Fragment's syntax for destructors, \texttt{fun(s).des} is taken from Abel et al.\cite{abel13copatterns} and is just another notation for the form \texttt{des(fun(s))} used above.
+The Codata Fragment's syntax for destructors, \texttt{fun(s).des} is taken from \citet{abel13copatterns} and is just another notation for the form \texttt{des(fun(s))} used above.
 
-Rendel et al.'s\cite{rendel15automatic} refunctionalization for the Data Fragment is inverse to their defunctionalization for the Codata Fragment. As an example, consider the result of refunctionalization of the example program above. Defunctionalizing this program leads back to the original program. Rendel et al. show that, when one views programs as two-dimensional matrices, defunctionalizing the Codata Fragment and refunctionalizing the Data Fragment can be regarded as one and the same function, namely matrix transposition.
+\citet{rendel15automatic}'s refunctionalization for the Data Fragment is inverse to their defunctionalization for the Codata Fragment. As an example, consider the result of refunctionalization of the example program above. Defunctionalizing this program leads back to the original program. \citeauthor{rendel15automatic} show that, when one views programs as two-dimensional matrices, defunctionalizing the Codata Fragment and refunctionalizing the Data Fragment can be regarded as one and the same function, namely matrix transposition.
 
 In the \hyperref[ch:uro]{following chapter}, we formally define the full Uroboro for the first time. Here, we motivate why we think Uroboro is interesting in general and for our purpose, automatic program transformations.
 
@@ -204,7 +204,7 @@ In our opinion, Uroboro is well suited for automatic program transformations whi
 
 \item In Uroboro, all functions are named. This means we don't have to care about function definitions being all over the program, especially not within right-hand sides of equations.
 \end{itemize}
-We aren't aware of any existing languages which have both of these properties, with the exception of Abel et al.'s copattern language\cite{abel13copatterns}, but this language has both codata and first-class functions.
+We aren't aware of any existing languages which have both of these properties, with the exception of \citet{abel13copatterns}'s copattern language, but this language has both codata and first-class functions.
 
 As we have seen before, codata generalizes first-class functions. For this reason, Uroboro doesn't lose expressiveness when compared to languages with first-class functions but without parametric polymorphism. Thus, in our opinion, Uroboro, or rather a future version of it that includes parametric polymorphism, has the potential to replace certain higher-order languages. We give more details on this in \autoref{sec:reluro}.
 
