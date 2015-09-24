@@ -353,7 +353,7 @@ First, we define the class of function definitions of a program $prg$ which are 
 
 Using this definition, we define defunctionalization $\langle \cdot \rangle^d$ of terms in \autoref{fig:termdefunc}; it depends upon $F^{prg}_d$ and therefore on the program $prg$. This transformation only changes symbols, but leaves the structure of the terms unchanged (disregarding the syntactic sugar for destructor calls). Especially, this means that $\langle q[\sigma] \rangle^d = \langle q \rangle^d [\langle \cdot \rangle^d \circ \sigma]$ for any copattern $q$ and substitution $\sigma$. A property that is important for the definition of \textsf{CoreDefunc} below is that, for any copattern $q$ that is allowed as a lhs in the domain of \textsf{CoreDefunc}, $\langle q \rangle^d$ is also a copattern. This can be easily shown by induction on the structure of $q$.
 
-Next, we give the definition for \textsf{CoreDefunc}. Like Rendel et al. do for their de- and refunctionalization, we use set-builder notation.
+Next, we define \textsf{CoreDefunc}. Like Rendel et al. do for their de- and refunctionalization, we use set-builder notation.
 
 \begin{algorithm}[\textsf{CoreDefunc}]
 
@@ -482,7 +482,7 @@ By combining \autoref{lem:sbruld} and \autoref{lem:iso}.
 \section{Core refunctionalization}
 \label{sec:corerefunc}
 
-Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of Rendel et al.\cite{rendel15automatic} for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. Unfortunately, and unlike defunctionalization, this algorithm requires some kind of preprocessing, since the actual refunctionalization requires all constructors to be the first pattern of an lhs. We first describe this asymmetry in more detail and illustrate the underlying problem, then consider a possible workaround for our situation, and finally give an example for and formally define the actual refunctionalization and, as with defunctionalization, consider important properties of it.
+Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of Rendel et al.\cite{rendel15automatic} for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. Unfortunately, and unlike defunctionalization, this algorithm requires some kind of preprocessing, since the actual refunctionalization requires all constructors to be the first pattern of an lhs. We first describe this asymmetry in more detail and illustrate the underlying problem, then consider a possible workaround for our situation, and finally present an example for and formally define the actual refunctionalization and, as with defunctionalization, consider important properties of it.
 
 \subsection{An asymmetry}
 
@@ -515,7 +515,7 @@ In the introduction to this chapter, we gave two fragments of Uroboro induced by
 
 The second fragment, for refunctionalization, with its syntax for function definitions shown in \autoref{fig:unnfdrefunc}, is somewhat analogous to the first, in that it is unnested regarding constructors, and allows arbitrarily many destructors when no constructors are present. However, there is an asymmetry between the two fragments. When only one destructor is allowed, this can also only be placed at one position. On the other hand, allowing only one constructor leaves open the possibility of placing this at different positions. More on this later.
 
-The refunctionalization algorithm given below requires the constructor to be at the first position, i.e., it has as its domain the fragment $\mathbf{U}_{cc}[fdef_{un,r'}]$ of Uroboro defined as follows.
+The refunctionalization algorithm defined below requires the constructor to be at the first position, i.e., it has as its domain the fragment $\mathbf{U}_{cc}[fdef_{un,r'}]$ of Uroboro defined as follows.
 
 \begin{definition}[Unnested Fragment for the actual \textsf{CoreRefunc}]
 The fragment $\mathbf{U}_{cc}[fdef_{un,r'}]$, for the actual \textsf{CoreRefunc}, is induced by the function definition fragment $fdef_{un,r'}$, defined below using EBNF rules.
@@ -745,7 +745,7 @@ First, we define the class of function definitions of a program $prg$ which are 
 
 Using this definition, in \autoref{fig:refuncterm} we define refunctionalization of terms, dually to defunctionalization of terms.
 
-Next, we give the definition for \textsf{CoreRefunc}.
+Next, we define \textsf{CoreRefunc}.
 
 \begin{algorithm}[\textsf{CoreRefunc}]
 

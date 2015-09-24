@@ -24,7 +24,7 @@ In the next section, we formally define extractions and how they are applied to 
 
 Extractions are induced by a function $\pi$ that specifies how to decrease the syntactic complexity. Broadly, extractions fall into two classes: extractions that change the ``outer'' form, and those which change the ``inner'' form. Before defining extractions, we describe a way to uniformly express extractions that change the ``outer'' form, such as the destructor extraction exemplified above.
 
-Changing the ``outer'' form of the copattern, i.e., removing or adding destructors, is dual to changing its ``inner'' form, i.e., replacing patterns with other patterns. For the purpose of defining extractions of the latter type, substitutions will be used. For the purpose of defining extractions of the former, we introduce the notion of \textit{co-substitution}.
+Changing the ``outer'' form of the copattern, that is, removing or adding destructors, is dual to changing its ``inner'' form, that is, replacing patterns with other patterns. For the purpose of defining extractions of the latter type, substitutions will be used. For the purpose of defining extractions of the former, we introduce the notion of \textit{co-substitution}.
 
 \begin{definition}[Co-substitution]
 A function $\sigma$ from copatterns to copatterns is called a \textit{co-substitution}, if, for every copattern $q$, it is defined as follows:
@@ -57,7 +57,7 @@ A $\pi$-extraction target $T$ is a set of equations such that $\pi(q) = \pi(q')$
 \end{definition}
 
 \begin{definition}[$\pi$-extraction targeting $T$]
-Let $aux$ be a fresh function name \footnote{In practice this means that is in undeclared in the program that is transformed by the extraction lifted to programs (see \hyperref[ssec:extrprog]{next section}).} Let the pair of \textsf{get} and \textsf{putback} be the $\pi$-lens. For any copattern $q$, let $\langle q \rangle^{vars}$ denote the list of all variables of $q$ in the order that they appear in in $q$. Let $\langle \cdot \rangle^{aux}$ be the call to the auxiliary function that corresponds to the given copattern, defined as follows for copatterns $q$: $\langle q \rangle^{aux} = aux(\langle q \rangle^{vars})$. A \textit{$\pi$-extraction targeting an extraction target $T$} is a triple consisting of
+Let $aux$ be a fresh function name \footnote{In practice this means that it is undeclared in the program that is transformed by the extraction lifted to programs (see \hyperref[ssec:extrprog]{next section}).} Let the pair of \textsf{get} and \textsf{putback} be the $\pi$-lens. For any copattern $q$, let $\langle q \rangle^{vars}$ denote the list of all variables of $q$ in the order that they appear in in $q$. Let $\langle \cdot \rangle^{aux}$ be the call to the auxiliary function that corresponds to the given copattern, defined as follows for copatterns $q$: $\langle q \rangle^{aux} = aux(\langle q \rangle^{vars})$. A \textit{$\pi$-extraction targeting an extraction target $T$} is a triple consisting of
 \begin{itemize}
 \item an equation $\epsilon$ with lhs $q_\epsilon = \textsf{get}(q)$ and rhs $t_\epsilon = \langle q_\epsilon \rangle^{aux}$, for some lhs $q$ of an equation in $T$,
 \item a function $\zeta$ with domain $T$, defined as follows: $\zeta_r := ``\textsf{putback}(t_\epsilon, q_r) = t_r  "$, and
@@ -85,7 +85,7 @@ the function definition that contains the lhss of $T$.
 \section{Prime extractions}
 \label{sec:extrex}
 
-In this section, we give some example extractions, destructor extraction and those from the family of constructor extractions. They are \textit{prime} extractions, in the sense that all other extractions' extraction projections are compositions of the underlying projections of destructor and constructor extractions.
+In this section, we present some example extractions, destructor extraction and those from the family of constructor extractions. They are \textit{prime} extractions, in the sense that all other extractions' extraction projections are compositions of the underlying projections of destructor and constructor extractions.
 
 \subsection{Destructor extraction}
 \label{sec:desextr}
@@ -165,7 +165,7 @@ function aux(Nat, Nat): Array
   aux(n, Zero()) = n
   aux(n, Succ(m)) = Zero()
 \end{lstlisting}
-Note than in this example, other than destructor extraction, this transformation actually decreased the overall syntactic complexity of the program. The original definition for \texttt{oneElemArray} contained lhss with both destructor and constructor calls; the new definition has one lhs with one destructor, but no constructor call, and the auxiliary definition has two lhss which both have one constructor, but no destructor. Of course, the opposite case also exists, i.e., there are programs which cannot be syntactically simplified by constructor extraction, but by destructor extraction.
+Note than in this example, other than destructor extraction, this transformation actually decreased the overall syntactic complexity of the program. The original definition for \texttt{oneElemArray} contained lhss with both destructor and constructor calls; the new definition has one lhs with one destructor, but no constructor call, and the auxiliary definition has two lhss which both have one constructor, but no destructor. Of course, the opposite case also exists, more precisely, there are programs which cannot be syntactically simplified by constructor extraction, but by destructor extraction.
 
 \section{Bisimulation}
 \label{sec:extrbis}
@@ -195,11 +195,11 @@ In other words, $\longrightarrow'_{\langle prg \rangle}$ is a conservative exten
 
 \begin{theorem}[Setzer et al.]
 \label{thm:setzer4a}
-Let $(\mathcal{A}, \longrightarrow), (\mathcal{A}', \longrightarrow')$ be abstract reduction systems, i.e., it is $\longrightarrow \subseteq \mathcal{A} \times \mathcal{A}$ and $\longrightarrow' \subseteq \mathcal{A}' \times \mathcal{A}'$, such that $\mathcal{A} \subseteq \mathcal{A}'$. Let \textsf{int} be a back-interpretation from $\mathcal{A}'$ into $\mathcal{A}$, $\textsf{m} : \mathcal{A}' \to \mathbb{N}$. We define the following conditions for the back-interpretation:\\
+Let $(\mathcal{A}, \longrightarrow), (\mathcal{A}', \longrightarrow')$ be abstract reduction systems, that is, it is $\longrightarrow \subseteq \mathcal{A} \times \mathcal{A}$ and $\longrightarrow' \subseteq \mathcal{A}' \times \mathcal{A}'$, such that $\mathcal{A} \subseteq \mathcal{A}'$. Let \textsf{int} be a back-interpretation from $\mathcal{A}'$ into $\mathcal{A}$, $\textsf{m} : \mathcal{A}' \to \mathbb{N}$. We define the following conditions for the back-interpretation:\\
 (SN 1) $\forall a, a' \in \mathcal{A}. a \longrightarrow a' \implies a {\longrightarrow'}^{\geq 1} a'$\\
 (SN 2) If $a \in \mathcal{A}, a' \in \mathcal{A}'$ and $a \longrightarrow' a'$ then $\textsf{int}(a) {\longrightarrow}^{\geq 1} \textsf{int}(a')$ or $\textsf{int}(a) = \textsf{int}(a') ~ \land ~ \textsf{m}(a) > \textsf{m}(a')$.
 
-(SN 1), (SN 2) imply that $(\mathcal{A}', \longrightarrow')$ is a conservative extension of $(\mathcal{A}, \longrightarrow)$, i.e. it is $a \longrightarrow^* a' \iff a {\longrightarrow'}^* a'$ for all $a, a' \in \mathcal{A}$, preserving strong normalisation.
+(SN 1), (SN 2) imply that $(\mathcal{A}', \longrightarrow')$ is a conservative extension of $(\mathcal{A}, \longrightarrow)$, that is, it is $a \longrightarrow^* a' \iff a {\longrightarrow'}^* a'$ for all $a, a' \in \mathcal{A}$, preserving strong normalisation.
 \end{theorem}
 
 \begin{proposition}
@@ -207,7 +207,7 @@ Let $(\mathcal{A}, \longrightarrow), (\mathcal{A}', \longrightarrow')$ be abstra
 The weak bisimulation statement~\ref{eq:bisim1} holds for any transformation defined as $apply(e)$ for some $\pi$-extraction $e$ targeting a $T$.
 
 \begin{proof}
-By \autoref{thm:setzer4a}, it suffices to show the statements (SN1) and (SN2). For this, set $\textsf{int} = \langle \cdot \rangle^{aux^{-1}}$. Note that this unconversion is compatible with evaluation contexts, i.e.,
+By \autoref{thm:setzer4a}, it suffices to show the statements (SN1) and (SN2). For this, set $\textsf{int} = \langle \cdot \rangle^{aux^{-1}}$. Note that this unconversion is compatible with evaluation contexts, that is,
 \[
 \langle \mathcal{E}[s'] \rangle^{aux^{-1}} = \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}],
 \]
@@ -216,9 +216,9 @@ because $\langle \cdot \rangle^{aux}$ converts to function calls, not destructor
 \langle q[\sigma] \rangle^{aux^{-1}} = \langle q \rangle^{aux^{-1}}[\langle \sigma \rangle^{aux^{-1}}],
 \]
 where $\langle \cdot \rangle^{aux^{-1}}$ has been straightforwardly lifted to substitutions by applying it to each right-hand side individually.
-Further, set \textsf{m} as the number of calls to the function targeted in the transformation, i.e., that of $q_\epsilon$.
+Further, set \textsf{m} as the number of calls to the function targeted in the transformation, that is, that of $q_\epsilon$.
 
-(SN 1): We know that $s = \mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]] = t$, for some evaluation context $\mathcal{E}$ of $prg$ and some equation $r$ of $prg$. When $r \not\in T$, i.e., $r$ is taken over unchanged to $\langle prg \rangle$, the reduction $\mathcal{E}[q_r[\sigma]] {\longrightarrow'}_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]]$ can be derived identically to $\mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]]$. When $r \in T$, it is $q_r = \sigma^{q_r}_\pi(q_\epsilon)$ and $t_r = t_{\zeta_r}$, and we distinguish between whether $\sigma^{q_r}_\pi$ is a substitution or a co-substitution.
+(SN 1): We know that $s = \mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]] = t$, for some evaluation context $\mathcal{E}$ of $prg$ and some equation $r$ of $prg$. When $r \not\in T$, that is, $r$ is taken over unchanged to $\langle prg \rangle$, the reduction $\mathcal{E}[q_r[\sigma]] {\longrightarrow'}_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]]$ can be derived identically to $\mathcal{E}[q_r[\sigma]] \longrightarrow_{prg} \mathcal{E}[t_r[\sigma]]$. When $r \in T$, it is $q_r = \sigma^{q_r}_\pi(q_\epsilon)$ and $t_r = t_{\zeta_r}$, and we distinguish between whether $\sigma^{q_r}_\pi$ is a substitution or a co-substitution.
 
 When $\sigma^{q_r}_\pi$ is a substitution, it is $\sigma^{q_r}_\pi(q_\epsilon)[\sigma] = q_\epsilon[\sigma \circ \sigma^{q_r}_\pi]$, and we can derive:
 \begin{flalign*}
@@ -236,7 +236,7 @@ When $\sigma^{q_r}_\pi$ is a co-substitution, it is $\sigma^{q_r}_\pi(q_\epsilon
 
 (SN 2): Three cases will be distinguished: The reduction in $\langle prg \rangle$ can use either an equation taken over unchanged from $prg$ (1.), it can use a $\zeta_r$ (2.), or it can use $\epsilon$ (3.). Each case makes use of an evaluation context $\mathcal{E}$ of the reduction relation for $\langle prg \rangle$.
 \begin{enumerate}
-\item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_r[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]] = t$. The desired reduction sequence can be given as follows:
+\item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_r[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_r[\sigma]] = t$. The desired reduction sequence can be derived as follows:
 \begin{flalign*}
 &\langle \mathcal{E}[s'] \rangle^{aux^{-1}} \\
 =~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}] \\
@@ -249,7 +249,7 @@ When $\sigma^{q_r}_\pi$ is a co-substitution, it is $\sigma^{q_r}_\pi(q_\epsilon
 =~& \langle t \rangle^{aux^{-1}}.
 \end{flalign*}
 
-\item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_{\zeta_r}[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_{\zeta_r}[\sigma]] = t$. The desired reduction sequence can be given as follows:
+\item We know $s = \mathcal{E}[s'] = \mathcal{E}[q_{\zeta_r}[\sigma]] \longrightarrow'_{\langle prg \rangle} \mathcal{E}[t_{\zeta_r}[\sigma]] = t$. The desired reduction sequence can be derived as follows:
 \begin{flalign*}
 &\langle \mathcal{E}[s'] \rangle^{aux^{-1}} \\
 =~& \langle \mathcal{E} \rangle^{aux^{-1}}[\langle s' \rangle^{aux^{-1}}] \\
@@ -300,7 +300,7 @@ In order to prove this, we define a counterpart to the $\longrightarrow'$ reduct
 \[
 \longrightarrow^{aux} = \{(a,b) : a \longrightarrow^{all} b ~ \land ~ \langle a \rangle^{aux^{-1}} = \langle b \rangle^{aux^{-1}}\},
 \]
-where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle$ whose underlying value set is the set of all terms, i.e., the reduction is allowed to choose any redex. Where $\longrightarrow'$ can ``sidestep'' reductions which don't change the back-interpretation of a term, $\longrightarrow^{aux}$ is purely ``interpretative'', that is, it only allows reductions to terms with equal back-interpretation. This is expressed formally in the following lemmas relating $\longrightarrow'$ and $\longrightarrow^{aux}$, one concerning their commutation, the other what we call their complementarity. The $`` \Rightarrow "$ direction of~\ref{eq:bisim2} follows from these, as shown below.
+where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle$ whose underlying value set is the set of all terms, that is, the reduction is allowed to choose any redex. Where $\longrightarrow'$ can ``sidestep'' reductions which don't change the back-interpretation of a term, $\longrightarrow^{aux}$ is purely ``interpretative'', that is, it only allows reductions to terms with equal back-interpretation. This is expressed formally in the following lemmas relating $\longrightarrow'$ and $\longrightarrow^{aux}$, one concerning their commutation, the other what we call their complementarity. The $`` \Rightarrow "$ direction of~\ref{eq:bisim2} follows from these, as shown below.
 
 \begin{figure}
 \begin{subfigure}{0.3\textwidth}
@@ -379,7 +379,7 @@ When $a \longrightarrow' b$ but $a \not\longrightarrow b$, then there is a $c$ w
 
 \begin{proof}[Proof of \autoref{lem:prop2lr}]
 
-By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$. For $n = 0$ it is $s = t$, thus simply choose $\widetilde{t} = t$. Now, consider the case that $n = n'+1$ for some $n' \geq 0$. We proceed by induction on the number $k$ of calls in $s$ to the function targeted in the transformation, i.e., that of $q_\epsilon$.
+By induction on the length $n$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$. For $n = 0$ it is $s = t$, thus simply choose $\widetilde{t} = t$. Now, consider the case that $n = n'+1$ for some $n' \geq 0$. We proceed by induction on the number $k$ of calls in $s$ to the function targeted in the transformation, that is, that of $q_\epsilon$.
 
 \begin{itemize}
 \item $k = 0$. Consider the first step $s {\longrightarrow'}_{\langle prg \rangle} s_1$ of $s {\longrightarrow'}_{\langle prg \rangle}^* t$. Because there are no calls to the function of $q_\epsilon$ in $s$, for all subterms $s^0$ of $s$ it is $\vdash'_v s^0$ iff $\vdash_v s^0$. Consequently, the reduction step from $s$ to $s_1$ is also possible with reduction relation $\longrightarrow_{\langle prg \rangle}$, that is, $s \longrightarrow_{\langle prg \rangle} s_1$. By the outer induction hypothesis, we have the rest of the desired reduction sequence $s_1 \longrightarrow_{\langle prg \rangle} \widetilde{t}$.
@@ -486,7 +486,7 @@ First, the equations of the transformed are classified. There are three kinds of
 \section{Preservation of well-typedness}
 \label{sec:extrpwt}
 
-In this section, we show that extractions preserve well-typedness, i.e., that when applying an extraction to a well-typed program a well-typed program obtains. Let $prg$ be the original program, and $\langle prg \rangle$ the program after extraction. By definition a program is well-typed when all of its equations $eqn$ are well-typed, i.e., it is $\Sigma \vdash eqn \textrm{ ok}$, where $\Sigma$ are the signatures of the program. Let $\Sigma_{prg}$ be the signatures of $prg$, and $\Sigma_{\langle prg \rangle}$ be the signatures of $\langle prg \rangle$. Since extractions only add one function signature, but leave the other signatures unchanged, it is $\Sigma_{prg} \subseteq \Sigma_{\langle prg \rangle}$. The following thus holds trivially.
+In this section, we show that extractions preserve well-typedness, which means that when applying an extraction to a well-typed program a well-typed program obtains. Let $prg$ be the original program, and $\langle prg \rangle$ the program after extraction. By definition a program is well-typed when all of its equations $eqn$ are well-typed, that is, it is $\Sigma \vdash eqn \textrm{ ok}$, where $\Sigma$ are the signatures of the program. Let $\Sigma_{prg}$ be the signatures of $prg$, and $\Sigma_{\langle prg \rangle}$ be the signatures of $\langle prg \rangle$. Since extractions only add one function signature, but leave the other signatures unchanged, it is $\Sigma_{prg} \subseteq \Sigma_{\langle prg \rangle}$. The following thus holds trivially.
 
 \begin{fact}
 \label{fac:wtpfac}
@@ -529,7 +529,7 @@ We want to show that $\Sigma_{\langle prg \rangle} \vdash `` q_\epsilon = t_\eps
 \end{enumerate}
 First, consider the first point. There is at least one left-hand side $q \in T$ (part of the extraction target) of $prg$, that we know is the result of applying a (co-)substitution to $q_\epsilon$. Since $prg$ is well-typed, it is $\Sigma_{prg} \vdash q : \tau'; \Gamma'$, and by \autoref{fac:wtpfac} also $\Sigma_{\langle prg \rangle} \vdash q : \tau'; \Gamma'$. We can rebuild this derivation into a derivation for $\Sigma_{\langle prg \rangle} \vdash q_\epsilon : \tau, \Gamma$. When $q_\epsilon$ results from $q$ by a co-substitution, cut off the ``Des'' steps of the derivation until arriving at the statement concerning $q_\epsilon$. When $q_\epsilon$ results from $q$ by a substitution, we rebuild the derivations of the auxiliary judgements used for type inference of variables in patterns. Replace each such derivation for a statement $\tau \vdash_{\Sigma} p : \Gamma$, that concerns a pattern $p$ in $q$ which is replaced by some variable $x$ in $q_\epsilon$, with a derivation for $\tau \vdash_{\Sigma} x : x:\tau$ by the ``Var'' rule. Then adapt the (typing contexts in the) derivation steps following this accordingly.
 
-Now, consider the second point. $t_\epsilon$ was defined as $aux(x_1, ..., x_n)$, with the $x_i$ being exactly the variables of $q_\epsilon$. The signature of $aux$ is defined as $`` aux(\tau_1, ..., \tau_n): \tau "$ with $\tau_i$ being precisely defined to be the types inferred for the $x_i$ in $q_\epsilon$, i.e., those that $\Gamma$ assigns to the $x_i$. Thus we can derive $\Gamma \vdash_{\Sigma} t_\epsilon : \tau$ using the ``Var'' rule for these variables, followed by the ``Fun'' rule for $aux$.
+Now, consider the second point. $t_\epsilon$ was defined as $aux(x_1, ..., x_n)$, with the $x_i$ being exactly the variables of $q_\epsilon$. The signature of $aux$ is defined as $`` aux(\tau_1, ..., \tau_n): \tau "$ with $\tau_i$ being precisely defined to be the types inferred for the $x_i$ in $q_\epsilon$, that is, those that $\Gamma$ assigns to the $x_i$. Thus we can derive $\Gamma \vdash_{\Sigma} t_\epsilon : \tau$ using the ``Var'' rule for these variables, followed by the ``Fun'' rule for $aux$.
 \end{proof}
 \end{lemma}
 
