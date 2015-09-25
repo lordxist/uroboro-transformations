@@ -256,7 +256,7 @@ Next, we consider important properties of the translation algorithm.
 \section{Core defunctionalization}
 \label{sec:coredefunc}
 
-The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of \citet{rendel15automatic} for the Codata Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a defunctionalized form after \textsf{Unnest}, virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the changed syntactic domains of the symbols.
+The core defunctionalization \textsf{CoreDefunc} applies the defunctionalization of \citet{rendel15automatic} for the Codata Fragment to the parts of the program that are in this fragment. Strictly speaking, the defunctionalization of \citep{rendel15automatic} doesn't allow constructor calls on right-hand sides; therefore, our transformation slightly adapts their defunctionalization to leave constructors unchanged. The rest of the program, which is already in a defunctionalized form after \textsf{Unnest}, is left virtually unchanged. That is, the only change to these parts affects the right-hand sides of equations, which are transformed to account for the changed syntactic domains of the symbols.
 
 \subsection{Example}
 
@@ -484,7 +484,7 @@ By combining \autoref{lem:sbruld} and \autoref{lem:iso}.
 \section{Core refunctionalization}
 \label{sec:corerefunc}
 
-Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of \citet{rendel15automatic} for the Data Fragment to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. Unfortunately, and unlike defunctionalization, this algorithm requires some kind of preprocessing, since the actual refunctionalization requires all constructors to be the first pattern of an lhs. We first describe this asymmetry in more detail and illustrate the underlying problem, then consider a possible workaround for our situation, and finally present an example for and formally define the actual refunctionalization and, as with defunctionalization, consider important properties of it.
+Core refunctionalization is defined analogously to core defunctionalization, with the exception of needing one more preprocessing, described below. The actual algorithm applies the refunctionalization of \citet{rendel15automatic} for the Data Fragment, slightly adapted to allow destructor calls on right-hand sides, to the parts of the program that are in this fragment, and leaves the rest, which is already in a refunctionalized form after \textsf{Unnest}, virtually unchanged. Unfortunately, and unlike defunctionalization, this algorithm requires some kind of preprocessing, since the actual refunctionalization requires all constructors to be the first pattern of an lhs. We first describe this asymmetry in more detail and illustrate the underlying problem, then consider a possible workaround for our situation, and finally present an example for and formally define the actual refunctionalization and, as with defunctionalization, consider important properties of it.
 
 \subsection{An asymmetry}
 
