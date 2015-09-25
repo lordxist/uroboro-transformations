@@ -26,7 +26,7 @@ This is possible because each immediate subterm $s$ of $\mathcal{E}^{aux}[a]$ is
 \begin{flalign*}
 &b = t_r[\sigma_{[]}][\mathcal{C}[a], ..., \mathcal{C}[a]] \\
 \longrightarrow^{aux}~& t_r[\sigma_{[]}][\mathcal{C}[c], \mathcal{C}[a], ..., \mathcal{C}[a]] \\
-\longrightarrow^{aux}~& t_r[\sigma_{[]}][\mathcal{C}[c], ..., \mathcal{C}[c]] = t_r[\sigma_{mod}] = d.
+\longrightarrow^{aux}~& t_r[\sigma_{[]}][\mathcal{C}[c], ..., \mathcal{C}[c]] = t_r[\sigma_{mod}] = d. 
 \end{flalign*}
 \end{enumerate}
 \end{proof}
@@ -42,7 +42,7 @@ By induction on the structure of $p$.
 Then it is $y = x$ and $\mathcal{E}'[a] = \sigma(x)$. Thus simply choose $\mathcal{E}'_0 = \mathcal{E}'$.
 
 \item $p = con(p_1, ..., p_n)$ for some $n$-ary constructor $con$ and some patterns $p_1, ..., p_n$.
-Then it is $\mathcal{E}'[a] = con(p_1, ..., p_n)[\sigma]$. When $\mathcal{E}' = []$, it would be $a = con(p^i_1, ..., p^i_{i_n})[\sigma]$, contradicting the premiss that $a$ isn't a constructor call. Thus it must be $\mathcal{E}' = con(\sigma(p_1), ..., \mathcal{E}'_{0'} ..., \sigma(p_n))$ for some $\mathcal{E}'_{0'} \in \mathbf{EC}[\vdash'_v]$, with $\mathcal{E}'_{0'}[a] = p_j$ for a $j \in \{1, ..., n\}$. By the induction hypothesis, there is a variable $x$ in $p_j$ and thus in $p$ such that $\sigma(x) = \mathcal{E}'_1$ for some $\mathcal{E}'_1 \in \mathbf{EC}[\vdash'_v]$.
+Then it is $\mathcal{E}'[a] = con(p_1, ..., p_n)[\sigma]$. When $\mathcal{E}' = []$, it would be $a = con(p^i_1, ..., p^i_{i_n})[\sigma]$, contradicting the premiss that $a$ isn't a constructor call. Thus it must be $\mathcal{E}' = con(\sigma(p_1), ..., \mathcal{E}'_{0'} ..., \sigma(p_n))$ for some $\mathcal{E}'_{0'} \in \mathbf{EC}[\vdash'_v]$, with $\mathcal{E}'_{0'}[a] = p_j$ for a $j \in \{1, ..., n\}$. By the induction hypothesis, there is a variable $x$ in $p_j$ and thus in $p$ such that $\sigma(x) = \mathcal{E}'_1$ for some $\mathcal{E}'_1 \in \mathbf{EC}[\vdash'_v]$. \qedhere
 \end{itemize}
 \end{proof}
 \end{fact}
@@ -86,7 +86,7 @@ t_\epsilon[\sigma^{aux}] = aux(x_1, ..., x_k)[\sigma^{aux}] = aux(\sigma(x_1), .
 
 \item $\mathcal{E}' = v.des(\overline{v}, \mathcal{E}'_0, \overline{t})$. The proof proceeds essentially identical to that for the function call case above; to see this, keep in mind that the destructor call syntax desugars to $des(v, \overline{v}, \mathcal{E}'_0, \overline{t})$. Thus the destructed value is actually just the first argument of the destructor, with the only difference being that it isn't an instance of a pattern. But this doesn't actually require a different argument than that of the previous function call case, because, regarding the arguments left of $\mathcal{E}'_0$, this argument only depends on them being values.
 
-\item $\mathcal{E}' = \mathcal{E}'_0.des(\overline{t})$, with $\mathcal{E}'_0 \in \mathbf{EC}[\vdash'_v]$. By expanding along the definition of evaluation contexts, we know that $\mathcal{E}'$ either has the form (a) $fun(\overline{v}, \mathcal{E}'_0, \overline{t})\overline{des(\overline{t'})}$, or (b) $v.des(\overline{v}, \mathcal{E}'_0, \overline{t}).\overline{des(\overline{t'})}$. In case (a), proceed like in the function call case above, and just add the destructor calls behind the function calls to $fun$. In case (b), proceed like in the destructor call case above, and again just add the destructor calls behind the function calls to $fun$.
+\item $\mathcal{E}' = \mathcal{E}'_0.des(\overline{t})$, with $\mathcal{E}'_0 \in \mathbf{EC}[\vdash'_v]$. By expanding along the definition of evaluation contexts, we know that $\mathcal{E}'$ either has the form (a) $fun(\overline{v}, \mathcal{E}'_0, \overline{t})\overline{des(\overline{t'})}$, or (b) $v.des(\overline{v}, \mathcal{E}'_0, \overline{t}).\overline{des(\overline{t'})}$. In case (a), proceed like in the function call case above, and just add the destructor calls behind the function calls to $fun$. In case (b), proceed like in the destructor call case above, and again just add the destructor calls behind the function calls to $fun$. \qedhere
 \end{enumerate}
 \end{proof}
 \end{lemma}
@@ -144,7 +144,7 @@ and
 = ~&\mathcal{E}^{merge}[[], c_0][a'_0] \\
 \longrightarrow' ~&\mathcal{E}^{merge}[[], c_0][b_0] = d.
 \end{flalign*}
-This second reduction is possible because it is $\mathcal{E}^{merge}[[], c_0] \in \mathbf{EC}[\vdash'_v]$, since $\mathcal{E}' = \mathcal{E}^{merge}[[], a^{aux}_0] \in \mathbf{EC}[\vdash'_v]$ and $\langle a^{aux}_0 \rangle^{aux^{-1}} = \langle c_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a^{aux}_0$ iff $\vdash'_v c_0$.
+This second reduction is possible because it is $\mathcal{E}^{merge}[[], c_0] \in \mathbf{EC}[\vdash'_v]$, since $\mathcal{E}' = \mathcal{E}^{merge}[[], a^{aux}_0] \in \mathbf{EC}[\vdash'_v]$ and $\langle a^{aux}_0 \rangle^{aux^{-1}} = \langle c_0 \rangle^{aux^{-1}}$ and thus $\vdash'_v a^{aux}_0$ iff $\vdash'_v c_0$. \qedhere
 \end{itemize}
 
 \end{proof}
