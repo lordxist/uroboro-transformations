@@ -45,7 +45,11 @@
 \usepackage{thmtools, thm-restate}
 \usepackage{hyperref}
 \usepackage{csquotes}
+\usepackage{microtype}
 \usepackage[numbers]{natbib}
+
+\usepackage{xpatch}
+\xapptocmd{\ttfamily}{\frenchspacing}{}{}
 
 \usepackage{graphicx}
 \usepackage[labelfont=bf]{caption}
