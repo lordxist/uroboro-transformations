@@ -197,7 +197,7 @@ In other words, $\longrightarrow'_{\langle prg \rangle}$ is a conservative exten
 \label{thm:setzer4a}
 Let $(\mathcal{A}, \longrightarrow), (\mathcal{A}', \longrightarrow')$ be abstract reduction systems, that is, it is $\longrightarrow \subseteq \mathcal{A} \times \mathcal{A}$ and $\longrightarrow' \subseteq \mathcal{A}' \times \mathcal{A}'$, such that $\mathcal{A} \subseteq \mathcal{A}'$. Let \textsf{int} be a back-interpretation from $\mathcal{A}'$ into $\mathcal{A}$, $\textsf{m} : \mathcal{A}' \to \mathbb{N}$. We define the following conditions for the back-interpretation:\\
 (SN 1) $\forall a, a' \in \mathcal{A}. a \longrightarrow a' \implies a {\longrightarrow'}^{\geq 1} a'$\\
-(SN 2) If $a \in \mathcal{A}, a' \in \mathcal{A}'$ and $a \longrightarrow' a'$ then $\textsf{int}(a) {\longrightarrow}^{\geq 1} \textsf{int}(a')$ or $\textsf{int}(a) = \textsf{int}(a') ~ \land ~ \textsf{m}(a) > \textsf{m}(a')$.
+(SN 2) If $a \in \mathcal{A}, a' \in \mathcal{A}'$ and $a \longrightarrow' a'$ then $\textsf{int}(a) {\longrightarrow}^{\geq 1} \textsf{int}(a')$ or ($\textsf{int}(a) = \textsf{int}(a')$ and $\textsf{m}(a) > \textsf{m}(a')$).
 
 (SN 1), (SN 2) imply that $(\mathcal{A}', \longrightarrow')$ is a conservative extension of $(\mathcal{A}, \longrightarrow)$, that is, it is $a \longrightarrow^* a' \iff a {\longrightarrow'}^* a'$ for all $a, a' \in \mathcal{A}$, preserving strong normalisation.
 \end{theorem}
@@ -359,9 +359,7 @@ a {\longrightarrow'}^n b ~ \land ~ a {\longrightarrow^{aux}}^* c \implies \exist
 \]
 
 \begin{proof}
-
 By induction on $n$ and on the length of $a {\longrightarrow^{aux}}^* c$.
-
 \end{proof}
 
 \end{corollary}

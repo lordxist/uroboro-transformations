@@ -359,13 +359,15 @@ Next, we define \textsf{CoreDefunc}. Like \citet{rendel15automatic} do for their
 
 \begin{align*}
 \langle prg \rangle^{\textsf{CoreDefunc}} & = ~&& \{ && \textrm{\textbf{data }} \sigma \textrm{\textbf{ where }} \span\span\span\span \\
-& && && && \{ \langle fun \rangle^d (\tau_1, ..., \tau_n): \sigma ~ | ~ `` fun(\tau_1, ..., \tau_n): \tau " \in prg \text{ s.t. } fun \not\in F^{prg}_d \} \\
+& && && && \{ \langle fun \rangle^d (\tau_1, ..., \tau_n): \sigma \\
+& && && && | ~ `` fun(\tau_1, ..., \tau_n): \tau " \in prg \text{ s.t. } fun \not\in F^{prg}_d \} \\
 & && | && `` \textrm{\textbf{codata }} \sigma ... " \in prg \} \span\span\span\span \\
 & \cup && \{ && \textrm{\textbf{function }} \langle des \rangle^d (\sigma, \tau_1, ..., \tau_n) \textrm{\textbf{ where}} \span\span\span\span \\
 & && && && \{ \langle des \rangle^d (\langle fun \rangle^d (\overline{x}), \overline{y}) = \langle t \rangle^d ~ | ~ `` fun(\overline{x}).des(\overline{y}) = t " \in prg \} \\
 & && | && `` \sigma.des(\tau_1, ..., \tau_n) " \in prg \} \span\span\span\span \\
 & \cup && \{ && \textrm{\textbf{data }} ... ~ | ~ `` \textrm{\textbf{data }} ... " \in prg \} \span\span\span\span \\
-& \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \{ q = \langle t \rangle^d ~ | ~ ``q = t" \in eqns \} \span\span\span\span \\
+& \cup && \{ && \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} \span\span\span\span \\
+& && && && \{ q = \langle t \rangle^d ~ | ~ ``q = t" \in eqns \} \span\span \\
 & && | && `` \textrm{\textbf{function }} fun(\sigma, \tau_1, ..., \tau_k): \tau \textrm{\textbf{ where }} eqns " \text{ s.t. } fun \in F^{prg}_d \} \span\span\span\span
 \end{align*}
 
@@ -751,7 +753,8 @@ Next, we define \textsf{CoreRefunc}.
 
 \begin{align*}
 \langle prg \rangle^{\textsf{CoreDefunc}} & = ~&& \{ && \textrm{\textbf{codata }} \sigma \textrm{\textbf{ where }} \span\span\span\span \\
-& && && && \{ \sigma.\langle fun \rangle^d (\tau_1, ..., \tau_n): \tau ~ | ~ `` fun(\sigma, \tau_1, ..., \tau_n): \tau " \in prg \text{ s.t. } fun \not\in F^{prg}_d \} \\
+& && && && \{ \sigma.\langle fun \rangle^d (\tau_1, ..., \tau_n): \tau ~ \\
+& && && && | ~ `` fun(\sigma, \tau_1, ..., \tau_n): \tau " \in prg \text{ s.t. } fun \not\in F^{prg}_d \} \\
 & && | && `` \textrm{\textbf{data }} \sigma ... " \in prg \} \span\span\span\span \\
 & \cup && \{ && \textrm{\textbf{function }} \langle con \rangle^r (\tau_1, ..., \tau_n): \tau \textrm{\textbf{ where}} \span\span\span\span \\
 & && && && \{ \langle con \rangle^r (\langle fun \rangle^d (\overline{x}), \overline{y}) = \langle t \rangle^d ~ | ~ `` fun(con(\overline{x}), \overline{y}) = t " \in prg \} \\
