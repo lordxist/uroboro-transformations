@@ -73,6 +73,20 @@
 
 \setcounter{secnumdepth}{3}
 
+\renewcommand{\texttt}[1]{%
+  \begingroup
+  \ifmmode \else \ttfamily\fi
+  \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\discretionary{}{}{}}%
+  \begingroup\lccode`~=`[\lowercase{\endgroup\def~}{[\discretionary{}{}{}}%
+  \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\discretionary{}{}{}}%
+  \catcode`/=\active\catcode`[=\active\catcode`.=\active
+  \scantokens{#1\noexpand}%
+  \endgroup
+}
+
+\let\underscore\_
+\renewcommand{\_}{\discretionary{\underscore}{}{\underscore}}
+
 %% This bit allows you to either specify only the files which you wish to
 %% process, or `all' to process all files which you \include.
 %% Krishna Sethuraman (1990).
