@@ -434,22 +434,22 @@ reserved.\par\permission}}
 % to \supervisor
 \newbox\@titlesupervisor 	\newbox\@abstractsupervisor
 
-\def\supervisor#1{\setbox\@titlesupervisor\vbox
+\def\supervisor#1{\gdef\@titlesupervisor
   %{\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
   %\def\baselinestretch{1}\large
   %\signature{Certified by}{#1 \\ Thesis Supervisor}}
-  {\unvbox\@titlesupervisor \vskip\baselineskip
+  {\vskip\baselineskip
   \def\baselinestretch{1}\large
   Thesis Supervisor: #1}
   \setbox\@abstractsupervisor\vbox{\unvbox\@abstractsupervisor
   \vskip\baselineskip \def\baselinestretch{1}\@normalsize 
   \par\noindent Thesis Supervisor: #1}}
 
-\def\secondexaminer#1{\setbox\@titlesupervisor\vbox
+\def\secondexaminer#1{\gdef\@titlesecondexaminer
   %{\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
   %\def\baselinestretch{1}\large
   %\signature{Certified by}{#1 \\ Second Examiner}}
-  {\unvbox\@titlesupervisor \vskip\baselineskip
+  {\vskip\baselineskip
   \def\baselinestretch{1}\large
   Second Examiner: #1}
   \setbox\@abstractsupervisor\vbox{\unvbox\@abstractsupervisor
@@ -493,7 +493,8 @@ at the
 %\signature{Author}{\@department \\ \@thesisdate}
 \par
 \vskip 3\baselineskip
-\unvbox\@titlesupervisor
+\@titlesupervisor
+\@titlesecondexaminer
 %\unvbox\@titlesupervisor
 %\par
 %\vfill
