@@ -523,6 +523,7 @@ requirements for the \@degreeword\ of \\
 %% page.
 %% Krishna Sethuraman (1990)
 \def\endabstractpage{\end{abstract}\noindent
+ (The German translation of this abstract is found in \autoref{ch:appb} (p.149).)
  \unvcopy\@abstractsupervisor \newpage}
 
 %% This counter is used to save the page number for the second copy of
