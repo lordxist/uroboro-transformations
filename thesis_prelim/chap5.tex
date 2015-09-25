@@ -179,11 +179,11 @@ codata Parenthesis where
 codata Word where
   Word.run(Nat): Bool
 
-function zero(): Nat where
+function zero(): Nat where      -- A
   zero().autogen3_aux(x0_1) = false()
   zero().autogen0_aux() = true()
 
-function succ(Nat): Nat where
+function succ(Nat): Nat where      -- B
   succ(x1_0).autogen3_aux(x0_1) = x0_1.run(x1_0)
   succ(x1_0).autogen0_aux() = false()
 
@@ -210,10 +210,10 @@ fun recognize_refunctionalized ps
        fun run ([], c) 
            = c NONE
          | run (L :: ps, c)
-           = run (ps, fn NONE => false | SOME ps => run (ps, c))
+           = run (ps, fn NONE => false | SOME ps => run (ps, c))      (* B *)
          | run (R :: ps, c)
            = c (SOME ps)
-    in run (ps, fn NONE => true | SOME ps => false)
+    in run (ps, fn NONE => true | SOME ps => false)      (* A *)
     end
 \end{lstlisting}
 \caption{Refunctionalized Dyck word recognizer of Danvy and Millikin}
@@ -228,6 +228,6 @@ Leaving this problem aside, we concentrate on recognizing the similarity between
 
 The arguments of their \texttt{run} function are words and functions from optional words  (i.e., they use ML's option type) to booleans. Where do we find this signature in our transformation result? Look at the signature of our \texttt{run}, which in the refunctionalized form of the program is a destructor of \texttt{Word}. It has one argument with type \texttt{Nat}. Let us look at the codata type definition for \texttt{Nat}: Two destructors are defined, both of which have result type \texttt{Bool}, and one of them has no arguments while the other has exactly one argument with type \texttt{Word}. The reason for there being two destructors instead of only one using an option type is that we didn't introduce any arguments with option types, in contrast to \citeauthor{danvy09refunctionalization}, who, during their manual preprocessing of the program, introduce such arguments in order to merge several functions.
 
-Looking at both the signatures \texttt{Word.run(Nat): Bool} and the signatures of the two destructors \texttt{Nat.autogen3\_aux(Word): Bool} and \texttt{Nat.autogen0\_aux(): Bool} for \texttt{Nat}, we can thus see the similarity of our \texttt{Word.run(Nat): Bool} to their \texttt{run : ord * (word option -> bool) -> bool} in their types. This is reinforced by comparing the equations defined for the two destructors of \texttt{Nat} with the continuation that is passed to \texttt{run} in the second to last line in Figure 3 of \citet{danvy09refunctionalization}. When given \texttt{NONE}, the continuation's result is defined as \texttt{true}, when given \texttt{SOME ps}, it is defined as \texttt{false}. Since this continuation is used at the initial call to \texttt{run}, where the stack is empty, we look at our function definition for \texttt{zero()}. Applying destructor \texttt{autogen0\_aux(): Bool} to \texttt{zero()}, which corresponds to passing \texttt{NONE} to the continuation in the initial call of \texttt{run}, yields \texttt{true()}, applying destructor \texttt{autogen3\_aux(Word): Bool} to \texttt{zero()}, which corresponds to passing \texttt{SOME ps} to the continuation in the initial call of \texttt{run}, yields \texttt{false()}. The other call to \texttt{run} in \citeauthor{danvy09refunctionalization}'s refunctionalized program likewise corresponds to our function definition for \texttt{succ(Nat)}.
+Looking at both the signatures \texttt{Word.run(Nat): Bool} and the signatures of the two destructors \texttt{Nat.autogen3\_aux(Word): Bool} and \texttt{Nat.autogen0\_aux(): Bool} for \texttt{Nat}, we can thus see the similarity of our \texttt{Word.run(Nat): Bool} to their \texttt{run : ord * (word option -> bool) -> bool} in their types. This is reinforced by comparing the equations defined for the two destructors of \texttt{Nat} with the continuation that is passed to \texttt{run} in the second to last line (indicated with comment `A') in Figure 3 of \citet{danvy09refunctionalization}. When given \texttt{NONE}, the continuation's result is defined as \texttt{true}, when given \texttt{SOME ps}, it is defined as \texttt{false}. Since this continuation is used at the initial call to \texttt{run}, where the stack is empty, we look at our function definition for \texttt{zero()} (also indicated with comment `A'). Applying destructor \texttt{autogen0\_aux(): Bool} to \texttt{zero()}, which corresponds to passing \texttt{NONE} to the continuation in the initial call of \texttt{run}, yields \texttt{true()}, applying destructor \texttt{autogen3\_aux(Word): Bool} to \texttt{zero()}, which corresponds to passing \texttt{SOME ps} to the continuation in the initial call of \texttt{run}, yields \texttt{false()}. The other call to \texttt{run} in \citeauthor{danvy09refunctionalization}'s refunctionalized program likewise corresponds to our function definition for \texttt{succ(Nat)} (relevant lines indicated by `B').
 
 All in all, it can be seen that refunctionalizing the counter as done manually by \citeauthor{danvy09refunctionalization} is essentially the same as the part of our automatic refunctionalizing concerning the type \texttt{Nat}. The differences between our refunctionalization result and theirs are due to the merging of functions they perform and our unrestricted refunctionalization of all types.
