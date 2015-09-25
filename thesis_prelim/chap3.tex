@@ -311,8 +311,8 @@ where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle
       (0,-3) node(c) {}
       (3,-3) node(d) {};
 \draw[->,ultra thick] (a) -- (b);
-\draw[->,color=red] (a) -- (c);
-\draw[->,dashed,color=red] (b) -- (d) node [midway, above, sloped] () {$*$};
+\draw[->] (a) -- (c);
+\draw[->,dashed] (b) -- (d) node [midway, above, sloped] () {$*$};
 \draw[->,dashed,ultra thick] (c) -- (d) node [midway, above, sloped] () {$=$};
 \end{tikzpicture}
 \caption{For \autoref{lem:cdpaux}}
@@ -326,9 +326,9 @@ where $\longrightarrow^{all}$ is the reduction relation for $\langle prg \rangle
       (0,-3) node(c) {}
       (3,-3) node(d) {};
 \draw[->,dashed,ultra thick] (a) -- (a') node [midway, above, sloped] () {$=$};
-\draw[->,dashed,color=red] (a') -- (b) node [midway, above, sloped] () {$*$};
-\draw[->,dashed,color=red] (a) -- (c) node [midway, above, sloped] () {$*$};
-\draw[->,color=red] (b) -- (d);
+\draw[->,dashed] (a') -- (b) node [midway, above, sloped] () {$*$};
+\draw[->,dashed] (a) -- (c) node [midway, above, sloped] () {$*$};
+\draw[->] (b) -- (d);
 \draw[->,ultra thick] (c) -- (d);
 \end{tikzpicture}
 \caption{For \autoref{lem:comminv}}
