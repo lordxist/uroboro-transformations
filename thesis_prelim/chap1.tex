@@ -132,16 +132,16 @@ codata Fun where
   Fun.apply(X): Y
 
 function foo(): Fun where
-  foo().apply(x) = y1()
+  foo().apply(x) = y1(x)
 
-function bar(): Y where
-  bar() = foo().apply(x1())
+function bar(Fun): Y where
+  bar(f) = f.apply(x1())
 \end{lstlisting}
-\caption{Codata representation for functions}
+\caption{Codata representation for first-class functions}
 \label{fig:codatafun}
 \end{figure}
 
-Uroboro is a functional programming language. Instead of first-class functions, Uroboro has its generalization, codata types, and copattern matching. A representation of functions using codata is shown in \autoref{fig:codatafun}, presented in Uroboro; note that in Uroboro, destructors have argument lists, facilitating this representation of functions. We first show how two fragments of Uroboro relate codata and copatterns with refunctionalization. Then we motivate why Uroboro is interesting---in general, and in particular for our purpose of automatic program transformations.
+Uroboro is a functional programming language. Instead of first-class functions, Uroboro has its generalization, codata types, and copattern matching. A representation of first-class functions using codata is shown in \autoref{fig:codatafun}, presented in Uroboro; note that in Uroboro, destructors have argument lists, facilitating this representation of functions. We first show how two fragments of Uroboro relate codata and copatterns with refunctionalization. Then we motivate why Uroboro is interesting---in general, and in particular for our purpose of automatic program transformations.
 
 How do copatterns and codata relate to refunctionalization? \citet{rendel15automatic} show how a program in a certain first-order language---which they call the Data Fragment---can be automatically transformed to a language---which they call the Codata Fragment---with copattern matching, and vice versa. The authors intend these two languages to be fragments of Uroboro. The key idea of \citeauthor{rendel15automatic} is that codata can be regarded as a generalization of first-class functions. This solves the problem of the multiple apply functions described above. Consider the example program in the Data Fragment shown in \autoref{fig:datafragex}, translated from \autoref{fig:refuncfailex}.
 
@@ -206,7 +206,7 @@ In our opinion, Uroboro is well suited for automatic program transformations whi
 \end{itemize}
 We aren't aware of any existing languages which have both of these properties, with the exception of \citet{abel13copatterns}'s copattern language, but this language has both codata and first-class functions.
 
-As we have seen before, codata generalizes first-class functions. For this reason, Uroboro doesn't lose expressiveness when compared to languages with first-class functions but without parametric polymorphism. Thus, in our opinion, Uroboro, or rather a future version of it that includes parametric polymorphism, has the potential to replace certain higher-order languages. We give more details on this in \autoref{sec:reluro}.
+As sketched in \autoref{fig:codatafun}, codata generalizes first-class functions. For this reason, Uroboro doesn't lose expressiveness when compared to languages with first-class functions but without parametric polymorphism. Thus, in our opinion, Uroboro, or rather a future version of it that includes parametric polymorphism, has the potential to replace certain higher-order languages. We give more details on this in \autoref{sec:reluro}.
 
 We now sum up the remaining contents of this work.
 
