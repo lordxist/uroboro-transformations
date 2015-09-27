@@ -440,10 +440,10 @@ reserved.\par\permission}}
   %\signature{Certified by}{#1 \\ Thesis Supervisor}}
   {\vskip\baselineskip
   \def\baselinestretch{1}\large
-  Thesis Supervisor: #1}
+  First Examiner: #1}
   \setbox\@abstractsupervisor\vbox{\unvbox\@abstractsupervisor
   \vskip\baselineskip \def\baselinestretch{1}\@normalsize 
-  \par\noindent Thesis Supervisor: #1}}
+  \par\noindent First Examiner: #1}}
 
 \def\secondexaminer#1{\gdef\@titlesecondexaminer
   %{\unvbox\@titlesupervisor \vskip 10pt% plus 1fil minus 1fil
