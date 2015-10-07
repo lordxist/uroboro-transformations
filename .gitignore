@@ -6,4 +6,9 @@ thesis_prelim/*
 !thesis_prelim/*.cls
 !thesis_prelim/*.sty
 !thesis_prelim/*.bib
+talk/*
+!talk/*.tex
+!talk/*.cls
+!talk/*.sty
+!talk/*.bib
 

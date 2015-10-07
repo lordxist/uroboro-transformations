@@ -1,0 +1,469 @@
+\documentclass[xcolor=svgnames]{beamer}
+
+\usepackage[utf8]    {inputenc}
+\usepackage[T1]      {fontenc}
+\usepackage[english] {babel}
+
+\usepackage{amsmath,amsfonts,graphicx,listings}
+\usepackage{beamerleanprogress}
+\usepackage[numbers]{natbib}
+
+\frenchspacing
+
+\title
+  [Automatic Program Transformations ...\hspace{2em}]
+  {Automatic \only<-4>{{\color<3>{red}Program Transformations}}\\ \only<-4>{{\color<4>{red}for a Language}} with \only<-4>{{\color<2>{red}Copattern Matching}}}
+
+\author
+  [Julian Jabs]
+  {\only<1>{Julian Jabs}}
+
+\date
+  {\only<1>{October 19, 2015}}
+
+\begin{document}
+
+\begin{frame}<1>[label=title]
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+\tableofcontents
+\end{frame}
+
+\section
+  {Patterns and copatterns}
+
+\againframe<2>{title}
+
+\begin{frame}[fragile]
+  {Patterns and copatterns}
+
+  \begin{block}{Data and patterns}
+    \begin{lstlisting}
+    data Nat where
+      zero(): Nat
+      succ(Nat): Nat
+
+    function add(Nat, Nat): Nat where
+      add(zero(), n)  = n
+      add(succ(m), n) = succ(add(m, n))
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  {Patterns and copatterns}
+
+  \begin{block}{Codata and copatterns\citep{abel13copatterns}}
+    \begin{lstlisting}
+    codata Stream where
+      Stream.head(): Nat
+      Stream.tail(): Stream
+
+    function repeat(Nat): Stream where
+      repeat(n).head() = n
+      repeat(n).tail() = repeat(n)
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  {Patterns and copatterns}
+
+  \begin{block}{Coverage}
+    A set of equations \textbf{covers} the function when the coverage for their lhss can be derived with \textbf{variable splits} and \textbf{result splits}.
+
+  (Adapted from \citet{abel13copatterns})
+
+   \underline{Example:} Suppose (co)data types \texttt{Nat} and \texttt{Stream} as shown before, and a function with signature \texttt{f(Nat): Stream}
+    \begin{itemize}
+      \item Variable split: \texttt{f(x)} $\to$ \texttt{f(zero())}, \texttt{f(succ(x))}
+
+      \texttt{x} in \texttt{f(succ(x))} can be further variable split.
+      \item Result split: \texttt{f(x)} $\to$ \texttt{f(x).head()}, \texttt{f(x).tail()}
+
+      \texttt{f(x).tail()} itself can be further result split.
+    \end{itemize}
+
+  Afterwards, further result and/or variable splitting could be done.
+  \end{block}
+\end{frame}
+
+\section
+  {(De|Re)functionalization}
+
+\againframe<3>{title}
+
+\begin{frame}
+  {(De|Re)functionalization}
+
+  \begin{block}{Defunctionalization \citep{reynolds72definitional}}
+    From \textbf{higher-order} to \textbf{first-order} programs.
+
+    Introduces a \textbf{data type} for functions:
+
+    \textbf{One constructor per first-class function}.
+  \end{block}
+
+  \begin{block}{Refunctionalization (original form) \citep{danvy09refunctionalization}}
+    \textbf{Left inverse} of defunctionalization.
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  {(De|Re)functionalization}
+
+  \begin{block}{Defunc. example}
+    \begin{lstlisting}
+    function all(Fun, List): Bool where
+     all(f, x:xs) = (f x) && all(f, xs)
+
+    function even: Nat -> Bool where
+     even(zero())  = true()
+     even(succ(n)) = not(even(n))
+
+    function odd: Nat -> Bool where
+      odd(n) = not(even(n))
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  {(De|Re)functionalization}
+
+  \begin{block}{Defunc. example, defunc'ed}
+    \begin{lstlisting}[escapechar=!]
+    data Fun where
+      !\alert{even()}!: Fun
+      !\alert{odd()}!: Fun
+
+    function all(Fun, List): Bool where
+     all(f, x:xs) = apply(f, x) && all(f, xs)
+
+    function apply(Fun, Nat): Bool where
+     apply(even(), zero())  = true()
+     apply(even(), succ(n)) =
+       not(apply(even(), n))
+     apply(odd(), n) = not(apply(even, n))
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  {(De|Re)functionalization}
+
+  \textbf{Refunc'ing} the last program gives back the original example.
+
+  \textbf{But:} With the original form of refunctionalization, one can only refunc. programs in the image of defunctionalization.
+
+  \begin{block}{Counter example}
+    \begin{lstlisting}[escapechar=!]
+    data Fun where
+      fun1(): Fun
+      fun2(): Fun
+
+    function apply1(Fun, X): Y where
+      ...
+    
+    function apply2(Fun, X): Y where
+      ...
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  {(De|Re)functionalization}
+
+Solution of \citet{rendel15automatic}: 
+
+\textbf{``Generalize first-class functions to arbitrary codata''}
+
+\begin{block}{First-class functions as codata}
+    \begin{lstlisting}[escapechar=!]
+    codata Fun where
+      Fun.apply(Nat): Bool
+
+    function all(Fun, List): Bool where
+     all(f, x:xs) = f.apply(x) && all(f, xs)
+
+    function even(): Fun where
+     even.apply(zero())  = true()
+     even.apply(succ(n)) = not(even.apply(n))
+    \end{lstlisting}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  {(De|Re)functionalization}
+  \begin{block}{Counter example, refunc'ed}
+    \begin{lstlisting}[escapechar=!]
+    codata Fun where
+      Fun.apply1(X): Y
+      Fun.apply2(X): Y
+
+    function fun1(): Fun where
+      ...
+    
+    function fun2(): Fun where
+      ...
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  {(De|Re)functionalization}
+
+\begin{block}{(Co)Data Fragments (\citeauthor{rendel15automatic})}
+  \textbf{Data Fragment}: only data types, \underline{limited} pattern matching
+
+  <->
+
+  \textbf{Codata Fragment}: only codata types, \underline{limited} copattern matching
+\end{block}
+
+De- and refunctionalization are \textbf{symmetric} on these fragments:
+
+Defunc'ing a Codata Fragment program gives a Data Fragment program.
+
+Refunc'ing this program gives back the original Codata Fragment program.
+
+\end{frame}
+
+\section
+  {Transformations for Uroboro}
+
+\againframe<4>{title}
+
+\begin{frame}<1>[label=contribs]
+  {Transformations for Uroboro}
+
+  \underline{\textbf{Contributions of this work:}}
+
+  \begin{itemize}
+  \item \alert<2>{Defines the language \textbf{Uroboro}: \textbf{a common superset} of both the Data and Codata Fragment}
+
+  \item \alert<3>{Extends de- and refunctionalization to all of Uroboro.}
+
+  \item \alert<4>{Identifies a generalization for certain steps in these transformations, called \textbf{Extraction}.}
+
+  \item \alert<5>{By-product: Shines some light on an asymmetry between de- and refunctionalization.}
+   \end{itemize}
+\end{frame}
+
+\againframe<2>{contribs}
+
+\begin{frame}[fragile]
+  {Transformations for Uroboro: Uroboro}
+
+  \begin{block}{Uroboro example w/ patterns \underline{and} copatterns in one lhs}
+    \begin{lstlisting}[escapechar=!]
+    data Expr where
+      var(Nat): Expr
+      fun(Var, Expr): Expr
+
+    codata Val where
+      Val.apply(Val): Val
+
+    function eval(Expr, Env): Val where
+      ...
+      !\alert{eval(fun(var,expr), env).apply(val)}! = 
+        eval(expr, env.extendWith(var, val))
+    \end{lstlisting}
+  \end{block}
+
+  Note: equations are \textbf{not ordered}
+\end{frame}
+
+\againframe<3>{contribs}
+
+\begin{frame}[fragile]
+  {Transformations for Uroboro: De- and refunctionalization}
+
+  \begin{block}{Two phases for de- and refunctionalization}
+    \begin{itemize}
+      \item \textbf{Unnesting}: brings (co)patterns to the limited form allowed in the (Co)Data Fragment
+      \item \textbf{Core (de|re)func.:} essentially the (de|re)functionalization for the (Co)Data Fragment
+    \end{itemize}
+  \end{block}
+
+  \textbf{Unnesting}: adapted for Uroboro from \citet{setzer14unnesting}
+\end{frame}
+
+\begin{frame}[fragile]
+  {Transformations for Uroboro: De- and refunctionalization}
+
+  \begin{block}{Uroboro example, unnested}
+    \begin{lstlisting}[escapechar=!]
+    ...
+
+    function eval(Expr, Env): Val where
+      ...
+      eval(fun(var,expr), env) =
+        aux(var, expr, env)
+        
+
+    !\alert{function aux(Expr, Expr, Env): Val}! where
+      aux(var, expr, env).apply(val) =
+        eval(expr, env.extendWith(var, val))
+    \end{lstlisting}
+  \end{block}
+
+  Call this: \textbf{Extraction} of a destructor
+\end{frame}
+
+\begin{frame}
+  {Transformations for Uroboro: De- and refunctionalization}
+
+\underline{In general:}
+
+Unnesting works on the coverage trees and ``undoes'' the coverage steps:
+\begin{itemize}
+\item Variable split: undone by constructor extraction
+
+Ex.: \texttt{f(c1()) = t1}, \texttt{f(c2()) = t2} \\
+\qquad $\to$ \texttt{f(x) = aux(x)}, \texttt{aux(c1()) = t1}, \texttt{aux(c2()) = t2}
+
+\item Result split: undone by destructor extraction
+
+(ex. on previous slide)
+\end{itemize}
+
+\textbf{Important:} The extractions must be carried out in exactly the reverse order of the coverage derivation---otherwise semantics preservation is not guaranteed.
+\end{frame}
+
+\begin{frame}[fragile]
+  {Transformations for Uroboro: De- and refunctionalization}
+
+  \begin{block}{Unnesting order example}
+    \begin{block}{}
+      \begin{lstlisting}[escapechar=!]
+         function fun(S): T where
+           fun(c1()).d1() = t1
+           fun(c1()).d2() = t2
+           fun(c2())      = t3
+      \end{lstlisting}
+    \end{block}
+    Clearly, last coverage derivation step was the result split; thus extract destr. first!
+    \begin{block}{}
+      \begin{lstlisting}[escapechar=!]
+         function fun(S): T where
+           fun(c1()) = aux()
+           fun(c2()) = t3
+      \end{lstlisting}
+    \end{block}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  {Transformations for Uroboro: De- and refunctionalization}
+
+  \begin{block}{Unnesting order example (cont'd)}
+    First extracting the constructor changes the semantics!
+    \begin{block}{}
+      \begin{lstlisting}[escapechar=!]
+         function fun(S): T where
+           fun(x).d1() = t1
+           fun(x).d2() = t2
+           fun(x)      = t3
+      \end{lstlisting}
+    \end{block}
+    The equations overlap, unlike the original equations.
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  {Transformations for Uroboro: De- and refunctionalization}
+The unnested program can now be passed to core defunc. ...
+
+  \begin{block}{Uroboro example, defunc'ed}
+    \begin{lstlisting}[escapechar=!]
+    !\alert{data Val where}!
+      !\alert{aux(Expr, Expr, Env): Val}!
+
+    function eval(Expr, Env): Val where
+      ...
+      eval(fun(var,expr), env) =
+        aux(var, expr, env)        
+
+    !\alert{function apply(Val, Val): Val}! where
+      apply(aux(var, expr, env), val) =
+        eval(expr, env.extendWith(var, val))
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  {Transformations for Uroboro: De- and refunctionalization}
+... or to core refunc.
+
+  \begin{block}{Uroboro example, refunc'ed}
+    \begin{lstlisting}[escapechar=!]
+    !\alert{codata Expr where}!
+      !\alert{Expr.eval(Env): Val}!
+
+    !\alert{function var(Nat): Expr}! where
+      ...
+
+    !\alert{function fun(Var, Expr): Expr}! where     
+      fun(var, expr).eval(env) =
+        aux(var, expr, env)
+
+    ...
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\againframe<4>{contribs}
+
+\begin{frame}
+  {Transformations for Uroboro: Extraction}
+
+  In general: \textbf{Extractions} make a program simpler \textbf{syntactically}, while preserving its \textbf{semantics} (cf. refactoring).
+
+  In Uroboro: Can either extract destructors or constructors.
+
+  Semantics preservation proof: Adapted and significantly extended from \citet{setzer14unnesting}
+
+\end{frame}
+
+\againframe<5>{contribs}
+
+\begin{frame}
+  {Transformations for Uroboro: An asymmetry}
+
+  In the Data Fragment: constructors only allowed in the first argument.
+
+  not allowed: \texttt{f(c(), c'())}
+
+  allowed: \texttt{f(c(), x)}
+
+  No analogous limitation for the Codata Fragment possible!
+
+  \texttt{f().d()}
+
+  Destructors observe output usage in \textbf{only one dimension}.
+
+  Compare: the difference between natural deduction and arbitrary sequent calculus, which allows multiple formulas on right-hand sides.
+\end{frame}
+
+\section*{}
+
+\begin{frame}
+  {Questions?}
+  \centering\Huge\textbf?
+\end{frame}
+
+\begin{frame}%[allowframebreaks]
+  {Bibliography}
+  \bibliographystyle{plainnat}
+  \tiny\bibliography{bibliography}
+\end{frame}
+
+\begin{frame}
+  \centering\Huge\textbf{Thanks!}
+\end{frame}
+
+\end{document}
+
