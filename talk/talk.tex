@@ -32,6 +32,36 @@
 \end{frame}
 
 \section
+  {Motivation}
+
+\begin{frame}
+  {Motivation}
+
+  \begin{itemize}
+    \item Important feature of many functional programming languages: \textbf{first-class functions}
+
+    \item \textbf{First-order} programs (without first-class functions) VS. \textbf{higher-order} programs (with first-class functions)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  {Motivation}
+
+  \begin{itemize}
+    \item First-order programs: certain properties beneficial for machine processing, recognizable as abstract machines
+
+    \item Higher-order programs: beneficial for human understandability
+
+    \item Want to find and automatize transformations between first-order and higher-order programs which preserve the program's semantics
+
+    \item Concepts connected to this: \textbf{patterns} and \textbf{copatterns}
+  \end{itemize}
+\end{frame}
+
+\section
+  {Background}
+
+\subsection
   {Patterns and copatterns}
 
 \againframe<2>{title}
@@ -90,7 +120,7 @@
   \end{block}
 \end{frame}
 
-\section
+\subsection
   {(De|Re)functionalization}
 
 \againframe<3>{title}
@@ -157,7 +187,7 @@
 
   \textbf{But:} With the original form of refunctionalization, one can only refunc. programs in the image of defunctionalization.
 
-  \begin{block}{Counter example}
+  \begin{block}{Counterexample}
     \begin{lstlisting}[escapechar=!]
     data Fun where
       fun1(): Fun
@@ -167,6 +197,23 @@
       ...
     
     function apply2(Fun, X): Y where
+      ...
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  {(De|Re)functionalization}
+  \begin{block}{Counterexample, refunc'ed}
+    \begin{lstlisting}[escapechar=!]
+    codata Fun where
+      Fun.apply1(X): Y
+      Fun.apply2(X): Y
+
+    function fun1(): Fun where
+      ...
+    
+    function fun2(): Fun where
       ...
     \end{lstlisting}
   \end{block}
@@ -195,23 +242,6 @@ Solution of \citet{rendel15automatic}:
 
 \end{frame}
 
-\begin{frame}[fragile]
-  {(De|Re)functionalization}
-  \begin{block}{Counter example, refunc'ed}
-    \begin{lstlisting}[escapechar=!]
-    codata Fun where
-      Fun.apply1(X): Y
-      Fun.apply2(X): Y
-
-    function fun1(): Fun where
-      ...
-    
-    function fun2(): Fun where
-      ...
-    \end{lstlisting}
-  \end{block}
-\end{frame}
-
 \begin{frame}
   {(De|Re)functionalization}
 
@@ -223,12 +253,32 @@ Solution of \citet{rendel15automatic}:
   \textbf{Codata Fragment}: only codata types, \underline{limited} copattern matching
 \end{block}
 
-De- and refunctionalization are \textbf{symmetric} on these fragments:
+De- and refunctionalization are \textbf{symmetric} on these fragments.
 
-Defunc'ing a Codata Fragment program gives a Data Fragment program.
+\end{frame}
 
-Refunc'ing this program gives back the original Codata Fragment program.
+\begin{frame}
+  {(De|Re)functionalization}
 
+  \begin{block}{Defunctionalization (data/codata)}
+    From \textbf{Codata Fragment} to \textbf{Data Fragment} programs.
+
+    Replaces each \textbf{codata type def.} with a \textbf{data type def.}:
+
+    \textbf{One constructor per function definition}.
+
+    \textbf{One function def. per destructor}.
+  \end{block}
+
+  \begin{block}{Refunctionalization (data/codata)}
+    From \textbf{Data Fragment} to \textbf{Codata Fragment} programs.
+
+    Replaces each \textbf{data type def.} with a \textbf{codata type def.}:
+
+    \textbf{One destructor per function definition}.
+
+    \textbf{One function def. per constructor}.
+  \end{block}
 \end{frame}
 
 \section
@@ -242,7 +292,7 @@ Refunc'ing this program gives back the original Codata Fragment program.
   \underline{\textbf{Contributions of this work:}}
 
   \begin{itemize}
-  \item \alert<2>{Defines the language \textbf{Uroboro}: \textbf{a common superset} of both the Data and Codata Fragment}
+  \item \alert<2>{Formally defines the language \textbf{Uroboro}: \textbf{a common superset} of both the Data and Codata Fragment}
 
   \item \alert<3>{Extends de- and refunctionalization to all of Uroboro.}
 
@@ -364,9 +414,9 @@ Ex.: \texttt{f(c1()) = t1}, \texttt{f(c2()) = t2} \\
     \begin{block}{}
       \begin{lstlisting}[escapechar=!]
          function fun(S): T where
-           fun(x).d1() = t1
-           fun(x).d2() = t2
-           fun(x)      = t3
+           fun(x).d1() = ...
+           fun(x).d2() = ...
+           fun(x)      = ...
       \end{lstlisting}
     \end{block}
     The equations overlap, unlike the original equations.
@@ -448,21 +498,25 @@ The unnested program can now be passed to core defunc. ...
   Compare: the difference between natural deduction and arbitrary sequent calculus, which allows multiple formulas on right-hand sides.
 \end{frame}
 
-\section*{}
+\section{Conclusion}
 
 \begin{frame}
-  {Questions?}
-  \centering\Huge\textbf?
+  {Conclusion}
+  \begin{itemize}
+    \item \citet{rendel15automatic} made de- and refunctionalization symmetric on two fragment languages
+    \item This work: makes them more practical by extending them to a full language (= common generalization of the fragments)
+    \item Adapted the unnesting algorithm of \citet{setzer14unnesting} to achieve this
+    \item Identified and proved correct a generalization of the unnesting steps
+    \item Recognized an asymmetry between patterns and copatterns
+  \end{itemize}
+
+  \centering\textbf{Thanks!}
 \end{frame}
 
 \begin{frame}%[allowframebreaks]
   {Bibliography}
   \bibliographystyle{plainnat}
   \tiny\bibliography{bibliography}
-\end{frame}
-
-\begin{frame}
-  \centering\Huge\textbf{Thanks!}
 \end{frame}
 
 \end{document}
