@@ -6,7 +6,15 @@
 
 \usepackage{amsmath,amsfonts,graphicx,listings}
 \usepackage{beamerleanprogress}
+\usepackage{bussproofs}
+\usepackage{fixltx2e}
 \usepackage[numbers]{natbib}
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+% tikzmark command, for shading over items
+\newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
 
 \frenchspacing
 
@@ -104,20 +112,53 @@
   \begin{block}{Coverage}
     A set of equations \textbf{covers} the function when the coverage for their lhss can be derived with \textbf{variable splits} and \textbf{result splits}.
 
+  \begin{prooftree}
+    \AxiomC{}
+    \RightLabel{C\textsubscript{Head}}
+    \UnaryInfC{$fun \lhd | (fun(\overline{x}))$}
+  \end{prooftree}
+
+  \begin{prooftree}
+    \AxiomC{$fun \lhd | ~ Q ~ (q^\tau)$}
+    \RightLabel{C\textsubscript{Des}}
+    \UnaryInfC{$fun \lhd | ~ Q ~ (q.des(\overline{x^{des}}))_{des \in Dess_\tau}$}
+  \end{prooftree}
+
+  \begin{prooftree}
+    \AxiomC{$fun \lhd | ~ Q ~ (q(x^\tau))$}
+    \RightLabel{C\textsubscript{Con}}
+    \UnaryInfC{$fun \lhd | ~ Q ~ (q[x \mapsto con(\overline{y^{con}})])_{con \in Cons_\tau}$}
+  \end{prooftree}
+
   (Adapted from \citet{abel13copatterns})
+  \end{block}
+\end{frame}
 
-   \underline{Example:} Suppose (co)data types \texttt{Nat} and \texttt{Stream} as shown before, and a function with signature \texttt{f(Nat): Stream}
+\begin{frame}
+  {Patterns and copatterns}
+\underline{Example:}
+
+Suppose (co)data types \texttt{Nat} and \texttt{Stream} as before. 
+
+Consider function \texttt{f(Nat): Stream}.
+
+Start with \texttt{f(x)} (C\textsubscript{Head}).
     \begin{itemize}
-      \item Variable split: \texttt{f(x)} $\to$ \texttt{f(zero())}, \texttt{f(succ(x))}
+      \item Variable splits (C\textsubscript{Con}):
 
-      \texttt{x} in \texttt{f(succ(x))} can be further variable split.
-      \item Result split: \texttt{f(x)} $\to$ \texttt{f(x).head()}, \texttt{f(x).tail()}
+        \only<1-2>{\texttt{f(\alert<2>{x})}} \only<3->{$\substack{\texttt{f(\alert<3>{zero()})} \\ \only<3-4>{\texttt{f(\alert<3>{succ(\alert<4>{x})})}} \only<5->{\substack{\texttt{f(succ(zero()))} \\ \texttt{f(succ(succ(x)))}}}}$}
 
-      \texttt{f(x).tail()} itself can be further result split.
+      \item Result splits (C\textsubscript{Des}):
+
+        \only<-7>{\texttt{\alert<7>{f(x)}}} \only<8->{$\substack{\texttt{f(x).head()} \\ \only<8-9>{\texttt{\alert<9>{f(x).tail()}}} \only<10->{\alert<10>{\substack{\texttt{f(x).tail().head()} \\ \texttt{f(x).tail().tail()}}}}}$}
+
+      \item Variable \underline{and} result splits:
+
+        \only<-11>{\texttt{\alert<11>{f(x)}}} \only<12->{$\substack{\texttt{f(x).head()} \\ \only<12-13>{\texttt{f(\alert<13>{x}).tail()}} \only<14->{\alert<14>{\substack{\texttt{f(zero()).tail()} \\ \texttt{f(succ(x)).tail()}}}}}$}
     \end{itemize}
 
-  Afterwards, further result and/or variable splitting could be done.
-  \end{block}
+
+
 \end{frame}
 
 \subsection
@@ -145,15 +186,15 @@
   {(De|Re)functionalization}
 
   \begin{block}{Defunc. example}
-    \begin{lstlisting}
+    \begin{lstlisting}[escapechar=!]
     function all(Fun, List): Bool where
      all(f, x:xs) = (f x) && all(f, xs)
 
-    function even: Nat -> Bool where
+    !\alert{function even: Nat -> Bool}! where
      even(zero())  = true()
      even(succ(n)) = not(even(n))
 
-    function odd: Nat -> Bool where
+    !\alert{function odd: Nat -> Bool}! where
       odd(n) = not(even(n))
     \end{lstlisting}
   \end{block}
@@ -281,6 +322,43 @@ De- and refunctionalization are \textbf{symmetric} on these fragments.
   \end{block}
 \end{frame}
 
+\begin{frame}[fragile, shrink]
+  {(De|Re)functionalization}
+
+    \begin{block}{}
+    \begin{lstlisting}[escapechar=!]
+    !\tikzmark{nat1}{data Nat}! where
+      !\tikzmark{zero1}{zero(): Nat}!
+      !\tikzmark{succ1}{succ(Nat): Nat}!
+    
+    !\tikzmark{add1}{function add(Nat, Nat): Nat}! where
+      add(zero(), x)  = x
+      add(succ(x), y) = succ(add(x, y))
+    \end{lstlisting}
+    \end{block}
+    \begin{block}{}
+    \begin{lstlisting}[escapechar=!]
+    !\tikzmark{nat2}{codata Nat}! where
+      !\tikzmark{add2}{Nat.add(Nat): Nat}!
+    
+    !\tikzmark{zero2}{function zero(): Nat}! where
+      zero().add(x)  = x
+
+    !\tikzmark{succ2}{function succ(x): Nat}! where
+      succ(x).add(y) = succ(x.add(y))
+    \end{lstlisting}
+    \end{block}
+
+    \tikz[overlay,remember picture]{\draw<2>[draw=red,thick,fill opacity=0.2] ($(nat1)+(-0.5,0.4)$) rectangle ($(nat1)+(6,-0.2)$);}
+    \tikz[overlay,remember picture]{\draw<2>[draw=red,thick,fill opacity=0.2] ($(nat2)+(-0.5,0.4)$) rectangle ($(nat2)+(6,-0.2)$);}
+    \tikz[overlay,remember picture]{\draw<3>[draw=red,thick,fill opacity=0.2] ($(zero1)+(-0.5,0.4)$) rectangle ($(zero1)+(6,-0.2)$);}
+    \tikz[overlay,remember picture]{\draw<3>[draw=red,thick,fill opacity=0.2] ($(zero2)+(-0.5,0.4)$) rectangle ($(zero2)+(6,-0.2)$);}
+    \tikz[overlay,remember picture]{\draw<4>[draw=red,thick,fill opacity=0.2] ($(succ1)+(-0.5,0.4)$) rectangle ($(succ1)+(6,-0.2)$);}
+    \tikz[overlay,remember picture]{\draw<4>[draw=red,thick,fill opacity=0.2] ($(succ2)+(-0.5,0.4)$) rectangle ($(succ2)+(6,-0.2)$);}
+    \tikz[overlay,remember picture]{\draw<5>[draw=red,thick,fill opacity=0.2] ($(add1)+(-0.5,0.4)$) rectangle ($(add1)+(6,-0.2)$);}
+    \tikz[overlay,remember picture]{\draw<5>[draw=red,thick,fill opacity=0.2] ($(add2)+(-0.5,0.4)$) rectangle ($(add2)+(6,-0.2)$);}
+\end{frame}
+
 \section
   {Transformations for Uroboro}
 
@@ -324,6 +402,43 @@ De- and refunctionalization are \textbf{symmetric} on these fragments.
   \end{block}
 
   Note: equations are \textbf{not ordered}
+\end{frame}
+
+\begin{frame}
+  {Transformations for Uroboro: Uroboro}
+
+   \begin{block}{Uroboro value judgement}
+  \tiny{
+  \begin{prooftree}
+\AxiomC{$fun(t_1, ..., t_n) \neq^? q ~ \forall (q, t) \in \textrm{Rules}(prg)$}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{CodTFun}}
+\QuaternaryInfC{$\vdash_v fun(t_1, ..., t_n)$, if $fun(t_1, ..., t_n)$ has codata type}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$t_0.des(t_1, ..., t_n) \neq^? q ~ \forall (q, t) \in \textrm{Rules}(prg)$}
+\AxiomC{$\vdash_v t_0$}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{CodTDes}}
+\QuinaryInfC{$\vdash_v t_0.des(t_1, ..., t_n)$, , if $t_0.des(t_1, ..., t_n)$ has codata type}
+\end{prooftree}
+
+\begin{prooftree}
+\AxiomC{$\vdash_v t_1$}
+\AxiomC{...}
+\AxiomC{$\vdash_v t_n$}
+\RightLabel{V\textsubscript{Con}}
+\TrinaryInfC{$\vdash_v con(t_1, ..., t_n)$}
+\end{prooftree}
+}
+  \end{block}
+
+... more in chapter 2 of the thesis ...
 \end{frame}
 
 \againframe<3>{contribs}
@@ -372,15 +487,28 @@ Unnesting works on the coverage trees and ``undoes'' the coverage steps:
 \begin{itemize}
 \item Variable split: undone by constructor extraction
 
-Ex.: \texttt{f(c1()) = t1}, \texttt{f(c2()) = t2} \\
-\qquad $\to$ \texttt{f(x) = aux(x)}, \texttt{aux(c1()) = t1}, \texttt{aux(c2()) = t2}
+Ex.:
+
+\only<-2>{$\substack{\texttt{f(\alert<2>{c1()}) = t1} \\ \texttt{f(\alert<2>{c2()}) = t2}}$}
+\only<3->{\texttt{f(\alert<3>{x}) = \alert<3>{aux(x)}} | \alert<3>{$\substack{\texttt{aux(c1()) = t1} \\ \texttt{aux(c2()) = t2}}$}}
 
 \item Result split: undone by destructor extraction
 
-(ex. on previous slide)
+Ex.:
+
+\only<-5>{$\substack{\texttt{\alert<5>{f(x).d1()} = t1} \\ \texttt{\alert<5>{f(x).d2()} = t2}}$}
+\only<6-7>{\texttt{\alert<6>{f(x)} = \alert<6>{aux(x)}} | \alert<6>{$\substack{\texttt{aux(x).d1() = t1} \\ \texttt{aux(x).d2() = t2}}$}}
+
+(other ex. on previous slide)
 \end{itemize}
 
+\end{frame}
+
+\begin{frame}
+  {Transformations for Uroboro: De- and refunctionalization}
+
 \textbf{Important:} The extractions must be carried out in exactly the reverse order of the coverage derivation---otherwise semantics preservation is not guaranteed.
+
 \end{frame}
 
 \begin{frame}[fragile]
@@ -390,8 +518,8 @@ Ex.: \texttt{f(c1()) = t1}, \texttt{f(c2()) = t2} \\
     \begin{block}{}
       \begin{lstlisting}[escapechar=!]
          function fun(S): T where
-           fun(c1()).d1() = t1
-           fun(c1()).d2() = t2
+           !\alert<2>{fun(c1()).d1()}! = t1
+           !\alert<2>{fun(c1()).d2()}! = t2
            fun(c2())      = t3
       \end{lstlisting}
     \end{block}
@@ -399,7 +527,7 @@ Ex.: \texttt{f(c1()) = t1}, \texttt{f(c2()) = t2} \\
     \begin{block}{}
       \begin{lstlisting}[escapechar=!]
          function fun(S): T where
-           fun(c1()) = aux()
+           !\alert<3>{fun(c1())}! = !\alert<3>{aux()}!
            fun(c2()) = t3
       \end{lstlisting}
     \end{block}
@@ -470,11 +598,15 @@ The unnested program can now be passed to core defunc. ...
 \begin{frame}
   {Transformations for Uroboro: Extraction}
 
-  In general: \textbf{Extractions} make a program simpler \textbf{syntactically}, while preserving its \textbf{semantics} (cf. refactoring).
+  \begin{itemize}
+    \item General intuition: \textbf{Extractions} make a program simpler \textbf{syntactically}, while preserving its \textbf{semantics} (cf. refactoring).
 
-  In Uroboro: Can either extract destructors or constructors.
+    \item In Uroboro: Can either extract destructors or constructors
 
-  Semantics preservation proof: Adapted and significantly extended from \citet{setzer14unnesting}
+    \item Metric for simplicity: maximal number of (co)patterns in any lhs
+
+    \item Semantics preservation proof: Adapted and significantly extended from \citet{setzer14unnesting}
+  \end{itemize}
 
 \end{frame}
 
@@ -482,20 +614,26 @@ The unnested program can now be passed to core defunc. ...
 
 \begin{frame}
   {Transformations for Uroboro: An asymmetry}
+  \begin{itemize}
+    \item In \citeauthor{rendel15automatic}'s Data Fragment: constructors only allowed in the first argument.
 
-  In the Data Fragment: constructors only allowed in the first argument.
+      not allowed: \texttt{f(c(), c'())}
 
-  not allowed: \texttt{f(c(), c'())}
+      allowed: \texttt{f(c(), x)}
 
-  allowed: \texttt{f(c(), x)}
+  \item Problem: No analogous limitation for copatterns (in their current form) possible!
 
-  No analogous limitation for the Codata Fragment possible!
+      \texttt{f().d()}
+  \end{itemize}
+\end{frame}
 
-  \texttt{f().d()}
+\begin{frame}
+  {Transformations for Uroboro: An asymmetry}
+  \begin{itemize}
+    \item Underlying problem: Copatterns allow to observe output usage in \textbf{only one dimension}, unlike patterns.
 
-  Destructors observe output usage in \textbf{only one dimension}.
-
-  Compare: the difference between natural deduction and arbitrary sequent calculus, which allows multiple formulas on right-hand sides.
+    \item Compare: the difference between natural deduction and arbitrary sequent calculus, which allows multiple formulas on right-hand sides.
+  \end{itemize}
 \end{frame}
 
 \section{Conclusion}
