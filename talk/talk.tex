@@ -37,8 +37,8 @@
 
 \lstdefinestyle{base}{
   language={Uroboro},
-  moredelim=*[is][\alert<.->]{|}{|},
-  moredelim=**[is][\only<+>{\color{red}}]{@}{@}
+  moredelim=*[is][\alert<.(1)->]{|}{|},
+  moredelim=**[is][\only<+(1)>{\color{red}}]{@}{@}
 }
 
 \frenchspacing
@@ -223,6 +223,7 @@ Start with \texttt{f(x)} (C\textsubscript{Head}).
       @odd(n) = not(even(n))@
     \end{lstlisting}
   \end{block}
+  \pause
 \end{frame}
 
 \begin{frame}[fragile]
@@ -244,6 +245,7 @@ Start with \texttt{f(x)} (C\textsubscript{Head}).
       @apply(odd(), n) = not(apply(even, n))@
     \end{lstlisting}
   \end{block}
+  \pause
 \end{frame}
 
 \begin{frame}[fragile]
