@@ -10,11 +10,36 @@
 \usepackage{fixltx2e}
 \usepackage[numbers]{natbib}
 
+\usepackage{lmodern}
+
 \usepackage{tikz}
 \usetikzlibrary{calc}
 
 % tikzmark command, for shading over items
 \newcommand{\tikzmark}[1]{\tikz[overlay,remember picture] \node (#1) {};}
+
+\newcommand{\redbox}[2]{\tikz[overlay,remember picture]{\draw<#2>[draw=red,thick,fill opacity=0.2] ($(#1)+(-0.5,0.4)$) rectangle ($(#1)+(6,-0.2)$);}}
+
+\lstdefinelanguage{Uroboro}
+{
+  % list of keywords
+  keywords={
+    data,
+    codata,
+    function,
+    where
+  },
+  keywordstyle=\bfseries,
+  comment=[l]{--} % l is for line comment
+}
+
+\lstset{columns=fullflexible,basicstyle=\ttfamily,language={Uroboro}}
+
+\lstdefinestyle{base}{
+  language={Uroboro},
+  moredelim=*[is][\alert]{|}{|},
+  moredelim=**[is][\only<+>{\color{red}}]{@}{@}
+}
 
 \frenchspacing
 
@@ -78,14 +103,14 @@
   {Patterns and copatterns}
 
   \begin{block}{Data and patterns}
-    \begin{lstlisting}
-    data Nat where
-      zero(): Nat
-      succ(Nat): Nat
+    \begin{lstlisting}[style=base, gobble=4]
+    @data Nat where@
+      @zero(): Nat@
+      @succ(Nat): Nat@
 
-    function add(Nat, Nat): Nat where
-      add(zero(), n)  = n
-      add(succ(m), n) = succ(add(m, n))
+    @function add(Nat, Nat): Nat where@
+      @add(zero(), n)  = n@
+      @add(succ(m), n) = succ(add(m, n))@
     \end{lstlisting}
   \end{block}
 \end{frame}
@@ -94,14 +119,14 @@
   {Patterns and copatterns}
 
   \begin{block}{Codata and copatterns\citep{abel13copatterns}}
-    \begin{lstlisting}
-    codata Stream where
-      Stream.head(): Nat
-      Stream.tail(): Stream
+    \begin{lstlisting}[style=base, gobble=4]
+    @codata Stream where@
+      @Stream.head(): Nat@
+      @Stream.tail(): Stream@
 
-    function repeat(Nat): Stream where
-      repeat(n).head() = n
-      repeat(n).tail() = repeat(n)
+    @function repeat(Nat): Stream where@
+      @repeat(n).head() = n@
+      @repeat(n).tail() = repeat(n)@
     \end{lstlisting}
   \end{block}
 \end{frame}
@@ -186,16 +211,16 @@ Start with \texttt{f(x)} (C\textsubscript{Head}).
   {(De|Re)functionalization}
 
   \begin{block}{Defunc. example}
-    \begin{lstlisting}[escapechar=!]
-    function all(Fun, List): Bool where
-     all(f, x:xs) = (f x) && all(f, xs)
+    \begin{lstlisting}[style=base, gobble=4]
+    @function all(Fun, List): Bool where@
+      @all(f, x:xs) = (f x) && all(f, xs)@
 
-    !\alert{function even: Nat -> Bool}! where
-     even(zero())  = true()
-     even(succ(n)) = not(even(n))
+    @|function even: Nat -> Bool| where@
+      @even(zero())  = true()@
+      @even(succ(n)) = not(even(n))@
 
-    !\alert{function odd: Nat -> Bool}! where
-      odd(n) = not(even(n))
+    @|function odd: Nat -> Bool| where@
+      @odd(n) = not(even(n))@
     \end{lstlisting}
   \end{block}
 \end{frame}
@@ -204,19 +229,19 @@ Start with \texttt{f(x)} (C\textsubscript{Head}).
   {(De|Re)functionalization}
 
   \begin{block}{Defunc. example, defunc'ed}
-    \begin{lstlisting}[escapechar=!]
-    data Fun where
-      !\alert{even()}!: Fun
-      !\alert{odd()}!: Fun
+    \begin{lstlisting}[style=base, gobble=4]
+    @data Fun where@
+      @|even(): Fun|@
+      @|odd(): Fun|@
 
-    function all(Fun, List): Bool where
-     all(f, x:xs) = apply(f, x) && all(f, xs)
+    @function all(Fun, List): Bool where@
+      @all(f, x:xs) = apply(f, x) && all(f, xs)@
 
-    function apply(Fun, Nat): Bool where
-     apply(even(), zero())  = true()
-     apply(even(), succ(n)) =
-       not(apply(even(), n))
-     apply(odd(), n) = not(apply(even, n))
+    @function apply(Fun, Nat): Bool where@
+      @apply(even(), zero())  = true()@
+      @apply(even(), succ(n)) = 
+       not(apply(even(), n))@
+      @apply(odd(), n) = not(apply(even, n))@
     \end{lstlisting}
   \end{block}
 \end{frame}
@@ -268,16 +293,16 @@ Solution of \citet{rendel15automatic}:
 \textbf{``Generalize first-class functions to arbitrary codata''}
 
 \begin{block}{First-class functions as codata}
-    \begin{lstlisting}[escapechar=!]
-    codata Fun where
-      Fun.apply(Nat): Bool
+    \begin{lstlisting}[style=base, gobble=4]
+    @codata Fun where@
+       @Fun.apply(Nat): Bool@
 
-    function all(Fun, List): Bool where
-     all(f, x:xs) = f.apply(x) && all(f, xs)
+    @function all(Fun, List): Bool where@
+      @all(f, x:xs) = f.apply(x) && all(f, xs)@
 
-    function even(): Fun where
-     even.apply(zero())  = true()
-     even.apply(succ(n)) = not(even.apply(n))
+    @function even(): Fun where@
+      @even.apply(zero())  = true()@
+      @even.apply(succ(n)) = not(even.apply(n))@
     \end{lstlisting}
   \end{block}
 
@@ -327,36 +352,33 @@ De- and refunctionalization are \textbf{symmetric} on these fragments.
 
     \begin{block}{}
     \begin{lstlisting}[escapechar=!]
-    !\tikzmark{nat1}{data Nat}! where
-      !\tikzmark{zero1}{zero(): Nat}!
-      !\tikzmark{succ1}{succ(Nat): Nat}!
+    !\tikzmark{nat1}!data Nat where
+      !\tikzmark{zero1}!zero(): Nat
+      !\tikzmark{succ1}!succ(Nat): Nat
     
-    !\tikzmark{add1}{function add(Nat, Nat): Nat}! where
+    !\tikzmark{add1}!function add(Nat, Nat): Nat where
       add(zero(), x)  = x
       add(succ(x), y) = succ(add(x, y))
     \end{lstlisting}
     \end{block}
     \begin{block}{}
     \begin{lstlisting}[escapechar=!]
-    !\tikzmark{nat2}{codata Nat}! where
-      !\tikzmark{add2}{Nat.add(Nat): Nat}!
+    !\tikzmark{nat2}!codata Nat where
+      !\tikzmark{add2}!Nat.add(Nat): Nat
     
-    !\tikzmark{zero2}{function zero(): Nat}! where
+    !\tikzmark{zero2}!function zero(): Nat where
       zero().add(x)  = x
 
-    !\tikzmark{succ2}{function succ(x): Nat}! where
+    !\tikzmark{succ2}!function succ(x): Nat where
       succ(x).add(y) = succ(x.add(y))
     \end{lstlisting}
     \end{block}
 
-    \tikz[overlay,remember picture]{\draw<2>[draw=red,thick,fill opacity=0.2] ($(nat1)+(-0.5,0.4)$) rectangle ($(nat1)+(6,-0.2)$);}
-    \tikz[overlay,remember picture]{\draw<2>[draw=red,thick,fill opacity=0.2] ($(nat2)+(-0.5,0.4)$) rectangle ($(nat2)+(6,-0.2)$);}
-    \tikz[overlay,remember picture]{\draw<3>[draw=red,thick,fill opacity=0.2] ($(zero1)+(-0.5,0.4)$) rectangle ($(zero1)+(6,-0.2)$);}
-    \tikz[overlay,remember picture]{\draw<3>[draw=red,thick,fill opacity=0.2] ($(zero2)+(-0.5,0.4)$) rectangle ($(zero2)+(6,-0.2)$);}
-    \tikz[overlay,remember picture]{\draw<4>[draw=red,thick,fill opacity=0.2] ($(succ1)+(-0.5,0.4)$) rectangle ($(succ1)+(6,-0.2)$);}
-    \tikz[overlay,remember picture]{\draw<4>[draw=red,thick,fill opacity=0.2] ($(succ2)+(-0.5,0.4)$) rectangle ($(succ2)+(6,-0.2)$);}
-    \tikz[overlay,remember picture]{\draw<5>[draw=red,thick,fill opacity=0.2] ($(add1)+(-0.5,0.4)$) rectangle ($(add1)+(6,-0.2)$);}
-    \tikz[overlay,remember picture]{\draw<5>[draw=red,thick,fill opacity=0.2] ($(add2)+(-0.5,0.4)$) rectangle ($(add2)+(6,-0.2)$);}
+    \foreach[count=\i from 2] \x/\y in {nat1/nat2, zero1/zero2, succ1/succ2, add1/add2}
+    {
+      \redbox{\x}{\i}
+      \redbox{\y}{\i}
+    }
 \end{frame}
 
 \section
@@ -460,7 +482,7 @@ De- and refunctionalization are \textbf{symmetric} on these fragments.
   {Transformations for Uroboro: De- and refunctionalization}
 
   \begin{block}{Uroboro example, unnested}
-    \begin{lstlisting}[escapechar=!]
+    \begin{lstlisting}[style=base, gobble=4]
     ...
 
     function eval(Expr, Env): Val where
@@ -469,7 +491,7 @@ De- and refunctionalization are \textbf{symmetric} on these fragments.
         aux(var, expr, env)
         
 
-    !\alert{function aux(Expr, Expr, Env): Val}! where
+    |function aux(Expr, Expr, Env): Val| where
       aux(var, expr, env).apply(val) =
         eval(expr, env.extendWith(var, val))
     \end{lstlisting}
@@ -516,18 +538,18 @@ Ex.:
 
   \begin{block}{Unnesting order example}
     \begin{block}{}
-      \begin{lstlisting}[escapechar=!]
+      \begin{lstlisting}[style=base, gobble=4]
          function fun(S): T where
-           !\alert<2>{fun(c1()).d1()}! = t1
-           !\alert<2>{fun(c1()).d2()}! = t2
+           |fun(c1()).d1()| = t1
+           |fun(c1()).d2()| = t2
            fun(c2())      = t3
       \end{lstlisting}
     \end{block}
     Clearly, last coverage derivation step was the result split; thus extract destr. first!
     \begin{block}{}
-      \begin{lstlisting}[escapechar=!]
+      \begin{lstlisting}[style=base, gobble=4]
          function fun(S): T where
-           !\alert<3>{fun(c1())}! = !\alert<3>{aux()}!
+           |fun(c1())| = |aux()|
            fun(c2()) = t3
       \end{lstlisting}
     \end{block}
@@ -540,7 +562,7 @@ Ex.:
   \begin{block}{Unnesting order example (cont'd)}
     First extracting the constructor changes the semantics!
     \begin{block}{}
-      \begin{lstlisting}[escapechar=!]
+      \begin{lstlisting}
          function fun(S): T where
            fun(x).d1() = ...
            fun(x).d2() = ...
@@ -556,16 +578,16 @@ Ex.:
 The unnested program can now be passed to core defunc. ...
 
   \begin{block}{Uroboro example, defunc'ed}
-    \begin{lstlisting}[escapechar=!]
-    !\alert{data Val where}!
-      !\alert{aux(Expr, Expr, Env): Val}!
+    \begin{lstlisting}[style=base, gobble=4]
+    |data Val| where
+      |aux(Expr, Expr, Env): Val|
 
     function eval(Expr, Env): Val where
       ...
       eval(fun(var,expr), env) =
         aux(var, expr, env)        
 
-    !\alert{function apply(Val, Val): Val}! where
+    |function apply(Val, Val): Val| where
       apply(aux(var, expr, env), val) =
         eval(expr, env.extendWith(var, val))
     \end{lstlisting}
@@ -577,14 +599,14 @@ The unnested program can now be passed to core defunc. ...
 ... or to core refunc.
 
   \begin{block}{Uroboro example, refunc'ed}
-    \begin{lstlisting}[escapechar=!]
-    !\alert{codata Expr where}!
-      !\alert{Expr.eval(Env): Val}!
+    \begin{lstlisting}[style=base, gobble=4]
+    |codata Expr where|
+      |Expr.eval(Env): Val|
 
-    !\alert{function var(Nat): Expr}! where
+    |function var(Nat): Expr| where
       ...
 
-    !\alert{function fun(Var, Expr): Expr}! where     
+    |function fun(Var, Expr): Expr| where     
       fun(var, expr).eval(env) =
         aux(var, expr, env)
 
