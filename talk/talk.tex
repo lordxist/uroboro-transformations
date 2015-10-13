@@ -410,7 +410,7 @@ De- and refunctionalization are \textbf{symmetric} on these fragments.
   {Transformations for Uroboro: Uroboro}
 
   \begin{block}{Uroboro example w/ patterns \underline{and} copatterns in one lhs}
-    \begin{lstlisting}[escapechar=!]
+    \begin{lstlisting}[style=base, gobble=4]
     data Expr where
       var(Nat): Expr
       fun(Var, Expr): Expr
@@ -420,7 +420,7 @@ De- and refunctionalization are \textbf{symmetric} on these fragments.
 
     function eval(Expr, Env): Val where
       ...
-      !\alert{eval(fun(var,expr), env).apply(val)}! = 
+      |eval(fun(var,expr), env).apply(val)| = 
         eval(expr, env.extendWith(var, val))
     \end{lstlisting}
   \end{block}
