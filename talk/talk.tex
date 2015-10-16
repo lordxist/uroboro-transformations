@@ -212,7 +212,7 @@ Start with \texttt{f(x)} (C\textsubscript{Head}).
 
   \begin{block}{Defunc. example}
     \begin{lstlisting}[style=base, gobble=4]
-    @function all(Fun, List): Bool where@
+    @function all(Nat -> Bool, List): Bool where@
       @all(f, x:xs) = (f x) && all(f, xs)@
 
     @|function even: Nat -> Bool| where@
@@ -371,7 +371,7 @@ De- and refunctionalization are \textbf{symmetric} on these fragments.
     !\tikzmark{zero2}!function zero(): Nat where
       zero().add(x)  = x
 
-    !\tikzmark{succ2}!function succ(x): Nat where
+    !\tikzmark{succ2}!function succ(Nat): Nat where
       succ(x).add(y) = succ(x.add(y))
     \end{lstlisting}
     \end{block}
@@ -400,7 +400,7 @@ De- and refunctionalization are \textbf{symmetric} on these fragments.
 
   \item \alert<4>{Identifies a generalization for certain steps in these transformations, called \textbf{Extraction}.}
 
-  \item \alert<5>{By-product: Shines some light on an asymmetry between de- and refunctionalization.}
+  \item \alert<5>{By-product: Shines some light on an asymmetry between patterns and copatterns.}
    \end{itemize}
 \end{frame}
 
